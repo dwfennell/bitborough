@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>RCity Tile Preview</title>
+  <style>
+    body { background: #1a1a1a; color: #eee; font-family: system-ui; padding: 20px; }
+    h2 { border-bottom: 1px solid #444; padding-bottom: 8px; }
+    .grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 32px; }
+    .tile { text-align: center; }
+    .tile img { width: 128px; height: 128px; border: 1px solid #333; image-rendering: pixelated; }
+    .tile p { font-size: 11px; color: #888; margin: 4px 0; }
+  </style>
+</head>
+<body>
+  <h1>RCity Tile Catalog</h1>
+  <div id="content"></div>
+  <script>
+    fetch('sprites/manifest.json')
+      .then(r => r.json())
+      .then(manifest => {
+        const grouped = {};
+        for (const entry of manifest) {
+          (grouped[entry.category] ??= []).push(entry);
+        }
+        const content = document.getElementById('content');
+        for (const [category, tiles] of Object.entries(grouped).sort()) {
+          const h2 = document.createElement('h2');
+          h2.textContent = category;
+          content.appendChild(h2);
+          const grid = document.createElement('div');
+          grid.className = 'grid';
+          for (const tile of tiles) {
+            const div = document.createElement('div');
+            div.className = 'tile';
+            div.innerHTML = `<img src="sprites/${tile.file}"><p>${tile.id}</p>`;
+            grid.appendChild(div);
+          }
+          content.appendChild(grid);
+        }
+      });
+  </script>
+</body>
+</html>
