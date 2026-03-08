@@ -1,4 +1,4 @@
-import { TileType } from '@rcity/core'
+import { TileType } from '@bitborough/core'
 import { layeredNoise } from './noise.js'
 
 export function placeSand(

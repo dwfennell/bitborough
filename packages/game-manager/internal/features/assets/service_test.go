@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/rcity/game-manager/internal/storage"
+	"github.com/bitborough/game-manager/internal/storage"
 )
 
 func setupTestDB(t *testing.T) (*storage.DB, string, func()) {

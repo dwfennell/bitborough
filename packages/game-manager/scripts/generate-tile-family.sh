@@ -9,7 +9,7 @@ FAMILY_NAME=$1
 BASE_REF=$2
 shift 2
 
-ASSETS_DIR="/Users/dustin/Documents/src/rcity/packages/game-manager/data/assets"
+ASSETS_DIR="/Users/dustin/Documents/src/bitborough/packages/game-manager/data/assets"
 API_URL="http://localhost:8080/api"
 STRENGTH=0.4
 STEPS=20

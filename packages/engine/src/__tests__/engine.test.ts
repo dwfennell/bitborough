@@ -1,7 +1,7 @@
 import { describe, test, expect } from 'vitest'
 import { Engine } from '../Engine.js'
 import { createTestMap } from '../test-helpers.js'
-import { SimSpeed } from '@rcity/core'
+import { SimSpeed } from '@bitborough/core'
 
 describe('Engine', () => {
   test('can be created from a map', () => {

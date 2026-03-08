@@ -7,7 +7,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/rcity/game-manager/internal/app"
+	"github.com/bitborough/game-manager/internal/app"
 )
 
 func main() {

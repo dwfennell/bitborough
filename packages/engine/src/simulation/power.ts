@@ -1,4 +1,4 @@
-import { type GameMap, Infrastructure, ZoneType, POWER } from '@rcity/core'
+import { type GameMap, Infrastructure, ZoneType, POWER } from '@bitborough/core'
 import { BUILDING_DEFS } from '../buildings-registry.js'
 
 interface PowerPlant {

@@ -1,4 +1,4 @@
-import { type GameMap, TileType, Infrastructure } from '@rcity/core'
+import { type GameMap, TileType, Infrastructure } from '@bitborough/core'
 
 export function calculateLandValues(
   map: GameMap,

@@ -2,7 +2,7 @@ import { describe, test, expect } from 'vitest'
 import { PRNG } from '../prng.js'
 import { createNoise2D } from '../noise.js'
 import { placeSand, placeVegetation } from '../terrain.js'
-import { TileType } from '@rcity/core'
+import { TileType } from '@bitborough/core'
 
 describe('Sand placement', () => {
   test('sand appears on grass tiles only', () => {

@@ -109,9 +109,9 @@ Define asset → Generate → Preview → Accept/Reject → Iterate → Export t
 ### Shared Code with Game
 ```
 packages/
-├── rcity-game/        # The game itself
-├── rcity-tools/       # The tooling webapp
-└── rcity-core/        # Shared code
+├── bitborough-game/        # The game itself
+├── bitborough-tools/       # The tooling webapp
+└── bitborough-core/        # Shared code
     ├── types/         # Asset definitions, map format
     ├── rendering/     # Tile rendering (reuse in both)
     └── simulation/    # Maybe expose for scenario testing
@@ -141,7 +141,7 @@ Recommendation: Start with Electron for tight `img` integration.
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  RCity Tools                                    [≡] [─] [×] │
+│  Bitborough Tools                                    [≡] [─] [×] │
 ├──────────┬──────────────────────────────────────────────────┤
 │          │                                                  │
 │  Assets  │   ┌──────────────────────────────────────────┐   │

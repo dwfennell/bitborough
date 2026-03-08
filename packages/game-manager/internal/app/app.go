@@ -7,10 +7,10 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/rcity/game-manager/internal/features/assets"
-	"github.com/rcity/game-manager/internal/features/generation"
-	"github.com/rcity/game-manager/internal/server"
-	"github.com/rcity/game-manager/internal/storage"
+	"github.com/bitborough/game-manager/internal/features/assets"
+	"github.com/bitborough/game-manager/internal/features/generation"
+	"github.com/bitborough/game-manager/internal/server"
+	"github.com/bitborough/game-manager/internal/storage"
 )
 
 type Config struct {

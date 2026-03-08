@@ -1,7 +1,7 @@
 # Map Generation Design
 
-**Package:** `@rcity/map-gen`
-**Dependencies:** `@rcity/core`
+**Package:** `@bitborough/map-gen`
+**Dependencies:** `@bitborough/core`
 **Status:** Approved
 
 ---

@@ -1,4 +1,4 @@
-module github.com/rcity/game-manager
+module github.com/bitborough/game-manager
 
 go 1.21
 

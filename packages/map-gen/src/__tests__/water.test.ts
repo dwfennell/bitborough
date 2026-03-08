@@ -2,7 +2,7 @@ import { describe, test, expect } from 'vitest'
 import { PRNG } from '../prng.js'
 import { createNoise2D } from '../noise.js'
 import { placeWater, smoothShoreline } from '../water.js'
-import { TileType } from '@rcity/core'
+import { TileType } from '@bitborough/core'
 
 describe('Water placement', () => {
   test('water level 0 produces no water', () => {

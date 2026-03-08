@@ -5,7 +5,7 @@
 The project consists of multiple packages that share code:
 
 ```
-rcity/
+bitborough/
 ├── packages/
 │   ├── core/              # Shared types, utilities, formats
 │   │   ├── types/         # Asset, map, entity definitions

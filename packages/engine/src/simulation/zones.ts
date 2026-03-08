@@ -1,4 +1,4 @@
-import { type GameMap, type DemandInfo, type Building, type BuildingDef, ZoneType, Infrastructure, DensityLevel, BuildingCategory } from '@rcity/core'
+import { type GameMap, type DemandInfo, type Building, type BuildingDef, ZoneType, Infrastructure, DensityLevel, BuildingCategory } from '@bitborough/core'
 import { PRNG } from '../prng.js'
 
 // Zone building definitions (auto-placed by simulation, not by player)

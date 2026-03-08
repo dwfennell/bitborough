@@ -1,2 +1,2 @@
-// @rcity/game - city builder game package
+// @bitborough/game - city builder game package
 export {}

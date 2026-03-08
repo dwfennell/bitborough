@@ -1,4 +1,4 @@
-import { type GameMap, Infrastructure } from '@rcity/core'
+import { type GameMap, Infrastructure } from '@bitborough/core'
 
 // Direction bits: N=bit0, E=bit1, S=bit2, W=bit3
 const DX = [0, 1, 0, -1] as const

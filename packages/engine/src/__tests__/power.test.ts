@@ -1,7 +1,7 @@
 import { describe, test, expect } from 'vitest'
 import { Engine } from '../Engine.js'
 import { createTestMap } from '../test-helpers.js'
-import { Infrastructure, FailReason, POWER } from '@rcity/core'
+import { Infrastructure, FailReason, POWER } from '@bitborough/core'
 
 describe('Power propagation', () => {
   test('coal power plant powers adjacent tiles through power lines', () => {

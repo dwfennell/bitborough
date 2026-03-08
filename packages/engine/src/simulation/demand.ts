@@ -1,4 +1,4 @@
-import { type GameMap, type DemandInfo, ZoneType } from '@rcity/core'
+import { type GameMap, type DemandInfo, ZoneType } from '@bitborough/core'
 
 /**
  * Calculate zone demand based on current map state, population, and tax rate.

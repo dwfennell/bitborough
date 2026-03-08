@@ -1,4 +1,4 @@
-import { type BuildingDef, BuildingCategory, DensityLevel } from '@rcity/core'
+import { type BuildingDef, BuildingCategory, DensityLevel } from '@bitborough/core'
 
 export const BUILDING_DEFS: Record<string, BuildingDef> = {
   'power.coal': {

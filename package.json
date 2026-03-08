@@ -1,5 +1,5 @@
 {
-  "name": "rcity",
+  "name": "bitborough",
   "private": true,
   "scripts": {
     "test": "pnpm -r test",

@@ -2,7 +2,7 @@
 
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
-**Goal:** Implement the `@rcity/core` and `@rcity/engine` packages — shared types and a pure simulation engine that can be tested headlessly without any rendering.
+**Goal:** Implement the `@bitborough/core` and `@bitborough/engine` packages — shared types and a pure simulation engine that can be tested headlessly without any rendering.
 
 **Architecture:** Monorepo with TypeScript packages. `core` defines types/constants, `engine` is a pure state machine (commands in, snapshots out). Engine has zero browser dependencies. TDD throughout — write failing test, implement, verify, commit.
 
@@ -31,7 +31,7 @@
 ```json
 // package.json
 {
-  "name": "rcity",
+  "name": "bitborough",
   "private": true,
   "scripts": {
     "test": "pnpm -r test",
@@ -72,7 +72,7 @@ packages:
 ```json
 // packages/core/package.json
 {
-  "name": "@rcity/core",
+  "name": "@bitborough/core",
   "version": "0.0.1",
   "type": "module",
   "main": "src/index.ts",
@@ -101,7 +101,7 @@ packages:
 
 ```typescript
 // packages/core/src/index.ts
-// @rcity/core — shared types, constants, formats
+// @bitborough/core — shared types, constants, formats
 export {}
 ```
 
@@ -110,7 +110,7 @@ export {}
 ```json
 // packages/engine/package.json
 {
-  "name": "@rcity/engine",
+  "name": "@bitborough/engine",
   "version": "0.0.1",
   "type": "module",
   "main": "src/index.ts",
@@ -122,7 +122,7 @@ export {}
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@rcity/core": "workspace:*"
+    "@bitborough/core": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.7.0",
@@ -157,7 +157,7 @@ export default defineConfig({
 
 ```typescript
 // packages/engine/src/index.ts
-// @rcity/engine — pure simulation engine
+// @bitborough/engine — pure simulation engine
 export {}
 ```
 
@@ -557,7 +557,7 @@ feat(core): add buildings, GameMap, GameState, and constants
 import { describe, test, expect } from 'vitest'
 import { Engine } from '../Engine.js'
 import { createTestMap } from '../test-helpers.js'
-import { SimSpeed } from '@rcity/core'
+import { SimSpeed } from '@bitborough/core'
 
 describe('Engine', () => {
   test('can be created from a map', () => {
@@ -656,7 +656,7 @@ export class PRNG {
 
 ```typescript
 // packages/engine/src/test-helpers.ts
-import { createEmptyMap, type GameMap, TileType } from '@rcity/core'
+import { createEmptyMap, type GameMap, TileType } from '@bitborough/core'
 
 export function createTestMap(size: number): GameMap {
   return createEmptyMap(size, size, {
@@ -692,7 +692,7 @@ import {
   type SaveFile,
   SimSpeed,
   DEFAULTS,
-} from '@rcity/core'
+} from '@bitborough/core'
 import { PRNG } from './prng.js'
 
 export interface EngineConfig {
@@ -842,7 +842,7 @@ feat(engine): scaffold Engine class with lifecycle, time model, and PRNG
 import { describe, test, expect } from 'vitest'
 import { Engine } from '../Engine.js'
 import { createTestMap } from '../test-helpers.js'
-import { TileType, Infrastructure, FailReason } from '@rcity/core'
+import { TileType, Infrastructure, FailReason } from '@bitborough/core'
 
 describe('Tile placement', () => {
   test('place road on grass succeeds', () => {
@@ -962,7 +962,7 @@ import {
   ZoneType,
   FailReason,
   COSTS,
-} from '@rcity/core'
+} from '@bitborough/core'
 
 export function placeTile(
   map: GameMap,
@@ -1030,7 +1030,7 @@ import {
   TileType,
   FailReason,
   COSTS,
-} from '@rcity/core'
+} from '@bitborough/core'
 
 export function bulldoze(
   map: GameMap,
@@ -1111,7 +1111,7 @@ feat(engine): add tile placement, zoning, and bulldoze commands
 import { describe, test, expect } from 'vitest'
 import { Engine } from '../Engine.js'
 import { createTestMap } from '../test-helpers.js'
-import { Infrastructure } from '@rcity/core'
+import { Infrastructure } from '@bitborough/core'
 
 describe('Connection masks', () => {
   test('isolated road has no connections', () => {
@@ -1157,7 +1157,7 @@ describe('Connection masks', () => {
 
 ```typescript
 // packages/engine/src/connections.ts
-import { type GameMap, Infrastructure } from '@rcity/core'
+import { type GameMap, Infrastructure } from '@bitborough/core'
 
 // Direction bits: N=0, E=1, S=2, W=3
 const DX = [0, 1, 0, -1]

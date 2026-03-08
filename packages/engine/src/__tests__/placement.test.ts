@@ -1,7 +1,7 @@
 import { describe, test, expect } from 'vitest'
 import { Engine } from '../Engine.js'
 import { createTestMap } from '../test-helpers.js'
-import { TileType, Infrastructure, FailReason } from '@rcity/core'
+import { TileType, Infrastructure, FailReason } from '@bitborough/core'
 
 describe('Tile placement', () => {
   test('place road on grass succeeds', () => {

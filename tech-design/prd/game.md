@@ -1,8 +1,8 @@
-# PRD: @rcity/game
+# PRD: @bitborough/game
 
 **Package:** `packages/game`
 **Status:** Approved
-**Dependencies:** `@rcity/core`, `@rcity/engine`, `@rcity/map-gen`
+**Dependencies:** `@bitborough/core`, `@bitborough/engine`, `@bitborough/map-gen`
 
 ---
 

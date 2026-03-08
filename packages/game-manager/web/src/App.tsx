@@ -219,7 +219,7 @@ export function App() {
     <div class="min-h-screen">
       <header class="bg-gray-800 border-b border-gray-700 px-6 py-4">
         <div class="flex items-center justify-between">
-          <h1 class="text-xl font-bold">RCity Game Manager</h1>
+          <h1 class="text-xl font-bold">Bitborough Game Manager</h1>
           <nav class="flex gap-2">
             <button
               onClick={() => handleSectionChange('assets')}

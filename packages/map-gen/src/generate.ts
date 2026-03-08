@@ -1,4 +1,4 @@
-import { type GameMap, type MapSize, createEmptyMap } from '@rcity/core'
+import { type GameMap, type MapSize, createEmptyMap } from '@bitborough/core'
 import { PRNG } from './prng.js'
 import { createNoise2D } from './noise.js'
 import { PRESETS } from './presets.js'

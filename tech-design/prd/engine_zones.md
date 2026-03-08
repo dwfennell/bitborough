@@ -2,7 +2,7 @@
 
 **System:** Zone growth, decline, and R/C/I demand model
 **Status:** Draft
-**Parent:** `@rcity/engine`
+**Parent:** `@bitborough/engine`
 
 ---
 

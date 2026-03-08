@@ -1,4 +1,4 @@
-import { createEmptyMap, type GameMap } from '@rcity/core'
+import { createEmptyMap, type GameMap } from '@bitborough/core'
 
 export function createTestMap(size: number): GameMap {
   return createEmptyMap(size, size, {

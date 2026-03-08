@@ -4,7 +4,7 @@ import {
   TileType,
   FailReason,
   COSTS,
-} from '@rcity/core'
+} from '@bitborough/core'
 
 export function bulldoze(
   map: GameMap,

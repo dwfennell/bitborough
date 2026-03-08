@@ -1,14 +1,14 @@
-# PRD: @rcity/map-gen
+# PRD: @bitborough/map-gen
 
 **Package:** `packages/map-gen`
 **Status:** Approved
-**Dependencies:** `@rcity/core`
+**Dependencies:** `@bitborough/core`
 
 ---
 
 ## Purpose
 
-Procedural terrain generation for RCity. Takes a configuration (size, seed, preset) and produces a `GameMap` with terrain populated — landmasses, water bodies, forests, beaches. The output is ready to hand to the engine or the map editor.
+Procedural terrain generation for Bitborough. Takes a configuration (size, seed, preset) and produces a `GameMap` with terrain populated — landmasses, water bodies, forests, beaches. The output is ready to hand to the engine or the map editor.
 
 ---
 
@@ -125,7 +125,7 @@ The noise module must accept a seed and produce deterministic output.
 
 ## Design Constraints
 
-- **Zero platform dependencies.** Pure TypeScript + `@rcity/core`. No browser, no Node APIs.
+- **Zero platform dependencies.** Pure TypeScript + `@bitborough/core`. No browser, no Node APIs.
 - **Deterministic.** Seeded PRNG and seeded noise throughout. No `Math.random()`.
 - **Fast enough.** Generating a 256x256 map should take under 500ms. This runs once at game start, not per frame.
 - **No simulation logic.** Map-gen doesn't know about power, zones, traffic, or economy. It produces terrain.

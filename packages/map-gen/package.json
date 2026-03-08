@@ -1,5 +1,5 @@
 {
-  "name": "@rcity/map-gen",
+  "name": "@bitborough/map-gen",
   "version": "0.0.1",
   "type": "module",
   "main": "src/index.ts",
@@ -11,7 +11,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@rcity/core": "workspace:*"
+    "@bitborough/core": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.7.0",

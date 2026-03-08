@@ -1,4 +1,4 @@
-# RCity Vision
+# Bitborough Vision
 
 ## Core Concept
 A faithful SimCity (1989) clone that evolves into something with Dwarf Fortress-level depth and emergent complexity. Start simple, grow slowly, let complexity emerge naturally.
@@ -24,7 +24,7 @@ Add one system at a time. Make sure each system is solid and interesting before 
 
 Per [GENERAL_GAME_DESIGN_PHILOSOPHY.md](./GENERAL_GAME_DESIGN_PHILOSOPHY.md), fun = mastery of problems.
 
-**RCity's core problem:** Spatial resource allocation under constraints.
+**Bitborough's core problem:** Spatial resource allocation under constraints.
 Where do you put things, given limited money, space, and competing demands?
 
 **Why it stays unsolved:**

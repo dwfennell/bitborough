@@ -33,7 +33,7 @@ Rationale: Canvas 2D is simple, well-documented, and plenty fast for tile-based 
 
 ## Project Structure
 ```
-rcity/
+bitborough/
 ├── design/              # Game design docs
 ├── tech-design/         # Technical docs
 ├── assets/

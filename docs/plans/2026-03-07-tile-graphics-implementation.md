@@ -2,7 +2,7 @@
 
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task. Use tile-author skill when authoring SVGs.
 
-**Goal:** Build the SVG-to-PNG rasterization pipeline and author the initial ~40-tile set for the rcity city builder.
+**Goal:** Build the SVG-to-PNG rasterization pipeline and author the initial ~40-tile set for the bitborough city builder.
 
 **Architecture:** SVG source files in `packages/game/assets/tiles/`, a Node build script using `@resvg/resvg-js` rasterizes them to 128x128 PNGs in `assets/sprites/`, generating a `manifest.json` that maps tile IDs to sprite filenames. The game package is scaffolded as a pnpm workspace member following the engine package pattern.
 
@@ -22,7 +22,7 @@
 
 ```json
 {
-  "name": "@rcity/game",
+  "name": "@bitborough/game",
   "version": "0.0.1",
   "type": "module",
   "main": "src/index.ts",
@@ -35,7 +35,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@rcity/core": "workspace:*"
+    "@bitborough/core": "workspace:*"
   },
   "devDependencies": {
     "@resvg/resvg-js": "^2.6.0",
@@ -76,13 +76,13 @@ export default defineConfig({
 **Step 4: Create src/index.ts**
 
 ```ts
-// @rcity/game - city builder game package
+// @bitborough/game - city builder game package
 export {}
 ```
 
 **Step 5: Install dependencies**
 
-Run: `cd /path/to/rcity && pnpm install`
+Run: `cd /path/to/bitborough && pnpm install`
 Expected: Successful install, new packages linked
 
 **Step 6: Verify package works**
@@ -494,7 +494,7 @@ A static HTML page that loads `manifest.json` and renders all sprites in a grid,
 <!DOCTYPE html>
 <html>
 <head>
-  <title>RCity Tile Preview</title>
+  <title>Bitborough Tile Preview</title>
   <style>
     body { background: #1a1a1a; color: #eee; font-family: system-ui; padding: 20px; }
     h2 { border-bottom: 1px solid #444; padding-bottom: 8px; }
@@ -505,7 +505,7 @@ A static HTML page that loads `manifest.json` and renders all sprites in a grid,
   </style>
 </head>
 <body>
-  <h1>RCity Tile Catalog</h1>
+  <h1>Bitborough Tile Catalog</h1>
   <div id="content"></div>
   <script>
     fetch('sprites/manifest.json')
@@ -558,7 +558,7 @@ Expected: All ~40 tiles rasterized, manifest complete
 
 **Step 2: Run all tests**
 
-Run: `cd /path/to/rcity && pnpm test`
+Run: `cd /path/to/bitborough && pnpm test`
 Expected: All packages pass
 
 **Step 3: Verify manifest completeness**

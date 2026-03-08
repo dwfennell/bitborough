@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'vitest'
 import { generateMap } from '../generate.js'
-import { TileType } from '@rcity/core'
+import { TileType } from '@bitborough/core'
 
 describe('generateMap', () => {
   test('returns a valid GameMap', () => {

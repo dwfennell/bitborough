@@ -1,4 +1,4 @@
-# PRD: @rcity/core
+# PRD: @bitborough/core
 
 **Package:** `packages/core`
 **Status:** Approved
@@ -8,7 +8,7 @@
 
 ## Purpose
 
-Shared vocabulary for the RCity project. Defines the types, constants, and serialization formats that all other packages depend on. This is the foundation contract — stable, minimal, and deliberate.
+Shared vocabulary for the Bitborough project. Defines the types, constants, and serialization formats that all other packages depend on. This is the foundation contract — stable, minimal, and deliberate.
 
 ---
 

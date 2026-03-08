@@ -2,7 +2,7 @@
 
 **System:** Traffic simulation
 **Status:** Draft (future — Milestone 7)
-**Parent:** `@rcity/engine`
+**Parent:** `@bitborough/engine`
 
 ---
 

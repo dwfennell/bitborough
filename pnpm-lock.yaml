@@ -16,7 +16,7 @@ importers:
 
   packages/engine:
     dependencies:
-      '@rcity/core':
+      '@bitborough/core':
         specifier: workspace:*
         version: link:../core
     devDependencies:
@@ -29,7 +29,7 @@ importers:
 
   packages/game:
     dependencies:
-      '@rcity/core':
+      '@bitborough/core':
         specifier: workspace:*
         version: link:../core
     devDependencies:
@@ -48,7 +48,7 @@ importers:
 
   packages/map-gen:
     dependencies:
-      '@rcity/core':
+      '@bitborough/core':
         specifier: workspace:*
         version: link:../core
     devDependencies:

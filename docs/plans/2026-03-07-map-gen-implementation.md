@@ -2,9 +2,9 @@
 
 > **For Claude:** REQUIRED SUB-SKILL: Use superpowers:executing-plans to implement this plan task-by-task.
 
-**Goal:** Implement `@rcity/map-gen` — a pure function that procedurally generates terrain maps for the city builder.
+**Goal:** Implement `@bitborough/map-gen` — a pure function that procedurally generates terrain maps for the city builder.
 
-**Architecture:** Pipeline of pure functions: PRNG → simplex noise → water placement → shoreline smoothing → sand biomes → vegetation. Single entry point `generateMap(config): GameMap`. Deterministic via seeded Mulberry32 PRNG. Depends only on `@rcity/core`.
+**Architecture:** Pipeline of pure functions: PRNG → simplex noise → water placement → shoreline smoothing → sand biomes → vegetation. Single entry point `generateMap(config): GameMap`. Deterministic via seeded Mulberry32 PRNG. Depends only on `@bitborough/core`.
 
 **Tech Stack:** TypeScript, Vitest, pnpm workspaces (existing monorepo)
 
@@ -24,7 +24,7 @@
 
 ```json
 {
-  "name": "@rcity/map-gen",
+  "name": "@bitborough/map-gen",
   "version": "0.0.1",
   "type": "module",
   "main": "src/index.ts",
@@ -36,7 +36,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@rcity/core": "workspace:*"
+    "@bitborough/core": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.7.0",
@@ -76,7 +76,7 @@ export default defineConfig({
 **Step 4: Create src/index.ts**
 
 ```typescript
-// @rcity/map-gen — procedural terrain generation
+// @bitborough/map-gen — procedural terrain generation
 export {}
 ```
 
@@ -347,7 +347,7 @@ import { describe, test, expect } from 'vitest'
 import { PRNG } from '../prng.js'
 import { createNoise2D } from '../noise.js'
 import { placeWater, smoothShoreline } from '../water.js'
-import { TileType } from '@rcity/core'
+import { TileType } from '@bitborough/core'
 
 describe('Water placement', () => {
   test('water level 0 produces no water', () => {
@@ -461,7 +461,7 @@ export const PRESETS: Record<string, PresetConfig> = {
 
 ```typescript
 // packages/map-gen/src/water.ts
-import { TileType } from '@rcity/core'
+import { TileType } from '@bitborough/core'
 import { layeredNoise } from './noise.js'
 
 export function placeWater(
@@ -558,7 +558,7 @@ import { describe, test, expect } from 'vitest'
 import { PRNG } from '../prng.js'
 import { createNoise2D } from '../noise.js'
 import { placeSand, placeVegetation } from '../terrain.js'
-import { TileType } from '@rcity/core'
+import { TileType } from '@bitborough/core'
 
 describe('Sand placement', () => {
   test('sand appears on grass tiles only', () => {
@@ -625,7 +625,7 @@ describe('Vegetation', () => {
 
 ```typescript
 // packages/map-gen/src/terrain.ts
-import { TileType } from '@rcity/core'
+import { TileType } from '@bitborough/core'
 import { layeredNoise } from './noise.js'
 
 export function placeSand(
@@ -705,7 +705,7 @@ feat(map-gen): add sand biomes and vegetation placement
 // packages/map-gen/src/__tests__/generate.test.ts
 import { describe, test, expect } from 'vitest'
 import { generateMap } from '../generate.js'
-import { TileType } from '@rcity/core'
+import { TileType } from '@bitborough/core'
 
 describe('generateMap', () => {
   test('returns a valid GameMap', () => {
@@ -810,7 +810,7 @@ function countTerrain(terrain: Uint8Array) {
 
 ```typescript
 // packages/map-gen/src/generate.ts
-import { type GameMap, type MapSize, createEmptyMap, TileType } from '@rcity/core'
+import { type GameMap, type MapSize, createEmptyMap, TileType } from '@bitborough/core'
 import { PRNG } from './prng.js'
 import { createNoise2D } from './noise.js'
 import { PRESETS, type PresetConfig } from './presets.js'

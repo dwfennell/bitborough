@@ -1,7 +1,7 @@
 import { describe, test, expect } from 'vitest'
 import { Engine } from '../Engine.js'
 import { createTestMap, advanceMonth } from '../test-helpers.js'
-import { Infrastructure, ZoneType } from '@rcity/core'
+import { Infrastructure, ZoneType } from '@bitborough/core'
 
 describe('Zone development', () => {
   function setupPoweredZonedCity(engine: ReturnType<typeof Engine.create>) {

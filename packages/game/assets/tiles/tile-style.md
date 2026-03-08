@@ -1,4 +1,4 @@
-# RCity Tile Style Guide
+# Bitborough Tile Style Guide
 
 Read this file before authoring any SVG tile. Follow these rules exactly for visual consistency.
 

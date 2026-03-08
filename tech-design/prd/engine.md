@@ -1,14 +1,14 @@
-# PRD: @rcity/engine
+# PRD: @bitborough/engine
 
 **Package:** `packages/engine`
 **Status:** Approved
-**Dependencies:** `@rcity/core`
+**Dependencies:** `@bitborough/core`
 
 ---
 
 ## Purpose
 
-Pure simulation engine for RCity. Accepts a `GameMap`, processes player commands, runs simulation ticks, and returns state snapshots. Contains all game logic — zone growth, power propagation, traffic, economy, land value — with zero rendering or platform dependencies.
+Pure simulation engine for Bitborough. Accepts a `GameMap`, processes player commands, runs simulation ticks, and returns state snapshots. Contains all game logic — zone growth, power propagation, traffic, economy, land value — with zero rendering or platform dependencies.
 
 ---
 
@@ -394,7 +394,7 @@ Every command validates before mutating state. Validation rules:
 
 ## Design Constraints
 
-- **Zero platform dependencies.** No DOM, no Canvas, no `window`, no `fs`, no `process`. Only core JS/TS and `@rcity/core`.
+- **Zero platform dependencies.** No DOM, no Canvas, no `window`, no `fs`, no `process`. Only core JS/TS and `@bitborough/core`.
 - **Deterministic.** Same seed + same commands + same ticks = same state. No `Math.random()` — use a seeded PRNG.
 - **No thrown errors for control flow.** Commands return `Result` types. Only throw on true programmer errors (invariant violations).
 - **Serializable state.** `getState()` and `serialize()` output must be JSON-serializable (typed arrays convert to base64 or arrays).

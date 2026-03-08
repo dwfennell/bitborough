@@ -7,8 +7,8 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/cors"
-	"github.com/rcity/game-manager/internal/features/assets"
-	"github.com/rcity/game-manager/internal/features/generation"
+	"github.com/bitborough/game-manager/internal/features/assets"
+	"github.com/bitborough/game-manager/internal/features/generation"
 )
 
 func New(assetSvc *assets.Service, genSvc *generation.Service, assetsDir string) http.Handler {

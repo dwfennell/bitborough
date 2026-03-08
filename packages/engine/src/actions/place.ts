@@ -6,7 +6,7 @@ import {
   ZoneType,
   FailReason,
   COSTS,
-} from '@rcity/core'
+} from '@bitborough/core'
 
 export function placeTile(
   map: GameMap,

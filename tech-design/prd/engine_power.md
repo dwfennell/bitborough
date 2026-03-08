@@ -2,7 +2,7 @@
 
 **System:** Power propagation
 **Status:** Draft
-**Parent:** `@rcity/engine`
+**Parent:** `@bitborough/engine`
 
 ---
 
@@ -21,7 +21,7 @@ In the original SimCity / Micropolis:
 - Power propagation is a flood fill from power plants
 - If a power line is destroyed, everything beyond the break goes dark immediately
 
-RCity follows this model with minor refinements for depth.
+Bitborough follows this model with minor refinements for depth.
 
 ---
 

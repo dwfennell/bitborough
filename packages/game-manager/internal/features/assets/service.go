@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/rcity/game-manager/internal/storage"
+	"github.com/bitborough/game-manager/internal/storage"
 )
 
 type Asset struct {

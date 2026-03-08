@@ -1,6 +1,6 @@
 # Game Manager App - Design Document
 
-A lightweight webapp for managing RCity content and development.
+A lightweight webapp for managing Bitborough content and development.
 
 ---
 
@@ -85,7 +85,7 @@ Schema lives alongside code, migrations tracked in git.
 Structure mirrors asset organization:
 ```
 data/
-├── rcity.db              # SQLite database
+├── bitborough.db              # SQLite database
 ├── assets/
 │   ├── raw/              # Generated images at full res
 │   ├── processed/        # Resized, optimized
@@ -160,7 +160,7 @@ game-manager/
 │   └── vite.config.ts
 │
 ├── data/                     # Runtime data (gitignored)
-│   ├── rcity.db
+│   ├── bitborough.db
 │   └── assets/
 │
 ├── Makefile                  # Build, run, migrate commands
@@ -468,7 +468,7 @@ server:
   host: "127.0.0.1"
 
 database:
-  path: "./data/rcity.db"
+  path: "./data/bitborough.db"
 
 storage:
   assets_dir: "./data/assets"

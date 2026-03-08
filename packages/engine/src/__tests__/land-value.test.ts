@@ -1,7 +1,7 @@
 import { describe, test, expect } from 'vitest'
 import { Engine } from '../Engine.js'
 import { createTestMap } from '../test-helpers.js'
-import { TileType, Infrastructure } from '@rcity/core'
+import { TileType, Infrastructure } from '@bitborough/core'
 
 describe('Land value', () => {
   test('water adjacency increases land value', () => {

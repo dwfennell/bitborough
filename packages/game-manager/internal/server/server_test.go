@@ -9,9 +9,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/rcity/game-manager/internal/features/assets"
-	"github.com/rcity/game-manager/internal/features/generation"
-	"github.com/rcity/game-manager/internal/storage"
+	"github.com/bitborough/game-manager/internal/features/assets"
+	"github.com/bitborough/game-manager/internal/features/generation"
+	"github.com/bitborough/game-manager/internal/storage"
 )
 
 func setupTestServer(t *testing.T) (http.Handler, func()) {

@@ -1,7 +1,7 @@
 import { describe, test, expect } from 'vitest'
 import { Engine } from '../Engine.js'
 import { createTestMap } from '../test-helpers.js'
-import { Infrastructure } from '@rcity/core'
+import { Infrastructure } from '@bitborough/core'
 
 describe('Connection masks', () => {
   test('isolated road has no connections', () => {

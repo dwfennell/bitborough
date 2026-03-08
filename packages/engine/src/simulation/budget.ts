@@ -1,4 +1,4 @@
-import { type GameMap, type BudgetInfo, Infrastructure, MAINTENANCE } from '@rcity/core'
+import { type GameMap, type BudgetInfo, Infrastructure, MAINTENANCE } from '@bitborough/core'
 import { BUILDING_DEFS } from '../buildings-registry.js'
 import { getZoneBuildingDef } from './zones.js'
 

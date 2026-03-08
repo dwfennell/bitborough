@@ -11,7 +11,7 @@ import {
   FailReason,
   SimSpeed,
   DEFAULTS,
-} from '@rcity/core'
+} from '@bitborough/core'
 import { PRNG } from './prng.js'
 import { placeTile, placeZone } from './actions/place.js'
 import { bulldoze } from './actions/bulldoze.js'
