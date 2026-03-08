@@ -245,7 +245,12 @@ export class Game {
     if (k.has('ArrowRight')) this.camera.pan(panSpeed, 0)
     if (k.has('ArrowUp')) this.camera.pan(0, -panSpeed)
     if (k.has('ArrowDown')) this.camera.pan(0, panSpeed)
-    if (k.has('ArrowLeft') || k.has('ArrowRight') || k.has('ArrowUp') || k.has('ArrowDown')) {
+    const zoomSpeed = 1.02 ** (delta / 16)
+    if (k.has('q')) this.camera.zoom /= zoomSpeed
+    if (k.has('w')) this.camera.zoom *= zoomSpeed
+    if (k.has('q') || k.has('w')) this.camera.clampZoom()
+    if (k.has('ArrowLeft') || k.has('ArrowRight') || k.has('ArrowUp') || k.has('ArrowDown') ||
+        k.has('q') || k.has('w')) {
       this.camera.clamp()
     }
 
