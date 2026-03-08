@@ -5,19 +5,23 @@
   "main": "src/index.ts",
   "types": "src/index.ts",
   "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "build": "tsc",
-    "build:tiles": "tsx scripts/rasterize-tiles.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@bitborough/core": "workspace:*"
+    "@bitborough/core": "workspace:*",
+    "@bitborough/engine": "workspace:*",
+    "@bitborough/map-gen": "workspace:*"
   },
   "devDependencies": {
     "@resvg/resvg-js": "^2.6.0",
     "tsx": "^4.0.0",
     "typescript": "^5.7.0",
+    "vite": "^7.0.0",
     "vitest": "^3.0.0"
   }
 }

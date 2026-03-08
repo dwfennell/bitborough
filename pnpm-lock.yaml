@@ -32,6 +32,12 @@ importers:
       '@bitborough/core':
         specifier: workspace:*
         version: link:../core
+      '@bitborough/engine':
+        specifier: workspace:*
+        version: link:../engine
+      '@bitborough/map-gen':
+        specifier: workspace:*
+        version: link:../map-gen
     devDependencies:
       '@resvg/resvg-js':
         specifier: ^2.6.0
@@ -42,6 +48,9 @@ importers:
       typescript:
         specifier: ^5.7.0
         version: 5.9.3
+      vite:
+        specifier: ^7.0.0
+        version: 7.3.1(tsx@4.21.0)
       vitest:
         specifier: ^3.0.0
         version: 3.2.4(tsx@4.21.0)
