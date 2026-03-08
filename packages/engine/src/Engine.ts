@@ -17,6 +17,7 @@ import { bulldoze } from './actions/bulldoze.js'
 import { updateConnections } from './connections.js'
 import { propagatePower } from './simulation/power.js'
 import { calculateDemand } from './simulation/demand.js'
+import { calculateLandValues } from './simulation/land-value.js'
 import { updateZones } from './simulation/zones.js'
 import { BUILDING_DEFS } from './buildings-registry.js'
 
@@ -107,6 +108,7 @@ export class Engine {
       }
       // Monthly systems
       this.demand = calculateDemand(this.map, this.population, this.taxRate)
+      calculateLandValues(this.map, this.powerGrid, this.pollutionLevel, this.crimeLevel, this.landValues)
 
       // Zone development
       const nextBuildingIdRef = { value: this.nextBuildingId }
