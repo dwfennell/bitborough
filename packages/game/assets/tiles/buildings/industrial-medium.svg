@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- Transparent background - terrain renders underneath -->
+
+  <!-- Building shadow -->
+  <rect x="28" y="28" width="72" height="60" rx="2" fill="#000000" opacity="0.1" transform="translate(3, 3)"/>
+
+  <!-- Lot ground (industrial yard) -->
+  <rect x="8" y="8" width="112" height="112" rx="3" fill="#c0c0b0" opacity="0.3"/>
+
+  <!-- Factory walls -->
+  <rect x="28" y="28" width="72" height="60" rx="2" fill="#d8d8d0"/>
+
+  <!-- Roof (darker industrial shade) -->
+  <rect x="25" y="25" width="78" height="54" rx="2" fill="#989880"/>
+
+  <!-- Pipe runs on roof (2-3 lines) -->
+  <g stroke="#8a8878" stroke-width="1" stroke-linecap="round" opacity="0.5">
+    <line x1="28" y1="36" x2="100" y2="36"/>
+    <line x1="28" y1="48" x2="100" y2="48"/>
+    <line x1="40" y1="56" x2="90" y2="56"/>
+  </g>
+
+  <!-- Tank/silo circle on roof (~16px diameter) -->
+  <circle cx="44" cy="42" r="8" fill="#a8a898" opacity="0.7"/>
+  <circle cx="44" cy="42" r="6" fill="#989880" opacity="0.5"/>
+  <circle cx="44" cy="42" r="2" fill="#8a8878" opacity="0.5"/>
+
+  <!-- Rust accent stripes -->
+  <rect x="25" y="64" width="78" height="3" rx="0.5" fill="#b09070" opacity="0.3"/>
+  <rect x="25" y="30" width="78" height="2" rx="0.5" fill="#b09070" opacity="0.2"/>
+
+  <!-- Smoke stack 1 (6px wide, 16px tall) -->
+  <rect x="72" y="12" width="6" height="16" rx="1" fill="#a8a898"/>
+  <rect x="71" y="11" width="8" height="3" rx="0.5" fill="#989880"/>
+  <!-- Smoke wisp 1 -->
+  <path d="M75 10 Q77 5 74 0 Q72 -5 75 -8" fill="none" stroke="#d0d0d0" stroke-width="1.5" stroke-linecap="round" opacity="0.3"/>
+
+  <!-- Smoke stack 2 (6px wide, 16px tall) -->
+  <rect x="84" y="16" width="6" height="12" rx="1" fill="#a8a898"/>
+  <rect x="83" y="15" width="8" height="3" rx="0.5" fill="#989880"/>
+  <!-- Smoke wisp 2 -->
+  <path d="M87 14 Q89 9 86 5 Q84 1 87 -3" fill="none" stroke="#d0d0d0" stroke-width="1.5" stroke-linecap="round" opacity="0.25"/>
+
+  <!-- Loading bay doors (multiple) -->
+  <rect x="34" y="80" width="12" height="8" rx="0.5" fill="#585858" opacity="0.5"/>
+  <line x1="40" y1="80" x2="40" y2="88" stroke="#989880" stroke-width="0.5" opacity="0.4"/>
+  <rect x="52" y="80" width="12" height="8" rx="0.5" fill="#585858" opacity="0.5"/>
+  <line x1="58" y1="80" x2="58" y2="88" stroke="#989880" stroke-width="0.5" opacity="0.4"/>
+  <rect x="70" y="80" width="12" height="8" rx="0.5" fill="#585858" opacity="0.45"/>
+  <line x1="76" y1="80" x2="76" y2="88" stroke="#989880" stroke-width="0.5" opacity="0.4"/>
+
+  <!-- Small windows on south wall -->
+  <rect x="86" y="82" width="5" height="5" rx="0.5" fill="#a8d0e8" opacity="0.6"/>
+  <rect x="86" y="82" width="5" height="5" rx="0.5" fill="none" stroke="#987868" stroke-width="0.6"/>
+  <line x1="88.5" y1="82" x2="88.5" y2="87" stroke="#987868" stroke-width="0.4" opacity="0.6"/>
+  <line x1="86" y1="84.5" x2="91" y2="84.5" stroke="#987868" stroke-width="0.4" opacity="0.6"/>
+
+  <!-- Door (4x8px) -->
+  <rect x="94" y="80" width="4" height="8" rx="0.5" fill="#8a6848"/>
+  <circle cx="97" cy="84.5" r="0.6" fill="#c0a080"/>
+
+  <!-- Ground details - pallets/crates near loading bays -->
+  <rect x="16" y="92" width="12" height="8" rx="1" fill="#c8b480" opacity="0.35"/>
+  <rect x="16" y="102" width="8" height="6" rx="1" fill="#d8c498" opacity="0.3"/>
+
+  <!-- Rust stain detail on ground -->
+  <ellipse cx="50" cy="96" rx="6" ry="3" fill="#b09070" opacity="0.15"/>
+</svg>

@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- Transparent background - terrain renders underneath -->
+
+  <!-- Building shadow -->
+  <rect x="40" y="38" width="48" height="40" rx="2" fill="#000000" opacity="0.1" transform="translate(3, 3)"/>
+
+  <!-- Lot ground (industrial yard) -->
+  <rect x="8" y="8" width="112" height="112" rx="3" fill="#c0c0b0" opacity="0.3"/>
+
+  <!-- Workshop walls -->
+  <rect x="40" y="38" width="48" height="40" rx="2" fill="#d8d8d0"/>
+
+  <!-- Roof -->
+  <rect x="37" y="35" width="54" height="34" rx="2" fill="#a8a898"/>
+  <!-- Pipe detail on roof -->
+  <line x1="40" y1="44" x2="88" y2="44" stroke="#8a8878" stroke-width="1" stroke-linecap="round" opacity="0.5"/>
+
+  <!-- Rust accent stripe -->
+  <rect x="37" y="58" width="54" height="3" rx="0.5" fill="#b09070" opacity="0.3"/>
+
+  <!-- Smoke stack (6px wide, 16px tall) -->
+  <rect x="74" y="22" width="6" height="16" rx="1" fill="#a8a898"/>
+  <rect x="73" y="21" width="8" height="3" rx="0.5" fill="#989880"/>
+  <!-- Smoke wisp -->
+  <path d="M77 20 Q79 15 76 10 Q74 5 77 1" fill="none" stroke="#d0d0d0" stroke-width="1.5" stroke-linecap="round" opacity="0.3"/>
+
+  <!-- Loading bay door (dark rect, 12x8px) -->
+  <rect x="50" y="70" width="12" height="8" rx="0.5" fill="#585858" opacity="0.5"/>
+  <!-- Loading bay frame lines -->
+  <line x1="56" y1="70" x2="56" y2="78" stroke="#989880" stroke-width="0.5" opacity="0.4"/>
+
+  <!-- Small windows on south wall -->
+  <rect x="68" y="72" width="5" height="5" rx="0.5" fill="#a8d0e8" opacity="0.6"/>
+  <rect x="68" y="72" width="5" height="5" rx="0.5" fill="none" stroke="#987868" stroke-width="0.6"/>
+  <line x1="70.5" y1="72" x2="70.5" y2="77" stroke="#987868" stroke-width="0.4" opacity="0.6"/>
+  <line x1="68" y1="74.5" x2="73" y2="74.5" stroke="#987868" stroke-width="0.4" opacity="0.6"/>
+
+  <!-- Door (4x8px) -->
+  <rect x="78" y="70" width="4" height="8" rx="0.5" fill="#8a6848"/>
+  <circle cx="81" cy="74.5" r="0.6" fill="#c0a080"/>
+
+  <!-- Ground details - crates/pallets near loading bay -->
+  <rect x="18" y="82" width="10" height="8" rx="1" fill="#c8b480" opacity="0.4"/>
+  <rect x="20" y="78" width="8" height="6" rx="1" fill="#d8c498" opacity="0.35"/>
+
+  <!-- Grass blade cluster in yard -->
+  <g fill="#6aaa50" opacity="0.35">
+    <path d="M100 100 L101.5 94 L103 100Z"/>
+    <path d="M102 100.5 L104 93 L105.5 100.5Z"/>
+  </g>
+</svg>

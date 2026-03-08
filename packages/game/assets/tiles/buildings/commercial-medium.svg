@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- Transparent background - terrain renders underneath -->
+
+  <!-- Building shadow -->
+  <rect x="40" y="24" width="48" height="56" rx="2" fill="#000000" opacity="0.1" transform="translate(3, 3)"/>
+
+  <!-- Lot ground (paved commercial lot) -->
+  <rect x="8" y="8" width="112" height="112" rx="3" fill="#d8d8d0" opacity="0.3"/>
+
+  <!-- Parking lines in front (south of building) -->
+  <g stroke="#e0e0e0" stroke-width="0.8" opacity="0.5">
+    <line x1="18" y1="88" x2="18" y2="108"/>
+    <line x1="30" y1="88" x2="30" y2="108"/>
+    <line x1="42" y1="88" x2="42" y2="108"/>
+    <line x1="54" y1="88" x2="54" y2="108"/>
+    <line x1="66" y1="88" x2="66" y2="108"/>
+    <line x1="78" y1="88" x2="78" y2="108"/>
+    <line x1="90" y1="88" x2="90" y2="108"/>
+    <line x1="102" y1="88" x2="102" y2="108"/>
+  </g>
+
+  <!-- Office walls -->
+  <rect x="40" y="24" width="48" height="56" rx="2" fill="#d8d8d0"/>
+
+  <!-- Roof (slightly different blue shade for variety) -->
+  <rect x="37" y="21" width="54" height="50" rx="2" fill="#80a8c8"/>
+  <!-- Roof ridge line -->
+  <line x1="64" y1="23" x2="64" y2="69" stroke="#90b8d8" stroke-width="2" opacity="0.4"/>
+
+  <!-- Rooftop AC unit 1 -->
+  <rect x="42" y="28" width="8" height="6" rx="1" fill="#a8a898" opacity="0.7"/>
+  <circle cx="46" cy="31" r="2" fill="none" stroke="#8a8878" stroke-width="0.5" opacity="0.6"/>
+  <circle cx="46" cy="31" r="0.6" fill="#8a8878" opacity="0.5"/>
+  <!-- Rooftop AC unit 2 -->
+  <rect x="76" y="36" width="8" height="6" rx="1" fill="#a8a898" opacity="0.7"/>
+  <circle cx="80" cy="39" r="2" fill="none" stroke="#8a8878" stroke-width="0.5" opacity="0.6"/>
+  <circle cx="80" cy="39" r="0.6" fill="#8a8878" opacity="0.5"/>
+
+  <!-- Signage rectangle on south wall -->
+  <rect x="46" y="72" width="28" height="4" rx="0.5" fill="#e8d080" opacity="0.5"/>
+
+  <!-- Windows on south wall (4 windows, 5x5px) -->
+  <g>
+    <rect x="43" y="73" width="5" height="5" rx="0.5" fill="#a8d0e8" opacity="0.8"/>
+    <rect x="43" y="73" width="5" height="5" rx="0.5" fill="none" stroke="#987868" stroke-width="0.6"/>
+    <line x1="45.5" y1="73" x2="45.5" y2="78" stroke="#987868" stroke-width="0.4" opacity="0.6"/>
+    <line x1="43" y1="75.5" x2="48" y2="75.5" stroke="#987868" stroke-width="0.4" opacity="0.6"/>
+  </g>
+  <g>
+    <rect x="53" y="73" width="5" height="5" rx="0.5" fill="#a8d0e8" opacity="0.8"/>
+    <rect x="53" y="73" width="5" height="5" rx="0.5" fill="none" stroke="#987868" stroke-width="0.6"/>
+    <line x1="55.5" y1="73" x2="55.5" y2="78" stroke="#987868" stroke-width="0.4" opacity="0.6"/>
+    <line x1="53" y1="75.5" x2="58" y2="75.5" stroke="#987868" stroke-width="0.4" opacity="0.6"/>
+  </g>
+  <g>
+    <rect x="67" y="73" width="5" height="5" rx="0.5" fill="#a8d0e8" opacity="0.8"/>
+    <rect x="67" y="73" width="5" height="5" rx="0.5" fill="none" stroke="#987868" stroke-width="0.6"/>
+    <line x1="69.5" y1="73" x2="69.5" y2="78" stroke="#987868" stroke-width="0.4" opacity="0.6"/>
+    <line x1="67" y1="75.5" x2="72" y2="75.5" stroke="#987868" stroke-width="0.4" opacity="0.6"/>
+  </g>
+  <g>
+    <rect x="77" y="73" width="5" height="5" rx="0.5" fill="#a8d0e8" opacity="0.8"/>
+    <rect x="77" y="73" width="5" height="5" rx="0.5" fill="none" stroke="#987868" stroke-width="0.6"/>
+    <line x1="79.5" y1="73" x2="79.5" y2="78" stroke="#987868" stroke-width="0.4" opacity="0.6"/>
+    <line x1="77" y1="75.5" x2="82" y2="75.5" stroke="#987868" stroke-width="0.4" opacity="0.6"/>
+  </g>
+
+  <!-- Door (4x8px) -->
+  <rect x="60" y="72" width="4" height="8" rx="0.5" fill="#8a6848"/>
+  <circle cx="63" cy="76.5" r="0.6" fill="#c0a080"/>
+
+  <!-- Parked cars in lot -->
+  <!-- Car 1 -->
+  <rect x="20" y="90" width="8" height="16" rx="2" fill="#90b8d8" opacity="0.45"/>
+  <rect x="21" y="92" width="6" height="4" rx="1" fill="#a8d0e8" opacity="0.35"/>
+  <rect x="21" y="100" width="6" height="4" rx="1" fill="#a8d0e8" opacity="0.35"/>
+  <!-- Car 2 -->
+  <rect x="56" y="90" width="8" height="16" rx="2" fill="#a8a898" opacity="0.4"/>
+  <rect x="57" y="92" width="6" height="4" rx="1" fill="#a8d0e8" opacity="0.3"/>
+  <rect x="57" y="100" width="6" height="4" rx="1" fill="#a8d0e8" opacity="0.3"/>
+  <!-- Car 3 -->
+  <rect x="80" y="90" width="8" height="16" rx="2" fill="#d08870" opacity="0.4"/>
+  <rect x="81" y="92" width="6" height="4" rx="1" fill="#a8d0e8" opacity="0.3"/>
+  <rect x="81" y="100" width="6" height="4" rx="1" fill="#a8d0e8" opacity="0.3"/>
+</svg>

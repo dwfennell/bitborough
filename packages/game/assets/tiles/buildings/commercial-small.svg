@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- Transparent background - terrain renders underneath -->
+
+  <!-- Building shadow -->
+  <rect x="44" y="30" width="40" height="48" rx="2" fill="#000000" opacity="0.1" transform="translate(3, 3)"/>
+
+  <!-- Lot ground (paved commercial lot) -->
+  <rect x="8" y="8" width="112" height="112" rx="3" fill="#d8d8d0" opacity="0.3"/>
+
+  <!-- Parking lines in front (south of building) -->
+  <g stroke="#e0e0e0" stroke-width="0.8" opacity="0.5">
+    <line x1="30" y1="84" x2="30" y2="100"/>
+    <line x1="42" y1="84" x2="42" y2="100"/>
+    <line x1="54" y1="84" x2="54" y2="100"/>
+    <line x1="66" y1="84" x2="66" y2="100"/>
+    <line x1="78" y1="84" x2="78" y2="100"/>
+    <line x1="90" y1="84" x2="90" y2="100"/>
+  </g>
+
+  <!-- Shop walls -->
+  <rect x="44" y="30" width="40" height="48" rx="2" fill="#d8d8d0"/>
+
+  <!-- Roof -->
+  <rect x="41" y="27" width="46" height="42" rx="2" fill="#90b8d8"/>
+  <!-- Roof ridge line -->
+  <line x1="64" y1="29" x2="64" y2="67" stroke="#80a8c8" stroke-width="1.5" opacity="0.5"/>
+
+  <!-- Rooftop AC unit (8x6px gray rect with circle fan) -->
+  <rect x="72" y="34" width="8" height="6" rx="1" fill="#a8a898" opacity="0.7"/>
+  <circle cx="76" cy="37" r="2" fill="none" stroke="#8a8878" stroke-width="0.5" opacity="0.6"/>
+  <circle cx="76" cy="37" r="0.6" fill="#8a8878" opacity="0.5"/>
+
+  <!-- Signage rectangle on south wall -->
+  <rect x="50" y="70" width="24" height="4" rx="0.5" fill="#e8d080" opacity="0.5"/>
+
+  <!-- Storefront windows (2 wide, 14x6px each, on south wall) -->
+  <g>
+    <rect x="46" y="72" width="14" height="6" rx="0.5" fill="#a8d0e8" opacity="0.8"/>
+    <rect x="46" y="72" width="14" height="6" rx="0.5" fill="none" stroke="#987868" stroke-width="0.6"/>
+    <line x1="53" y1="72" x2="53" y2="78" stroke="#987868" stroke-width="0.4" opacity="0.6"/>
+    <line x1="46" y1="75" x2="60" y2="75" stroke="#987868" stroke-width="0.4" opacity="0.6"/>
+  </g>
+  <g>
+    <rect x="64" y="72" width="14" height="6" rx="0.5" fill="#a8d0e8" opacity="0.8"/>
+    <rect x="64" y="72" width="14" height="6" rx="0.5" fill="none" stroke="#987868" stroke-width="0.6"/>
+    <line x1="71" y1="72" x2="71" y2="78" stroke="#987868" stroke-width="0.4" opacity="0.6"/>
+    <line x1="64" y1="75" x2="78" y2="75" stroke="#987868" stroke-width="0.4" opacity="0.6"/>
+  </g>
+
+  <!-- Door (4x8px) -->
+  <rect x="60" y="70" width="4" height="8" rx="0.5" fill="#8a6848"/>
+  <circle cx="63" cy="74.5" r="0.6" fill="#c0a080"/>
+
+  <!-- Parked cars in lot -->
+  <!-- Car 1 -->
+  <rect x="32" y="86" width="8" height="12" rx="2" fill="#90b8d8" opacity="0.45"/>
+  <rect x="33" y="88" width="6" height="3" rx="1" fill="#a8d0e8" opacity="0.35"/>
+  <rect x="33" y="93" width="6" height="3" rx="1" fill="#a8d0e8" opacity="0.35"/>
+  <!-- Car 2 -->
+  <rect x="68" y="86" width="8" height="12" rx="2" fill="#d08870" opacity="0.4"/>
+  <rect x="69" y="88" width="6" height="3" rx="1" fill="#a8d0e8" opacity="0.3"/>
+  <rect x="69" y="93" width="6" height="3" rx="1" fill="#a8d0e8" opacity="0.3"/>
+</svg>
