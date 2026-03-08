@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="asphalt" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#707070"/>
+      <stop offset="100%" stop-color="#686868"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Grass base -->
+  <rect width="128" height="128" fill="#8cc870"/>
+  <ellipse cx="18" cy="18" rx="12" ry="9" fill="#95d07a" opacity="0.4"/>
+  <ellipse cx="110" cy="18" rx="12" ry="9" fill="#82c466" opacity="0.35"/>
+  <ellipse cx="18" cy="110" rx="12" ry="9" fill="#95d07a" opacity="0.38"/>
+  <ellipse cx="110" cy="110" rx="12" ry="9" fill="#82c466" opacity="0.4"/>
+
+  <!-- Grass blade clusters in corners -->
+  <g fill="#6aaa50" opacity="0.45">
+    <path d="M14 28 L15.5 22 L17 28Z"/>
+    <path d="M16 28.5 L18 21 L19.5 28.5Z"/>
+  </g>
+  <g fill="#6aaa50" opacity="0.4">
+    <path d="M108 100 L109.5 94 L111 100Z"/>
+    <path d="M110 100.5 L112 93 L113.5 100.5Z"/>
+  </g>
+
+  <!-- Sidewalks - lighter pavement flanking the road -->
+  <!-- Vertical sidewalks -->
+  <rect x="40" y="0" width="8" height="40" fill="#b0b0a8" opacity="0.6"/>
+  <rect x="80" y="0" width="8" height="40" fill="#b0b0a8" opacity="0.6"/>
+  <rect x="40" y="88" width="8" height="40" fill="#b0b0a8" opacity="0.6"/>
+  <rect x="80" y="88" width="8" height="40" fill="#b0b0a8" opacity="0.6"/>
+  <!-- Horizontal sidewalks -->
+  <rect x="0" y="40" width="40" height="8" fill="#b0b0a8" opacity="0.6"/>
+  <rect x="0" y="80" width="40" height="8" fill="#b0b0a8" opacity="0.6"/>
+  <rect x="88" y="40" width="40" height="8" fill="#b0b0a8" opacity="0.6"/>
+  <rect x="88" y="80" width="40" height="8" fill="#b0b0a8" opacity="0.6"/>
+  <!-- Intersection sidewalk corners -->
+  <rect x="40" y="40" width="8" height="8" fill="#b0b0a8" opacity="0.6"/>
+  <rect x="80" y="40" width="8" height="8" fill="#b0b0a8" opacity="0.6"/>
+  <rect x="40" y="80" width="8" height="8" fill="#b0b0a8" opacity="0.6"/>
+  <rect x="80" y="80" width="8" height="8" fill="#b0b0a8" opacity="0.6"/>
+
+  <!-- Road pavement - 32px wide -->
+  <!-- Vertical road -->
+  <rect x="48" y="0" width="32" height="128" fill="url(#asphalt)"/>
+  <!-- Horizontal road -->
+  <rect x="0" y="48" width="128" height="32" fill="url(#asphalt)"/>
+
+  <!-- Curb lines -->
+  <g stroke="#989898" stroke-width="1.5" opacity="0.5">
+    <!-- Vertical outer curbs (grass side) -->
+    <line x1="40" y1="0" x2="40" y2="40"/>
+    <line x1="88" y1="0" x2="88" y2="40"/>
+    <line x1="40" y1="88" x2="40" y2="128"/>
+    <line x1="88" y1="88" x2="88" y2="128"/>
+    <!-- Horizontal outer curbs (grass side) -->
+    <line x1="0" y1="40" x2="40" y2="40"/>
+    <line x1="88" y1="40" x2="128" y2="40"/>
+    <line x1="0" y1="88" x2="40" y2="88"/>
+    <line x1="88" y1="88" x2="128" y2="88"/>
+  </g>
+
+  <!-- Road surface texture -->
+  <g fill="#606060" opacity="0.12">
+    <circle cx="56" cy="15" r="0.8"/>
+    <circle cx="70" cy="28" r="0.7"/>
+    <circle cx="52" cy="55" r="0.9"/>
+    <circle cx="74" cy="68" r="0.7"/>
+    <circle cx="60" cy="105" r="0.8"/>
+    <circle cx="72" cy="118" r="0.7"/>
+    <circle cx="18" cy="60" r="0.8"/>
+    <circle cx="30" cy="70" r="0.7"/>
+    <circle cx="100" cy="56" r="0.8"/>
+    <circle cx="112" cy="68" r="0.7"/>
+    <circle cx="64" cy="64" r="0.6"/>
+  </g>
+
+  <!-- Center lane markings - dashed yellow -->
+  <!-- Vertical (north approach) -->
+  <rect x="63.25" y="4" width="1.5" height="8" rx="0.75" fill="#e8d080" opacity="0.7"/>
+  <rect x="63.25" y="18" width="1.5" height="8" rx="0.75" fill="#e8d080" opacity="0.7"/>
+  <rect x="63.25" y="32" width="1.5" height="8" rx="0.75" fill="#e8d080" opacity="0.7"/>
+  <!-- Vertical (south approach) -->
+  <rect x="63.25" y="88" width="1.5" height="8" rx="0.75" fill="#e8d080" opacity="0.7"/>
+  <rect x="63.25" y="102" width="1.5" height="8" rx="0.75" fill="#e8d080" opacity="0.7"/>
+  <rect x="63.25" y="116" width="1.5" height="8" rx="0.75" fill="#e8d080" opacity="0.7"/>
+  <!-- Horizontal (west approach) -->
+  <rect x="4" y="63.25" width="8" height="1.5" rx="0.75" fill="#e8d080" opacity="0.7"/>
+  <rect x="18" y="63.25" width="8" height="1.5" rx="0.75" fill="#e8d080" opacity="0.7"/>
+  <rect x="32" y="63.25" width="8" height="1.5" rx="0.75" fill="#e8d080" opacity="0.7"/>
+  <!-- Horizontal (east approach) -->
+  <rect x="88" y="63.25" width="8" height="1.5" rx="0.75" fill="#e8d080" opacity="0.7"/>
+  <rect x="102" y="63.25" width="8" height="1.5" rx="0.75" fill="#e8d080" opacity="0.7"/>
+  <rect x="116" y="63.25" width="8" height="1.5" rx="0.75" fill="#e8d080" opacity="0.7"/>
+
+  <!-- Stop lines -->
+  <rect x="49" y="46.5" width="14" height="1.5" rx="0.5" fill="#e0e0e0" opacity="0.6"/>
+  <rect x="65" y="80" width="14" height="1.5" rx="0.5" fill="#e0e0e0" opacity="0.6"/>
+  <rect x="80" y="49" width="1.5" height="14" rx="0.5" fill="#e0e0e0" opacity="0.6"/>
+  <rect x="46.5" y="65" width="1.5" height="14" rx="0.5" fill="#e0e0e0" opacity="0.6"/>
+
+  <!-- Manhole cover in center -->
+  <circle cx="64" cy="64" r="3" fill="#585858" opacity="0.5"/>
+  <circle cx="64" cy="64" r="2" fill="#626262" opacity="0.4"/>
+  <line x1="62.5" y1="62.5" x2="65.5" y2="65.5" stroke="#555555" stroke-width="0.5" opacity="0.4"/>
+  <line x1="65.5" y1="62.5" x2="62.5" y2="65.5" stroke="#555555" stroke-width="0.5" opacity="0.4"/>
+
+  <!-- Small flowers in grass corners -->
+  <circle cx="15" cy="108" r="1.5" fill="#e8c8d0" opacity="0.6"/>
+  <circle cx="112" cy="15" r="1.5" fill="#e8d8a0" opacity="0.6"/>
+</svg>

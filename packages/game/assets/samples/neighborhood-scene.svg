@@ -1,0 +1,514 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 1024">
+  <!-- 10x8 tile neighborhood scene showing scale relationships -->
+  <!-- Each cell is 128x128px = 32m x 32m -->
+
+  <defs>
+    <linearGradient id="grassBase" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#8cc870"/>
+      <stop offset="100%" stop-color="#7abb62"/>
+    </linearGradient>
+    <linearGradient id="waterBase" x1="0" y1="0" x2="0.3" y2="1">
+      <stop offset="0%" stop-color="#88c8e8"/>
+      <stop offset="50%" stop-color="#78b8d8"/>
+      <stop offset="100%" stop-color="#88c8e8"/>
+    </linearGradient>
+    <linearGradient id="asphalt" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#707070"/>
+      <stop offset="100%" stop-color="#686868"/>
+    </linearGradient>
+  </defs>
+
+  <!-- ============================================ -->
+  <!-- BASE LAYER: Fill everything with grass first -->
+  <!-- ============================================ -->
+  <rect width="1280" height="1024" fill="url(#grassBase)"/>
+
+  <!-- Grass texture patches scattered everywhere -->
+  <g>
+    <!-- Row by row organic patches -->
+    <ellipse cx="50" cy="40" rx="18" ry="11" fill="#95d07a" opacity="0.4"/>
+    <ellipse cx="180" cy="80" rx="15" ry="9" fill="#82c466" opacity="0.35"/>
+    <ellipse cx="90" cy="180" rx="20" ry="12" fill="#9ad680" opacity="0.3"/>
+    <ellipse cx="60" cy="320" rx="16" ry="10" fill="#95d07a" opacity="0.4"/>
+    <ellipse cx="30" cy="500" rx="14" ry="8" fill="#a0da88" opacity="0.35"/>
+    <ellipse cx="100" cy="600" rx="18" ry="11" fill="#82c466" opacity="0.3"/>
+    <ellipse cx="50" cy="750" rx="15" ry="10" fill="#95d07a" opacity="0.4"/>
+    <ellipse cx="160" cy="900" rx="20" ry="12" fill="#9ad680" opacity="0.35"/>
+    <ellipse cx="1200" cy="60" rx="16" ry="10" fill="#82c466" opacity="0.35"/>
+    <ellipse cx="1100" cy="150" rx="18" ry="12" fill="#95d07a" opacity="0.4"/>
+    <ellipse cx="1230" cy="300" rx="14" ry="9" fill="#a0da88" opacity="0.3"/>
+    <ellipse cx="1150" cy="500" rx="20" ry="11" fill="#82c466" opacity="0.35"/>
+    <ellipse cx="1200" cy="700" rx="16" ry="10" fill="#95d07a" opacity="0.38"/>
+    <ellipse cx="1100" cy="850" rx="18" ry="12" fill="#9ad680" opacity="0.35"/>
+    <ellipse cx="300" cy="50" rx="14" ry="9" fill="#82c466" opacity="0.35"/>
+    <ellipse cx="700" cy="40" rx="16" ry="10" fill="#95d07a" opacity="0.38"/>
+    <ellipse cx="900" cy="90" rx="14" ry="8" fill="#a0da88" opacity="0.3"/>
+    <ellipse cx="600" cy="600" rx="18" ry="11" fill="#82c466" opacity="0.3"/>
+    <ellipse cx="800" cy="700" rx="15" ry="10" fill="#95d07a" opacity="0.35"/>
+    <ellipse cx="400" cy="800" rx="20" ry="12" fill="#9ad680" opacity="0.3"/>
+    <ellipse cx="1000" cy="900" rx="16" ry="10" fill="#82c466" opacity="0.35"/>
+  </g>
+
+  <!-- Grass dark patches -->
+  <g fill="#6aaa50">
+    <ellipse cx="80" cy="100" rx="10" ry="6" opacity="0.25"/>
+    <ellipse cx="200" cy="400" rx="12" ry="7" opacity="0.2"/>
+    <ellipse cx="1150" cy="400" rx="10" ry="6" opacity="0.25"/>
+    <ellipse cx="60" cy="900" rx="11" ry="7" opacity="0.22"/>
+    <ellipse cx="900" cy="50" rx="10" ry="6" opacity="0.25"/>
+  </g>
+
+  <!-- Grass blade clusters scattered around -->
+  <g fill="#6aaa50" opacity="0.4">
+    <path d="M40 150 L42 143 L44 150Z"/>
+    <path d="M42 151 L45 142 L47 151Z"/>
+    <path d="M1210 180 L1212 173 L1214 180Z"/>
+    <path d="M1212 181 L1215 172 L1217 181Z"/>
+    <path d="M80 850 L82 843 L84 850Z"/>
+    <path d="M82 851 L85 842 L87 851Z"/>
+    <path d="M700 100 L702 93 L704 100Z"/>
+    <path d="M702 101 L705 92 L707 101Z"/>
+  </g>
+
+  <!-- Flowers scattered in grass areas -->
+  <g>
+    <circle cx="30" cy="260" r="1.8" fill="#e8c8d0" opacity="0.65"/>
+    <circle cx="32" cy="258" r="1.4" fill="#d8a8b8" opacity="0.55"/>
+    <circle cx="1240" cy="500" r="1.8" fill="#e8d8a0" opacity="0.6"/>
+    <circle cx="100" cy="700" r="1.8" fill="#e8c8d0" opacity="0.6"/>
+    <circle cx="700" cy="60" r="1.5" fill="#e8d8a0" opacity="0.6"/>
+    <circle cx="180" cy="950" r="1.8" fill="#e8c8d0" opacity="0.65"/>
+    <circle cx="182" cy="948" r="1.4" fill="#d8b8c0" opacity="0.55"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- WATER: Right edge (columns 9-10, rows 1-4)  -->
+  <!-- ============================================ -->
+  <rect x="1024" y="0" width="256" height="512" fill="url(#waterBase)"/>
+  <!-- Water depth patches -->
+  <ellipse cx="1100" cy="100" rx="30" ry="20" fill="#6aaccf" opacity="0.18"/>
+  <ellipse cx="1180" cy="250" rx="25" ry="15" fill="#6aaccf" opacity="0.15"/>
+  <ellipse cx="1080" cy="400" rx="28" ry="18" fill="#6aaccf" opacity="0.17"/>
+  <!-- Ripples -->
+  <g fill="none" stroke="#a0d8f0" stroke-width="1" stroke-linecap="round" opacity="0.35">
+    <path d="M1050 60 Q1080 56 1110 60 Q1140 64 1170 60"/>
+    <path d="M1070 150 Q1100 146 1130 150 Q1160 154 1190 150"/>
+    <path d="M1040 250 Q1070 246 1100 250 Q1130 254 1160 250"/>
+    <path d="M1080 340 Q1110 336 1140 340 Q1170 344 1200 340"/>
+    <path d="M1050 440 Q1080 436 1110 440 Q1140 444 1170 440"/>
+  </g>
+  <!-- Secondary ripples -->
+  <g fill="none" stroke="#b0e0f4" stroke-width="0.7" stroke-linecap="round" opacity="0.25">
+    <path d="M1060 100 Q1080 98 1100 100"/>
+    <path d="M1120 200 Q1140 198 1160 200"/>
+    <path d="M1050 300 Q1070 298 1090 300"/>
+    <path d="M1130 380 Q1150 378 1170 380"/>
+    <path d="M1070 470 Q1090 468 1110 470"/>
+  </g>
+  <!-- Sparkles -->
+  <circle cx="1100" cy="80" r="1.3" fill="#d0eef8" opacity="0.55"/>
+  <circle cx="1200" cy="180" r="1.1" fill="#d0eef8" opacity="0.5"/>
+  <circle cx="1060" cy="320" r="1.2" fill="#d0eef8" opacity="0.5"/>
+  <circle cx="1180" cy="430" r="1" fill="#d0eef8" opacity="0.45"/>
+
+  <!-- Water-grass edge (column 8, rows 1-4: transition) -->
+  <!-- Gentle shoreline with grass on left, water creeping in -->
+  <path d="M1024 0 Q1030 50 1024 100 Q1018 150 1024 200 Q1030 250 1024 300 Q1018 350 1024 400 Q1030 450 1024 512" fill="url(#waterBase)" opacity="0.6"/>
+  <path d="M1024 0 Q1036 40 1028 80 Q1020 120 1030 160 Q1040 200 1028 240 Q1016 280 1028 320 Q1040 360 1030 400 Q1020 440 1030 480 Q1036 500 1024 512" fill="url(#waterBase)" opacity="0.3"/>
+
+  <!-- ============================================ -->
+  <!-- TREES: Scattered groves                     -->
+  <!-- ============================================ -->
+  <!-- Tree cluster top-left area -->
+  <g>
+    <!-- Tree 1 -->
+    <circle cx="55" cy="460" r="13" fill="#60a850" opacity="0.3"/>
+    <circle cx="52" cy="456" r="11" fill="#78b868" opacity="0.55"/>
+    <circle cx="48" cy="452" r="8" fill="#90c880" opacity="0.45"/>
+    <!-- Tree 2 -->
+    <circle cx="90" cy="480" r="12" fill="#60a850" opacity="0.3"/>
+    <circle cx="87" cy="476" r="10" fill="#78b868" opacity="0.55"/>
+    <circle cx="84" cy="473" r="7" fill="#90c880" opacity="0.4"/>
+    <!-- Tree 3 -->
+    <circle cx="40" cy="500" r="11" fill="#60a850" opacity="0.3"/>
+    <circle cx="37" cy="496" r="9" fill="#78b868" opacity="0.5"/>
+    <circle cx="35" cy="493" r="6.5" fill="#90c880" opacity="0.4"/>
+  </g>
+
+  <!-- Tree cluster near water -->
+  <g>
+    <circle cx="980" cy="180" r="14" fill="#60a850" opacity="0.3"/>
+    <circle cx="977" cy="176" r="11" fill="#78b868" opacity="0.55"/>
+    <circle cx="974" cy="173" r="8" fill="#90c880" opacity="0.45"/>
+
+    <circle cx="950" cy="220" r="12" fill="#60a850" opacity="0.3"/>
+    <circle cx="947" cy="216" r="10" fill="#78b868" opacity="0.5"/>
+    <circle cx="944" cy="213" r="7" fill="#90c880" opacity="0.4"/>
+
+    <circle cx="1000" cy="240" r="11" fill="#60a850" opacity="0.28"/>
+    <circle cx="997" cy="236" r="9" fill="#78b868" opacity="0.5"/>
+    <circle cx="995" cy="233" r="6" fill="#90c880" opacity="0.4"/>
+  </g>
+
+  <!-- Isolated trees -->
+  <g>
+    <circle cx="200" cy="200" r="12" fill="#60a850" opacity="0.28"/>
+    <circle cx="197" cy="196" r="10" fill="#78b868" opacity="0.5"/>
+    <circle cx="194" cy="193" r="7" fill="#90c880" opacity="0.4"/>
+
+    <circle cx="750" cy="900" r="13" fill="#60a850" opacity="0.3"/>
+    <circle cx="747" cy="896" r="10" fill="#78b868" opacity="0.55"/>
+    <circle cx="744" cy="893" r="7.5" fill="#90c880" opacity="0.42"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- ROADS: Horizontal road across row 5 (y=512) -->
+  <!--        Vertical road down column 3 (x=256)  -->
+  <!-- ============================================ -->
+
+  <!-- Horizontal road: full width, at y=496-560 (row 4-5 boundary area) -->
+  <!-- Sidewalks -->
+  <rect x="0" y="488" width="1024" height="8" fill="#b0b0a8" opacity="0.6"/>
+  <rect x="0" y="560" width="1024" height="8" fill="#b0b0a8" opacity="0.6"/>
+  <!-- Pavement -->
+  <rect x="0" y="496" width="1024" height="64" fill="url(#asphalt)"/>
+  <!-- Wait, roads are 32px pavement + 8px sidewalk each side = 48px total -->
+  <!-- Let me correct: sidewalk 8px, pavement 32px, sidewalk 8px -->
+
+  <!-- Actually let me redo the road properly -->
+  <!-- Horizontal road across the scene at y ~= 512 area -->
+  <!-- Sidewalk top -->
+  <rect x="0" y="488" width="1280" height="8" fill="#b0b0a8" opacity="0.55"/>
+  <!-- Pavement -->
+  <rect x="0" y="496" width="1280" height="32" fill="url(#asphalt)"/>
+  <!-- Sidewalk bottom -->
+  <rect x="0" y="528" width="1280" height="8" fill="#b0b0a8" opacity="0.55"/>
+
+  <!-- Curb lines -->
+  <line x1="0" y1="488" x2="1280" y2="488" stroke="#989898" stroke-width="1.5" opacity="0.4"/>
+  <line x1="0" y1="536" x2="1280" y2="536" stroke="#989898" stroke-width="1.5" opacity="0.4"/>
+
+  <!-- Horizontal road center dashes -->
+  <g fill="#e8d080" opacity="0.6">
+    <rect x="10" y="511.25" width="8" height="1.5" rx="0.75"/>
+    <rect x="24" y="511.25" width="8" height="1.5" rx="0.75"/>
+    <rect x="38" y="511.25" width="8" height="1.5" rx="0.75"/>
+    <rect x="52" y="511.25" width="8" height="1.5" rx="0.75"/>
+    <rect x="66" y="511.25" width="8" height="1.5" rx="0.75"/>
+    <rect x="80" y="511.25" width="8" height="1.5" rx="0.75"/>
+    <rect x="94" y="511.25" width="8" height="1.5" rx="0.75"/>
+    <rect x="108" y="511.25" width="8" height="1.5" rx="0.75"/>
+    <rect x="122" y="511.25" width="8" height="1.5" rx="0.75"/>
+    <rect x="136" y="511.25" width="8" height="1.5" rx="0.75"/>
+    <rect x="150" y="511.25" width="8" height="1.5" rx="0.75"/>
+    <rect x="164" y="511.25" width="8" height="1.5" rx="0.75"/>
+    <rect x="178" y="511.25" width="8" height="1.5" rx="0.75"/>
+    <rect x="192" y="511.25" width="8" height="1.5" rx="0.75"/>
+    <rect x="206" y="511.25" width="8" height="1.5" rx="0.75"/>
+    <rect x="220" y="511.25" width="8" height="1.5" rx="0.75"/>
+    <rect x="234" y="511.25" width="8" height="1.5" rx="0.75"/>
+    <!-- gap for intersection at column 3 -->
+    <rect x="304" y="511.25" width="8" height="1.5" rx="0.75"/>
+    <rect x="318" y="511.25" width="8" height="1.5" rx="0.75"/>
+    <rect x="332" y="511.25" width="8" height="1.5" rx="0.75"/>
+    <rect x="346" y="511.25" width="8" height="1.5" rx="0.75"/>
+    <rect x="360" y="511.25" width="8" height="1.5" rx="0.75"/>
+    <rect x="374" y="511.25" width="8" height="1.5" rx="0.75"/>
+    <rect x="388" y="511.25" width="8" height="1.5" rx="0.75"/>
+    <rect x="402" y="511.25" width="8" height="1.5" rx="0.75"/>
+    <rect x="416" y="511.25" width="8" height="1.5" rx="0.75"/>
+    <rect x="430" y="511.25" width="8" height="1.5" rx="0.75"/>
+    <rect x="444" y="511.25" width="8" height="1.5" rx="0.75"/>
+    <rect x="458" y="511.25" width="8" height="1.5" rx="0.75"/>
+    <rect x="472" y="511.25" width="8" height="1.5" rx="0.75"/>
+    <rect x="486" y="511.25" width="8" height="1.5" rx="0.75"/>
+    <rect x="500" y="511.25" width="8" height="1.5" rx="0.75"/>
+    <rect x="514" y="511.25" width="8" height="1.5" rx="0.75"/>
+    <rect x="528" y="511.25" width="8" height="1.5" rx="0.75"/>
+    <rect x="542" y="511.25" width="8" height="1.5" rx="0.75"/>
+    <rect x="556" y="511.25" width="8" height="1.5" rx="0.75"/>
+    <rect x="570" y="511.25" width="8" height="1.5" rx="0.75"/>
+    <rect x="584" y="511.25" width="8" height="1.5" rx="0.75"/>
+    <rect x="598" y="511.25" width="8" height="1.5" rx="0.75"/>
+    <rect x="612" y="511.25" width="8" height="1.5" rx="0.75"/>
+    <rect x="626" y="511.25" width="8" height="1.5" rx="0.75"/>
+    <rect x="640" y="511.25" width="8" height="1.5" rx="0.75"/>
+  </g>
+
+  <!-- Vertical road down column 3 (x centered at 320) -->
+  <!-- Sidewalks -->
+  <rect x="296" y="0" width="8" height="1024" fill="#b0b0a8" opacity="0.55"/>
+  <rect x="336" y="0" width="8" height="1024" fill="#b0b0a8" opacity="0.55"/>
+  <!-- Pavement -->
+  <rect x="304" y="0" width="32" height="1024" fill="url(#asphalt)"/>
+  <!-- Curbs -->
+  <line x1="296" y1="0" x2="296" y2="1024" stroke="#989898" stroke-width="1.5" opacity="0.4"/>
+  <line x1="344" y1="0" x2="344" y2="1024" stroke="#989898" stroke-width="1.5" opacity="0.4"/>
+
+  <!-- Vertical road center dashes (skip intersection zone y=488-536) -->
+  <g fill="#e8d080" opacity="0.6">
+    <rect x="319.25" y="10" width="1.5" height="8" rx="0.75"/>
+    <rect x="319.25" y="24" width="1.5" height="8" rx="0.75"/>
+    <rect x="319.25" y="38" width="1.5" height="8" rx="0.75"/>
+    <rect x="319.25" y="52" width="1.5" height="8" rx="0.75"/>
+    <rect x="319.25" y="66" width="1.5" height="8" rx="0.75"/>
+    <rect x="319.25" y="80" width="1.5" height="8" rx="0.75"/>
+    <rect x="319.25" y="94" width="1.5" height="8" rx="0.75"/>
+    <rect x="319.25" y="108" width="1.5" height="8" rx="0.75"/>
+    <rect x="319.25" y="122" width="1.5" height="8" rx="0.75"/>
+    <rect x="319.25" y="136" width="1.5" height="8" rx="0.75"/>
+    <rect x="319.25" y="150" width="1.5" height="8" rx="0.75"/>
+    <rect x="319.25" y="164" width="1.5" height="8" rx="0.75"/>
+    <rect x="319.25" y="178" width="1.5" height="8" rx="0.75"/>
+    <rect x="319.25" y="192" width="1.5" height="8" rx="0.75"/>
+    <rect x="319.25" y="206" width="1.5" height="8" rx="0.75"/>
+    <rect x="319.25" y="220" width="1.5" height="8" rx="0.75"/>
+    <rect x="319.25" y="234" width="1.5" height="8" rx="0.75"/>
+    <rect x="319.25" y="248" width="1.5" height="8" rx="0.75"/>
+    <rect x="319.25" y="262" width="1.5" height="8" rx="0.75"/>
+    <rect x="319.25" y="276" width="1.5" height="8" rx="0.75"/>
+    <rect x="319.25" y="290" width="1.5" height="8" rx="0.75"/>
+    <rect x="319.25" y="304" width="1.5" height="8" rx="0.75"/>
+    <rect x="319.25" y="318" width="1.5" height="8" rx="0.75"/>
+    <rect x="319.25" y="332" width="1.5" height="8" rx="0.75"/>
+    <rect x="319.25" y="346" width="1.5" height="8" rx="0.75"/>
+    <rect x="319.25" y="360" width="1.5" height="8" rx="0.75"/>
+    <rect x="319.25" y="374" width="1.5" height="8" rx="0.75"/>
+    <rect x="319.25" y="388" width="1.5" height="8" rx="0.75"/>
+    <rect x="319.25" y="402" width="1.5" height="8" rx="0.75"/>
+    <rect x="319.25" y="416" width="1.5" height="8" rx="0.75"/>
+    <rect x="319.25" y="430" width="1.5" height="8" rx="0.75"/>
+    <rect x="319.25" y="444" width="1.5" height="8" rx="0.75"/>
+    <rect x="319.25" y="458" width="1.5" height="8" rx="0.75"/>
+    <rect x="319.25" y="472" width="1.5" height="8" rx="0.75"/>
+    <!-- skip intersection -->
+    <rect x="319.25" y="546" width="1.5" height="8" rx="0.75"/>
+    <rect x="319.25" y="560" width="1.5" height="8" rx="0.75"/>
+    <rect x="319.25" y="574" width="1.5" height="8" rx="0.75"/>
+    <rect x="319.25" y="588" width="1.5" height="8" rx="0.75"/>
+    <rect x="319.25" y="602" width="1.5" height="8" rx="0.75"/>
+    <rect x="319.25" y="616" width="1.5" height="8" rx="0.75"/>
+    <rect x="319.25" y="630" width="1.5" height="8" rx="0.75"/>
+    <rect x="319.25" y="644" width="1.5" height="8" rx="0.75"/>
+    <rect x="319.25" y="658" width="1.5" height="8" rx="0.75"/>
+    <rect x="319.25" y="672" width="1.5" height="8" rx="0.75"/>
+    <rect x="319.25" y="686" width="1.5" height="8" rx="0.75"/>
+    <rect x="319.25" y="700" width="1.5" height="8" rx="0.75"/>
+    <rect x="319.25" y="714" width="1.5" height="8" rx="0.75"/>
+    <rect x="319.25" y="728" width="1.5" height="8" rx="0.75"/>
+    <rect x="319.25" y="742" width="1.5" height="8" rx="0.75"/>
+    <rect x="319.25" y="756" width="1.5" height="8" rx="0.75"/>
+    <rect x="319.25" y="770" width="1.5" height="8" rx="0.75"/>
+  </g>
+
+  <!-- Road grain texture -->
+  <g fill="#606060" opacity="0.1">
+    <circle cx="310" cy="50" r="0.7"/>
+    <circle cx="330" cy="120" r="0.8"/>
+    <circle cx="315" cy="250" r="0.7"/>
+    <circle cx="325" cy="380" r="0.8"/>
+    <circle cx="312" cy="600" r="0.7"/>
+    <circle cx="335" cy="700" r="0.8"/>
+    <circle cx="318" cy="850" r="0.7"/>
+    <circle cx="100" cy="505" r="0.7"/>
+    <circle cx="200" cy="518" r="0.8"/>
+    <circle cx="450" cy="508" r="0.7"/>
+    <circle cx="550" cy="520" r="0.8"/>
+    <circle cx="700" cy="502" r="0.7"/>
+    <circle cx="850" cy="515" r="0.8"/>
+  </g>
+
+  <!-- Intersection manhole -->
+  <circle cx="320" cy="512" r="3" fill="#585858" opacity="0.4"/>
+  <circle cx="320" cy="512" r="2" fill="#626262" opacity="0.35"/>
+
+  <!-- ============================================ -->
+  <!-- HOUSES: Along the road, various lots          -->
+  <!-- ============================================ -->
+
+  <!-- House 1: tile (0,2) - top-left of scene, left of road -->
+  <g transform="translate(128, 256)">
+    <rect x="44" y="38" width="40" height="32" rx="2" fill="#000000" opacity="0.1" transform="translate(3, 3)"/>
+    <rect x="8" y="8" width="112" height="112" rx="3" fill="#a0d48a" opacity="0.5"/>
+    <rect x="60" y="72" width="8" height="48" rx="1" fill="#c8b898" opacity="0.4"/>
+    <rect x="44" y="38" width="40" height="36" rx="2" fill="#e8c8b0"/>
+    <rect x="41" y="35" width="46" height="30" rx="2" fill="#d08870"/>
+    <line x1="64" y1="37" x2="64" y2="63" stroke="#c07060" stroke-width="1.5" opacity="0.5"/>
+    <g stroke="#c07860" stroke-width="0.5" opacity="0.25">
+      <line x1="43" y1="42" x2="85" y2="42"/>
+      <line x1="43" y1="49" x2="85" y2="49"/>
+      <line x1="43" y1="56" x2="85" y2="56"/>
+    </g>
+    <rect x="76" y="37" width="4" height="4" rx="0.5" fill="#a08070"/>
+    <rect x="75" y="36" width="6" height="2" rx="0.5" fill="#8a7060"/>
+    <path d="M78 35 Q79.5 30 77.5 25 Q76 20 78 16" fill="none" stroke="#d0d0d0" stroke-width="1" stroke-linecap="round" opacity="0.2"/>
+    <rect x="48" y="67" width="5" height="5" rx="0.5" fill="#a8d0e8" opacity="0.8"/>
+    <rect x="48" y="67" width="5" height="5" rx="0.5" fill="none" stroke="#987868" stroke-width="0.6"/>
+    <rect x="57" y="67" width="5" height="5" rx="0.5" fill="#a8d0e8" opacity="0.8"/>
+    <rect x="57" y="67" width="5" height="5" rx="0.5" fill="none" stroke="#987868" stroke-width="0.6"/>
+    <rect x="70" y="66" width="4" height="8" rx="0.5" fill="#8a6848"/>
+    <ellipse cx="40" cy="68" rx="3" ry="2.5" fill="#78b868" opacity="0.65"/>
+    <ellipse cx="88" cy="65" rx="3" ry="2.5" fill="#78b868" opacity="0.65"/>
+    <!-- Yard tree -->
+    <circle cx="22" cy="30" r="11" fill="#78b868" opacity="0.5"/>
+    <circle cx="20" cy="28" r="8" fill="#90c880" opacity="0.45"/>
+  </g>
+
+  <!-- House 2: tile (1,2) - different roof color -->
+  <g transform="translate(0, 256)">
+    <rect x="48" y="42" width="36" height="28" rx="2" fill="#000000" opacity="0.1" transform="translate(3, 3)"/>
+    <rect x="8" y="8" width="112" height="112" rx="3" fill="#a0d48a" opacity="0.5"/>
+    <rect x="62" y="70" width="8" height="50" rx="1" fill="#c8b898" opacity="0.4"/>
+    <rect x="48" y="42" width="36" height="32" rx="2" fill="#e8c8b0"/>
+    <rect x="45" y="39" width="42" height="26" rx="2" fill="#c07060"/>
+    <line x1="66" y1="41" x2="66" y2="63" stroke="#a86050" stroke-width="1.5" opacity="0.5"/>
+    <g stroke="#a86050" stroke-width="0.5" opacity="0.25">
+      <line x1="47" y1="46" x2="85" y2="46"/>
+      <line x1="47" y1="52" x2="85" y2="52"/>
+      <line x1="47" y1="58" x2="85" y2="58"/>
+    </g>
+    <rect x="52" y="68" width="5" height="5" rx="0.5" fill="#a8d0e8" opacity="0.8"/>
+    <rect x="52" y="68" width="5" height="5" rx="0.5" fill="none" stroke="#987868" stroke-width="0.6"/>
+    <rect x="67" y="67" width="4" height="8" rx="0.5" fill="#8a6848"/>
+    <ellipse cx="95" cy="60" rx="3" ry="2.5" fill="#78b868" opacity="0.65"/>
+    <circle cx="100" cy="30" r="10" fill="#78b868" opacity="0.5"/>
+    <circle cx="98" cy="28" r="7" fill="#90c880" opacity="0.4"/>
+  </g>
+
+  <!-- House 3: tile (0,5) - below road, left of vertical road -->
+  <g transform="translate(128, 544)">
+    <rect x="44" y="30" width="40" height="32" rx="2" fill="#000000" opacity="0.1" transform="translate(3, 3)"/>
+    <rect x="8" y="8" width="112" height="112" rx="3" fill="#a0d48a" opacity="0.5"/>
+    <rect x="44" y="30" width="40" height="36" rx="2" fill="#e8c8b0"/>
+    <rect x="41" y="27" width="46" height="30" rx="2" fill="#d08870"/>
+    <line x1="64" y1="29" x2="64" y2="55" stroke="#c07060" stroke-width="1.5" opacity="0.5"/>
+    <g stroke="#c07860" stroke-width="0.5" opacity="0.25">
+      <line x1="43" y1="34" x2="85" y2="34"/>
+      <line x1="43" y1="41" x2="85" y2="41"/>
+      <line x1="43" y1="48" x2="85" y2="48"/>
+    </g>
+    <rect x="48" y="60" width="5" height="5" rx="0.5" fill="#a8d0e8" opacity="0.8"/>
+    <rect x="48" y="60" width="5" height="5" rx="0.5" fill="none" stroke="#987868" stroke-width="0.6"/>
+    <rect x="57" y="60" width="5" height="5" rx="0.5" fill="#a8d0e8" opacity="0.8"/>
+    <rect x="57" y="60" width="5" height="5" rx="0.5" fill="none" stroke="#987868" stroke-width="0.6"/>
+    <rect x="70" y="59" width="4" height="8" rx="0.5" fill="#8a6848"/>
+    <ellipse cx="40" cy="62" rx="3" ry="2.5" fill="#78b868" opacity="0.6"/>
+    <ellipse cx="90" cy="58" rx="3" ry="2.5" fill="#78b868" opacity="0.6"/>
+    <!-- Parked car -->
+    <rect x="20" y="80" width="18" height="8" rx="2" fill="#90b8d8" opacity="0.45"/>
+    <rect x="22" y="81" width="5" height="6" rx="1" fill="#a8d0e8" opacity="0.35"/>
+    <rect x="32" y="81" width="4" height="6" rx="1" fill="#a8d0e8" opacity="0.35"/>
+    <circle cx="100" cy="90" r="1.5" fill="#e8c8d0" opacity="0.6"/>
+  </g>
+
+  <!-- House 4: tile (0, 6) -->
+  <g transform="translate(0, 544)">
+    <rect x="50" y="35" width="34" height="28" rx="2" fill="#000000" opacity="0.1" transform="translate(3, 3)"/>
+    <rect x="8" y="8" width="112" height="112" rx="3" fill="#a0d48a" opacity="0.5"/>
+    <rect x="50" y="35" width="34" height="30" rx="2" fill="#e8c8b0"/>
+    <rect x="47" y="32" width="40" height="24" rx="2" fill="#c07060"/>
+    <line x1="67" y1="34" x2="67" y2="54" stroke="#a86050" stroke-width="1.5" opacity="0.5"/>
+    <rect x="54" y="59" width="5" height="5" rx="0.5" fill="#a8d0e8" opacity="0.8"/>
+    <rect x="54" y="59" width="5" height="5" rx="0.5" fill="none" stroke="#987868" stroke-width="0.6"/>
+    <rect x="68" y="58" width="4" height="8" rx="0.5" fill="#8a6848"/>
+    <circle cx="30" cy="80" r="10" fill="#78b868" opacity="0.5"/>
+    <circle cx="28" cy="78" r="7" fill="#90c880" opacity="0.4"/>
+    <circle cx="95" cy="100" r="1.5" fill="#e8d8a0" opacity="0.6"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- COMMERCIAL: Right of vertical road            -->
+  <!-- ============================================ -->
+
+  <!-- Shop 1: tile (3,2) - east of road, above horizontal road -->
+  <g transform="translate(384, 256)">
+    <rect x="38" y="30" width="52" height="42" rx="2" fill="#000000" opacity="0.1" transform="translate(3, 3)"/>
+    <rect x="8" y="8" width="112" height="112" rx="3" fill="#c8c8c0" opacity="0.3"/>
+    <rect x="38" y="30" width="52" height="46" rx="2" fill="#d8d8d0"/>
+    <rect x="35" y="27" width="58" height="36" rx="2" fill="#90b8d8"/>
+    <line x1="64" y1="29" x2="64" y2="61" stroke="#80a8c8" stroke-width="1.5" opacity="0.4"/>
+    <!-- Rooftop AC unit -->
+    <rect x="72" y="34" width="8" height="6" rx="1" fill="#a8a898" opacity="0.6"/>
+    <circle cx="76" cy="37" r="2" fill="#989880" opacity="0.5"/>
+    <!-- Storefront windows (larger) -->
+    <rect x="42" y="70" width="14" height="6" rx="0.5" fill="#a8d0e8" opacity="0.75"/>
+    <rect x="42" y="70" width="14" height="6" rx="0.5" fill="none" stroke="#987868" stroke-width="0.5"/>
+    <rect x="62" y="70" width="14" height="6" rx="0.5" fill="#a8d0e8" opacity="0.75"/>
+    <rect x="62" y="70" width="14" height="6" rx="0.5" fill="none" stroke="#987868" stroke-width="0.5"/>
+    <!-- Sign rectangle -->
+    <rect x="48" y="64" width="24" height="4" rx="0.5" fill="#e8d080" opacity="0.5"/>
+    <!-- Parking lines in front -->
+    <g stroke="#e0e0e0" stroke-width="0.5" opacity="0.3">
+      <line x1="40" y1="90" x2="40" y2="108"/>
+      <line x1="52" y1="90" x2="52" y2="108"/>
+      <line x1="64" y1="90" x2="64" y2="108"/>
+      <line x1="76" y1="90" x2="76" y2="108"/>
+      <line x1="88" y1="90" x2="88" y2="108"/>
+    </g>
+    <!-- Parked cars in lot -->
+    <rect x="42" y="94" width="8" height="5" rx="1" fill="#d08870" opacity="0.4"/>
+    <rect x="66" y="94" width="8" height="5" rx="1" fill="#585858" opacity="0.35"/>
+  </g>
+
+  <!-- Shop 2: tile (3,3) -->
+  <g transform="translate(384, 384)">
+    <rect x="42" y="20" width="44" height="38" rx="2" fill="#000000" opacity="0.1" transform="translate(3, 3)"/>
+    <rect x="8" y="8" width="112" height="112" rx="3" fill="#c8c8c0" opacity="0.3"/>
+    <rect x="42" y="20" width="44" height="40" rx="2" fill="#d8d8d0"/>
+    <rect x="39" y="17" width="50" height="30" rx="2" fill="#80a8c8"/>
+    <rect x="46" y="55" width="12" height="5" rx="0.5" fill="#a8d0e8" opacity="0.75"/>
+    <rect x="46" y="55" width="12" height="5" rx="0.5" fill="none" stroke="#987868" stroke-width="0.5"/>
+    <rect x="64" y="55" width="12" height="5" rx="0.5" fill="#a8d0e8" opacity="0.75"/>
+    <rect x="64" y="55" width="12" height="5" rx="0.5" fill="none" stroke="#987868" stroke-width="0.5"/>
+    <rect x="50" y="48" width="20" height="4" rx="0.5" fill="#e8d080" opacity="0.5"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- INDUSTRIAL: Far right, above water            -->
+  <!-- ============================================ -->
+  <g transform="translate(768, 256)">
+    <rect x="15" y="15" width="98" height="98" rx="2" fill="#000000" opacity="0.1" transform="translate(3, 3)"/>
+    <rect x="8" y="8" width="112" height="112" rx="3" fill="#c0c0b0" opacity="0.4"/>
+    <!-- Factory building -->
+    <rect x="15" y="15" width="98" height="98" rx="2" fill="#a8a898"/>
+    <rect x="15" y="15" width="98" height="70" rx="2" fill="#989880"/>
+    <!-- Smoke stacks -->
+    <rect x="25" y="10" width="6" height="20" rx="1" fill="#8a8878"/>
+    <rect x="24" y="8" width="8" height="3" rx="0.5" fill="#787868"/>
+    <path d="M28 7 Q30 0 27 -6 Q25 -12 28 -16" fill="none" stroke="#d0d0d0" stroke-width="1.5" stroke-linecap="round" opacity="0.25"/>
+    <rect x="45" y="12" width="6" height="16" rx="1" fill="#8a8878"/>
+    <rect x="44" y="10" width="8" height="3" rx="0.5" fill="#787868"/>
+    <path d="M48 9 Q50 3 47 -3 Q45 -8 48 -12" fill="none" stroke="#d0d0d0" stroke-width="1.2" stroke-linecap="round" opacity="0.2"/>
+    <!-- Rust accents -->
+    <rect x="70" y="20" width="35" height="3" rx="0.5" fill="#b09070" opacity="0.3"/>
+    <rect x="70" y="40" width="35" height="3" rx="0.5" fill="#b09070" opacity="0.25"/>
+    <!-- Loading bay -->
+    <rect x="60" y="95" width="20" height="16" rx="1" fill="#787868" opacity="0.5"/>
+    <rect x="63" y="98" width="14" height="10" rx="0.5" fill="#6a6a58" opacity="0.4"/>
+    <!-- Pipes -->
+    <line x1="88" y1="25" x2="88" y2="80" stroke="#8a8878" stroke-width="2" opacity="0.4"/>
+    <line x1="95" y1="25" x2="95" y2="80" stroke="#8a8878" stroke-width="1.5" opacity="0.35"/>
+  </g>
+
+  <!-- ============================================ -->
+  <!-- TILE GRID (faint reference)                   -->
+  <!-- ============================================ -->
+  <g stroke="#000000" stroke-width="0.5" opacity="0.04" stroke-dasharray="4 4">
+    <line x1="128" y1="0" x2="128" y2="1024"/>
+    <line x1="256" y1="0" x2="256" y2="1024"/>
+    <line x1="384" y1="0" x2="384" y2="1024"/>
+    <line x1="512" y1="0" x2="512" y2="1024"/>
+    <line x1="640" y1="0" x2="640" y2="1024"/>
+    <line x1="768" y1="0" x2="768" y2="1024"/>
+    <line x1="896" y1="0" x2="896" y2="1024"/>
+    <line x1="1024" y1="0" x2="1024" y2="1024"/>
+    <line x1="1152" y1="0" x2="1152" y2="1024"/>
+    <line x1="0" y1="128" x2="1280" y2="128"/>
+    <line x1="0" y1="256" x2="1280" y2="256"/>
+    <line x1="0" y1="384" x2="1280" y2="384"/>
+    <line x1="0" y1="512" x2="1280" y2="512"/>
+    <line x1="0" y1="640" x2="1280" y2="640"/>
+    <line x1="0" y1="768" x2="1280" y2="768"/>
+    <line x1="0" y1="896" x2="1280" y2="896"/>
+  </g>
+</svg>

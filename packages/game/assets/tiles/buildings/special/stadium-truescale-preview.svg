@@ -1,0 +1,296 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 768">
+  <!-- 8x6 tile true-scale stadium (1024x768 = 256m x 192m) -->
+
+  <defs>
+    <linearGradient id="fieldGrass" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6ab850"/>
+      <stop offset="100%" stop-color="#5eaa46"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Surrounding ground (parking / plaza) -->
+  <rect width="1024" height="768" fill="#c8b898"/>
+
+  <!-- Parking lot sections -->
+  <!-- NW lot -->
+  <g stroke="#b8a888" stroke-width="0.5" opacity="0.35">
+    <line x1="30" y1="40" x2="30" y2="90"/>
+    <line x1="42" y1="40" x2="42" y2="90"/>
+    <line x1="54" y1="40" x2="54" y2="90"/>
+    <line x1="66" y1="40" x2="66" y2="90"/>
+    <line x1="78" y1="40" x2="78" y2="90"/>
+    <line x1="90" y1="40" x2="90" y2="90"/>
+    <line x1="25" y1="40" x2="95" y2="40"/>
+    <line x1="25" y1="65" x2="95" y2="65"/>
+    <line x1="25" y1="90" x2="95" y2="90"/>
+  </g>
+  <!-- NE lot -->
+  <g stroke="#b8a888" stroke-width="0.5" opacity="0.35">
+    <line x1="930" y1="40" x2="930" y2="90"/>
+    <line x1="942" y1="40" x2="942" y2="90"/>
+    <line x1="954" y1="40" x2="954" y2="90"/>
+    <line x1="966" y1="40" x2="966" y2="90"/>
+    <line x1="978" y1="40" x2="978" y2="90"/>
+    <line x1="990" y1="40" x2="990" y2="90"/>
+    <line x1="925" y1="40" x2="995" y2="40"/>
+    <line x1="925" y1="65" x2="995" y2="65"/>
+    <line x1="925" y1="90" x2="995" y2="90"/>
+  </g>
+  <!-- SW lot -->
+  <g stroke="#b8a888" stroke-width="0.5" opacity="0.35">
+    <line x1="30" y1="670" x2="30" y2="720"/>
+    <line x1="42" y1="670" x2="42" y2="720"/>
+    <line x1="54" y1="670" x2="54" y2="720"/>
+    <line x1="66" y1="670" x2="66" y2="720"/>
+    <line x1="78" y1="670" x2="78" y2="720"/>
+    <line x1="25" y1="670" x2="83" y2="670"/>
+    <line x1="25" y1="695" x2="83" y2="695"/>
+    <line x1="25" y1="720" x2="83" y2="720"/>
+  </g>
+  <!-- SE lot -->
+  <g stroke="#b8a888" stroke-width="0.5" opacity="0.35">
+    <line x1="940" y1="670" x2="940" y2="720"/>
+    <line x1="952" y1="670" x2="952" y2="720"/>
+    <line x1="964" y1="670" x2="964" y2="720"/>
+    <line x1="976" y1="670" x2="976" y2="720"/>
+    <line x1="988" y1="670" x2="988" y2="720"/>
+    <line x1="935" y1="670" x2="993" y2="670"/>
+    <line x1="935" y1="695" x2="993" y2="695"/>
+    <line x1="935" y1="720" x2="993" y2="720"/>
+  </g>
+
+  <!-- Parked cars -->
+  <g opacity="0.45">
+    <rect x="31" y="42" width="9" height="5" rx="1" fill="#90b8d8"/>
+    <rect x="43" y="42" width="9" height="5" rx="1" fill="#d08870"/>
+    <rect x="55" y="42" width="9" height="5" rx="1" fill="#e8e8e0"/>
+    <rect x="67" y="42" width="9" height="5" rx="1" fill="#a8a898"/>
+    <rect x="79" y="42" width="9" height="5" rx="1" fill="#585858"/>
+    <rect x="31" y="67" width="9" height="5" rx="1" fill="#e8e8e0"/>
+    <rect x="43" y="67" width="9" height="5" rx="1" fill="#90b8d8"/>
+    <rect x="55" y="67" width="9" height="5" rx="1" fill="#d08870"/>
+    <rect x="67" y="67" width="9" height="5" rx="1" fill="#585858"/>
+
+    <rect x="931" y="42" width="9" height="5" rx="1" fill="#d08870"/>
+    <rect x="943" y="42" width="9" height="5" rx="1" fill="#90b8d8"/>
+    <rect x="955" y="42" width="9" height="5" rx="1" fill="#e8e8e0"/>
+    <rect x="967" y="42" width="9" height="5" rx="1" fill="#a8a898"/>
+    <rect x="931" y="67" width="9" height="5" rx="1" fill="#585858"/>
+    <rect x="943" y="67" width="9" height="5" rx="1" fill="#e8e8e0"/>
+    <rect x="955" y="67" width="9" height="5" rx="1" fill="#d08870"/>
+
+    <rect x="31" y="672" width="9" height="5" rx="1" fill="#a8a898"/>
+    <rect x="43" y="672" width="9" height="5" rx="1" fill="#90b8d8"/>
+    <rect x="55" y="672" width="9" height="5" rx="1" fill="#e8e8e0"/>
+    <rect x="31" y="697" width="9" height="5" rx="1" fill="#d08870"/>
+    <rect x="43" y="697" width="9" height="5" rx="1" fill="#585858"/>
+
+    <rect x="941" y="672" width="9" height="5" rx="1" fill="#e8e8e0"/>
+    <rect x="953" y="672" width="9" height="5" rx="1" fill="#90b8d8"/>
+    <rect x="965" y="672" width="9" height="5" rx="1" fill="#d08870"/>
+    <rect x="941" y="697" width="9" height="5" rx="1" fill="#a8a898"/>
+    <rect x="953" y="697" width="9" height="5" rx="1" fill="#585858"/>
+  </g>
+
+  <!-- Access roads -->
+  <rect x="496" y="0" width="32" height="100" rx="1" fill="#707070" opacity="0.6"/>
+  <rect x="496" y="668" width="32" height="100" rx="1" fill="#707070" opacity="0.6"/>
+  <rect x="0" y="368" width="80" height="32" rx="1" fill="#707070" opacity="0.6"/>
+  <rect x="944" y="368" width="80" height="32" rx="1" fill="#707070" opacity="0.6"/>
+
+  <!-- Road center dashes on access roads -->
+  <g fill="#e8d080" opacity="0.5">
+    <rect x="511" y="10" width="2" height="8" rx="0.75"/>
+    <rect x="511" y="26" width="2" height="8" rx="0.75"/>
+    <rect x="511" y="42" width="2" height="8" rx="0.75"/>
+    <rect x="511" y="58" width="2" height="8" rx="0.75"/>
+    <rect x="511" y="74" width="2" height="8" rx="0.75"/>
+
+    <rect x="511" y="678" width="2" height="8" rx="0.75"/>
+    <rect x="511" y="694" width="2" height="8" rx="0.75"/>
+    <rect x="511" y="710" width="2" height="8" rx="0.75"/>
+    <rect x="511" y="726" width="2" height="8" rx="0.75"/>
+    <rect x="511" y="742" width="2" height="8" rx="0.75"/>
+  </g>
+
+  <!-- Stadium shadow -->
+  <ellipse cx="518" cy="390" rx="430" ry="320" fill="#000000" opacity="0.07"/>
+
+  <!-- Stadium outer wall -->
+  <ellipse cx="512" cy="384" rx="426" ry="316" fill="#a8a898"/>
+  <ellipse cx="512" cy="384" rx="426" ry="316" fill="none" stroke="#989880" stroke-width="4" opacity="0.4"/>
+
+  <!-- Outer concourse -->
+  <ellipse cx="512" cy="384" rx="410" ry="300" fill="#b8b0a8"/>
+
+  <!-- Structural ribs (radial lines from center outward through concourse) -->
+  <g stroke="#a0988e" stroke-width="1" opacity="0.2">
+    <line x1="512" y1="68" x2="512" y2="84"/>
+    <line x1="512" y1="684" x2="512" y2="700"/>
+    <line x1="86" y1="384" x2="102" y2="384"/>
+    <line x1="922" y1="384" x2="938" y2="384"/>
+
+    <line x1="220" y1="110" x2="230" y2="126"/>
+    <line x1="804" y1="110" x2="794" y2="126"/>
+    <line x1="220" y1="658" x2="230" y2="642"/>
+    <line x1="804" y1="658" x2="794" y2="642"/>
+
+    <line x1="350" y1="78" x2="354" y2="96"/>
+    <line x1="674" y1="78" x2="670" y2="96"/>
+    <line x1="350" y1="690" x2="354" y2="672"/>
+    <line x1="674" y1="690" x2="670" y2="672"/>
+
+    <line x1="130" y1="200" x2="146" y2="206"/>
+    <line x1="130" y1="568" x2="146" y2="562"/>
+    <line x1="894" y1="200" x2="878" y2="206"/>
+    <line x1="894" y1="568" x2="878" y2="562"/>
+
+    <line x1="100" y1="300" x2="118" y2="302"/>
+    <line x1="100" y1="468" x2="118" y2="466"/>
+    <line x1="924" y1="300" x2="906" y2="302"/>
+    <line x1="924" y1="468" x2="906" y2="466"/>
+  </g>
+
+  <!-- Upper seating tier (terracotta) -->
+  <ellipse cx="512" cy="384" rx="396" ry="288" fill="#c07060"/>
+  <g fill="none" stroke="#b06858" stroke-width="1" opacity="0.3">
+    <ellipse cx="512" cy="384" rx="390" ry="282"/>
+    <ellipse cx="512" cy="384" rx="384" ry="276"/>
+    <ellipse cx="512" cy="384" rx="378" ry="270"/>
+    <ellipse cx="512" cy="384" rx="372" ry="264"/>
+    <ellipse cx="512" cy="384" rx="366" ry="258"/>
+    <ellipse cx="512" cy="384" rx="360" ry="252"/>
+    <ellipse cx="512" cy="384" rx="354" ry="246"/>
+  </g>
+
+  <!-- Mid concourse -->
+  <ellipse cx="512" cy="384" rx="346" ry="238" fill="#b8b0a8"/>
+  <ellipse cx="512" cy="384" rx="346" ry="238" fill="none" stroke="#a8a098" stroke-width="1" opacity="0.35"/>
+
+  <!-- Lower seating tier (blue) -->
+  <ellipse cx="512" cy="384" rx="336" ry="228" fill="#90b8d8"/>
+  <g fill="none" stroke="#80a8c8" stroke-width="1" opacity="0.3">
+    <ellipse cx="512" cy="384" rx="330" ry="222"/>
+    <ellipse cx="512" cy="384" rx="324" ry="216"/>
+    <ellipse cx="512" cy="384" rx="318" ry="210"/>
+    <ellipse cx="512" cy="384" rx="312" ry="204"/>
+    <ellipse cx="512" cy="384" rx="306" ry="198"/>
+    <ellipse cx="512" cy="384" rx="300" ry="192"/>
+    <ellipse cx="512" cy="384" rx="294" ry="186"/>
+    <ellipse cx="512" cy="384" rx="288" ry="180"/>
+  </g>
+
+  <!-- VIP concourse -->
+  <ellipse cx="512" cy="384" rx="280" ry="172" fill="#b8b0a8"/>
+
+  <!-- Lowest seating (gold/VIP) -->
+  <ellipse cx="512" cy="384" rx="272" ry="164" fill="#e8d080"/>
+  <g fill="none" stroke="#d8c070" stroke-width="1" opacity="0.25">
+    <ellipse cx="512" cy="384" rx="268" ry="160"/>
+    <ellipse cx="512" cy="384" rx="264" ry="156"/>
+    <ellipse cx="512" cy="384" rx="260" ry="152"/>
+  </g>
+
+  <!-- Pitch surround / running track -->
+  <ellipse cx="512" cy="384" rx="252" ry="144" fill="#d8c8a8" opacity="0.5"/>
+
+  <!-- Soccer pitch (105x68m = 420x272px at true scale) -->
+  <rect x="302" y="248" width="420" height="272" rx="3" fill="url(#fieldGrass)"/>
+
+  <!-- Pitch grass stripe pattern -->
+  <g fill="#62b048" opacity="0.12">
+    <rect x="302" y="248" width="42" height="272"/>
+    <rect x="386" y="248" width="42" height="272"/>
+    <rect x="470" y="248" width="42" height="272"/>
+    <rect x="554" y="248" width="42" height="272"/>
+    <rect x="638" y="248" width="42" height="272"/>
+  </g>
+
+  <!-- Pitch markings -->
+  <g fill="none" stroke="#e8e8e0" stroke-width="2" opacity="0.65">
+    <!-- Boundary -->
+    <rect x="312" y="258" width="400" height="252" rx="1"/>
+    <!-- Center line -->
+    <line x1="512" y1="258" x2="512" y2="510"/>
+    <!-- Center circle (9.15m radius = ~37px) -->
+    <circle cx="512" cy="384" r="37"/>
+    <!-- Center spot -->
+    <circle cx="512" cy="384" r="2" fill="#e8e8e0" stroke="none"/>
+
+    <!-- Left penalty box (40.3x16.5m = 161x66px) -->
+    <rect x="312" y="318" width="66" height="132"/>
+    <!-- Left goal area (18.3x5.5m = 73x22px) -->
+    <rect x="312" y="351" width="22" height="66"/>
+    <!-- Left penalty spot (11m = 44px from goal line) -->
+    <circle cx="356" cy="384" r="2" fill="#e8e8e0" stroke="none"/>
+    <!-- Left penalty arc -->
+    <path d="M378 348 A37 37 0 0 1 378 420"/>
+
+    <!-- Right penalty box -->
+    <rect x="646" y="318" width="66" height="132"/>
+    <!-- Right goal area -->
+    <rect x="690" y="351" width="22" height="66"/>
+    <!-- Right penalty spot -->
+    <circle cx="668" cy="384" r="2" fill="#e8e8e0" stroke="none"/>
+    <!-- Right penalty arc -->
+    <path d="M646 348 A37 37 0 0 0 646 420"/>
+
+    <!-- Corner arcs (1m = 4px) -->
+    <path d="M312 262 A4 4 0 0 1 316 258"/>
+    <path d="M708 258 A4 4 0 0 1 712 262"/>
+    <path d="M312 506 A4 4 0 0 0 316 510"/>
+    <path d="M708 510 A4 4 0 0 0 712 506"/>
+  </g>
+
+  <!-- Goals -->
+  <rect x="306" y="376" width="6" height="16" rx="1" fill="#e0e0e0" opacity="0.6"/>
+  <rect x="712" y="376" width="6" height="16" rx="1" fill="#e0e0e0" opacity="0.6"/>
+
+  <!-- Entrance gates -->
+  <g fill="#e8d8b0" opacity="0.6">
+    <rect x="498" y="66" width="28" height="8" rx="3"/>
+    <rect x="498" y="694" width="28" height="8" rx="3"/>
+    <rect x="82" y="370" width="8" height="28" rx="3"/>
+    <rect x="934" y="370" width="8" height="28" rx="3"/>
+    <!-- Diagonal entrances -->
+    <rect x="200" y="108" width="20" height="6" rx="2" transform="rotate(-35, 210, 111)"/>
+    <rect x="804" y="108" width="20" height="6" rx="2" transform="rotate(35, 814, 111)"/>
+    <rect x="200" y="654" width="20" height="6" rx="2" transform="rotate(35, 210, 657)"/>
+    <rect x="804" y="654" width="20" height="6" rx="2" transform="rotate(-35, 814, 657)"/>
+  </g>
+
+  <!-- Floodlight towers -->
+  <g>
+    <rect x="156" y="140" width="8" height="8" rx="1" fill="#a8a898"/>
+    <circle cx="160" cy="144" r="6" fill="#e8d8a0" opacity="0.25"/>
+    <circle cx="160" cy="144" r="3" fill="#f0e8c0" opacity="0.5"/>
+
+    <rect x="860" y="140" width="8" height="8" rx="1" fill="#a8a898"/>
+    <circle cx="864" cy="144" r="6" fill="#e8d8a0" opacity="0.25"/>
+    <circle cx="864" cy="144" r="3" fill="#f0e8c0" opacity="0.5"/>
+
+    <rect x="156" y="620" width="8" height="8" rx="1" fill="#a8a898"/>
+    <circle cx="160" cy="624" r="6" fill="#e8d8a0" opacity="0.25"/>
+    <circle cx="160" cy="624" r="3" fill="#f0e8c0" opacity="0.5"/>
+
+    <rect x="860" y="620" width="8" height="8" rx="1" fill="#a8a898"/>
+    <circle cx="864" cy="624" r="6" fill="#e8d8a0" opacity="0.25"/>
+    <circle cx="864" cy="624" r="3" fill="#f0e8c0" opacity="0.5"/>
+  </g>
+
+  <!-- Tile grid overlay -->
+  <g stroke="#000000" stroke-width="0.5" opacity="0.06" stroke-dasharray="4 4">
+    <line x1="128" y1="0" x2="128" y2="768"/>
+    <line x1="256" y1="0" x2="256" y2="768"/>
+    <line x1="384" y1="0" x2="384" y2="768"/>
+    <line x1="512" y1="0" x2="512" y2="768"/>
+    <line x1="640" y1="0" x2="640" y2="768"/>
+    <line x1="768" y1="0" x2="768" y2="768"/>
+    <line x1="896" y1="0" x2="896" y2="768"/>
+    <line x1="0" y1="128" x2="1024" y2="128"/>
+    <line x1="0" y1="256" x2="1024" y2="256"/>
+    <line x1="0" y1="384" x2="1024" y2="384"/>
+    <line x1="0" y1="512" x2="1024" y2="512"/>
+    <line x1="0" y1="640" x2="1024" y2="640"/>
+  </g>
+</svg>

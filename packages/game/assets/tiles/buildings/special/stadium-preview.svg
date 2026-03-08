@@ -1,0 +1,238 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- 4x4 tile preview (512x512 = 128m x 128m at game scale) -->
+  <!-- This is a combined preview; actual game uses individual 128x128 tile splits -->
+
+  <defs>
+    <linearGradient id="fieldGrass" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6ab850"/>
+      <stop offset="100%" stop-color="#5eaa46"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Surrounding ground (parking / plaza area) -->
+  <rect width="512" height="512" fill="#c8b898"/>
+  <!-- Parking lot texture - faint grid lines -->
+  <g stroke="#b8a888" stroke-width="0.5" opacity="0.4">
+    <line x1="20" y1="30" x2="20" y2="60"/>
+    <line x1="30" y1="30" x2="30" y2="60"/>
+    <line x1="40" y1="30" x2="40" y2="60"/>
+    <line x1="50" y1="30" x2="50" y2="60"/>
+    <line x1="15" y1="30" x2="55" y2="30"/>
+    <line x1="15" y1="60" x2="55" y2="60"/>
+
+    <line x1="460" y1="440" x2="460" y2="480"/>
+    <line x1="470" y1="440" x2="470" y2="480"/>
+    <line x1="480" y1="440" x2="480" y2="480"/>
+    <line x1="490" y1="440" x2="490" y2="480"/>
+    <line x1="455" y1="440" x2="495" y2="440"/>
+    <line x1="455" y1="480" x2="495" y2="480"/>
+
+    <line x1="440" y1="20" x2="440" y2="55"/>
+    <line x1="450" y1="20" x2="450" y2="55"/>
+    <line x1="460" y1="20" x2="460" y2="55"/>
+    <line x1="470" y1="20" x2="470" y2="55"/>
+    <line x1="435" y1="20" x2="475" y2="20"/>
+    <line x1="435" y1="55" x2="475" y2="55"/>
+
+    <line x1="30" y1="450" x2="30" y2="485"/>
+    <line x1="40" y1="450" x2="40" y2="485"/>
+    <line x1="50" y1="450" x2="50" y2="485"/>
+    <line x1="60" y1="450" x2="60" y2="485"/>
+    <line x1="25" y1="450" x2="65" y2="450"/>
+    <line x1="25" y1="485" x2="65" y2="485"/>
+  </g>
+
+  <!-- Parked cars (tiny colored rectangles) -->
+  <g opacity="0.5">
+    <rect x="21" y="32" width="7" height="4" rx="1" fill="#90b8d8"/>
+    <rect x="31" y="32" width="7" height="4" rx="1" fill="#d08870"/>
+    <rect x="41" y="32" width="7" height="4" rx="1" fill="#e8e8e0"/>
+    <rect x="21" y="44" width="7" height="4" rx="1" fill="#a8a898"/>
+    <rect x="31" y="44" width="7" height="4" rx="1" fill="#90b8d8"/>
+    <rect x="41" y="44" width="7" height="4" rx="1" fill="#585858"/>
+
+    <rect x="461" y="442" width="7" height="4" rx="1" fill="#d08870"/>
+    <rect x="471" y="442" width="7" height="4" rx="1" fill="#e8e8e0"/>
+    <rect x="461" y="454" width="7" height="4" rx="1" fill="#585858"/>
+    <rect x="471" y="454" width="7" height="4" rx="1" fill="#90b8d8"/>
+
+    <rect x="441" y="22" width="7" height="4" rx="1" fill="#e8e8e0"/>
+    <rect x="451" y="22" width="7" height="4" rx="1" fill="#a8a898"/>
+    <rect x="441" y="34" width="7" height="4" rx="1" fill="#90b8d8"/>
+    <rect x="451" y="34" width="7" height="4" rx="1" fill="#d08870"/>
+
+    <rect x="31" y="452" width="7" height="4" rx="1" fill="#a8a898"/>
+    <rect x="41" y="452" width="7" height="4" rx="1" fill="#e8e8e0"/>
+    <rect x="51" y="452" width="7" height="4" rx="1" fill="#d08870"/>
+    <rect x="31" y="464" width="7" height="4" rx="1" fill="#90b8d8"/>
+  </g>
+
+  <!-- Access roads / paths to stadium -->
+  <rect x="240" y="0" width="32" height="76" rx="1" fill="#707070" opacity="0.6"/>
+  <rect x="240" y="436" width="32" height="76" rx="1" fill="#707070" opacity="0.6"/>
+  <rect x="0" y="240" width="60" height="32" rx="1" fill="#707070" opacity="0.6"/>
+  <rect x="452" y="240" width="60" height="32" rx="1" fill="#707070" opacity="0.6"/>
+
+  <!-- Stadium shadow -->
+  <ellipse cx="262" cy="262" rx="210" ry="180" fill="#000000" opacity="0.08"/>
+
+  <!-- Stadium outer wall -->
+  <ellipse cx="256" cy="256" rx="208" ry="178" fill="#a8a898"/>
+  <!-- Outer wall ring detail -->
+  <ellipse cx="256" cy="256" rx="208" ry="178" fill="none" stroke="#989880" stroke-width="3" opacity="0.5"/>
+
+  <!-- Outer concourse (walkway ring) -->
+  <ellipse cx="256" cy="256" rx="198" ry="168" fill="#b8b0a8"/>
+
+  <!-- Upper seating tier -->
+  <ellipse cx="256" cy="256" rx="188" ry="160" fill="#c07060"/>
+  <!-- Upper tier seat rows -->
+  <g fill="none" stroke="#b06858" stroke-width="1" opacity="0.35">
+    <ellipse cx="256" cy="256" rx="184" ry="156"/>
+    <ellipse cx="256" cy="256" rx="180" ry="152"/>
+    <ellipse cx="256" cy="256" rx="176" ry="148"/>
+    <ellipse cx="256" cy="256" rx="172" ry="144"/>
+  </g>
+
+  <!-- Section dividers (radial lines through seating) -->
+  <g stroke="#b8b0a8" stroke-width="1.5" opacity="0.3">
+    <line x1="256" y1="78" x2="256" y2="96"/>
+    <line x1="256" y1="416" x2="256" y2="434"/>
+    <line x1="68" y1="256" x2="86" y2="256"/>
+    <line x1="426" y1="256" x2="444" y2="256"/>
+    <!-- Diagonal sections -->
+    <line x1="108" y1="118" x2="120" y2="132"/>
+    <line x1="404" y1="118" x2="392" y2="132"/>
+    <line x1="108" y1="394" x2="120" y2="380"/>
+    <line x1="404" y1="394" x2="392" y2="380"/>
+    <!-- Mid sections -->
+    <line x1="150" y1="88" x2="155" y2="106"/>
+    <line x1="362" y1="88" x2="357" y2="106"/>
+    <line x1="150" y1="424" x2="155" y2="406"/>
+    <line x1="362" y1="424" x2="357" y2="406"/>
+    <line x1="72" y1="175" x2="90" y2="178"/>
+    <line x1="72" y1="337" x2="90" y2="334"/>
+    <line x1="440" y1="175" x2="422" y2="178"/>
+    <line x1="440" y1="337" x2="422" y2="334"/>
+  </g>
+
+  <!-- Middle walkway / concourse ring -->
+  <ellipse cx="256" cy="256" rx="166" ry="138" fill="#b8b0a8"/>
+  <ellipse cx="256" cy="256" rx="166" ry="138" fill="none" stroke="#a8a098" stroke-width="1" opacity="0.4"/>
+
+  <!-- Lower seating tier -->
+  <ellipse cx="256" cy="256" rx="158" ry="130" fill="#90b8d8"/>
+  <!-- Lower tier seat rows -->
+  <g fill="none" stroke="#80a8c8" stroke-width="1" opacity="0.35">
+    <ellipse cx="256" cy="256" rx="154" ry="126"/>
+    <ellipse cx="256" cy="256" rx="150" ry="122"/>
+    <ellipse cx="256" cy="256" rx="146" ry="118"/>
+    <ellipse cx="256" cy="256" rx="142" ry="114"/>
+    <ellipse cx="256" cy="256" rx="138" ry="110"/>
+  </g>
+
+  <!-- VIP / lower concourse ring -->
+  <ellipse cx="256" cy="256" rx="132" ry="104" fill="#b8b0a8"/>
+
+  <!-- Lowest seating (closest to pitch) -->
+  <ellipse cx="256" cy="256" rx="126" ry="98" fill="#e8d080"/>
+  <g fill="none" stroke="#d8c070" stroke-width="1" opacity="0.3">
+    <ellipse cx="256" cy="256" rx="123" ry="95"/>
+    <ellipse cx="256" cy="256" rx="120" ry="92"/>
+  </g>
+
+  <!-- Pitch surround / running track -->
+  <ellipse cx="256" cy="256" rx="115" ry="87" fill="#c8b898" opacity="0.5"/>
+
+  <!-- Soccer pitch -->
+  <rect x="168" y="186" width="176" height="140" rx="3" fill="url(#fieldGrass)"/>
+
+  <!-- Pitch grass stripe pattern -->
+  <g fill="#62b048" opacity="0.15">
+    <rect x="168" y="186" width="22" height="140"/>
+    <rect x="212" y="186" width="22" height="140"/>
+    <rect x="256" y="186" width="22" height="140"/>
+    <rect x="300" y="186" width="22" height="140"/>
+  </g>
+
+  <!-- Pitch markings (white lines) -->
+  <g fill="none" stroke="#e8e8e0" stroke-width="1.5" opacity="0.7">
+    <!-- Outer boundary -->
+    <rect x="174" y="192" width="164" height="128" rx="1"/>
+    <!-- Center line -->
+    <line x1="256" y1="192" x2="256" y2="320"/>
+    <!-- Center circle -->
+    <circle cx="256" cy="256" r="22"/>
+    <!-- Center spot -->
+    <circle cx="256" cy="256" r="1.5" fill="#e8e8e0" stroke="none"/>
+
+    <!-- Left penalty box -->
+    <rect x="174" y="224" width="30" height="64"/>
+    <!-- Left goal box -->
+    <rect x="174" y="240" width="12" height="32"/>
+    <!-- Left penalty spot -->
+    <circle cx="196" cy="256" r="1.2" fill="#e8e8e0" stroke="none"/>
+    <!-- Left penalty arc -->
+    <path d="M204 236 A22 22 0 0 1 204 276" fill="none"/>
+
+    <!-- Right penalty box -->
+    <rect x="308" y="224" width="30" height="64"/>
+    <!-- Right goal box -->
+    <rect x="326" y="240" width="12" height="32"/>
+    <!-- Right penalty spot -->
+    <circle cx="316" cy="256" r="1.2" fill="#e8e8e0" stroke="none"/>
+    <!-- Right penalty arc -->
+    <path d="M308 236 A22 22 0 0 0 308 276" fill="none"/>
+
+    <!-- Corner arcs -->
+    <path d="M174 196 A4 4 0 0 1 178 192"/>
+    <path d="M334 192 A4 4 0 0 1 338 196"/>
+    <path d="M174 316 A4 4 0 0 0 178 320"/>
+    <path d="M334 320 A4 4 0 0 0 338 316"/>
+  </g>
+
+  <!-- Goals (nets seen from above) -->
+  <rect x="170" y="248" width="4" height="16" rx="0.5" fill="#e0e0e0" opacity="0.6"/>
+  <rect x="338" y="248" width="4" height="16" rx="0.5" fill="#e0e0e0" opacity="0.6"/>
+
+  <!-- Stadium entrance gates (bright spots on outer wall) -->
+  <g fill="#e8d8b0" opacity="0.6">
+    <rect x="246" y="76" width="20" height="6" rx="2"/>
+    <rect x="246" y="430" width="20" height="6" rx="2"/>
+    <rect x="58" y="246" width="6" height="20" rx="2"/>
+    <rect x="448" y="246" width="6" height="20" rx="2"/>
+  </g>
+
+  <!-- Floodlight towers (4 corners) -->
+  <g>
+    <!-- NW tower -->
+    <rect x="92" y="102" width="6" height="6" rx="1" fill="#a8a898"/>
+    <circle cx="95" cy="105" r="4" fill="#e8d8a0" opacity="0.3"/>
+    <circle cx="95" cy="105" r="2" fill="#f0e8c0" opacity="0.5"/>
+
+    <!-- NE tower -->
+    <rect x="414" y="102" width="6" height="6" rx="1" fill="#a8a898"/>
+    <circle cx="417" cy="105" r="4" fill="#e8d8a0" opacity="0.3"/>
+    <circle cx="417" cy="105" r="2" fill="#f0e8c0" opacity="0.5"/>
+
+    <!-- SW tower -->
+    <rect x="92" y="404" width="6" height="6" rx="1" fill="#a8a898"/>
+    <circle cx="95" cy="407" r="4" fill="#e8d8a0" opacity="0.3"/>
+    <circle cx="95" cy="407" r="2" fill="#f0e8c0" opacity="0.5"/>
+
+    <!-- SE tower -->
+    <rect x="414" y="404" width="6" height="6" rx="1" fill="#a8a898"/>
+    <circle cx="417" cy="407" r="4" fill="#e8d8a0" opacity="0.3"/>
+    <circle cx="417" cy="407" r="2" fill="#f0e8c0" opacity="0.5"/>
+  </g>
+
+  <!-- Tile grid overlay (faint, to show how it would split) -->
+  <g stroke="#000000" stroke-width="0.5" opacity="0.08" stroke-dasharray="4 4">
+    <line x1="128" y1="0" x2="128" y2="512"/>
+    <line x1="256" y1="0" x2="256" y2="512"/>
+    <line x1="384" y1="0" x2="384" y2="512"/>
+    <line x1="0" y1="128" x2="512" y2="128"/>
+    <line x1="0" y1="256" x2="512" y2="256"/>
+    <line x1="0" y1="384" x2="512" y2="384"/>
+  </g>
+</svg>
