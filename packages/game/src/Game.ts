@@ -80,6 +80,8 @@ export class Game {
       { label: 'Budget (B)', key: 'b', action: () => this.budgetPanel.toggle() },
       { label: 'Power (P)', key: 'p', action: () => this.renderer.toggleOverlay('power') },
       { label: 'Value (V)', key: 'v', action: () => this.renderer.toggleOverlay('landValue') },
+      { label: 'Crime (C)', key: 'c', action: () => this.renderer.toggleOverlay('crime') },
+      { label: 'Fire (F)', key: 'f', action: () => this.renderer.toggleOverlay('fire') },
       { label: 'Grid (G)', key: 'g', action: () => this.renderer.toggleGridLines() },
       { label: 'Export', action: () => { this.autoSave(); this.saveManager.exportToFile() } },
     ]
