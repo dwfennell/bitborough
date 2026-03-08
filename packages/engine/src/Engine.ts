@@ -74,7 +74,9 @@ export class Engine {
 
   // Fire system
   private fireState: FireState
-  private activeFires: number[] = []
+
+  // Reusable buffer for radial influence calculations (avoids per-tick allocation)
+  private influenceBuffer: Float32Array
 
   private constructor(map: GameMap, config: EngineConfig) {
     this.map = map
@@ -96,6 +98,7 @@ export class Engine {
     this.fireCoverage = new Uint8Array(size)
     this.trafficDensity = new Uint8Array(size)
     this.fireState = createFireState()
+    this.influenceBuffer = new Float32Array(size)
 
     // Initialize demand
     this.demand = calculateDemand(this.map, this.population, this.taxRate)
@@ -123,16 +126,15 @@ export class Engine {
       if (this.month > this.monthsPerYear) {
         this.month = 1
         this.year++
-        // Annual systems: calculate budget and apply balance to funds
-        this.budgetInfo = calculateBudget(this.map, this.population, this.taxRate, this.landValues, this.funding)
-        this.funds += this.budgetInfo.balance
       }
-      // Monthly systems
+
       this.demand = calculateDemand(this.map, this.population, this.taxRate)
+
+      // Land values use previous month's crime; crime uses updated land values
       calculateLandValues(this.map, this.powerGrid, this.pollutionLevel, this.crimeLevel, this.landValues)
-      calculateCrime(this.map, this.landValues, this.crimeLevel, this.population, this.funding.police)
-      calculateFireCoverage(this.map, this.fireCoverage, this.funding.fire)
-      this.activeFires = updateFires(this.map, this.fireState, this.fireCoverage, this.prng)
+      calculateCrime(this.map, this.landValues, this.crimeLevel, this.funding.police, this.influenceBuffer)
+      calculateFireCoverage(this.map, this.fireCoverage, this.funding.fire, this.influenceBuffer)
+      updateFires(this.map, this.fireState, this.fireCoverage, this.prng)
 
       // Zone development
       const nextBuildingIdRef = { value: this.nextBuildingId }
@@ -140,8 +142,12 @@ export class Engine {
       this.nextBuildingId = nextBuildingIdRef.value
       this.population += populationDelta
 
-      // Update budget projections monthly (without applying balance)
+      // Budget projections (balance applied annually)
       this.budgetInfo = calculateBudget(this.map, this.population, this.taxRate, this.landValues, this.funding)
+      if (this.month === 1) {
+        // Year just started — apply last year's balance
+        this.funds += this.budgetInfo.balance
+      }
     }
   }
 
@@ -164,7 +170,7 @@ export class Engine {
       crimeLevel: this.crimeLevel,
       fireCoverage: this.fireCoverage,
       trafficDensity: this.trafficDensity,
-      activeFires: this.activeFires,
+      activeFires: Array.from(this.fireState.activeFires.keys()),
     }
   }
 
@@ -275,6 +281,9 @@ export class Engine {
   }
 
   serialize(): SaveFile {
+    // Convert active fires Map to array of [index, remaining] pairs
+    const activeFires: Array<[number, number]> = Array.from(this.fireState.activeFires.entries())
+
     return {
       version: 1,
       map: {
@@ -298,6 +307,7 @@ export class Engine {
         taxRate: this.taxRate,
         funding: { ...this.funding },
         seed: this.prng.getInternalState(),
+        activeFires,
       },
       timestamp: new Date().toISOString(),
     }
@@ -340,6 +350,14 @@ export class Engine {
       police: save.state.funding.police ?? 100,
       fire: save.state.funding.fire ?? 100,
       transit: save.state.funding.transit ?? 100,
+    }
+
+    // Restore active fires
+    const savedFires = (save.state as Record<string, unknown>).activeFires as Array<[number, number]> | undefined
+    if (savedFires) {
+      for (const [idx, remaining] of savedFires) {
+        engine.fireState.activeFires.set(idx, remaining)
+      }
     }
 
     // Restore nextBuildingId from existing buildings

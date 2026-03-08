@@ -13,6 +13,20 @@ export function landValueToRgba(value: number): string {
   return `rgba(${r}, ${g}, ${b}, 0.4)`
 }
 
+export function crimeToRgba(value: number): string {
+  const v = value / 255
+  const r = Math.floor(v * 255)
+  const b = Math.floor((1 - v) * 200)
+  return `rgba(${r}, 20, ${b}, 0.5)`
+}
+
+export function fireCoverageToRgba(value: number): string {
+  const v = value / 255
+  const r = Math.floor((1 - v) * 220)
+  const g = Math.floor(v * 200)
+  return `rgba(${r}, ${g}, 30, 0.4)`
+}
+
 export const TERRAIN_COLORS: Record<number, string> = {
   [TileType.Grass]: '#4a8c3f',
   [TileType.Water]: '#3b7dd8',
