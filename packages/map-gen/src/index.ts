@@ -1,2 +1,1 @@
-// @rcity/map-gen — procedural terrain generation
-export {}
+export { generateMap, type MapGenConfig } from './generate.js'
