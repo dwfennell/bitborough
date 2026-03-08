@@ -48,6 +48,7 @@ export class Game {
   private frameCount = 0
 
   private actions: GameAction[]
+  private pressedKeys = new Set<string>()
 
   constructor(
     private canvas: HTMLCanvasElement,
@@ -211,8 +212,12 @@ export class Game {
 
     window.addEventListener('keydown', (e) => {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement) return
+      this.pressedKeys.add(e.key)
       const action = keyMap.get(e.key)
       if (action) action()
+    })
+    window.addEventListener('keyup', (e) => {
+      this.pressedKeys.delete(e.key)
     })
   }
 
@@ -231,6 +236,17 @@ export class Game {
       this.canvas.width = window.innerWidth
       this.canvas.height = window.innerHeight
       this.camera.setViewport(this.canvas.width, this.canvas.height)
+    }
+
+    // Keyboard panning (arrow keys)
+    const panSpeed = 12 / (this.camera.tileSize * this.camera.zoom) * (delta / 16)
+    const k = this.pressedKeys
+    if (k.has('ArrowLeft')) this.camera.pan(-panSpeed, 0)
+    if (k.has('ArrowRight')) this.camera.pan(panSpeed, 0)
+    if (k.has('ArrowUp')) this.camera.pan(0, -panSpeed)
+    if (k.has('ArrowDown')) this.camera.pan(0, panSpeed)
+    if (k.has('ArrowLeft') || k.has('ArrowRight') || k.has('ArrowUp') || k.has('ArrowDown')) {
+      this.camera.clamp()
     }
 
     const tickInterval = TICK_INTERVALS[this.speed]
