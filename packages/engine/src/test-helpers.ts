@@ -4,7 +4,7 @@ export function createTestMap(size: number): GameMap {
   return createEmptyMap(size, size, {
     name: 'Test Map',
     seed: 0,
-    createdAt: new Date().toISOString(),
+    createdAt: '2026-01-01T00:00:00.000Z',
   })
 }
 

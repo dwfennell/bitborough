@@ -20,7 +20,8 @@ export class PRNG {
     return min + Math.floor(this.next() * (max - min + 1))
   }
 
-  getSeed(): number {
+  // Returns current internal state (for save/restore)
+  getInternalState(): number {
     return this.state
   }
 }
