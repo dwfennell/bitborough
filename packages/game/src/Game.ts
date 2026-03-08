@@ -103,13 +103,13 @@ export class Game {
     // Shared actions for menu bar and keyboard shortcuts
     this.actions = [
       { label: 'Budget (B)', key: 'b', action: () => this.budgetPanel.toggle() },
-      { label: 'Guide (D)', key: 'd', action: () => this.docsPanel.toggle() },
+      { label: 'Guide (G)', key: 'g', action: () => this.docsPanel.toggle() },
       { label: 'Power (P)', key: 'p', action: () => this.renderer.toggleOverlay('power') },
       { label: 'Value (V)', key: 'v', action: () => this.renderer.toggleOverlay('landValue') },
       { label: 'Crime (C)', key: 'c', action: () => this.renderer.toggleOverlay('crime') },
       { label: 'Fire (F)', key: 'f', action: () => this.renderer.toggleOverlay('fire') },
       { label: 'Traffic (T)', key: 't', action: () => this.renderer.toggleOverlay('traffic') },
-      { label: 'Grid (G)', key: 'g', action: () => this.renderer.toggleGridLines() },
+      { label: 'Grid (D)', key: 'd', action: () => this.renderer.toggleGridLines() },
       { label: 'Export', action: () => { this.autoSave(); this.saveManager.exportToFile() } },
     ]
 
