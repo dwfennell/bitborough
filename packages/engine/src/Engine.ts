@@ -163,9 +163,9 @@ export class Engine {
     return {
       terrain: this.map.terrain[idx] as TileType,
       zone: this.map.zones[idx] as ZoneType,
-      infrastructure: this.map.infrastructure[idx],
-      connections: this.map.connections[idx],
-      elevation: this.map.elevation[idx],
+      infrastructure: this.map.infrastructure[idx]!,
+      connections: this.map.connections[idx]!,
+      elevation: this.map.elevation[idx]!,
       powered: this.powerGrid[idx] !== 0,
     }
   }

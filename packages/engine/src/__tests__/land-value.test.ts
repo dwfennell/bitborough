@@ -13,8 +13,8 @@ describe('Land value', () => {
     // Tick to recalculate land values
     for (let i = 0; i < 4; i++) engine.tick()
     // Tile adjacent to water should have higher value than one far away
-    const nearWater = state.landValues[6 * 32 + 10] // adjacent to water
-    const farFromWater = state.landValues[20 * 32 + 20] // far from water
+    const nearWater = state.landValues[6 * 32 + 10]! // adjacent to water
+    const farFromWater = state.landValues[20 * 32 + 20]! // far from water
     expect(nearWater).toBeGreaterThan(farFromWater)
   })
 
@@ -23,8 +23,8 @@ describe('Land value', () => {
     engine.placeBuilding(10, 10, 'special.park')
     for (let i = 0; i < 4; i++) engine.tick()
     const state = engine.getState()
-    const nearPark = state.landValues[11 * 32 + 10] // adjacent to park
-    const farFromPark = state.landValues[25 * 32 + 25] // far from park
+    const nearPark = state.landValues[11 * 32 + 10]! // adjacent to park
+    const farFromPark = state.landValues[25 * 32 + 25]! // far from park
     expect(nearPark).toBeGreaterThan(farFromPark)
   })
 

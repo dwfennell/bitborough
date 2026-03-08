@@ -29,7 +29,7 @@ export function placeTile(
     return { result: { ok: false, reason: FailReason.InsufficientFunds }, cost: 0 }
   }
 
-  map.infrastructure[idx] |= infra
+  map.infrastructure[idx]! |= infra
   return { result: { ok: true }, cost }
 }
 

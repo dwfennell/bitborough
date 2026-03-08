@@ -32,10 +32,10 @@ export function calculateLandValues(
       }
 
       // Pollution penalty (negative)
-      value -= pollutionLevel[idx] * 0.5
+      value -= pollutionLevel[idx]! * 0.5
 
       // Crime penalty (negative)
-      value -= crimeLevel[idx] * 0.3
+      value -= crimeLevel[idx]! * 0.3
 
       // Clamp to [0, 255]
       landValues[idx] = Math.max(0, Math.min(255, Math.round(value)))
@@ -76,7 +76,7 @@ function hasNearbyRoad(map: GameMap, x: number, y: number, radius: number): bool
       const nx = x + dx
       const ny = y + dy
       if (nx < 0 || ny < 0 || nx >= map.width || ny >= map.height) continue
-      if (map.infrastructure[ny * map.width + nx] & Infrastructure.Road) return true
+      if (map.infrastructure[ny * map.width + nx]! & Infrastructure.Road) return true
     }
   }
   return false
