@@ -12,6 +12,7 @@ import {
 import { PRNG } from './prng.js'
 import { placeTile, placeZone } from './actions/place.js'
 import { bulldoze } from './actions/bulldoze.js'
+import { updateConnections } from './connections.js'
 
 export interface TileInfo {
   terrain: TileType
@@ -127,6 +128,9 @@ export class Engine {
   placeTile(x: number, y: number, infra: Infrastructure): Result {
     const { result, cost } = placeTile(this.map, x, y, infra, this.funds)
     this.funds -= cost
+    if (result.ok) {
+      updateConnections(this.map, x, y)
+    }
     return result
   }
 
@@ -137,6 +141,9 @@ export class Engine {
   bulldoze(x: number, y: number): Result {
     const { result, cost } = bulldoze(this.map, x, y, this.funds)
     this.funds -= cost
+    if (result.ok) {
+      updateConnections(this.map, x, y)
+    }
     return result
   }
 
