@@ -88,6 +88,7 @@ export interface SaveFile {
     taxRate: number
     funding: Record<string, number>
     seed: number
+    activeFires?: Array<[number, number]>
   }
   timestamp: string
 }

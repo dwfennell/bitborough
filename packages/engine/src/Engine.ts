@@ -355,7 +355,7 @@ export class Engine {
     }
 
     // Restore active fires
-    const savedFires = (save.state as Record<string, unknown>).activeFires as Array<[number, number]> | undefined
+    const savedFires = save.state.activeFires
     if (savedFires) {
       for (const [idx, remaining] of savedFires) {
         engine.fireState.activeFires.set(idx, remaining)
