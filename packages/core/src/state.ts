@@ -1,0 +1,91 @@
+import type { GameMap } from './map.js'
+
+export enum SimSpeed {
+  Paused,
+  Slow,
+  Normal,
+  Fast,
+  Turbo,
+}
+
+export type Result =
+  | { ok: true }
+  | { ok: false; reason: FailReason; detail?: string }
+
+export enum FailReason {
+  InsufficientFunds,
+  InvalidLocation,
+  Occupied,
+  NoPower,
+  NotBulldozable,
+  NotZonable,
+}
+
+export interface DemandInfo {
+  residential: number
+  commercial: number
+  industrial: number
+}
+
+export interface BudgetInfo {
+  taxRate: number
+  totalFunds: number
+  funding: {
+    police: number
+    fire: number
+    transit: number
+  }
+  taxIncome: number
+  maintenanceCosts: {
+    roads: number
+    rails: number
+    powerLines: number
+    powerPlants: number
+    total: number
+  }
+  serviceCosts: {
+    police: number
+    fire: number
+    transit: number
+    total: number
+  }
+  balance: number
+  projectedIncome: number
+  projectedExpenses: number
+  projectedBalance: number
+}
+
+export interface GameState {
+  map: GameMap
+  time: {
+    tickCount: number
+    month: number
+    year: number
+    speed: SimSpeed
+  }
+  population: number
+  funds: number
+  demand: DemandInfo
+  budget: BudgetInfo
+  powerGrid: Uint8Array
+  landValues: Uint8Array
+  pollutionLevel: Uint8Array
+  crimeLevel: Uint8Array
+  trafficDensity: Uint8Array
+}
+
+export interface SaveFile {
+  version: number
+  map: GameMap
+  state: {
+    funds: number
+    population: number
+    month: number
+    year: number
+    tickCount: number
+    taxRate: number
+    funding: Record<string, number>
+    seed: number
+  }
+  timestamp: string
+}
