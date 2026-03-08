@@ -9,7 +9,7 @@ describe('Water placement', () => {
     const prng = new PRNG(42)
     const noise = createNoise2D(prng)
     const terrain = new Uint8Array(64 * 64)
-    placeWater(terrain, 64, 64, noise, 0, null)
+    placeWater(terrain, 64, 64, noise, 0, 'plains')
     const waterCount = Array.from(terrain).filter(t => t === TileType.Water).length
     expect(waterCount).toBe(0)
   })
@@ -18,7 +18,7 @@ describe('Water placement', () => {
     const prng = new PRNG(42)
     const noise = createNoise2D(prng)
     const terrain = new Uint8Array(64 * 64)
-    placeWater(terrain, 64, 64, noise, 1.0, null)
+    placeWater(terrain, 64, 64, noise, 1.0, 'plains')
     const waterCount = Array.from(terrain).filter(t => t === TileType.Water).length
     expect(waterCount).toBe(64 * 64)
   })

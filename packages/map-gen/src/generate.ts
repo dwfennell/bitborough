@@ -34,7 +34,7 @@ export function generateMap(config: MapGenConfig): GameMap {
   const sandNoise = createNoise2D(new PRNG(prng.nextInt(0, 0x7fffffff)))
   const treeNoise = createNoise2D(new PRNG(prng.nextInt(0, 0x7fffffff)))
 
-  // Pipeline
+  // Pipeline — order matters: smoothing must run before sand/vegetation
   placeWater(map.terrain, size, size, waterNoise, waterLevel, config.preset)
   smoothShoreline(map.terrain, size, size, smoothing)
   placeSand(map.terrain, size, size, sandNoise, preset.sandFrequency, preset.sandThreshold)

@@ -7,7 +7,7 @@ export function placeWater(
   height: number,
   noise: (x: number, y: number) => number,
   waterLevel: number,
-  preset: string | null,
+  preset: 'plains' | 'island',
 ): void {
   const freq = 0.03
   const octaves = 4
