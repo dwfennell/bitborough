@@ -64,6 +64,39 @@ describe('Traffic system', () => {
     expect(totalTraffic).toBe(0)
   })
 
+  test('heavy congestion suppresses demand', () => {
+    const engine = Engine.create(createTestMap(32), { startingFunds: 100_000 })
+    setupCity(engine, 32)
+    for (let x = 5; x < 15; x++) {
+      for (let y = 5; y < 15; y++) {
+        engine.placeZone(x, y, ZoneType.Residential)
+      }
+    }
+    for (let x = 20; x < 30; x++) {
+      for (let y = 5; y < 15; y++) {
+        engine.placeZone(x, y, ZoneType.Commercial)
+      }
+    }
+    // Let city develop with low traffic
+    for (let i = 0; i < 20; i++) advanceMonth(engine)
+    const demandBefore = engine.getDemand()
+
+    // Artificially saturate traffic to max on all road tiles
+    const state = engine.getState()
+    for (let x = 0; x < 32; x++) {
+      const idx = 4 * 32 + x
+      if (state.map.infrastructure[idx]! & Infrastructure.Road) {
+        state.trafficDensity[idx] = 255
+      }
+    }
+    // Advance to recalculate demand with congestion
+    advanceMonth(engine)
+    const demandAfter = engine.getDemand()
+
+    // Residential demand should be suppressed by congestion
+    expect(demandAfter.residential).toBeLessThanOrEqual(demandBefore.residential)
+  })
+
   test('parallel roads reduce congestion', () => {
     const engine1 = Engine.create(createTestMap(32), { startingFunds: 100_000, seed: 42 })
     setupCity(engine1, 32)

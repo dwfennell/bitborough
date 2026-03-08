@@ -1,7 +1,9 @@
-import { type GameMap, type DemandInfo, ZoneType } from '@bitborough/core'
+import { type GameMap, type DemandInfo, ZoneType, Infrastructure } from '@bitborough/core'
+
+const TRAFFIC_CAPACITY = 100
 
 /**
- * Calculate zone demand based on current map state, population, and tax rate.
+ * Calculate zone demand based on current map state, population, tax rate, and traffic.
  *
  * Demand values range from -1 (strong decline) to 1 (strong growth).
  *
@@ -10,22 +12,14 @@ import { type GameMap, type DemandInfo, ZoneType } from '@bitborough/core'
  * - Residential base: 0.5 (always positive base demand)
  * - Commercial: follows population (needs customers)
  * - Industrial: base 0.3 with dampened tax sensitivity
+ * - Congestion: average road congestion > 0.8 suppresses all demand
  */
 export function calculateDemand(
   map: GameMap,
   population: number,
   taxRate: number,
+  trafficDensity?: Uint8Array,
 ): DemandInfo {
-  // Count existing zones of each type (reserved for future saturation logic)
-  let _rCount = 0, _cCount = 0, _iCount = 0
-  for (let i = 0; i < map.zones.length; i++) {
-    switch (map.zones[i]) {
-      case ZoneType.Residential: _rCount++; break
-      case ZoneType.Commercial: _cCount++; break
-      case ZoneType.Industrial: _iCount++; break
-    }
-  }
-
   // Tax rate modifier:
   // At 7% tax, modifier is 1.0 (neutral)
   // Lower tax → modifier > 1 (boost)
@@ -33,23 +27,28 @@ export function calculateDemand(
   const taxModifier = 1.0 - ((taxRate - 0.07) * 5.0)
 
   // Residential demand:
-  // Base demand of 0.5 (people always want to live somewhere)
-  // Modified by tax rate
   const rBase = 0.5
-  const rDemand = rBase * taxModifier
+  let rDemand = rBase * taxModifier
 
   // Commercial demand:
-  // Follows residential population (needs customers)
-  // Base is proportional to population, capped at 0.5
-  // Modified by tax rate
   const cBase = population > 0 ? Math.min(population / 500, 0.5) : 0
-  const cDemand = cBase * taxModifier
+  let cDemand = cBase * taxModifier
 
   // Industrial demand:
-  // Natural base demand (always some demand for industry)
-  // Less affected by tax rate than residential (dampened effect)
   const iBase = 0.3
-  const iDemand = iBase * (taxModifier * 0.5 + 0.5)
+  let iDemand = iBase * (taxModifier * 0.5 + 0.5)
+
+  // Congestion suppression: high average road congestion reduces demand
+  if (trafficDensity) {
+    const avgCongestion = computeAverageCongestion(map, trafficDensity)
+    if (avgCongestion > 0.8) {
+      // Scale from 1.0 at 0.8 congestion to 0.5 at 2.0+ congestion
+      const penalty = Math.max(0.5, 1.0 - (avgCongestion - 0.8) * 0.4)
+      rDemand *= penalty
+      cDemand *= penalty
+      iDemand *= penalty
+    }
+  }
 
   // Clamp all values to [-1, 1]
   return {
@@ -57,6 +56,20 @@ export function calculateDemand(
     commercial: clamp(cDemand, -1, 1),
     industrial: clamp(iDemand, -1, 1),
   }
+}
+
+function computeAverageCongestion(map: GameMap, trafficDensity: Uint8Array): number {
+  let totalCongestion = 0
+  let roadCount = 0
+
+  for (let i = 0; i < map.infrastructure.length; i++) {
+    if (map.infrastructure[i]! & Infrastructure.Road) {
+      totalCongestion += trafficDensity[i]! / TRAFFIC_CAPACITY
+      roadCount++
+    }
+  }
+
+  return roadCount > 0 ? totalCongestion / roadCount : 0
 }
 
 function clamp(value: number, min: number, max: number): number {

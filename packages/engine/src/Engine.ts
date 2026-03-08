@@ -129,7 +129,7 @@ export class Engine {
         this.year++
       }
 
-      this.demand = calculateDemand(this.map, this.population, this.taxRate)
+      this.demand = calculateDemand(this.map, this.population, this.taxRate, this.trafficDensity)
 
       // Land values use previous month's crime; crime uses updated land values
       calculateLandValues(this.map, this.powerGrid, this.pollutionLevel, this.crimeLevel, this.landValues)
