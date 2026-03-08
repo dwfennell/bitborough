@@ -19,6 +19,7 @@ import { propagatePower } from './simulation/power.js'
 import { calculateDemand } from './simulation/demand.js'
 import { calculateLandValues } from './simulation/land-value.js'
 import { updateZones } from './simulation/zones.js'
+import { calculateBudget } from './simulation/budget.js'
 import { BUILDING_DEFS } from './buildings-registry.js'
 
 export interface TileInfo {
@@ -56,6 +57,10 @@ export class Engine {
   // Demand
   private demand: { residential: number; commercial: number; industrial: number }
 
+  // Budget
+  private funding: { police: number; fire: number; transit: number }
+  private budgetInfo: BudgetInfo
+
   // Simulation layers
   private powerGrid: Uint8Array
   private landValues: Uint8Array
@@ -84,6 +89,10 @@ export class Engine {
 
     // Initialize demand
     this.demand = calculateDemand(this.map, this.population, this.taxRate)
+
+    // Initialize budget
+    this.funding = { police: 100, fire: 100, transit: 100 }
+    this.budgetInfo = calculateBudget(this.map, this.population, this.taxRate, this.landValues, this.funding)
   }
 
   static create(map: GameMap, config: EngineConfig = {}): Engine {
@@ -104,7 +113,9 @@ export class Engine {
       if (this.month > this.monthsPerYear) {
         this.month = 1
         this.year++
-        // Annual systems (budget) will go here
+        // Annual systems: calculate budget and apply balance to funds
+        this.budgetInfo = calculateBudget(this.map, this.population, this.taxRate, this.landValues, this.funding)
+        this.funds += this.budgetInfo.balance
       }
       // Monthly systems
       this.demand = calculateDemand(this.map, this.population, this.taxRate)
@@ -115,6 +126,9 @@ export class Engine {
       const { populationDelta } = updateZones(this.map, this.powerGrid, this.demand, this.prng, nextBuildingIdRef)
       this.nextBuildingId = nextBuildingIdRef.value
       this.population += populationDelta
+
+      // Update budget projections monthly (without applying balance)
+      this.budgetInfo = calculateBudget(this.map, this.population, this.taxRate, this.landValues, this.funding)
     }
   }
 
@@ -130,7 +144,7 @@ export class Engine {
       population: this.population,
       funds: this.funds,
       demand: this.demand,
-      budget: this.buildBudgetInfo(),
+      budget: { ...this.budgetInfo, totalFunds: this.funds },
       powerGrid: this.powerGrid,
       landValues: this.landValues,
       pollutionLevel: this.pollutionLevel,
@@ -235,29 +249,13 @@ export class Engine {
     return { ok: true }
   }
 
-  private buildBudgetInfo(): BudgetInfo {
-    return {
-      taxRate: this.taxRate,
-      totalFunds: this.funds,
-      funding: { police: 100, fire: 100, transit: 100 },
-      taxIncome: 0,
-      maintenanceCosts: {
-        roads: 0,
-        rails: 0,
-        powerLines: 0,
-        powerPlants: 0,
-        total: 0,
-      },
-      serviceCosts: {
-        police: 0,
-        fire: 0,
-        transit: 0,
-        total: 0,
-      },
-      balance: 0,
-      projectedIncome: 0,
-      projectedExpenses: 0,
-      projectedBalance: 0,
-    }
+  setTaxRate(rate: number): void {
+    this.taxRate = Math.max(0, Math.min(0.20, rate))
+    this.budgetInfo = calculateBudget(this.map, this.population, this.taxRate, this.landValues, this.funding)
+  }
+
+  setFunding(service: 'police' | 'fire' | 'transit', level: number): void {
+    this.funding[service] = Math.max(0, Math.min(100, level))
+    this.budgetInfo = calculateBudget(this.map, this.population, this.taxRate, this.landValues, this.funding)
   }
 }

@@ -1,0 +1,97 @@
+import { type GameMap, type BudgetInfo, Infrastructure, MAINTENANCE } from '@rcity/core'
+import { BUILDING_DEFS } from '../buildings-registry.js'
+import { getZoneBuildingDef } from './zones.js'
+
+export function calculateBudget(
+  map: GameMap,
+  population: number,
+  taxRate: number,
+  landValues: Uint8Array,
+  funding: { police: number; fire: number; transit: number },
+): BudgetInfo {
+  // Count infrastructure for maintenance
+  let roadCount = 0
+  let railCount = 0
+  let powerLineCount = 0
+
+  for (let i = 0; i < map.infrastructure.length; i++) {
+    const infra = map.infrastructure[i]!
+    if (infra & Infrastructure.Road) roadCount++
+    if (infra & Infrastructure.PowerLine) powerLineCount++
+    if (infra & Infrastructure.Rail) railCount++
+  }
+
+  // Count building maintenance
+  let powerPlantMaintenance = 0
+  let policeStationCount = 0
+  let fireStationCount = 0
+
+  for (const building of map.buildings) {
+    const def = BUILDING_DEFS[building.defId]
+    if (!def) continue
+    if (building.defId === 'power.coal') powerPlantMaintenance += MAINTENANCE.coalPlant
+    if (building.defId === 'power.nuclear') powerPlantMaintenance += MAINTENANCE.nuclearPlant
+    if (building.defId === 'service.police') policeStationCount++
+    if (building.defId === 'service.fire') fireStationCount++
+  }
+
+  const maintenanceCosts = {
+    roads: roadCount * MAINTENANCE.road,
+    rails: railCount * MAINTENANCE.rail,
+    powerLines: powerLineCount * MAINTENANCE.powerLine,
+    powerPlants: powerPlantMaintenance,
+    total: 0,
+  }
+  maintenanceCosts.total = maintenanceCosts.roads + maintenanceCosts.rails +
+    maintenanceCosts.powerLines + maintenanceCosts.powerPlants
+
+  // Service costs based on funding level
+  const serviceCosts = {
+    police: policeStationCount * MAINTENANCE.policeStation * (funding.police / 100),
+    fire: fireStationCount * MAINTENANCE.fireStation * (funding.fire / 100),
+    transit: 0, // future
+    total: 0,
+  }
+  serviceCosts.total = serviceCosts.police + serviceCosts.fire + serviceCosts.transit
+
+  // Tax income: sum taxable value of all zone buildings × taxRate
+  // From PRD: totalPopulation × averageLandValue / 120 × taxRate
+  let totalLandValue = 0
+  let developedTileCount = 0
+  for (const building of map.buildings) {
+    const def = getZoneBuildingDef(building.defId)
+    if (!def) continue // skip special buildings
+    const idx = building.y * map.width + building.x
+    totalLandValue += landValues[idx]!
+    developedTileCount++
+  }
+
+  const avgLandValue = developedTileCount > 0 ? totalLandValue / developedTileCount : 0
+  const taxIncome = population * avgLandValue / 120 * taxRate
+
+  const balance = taxIncome - maintenanceCosts.total - serviceCosts.total
+
+  return {
+    taxRate,
+    totalFunds: 0, // filled by Engine
+    funding,
+    taxIncome: Math.round(taxIncome),
+    maintenanceCosts: {
+      roads: Math.round(maintenanceCosts.roads),
+      rails: Math.round(maintenanceCosts.rails),
+      powerLines: Math.round(maintenanceCosts.powerLines),
+      powerPlants: Math.round(maintenanceCosts.powerPlants),
+      total: Math.round(maintenanceCosts.total),
+    },
+    serviceCosts: {
+      police: Math.round(serviceCosts.police),
+      fire: Math.round(serviceCosts.fire),
+      transit: 0,
+      total: Math.round(serviceCosts.total),
+    },
+    balance: Math.round(balance),
+    projectedIncome: Math.round(taxIncome),
+    projectedExpenses: Math.round(maintenanceCosts.total + serviceCosts.total),
+    projectedBalance: Math.round(balance),
+  }
+}
