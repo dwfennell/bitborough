@@ -27,6 +27,16 @@ export function fireCoverageToRgba(value: number): string {
   return `rgba(${r}, ${g}, 30, 0.4)`
 }
 
+export function trafficToRgba(value: number): string {
+  // value 0-255 maps to congestion 0-2.55 (capacity = 100, so 100/255 ≈ 0.39)
+  // Thresholds: <50 green, <80 yellow, <=100 orange, >100 red
+  if (value === 0) return 'rgba(0, 0, 0, 0)'
+  if (value < 50) return 'rgba(76, 175, 80, 0.5)'
+  if (value < 80) return 'rgba(255, 235, 59, 0.6)'
+  if (value <= 100) return 'rgba(255, 152, 0, 0.7)'
+  return 'rgba(244, 67, 54, 0.8)'
+}
+
 export const TERRAIN_COLORS: Record<number, string> = {
   [TileType.Grass]: '#4a8c3f',
   [TileType.Water]: '#3b7dd8',
