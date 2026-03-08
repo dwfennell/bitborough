@@ -82,6 +82,7 @@ export class Game {
       { label: 'Value (V)', key: 'v', action: () => this.renderer.toggleOverlay('landValue') },
       { label: 'Crime (C)', key: 'c', action: () => this.renderer.toggleOverlay('crime') },
       { label: 'Fire (F)', key: 'f', action: () => this.renderer.toggleOverlay('fire') },
+      { label: 'Traffic (T)', key: 't', action: () => this.renderer.toggleOverlay('traffic') },
       { label: 'Grid (G)', key: 'g', action: () => this.renderer.toggleGridLines() },
       { label: 'Export', action: () => { this.autoSave(); this.saveManager.exportToFile() } },
     ]

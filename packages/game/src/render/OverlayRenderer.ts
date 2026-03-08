@@ -1,7 +1,8 @@
 import type { GameState } from '@bitborough/core'
+import { Infrastructure } from '@bitborough/core'
 import { landValueToRgba, crimeToRgba, fireCoverageToRgba } from './colors.js'
 
-export type OverlayType = 'power' | 'landValue' | 'crime' | 'fire' | 'none'
+export type OverlayType = 'power' | 'landValue' | 'crime' | 'fire' | 'traffic' | 'none'
 
 // Precomputed color lookups (0-255 index → rgba string)
 function buildColorTable(fn: (v: number) => string): string[] {
@@ -17,6 +18,13 @@ const FIRE_COVERAGE_COLORS = buildColorTable(fireCoverageToRgba)
 const POWER_ON = 'rgba(255, 235, 59, 0.4)'
 const POWER_OFF = 'rgba(100, 100, 100, 0.3)'
 const FIRE_ACTIVE = 'rgba(255, 100, 0, 0.7)'
+
+// Traffic congestion colors (by capacity ratio)
+const TRAFFIC_FREE = 'rgba(76, 175, 80, 0.5)'      // green: < 50%
+const TRAFFIC_MODERATE = 'rgba(255, 235, 59, 0.6)'  // yellow: 50-80%
+const TRAFFIC_HEAVY = 'rgba(255, 152, 0, 0.7)'      // orange: 80-100%
+const TRAFFIC_GRIDLOCK = 'rgba(244, 67, 54, 0.8)'   // red: > 100%
+const TRAFFIC_CAPACITY = 100
 
 export interface VisibleTileRange {
   ts: number
@@ -94,6 +102,25 @@ export class OverlayRenderer {
               ctx.fillStyle = FIRE_COVERAGE_COLORS[v]!
               ctx.fillRect((x - cameraX) * ts, (y - cameraY) * ts, ts, ts)
             }
+          }
+        }
+        break
+      }
+
+      case 'traffic': {
+        const traffic = state.trafficDensity
+        const infra = state.map.infrastructure
+
+        for (let y = startY; y <= endY; y++) {
+          for (let x = startX; x <= endX; x++) {
+            const idx = y * mapWidth + x
+            if (!(infra[idx]! & Infrastructure.Road)) continue
+            const congestion = traffic[idx]! / TRAFFIC_CAPACITY
+            if (congestion < 0.5) ctx.fillStyle = TRAFFIC_FREE
+            else if (congestion < 0.8) ctx.fillStyle = TRAFFIC_MODERATE
+            else if (congestion <= 1.0) ctx.fillStyle = TRAFFIC_HEAVY
+            else ctx.fillStyle = TRAFFIC_GRIDLOCK
+            ctx.fillRect((x - cameraX) * ts, (y - cameraY) * ts, ts, ts)
           }
         }
         break
