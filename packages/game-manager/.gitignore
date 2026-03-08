@@ -1,5 +1,7 @@
 # Build outputs
 bin/
+server
+library/
 web/dist/
 web/node_modules/
 
