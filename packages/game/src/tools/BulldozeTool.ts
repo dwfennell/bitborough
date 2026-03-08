@@ -5,6 +5,7 @@ import type { Engine } from '@bitborough/engine'
 export class BulldozeTool implements Tool {
   readonly name = 'Bulldoze'
   readonly cursor = 'crosshair'
+  readonly category = 'bulldoze' as const
 
   onTileClick(x: number, y: number, engine: Engine): Result {
     return engine.bulldoze(x, y)

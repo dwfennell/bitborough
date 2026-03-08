@@ -5,6 +5,7 @@ import { type Engine, type TileInfo } from '@bitborough/engine'
 export class QueryTool implements Tool {
   readonly name = 'Query'
   readonly cursor = 'help'
+  readonly category = 'query' as const
   lastQuery: TileInfo | null = null
 
   onTileClick(x: number, y: number, engine: Engine): Result {

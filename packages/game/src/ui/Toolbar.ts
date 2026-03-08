@@ -14,14 +14,22 @@ interface ToolEntry {
 }
 
 const TOOL_ENTRIES: ToolEntry[] = [
+  // Infrastructure
   { label: 'Road', key: '1', factory: () => new InfrastructureTool('Road', Infrastructure.Road, 'rgba(85,85,85,0.5)') },
   { label: 'Power', key: '2', factory: () => new InfrastructureTool('Power Line', Infrastructure.PowerLine, 'rgba(255,193,7,0.5)') },
+  // Zones
   { label: 'Zone R', key: '3', factory: () => new ZoneTool(ZoneType.Residential) },
   { label: 'Zone C', key: '4', factory: () => new ZoneTool(ZoneType.Commercial) },
   { label: 'Zone I', key: '5', factory: () => new ZoneTool(ZoneType.Industrial) },
+  // Buildings
   { label: 'Coal', key: '6', factory: () => new BuildingTool('power.coal') },
-  { label: 'Bulldoze', key: '7', factory: () => new BulldozeTool() },
-  { label: 'Query', key: '8', factory: () => new QueryTool() },
+  { label: 'Nuclear', key: '7', factory: () => new BuildingTool('power.nuclear') },
+  { label: 'Police', key: '8', factory: () => new BuildingTool('service.police') },
+  { label: 'Fire', key: '9', factory: () => new BuildingTool('service.fire') },
+  { label: 'Park', key: '0', factory: () => new BuildingTool('special.park') },
+  // Utility
+  { label: 'Bulldoze', key: '-', factory: () => new BulldozeTool() },
+  { label: 'Query', key: '=', factory: () => new QueryTool() },
 ]
 
 export class Toolbar {

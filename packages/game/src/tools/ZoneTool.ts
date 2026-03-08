@@ -6,6 +6,7 @@ import { ZONE_PREVIEW_COLORS } from '../render/colors.js'
 export class ZoneTool implements Tool {
   readonly name: string
   readonly cursor = 'crosshair'
+  readonly category = 'zone' as const
 
   constructor(private zone: ZoneType) {
     const names: Record<number, string> = {

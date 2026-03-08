@@ -5,6 +5,7 @@ import type { Engine } from '@bitborough/engine'
 export class BuildingTool implements Tool {
   readonly name: string
   readonly cursor = 'crosshair'
+  readonly category = 'building' as const
 
   constructor(private defId: string) {
     this.name = defId

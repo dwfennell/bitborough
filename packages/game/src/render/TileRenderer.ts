@@ -5,7 +5,7 @@ import {
   type Building,
   type BuildingDef,
 } from '@bitborough/core'
-import { ZONE_OVERLAY_COLORS, ZONE_LETTERS } from './colors.js'
+import { TERRAIN_COLORS, ZONE_OVERLAY_COLORS, ZONE_LETTERS } from './colors.js'
 
 export interface TileRenderer {
   drawTile(
@@ -39,15 +39,6 @@ export interface TileRenderer {
     tileSize: number,
   ): void
 }
-
-const TERRAIN_COLORS: Record<TileType, string> = {
-  [TileType.Grass]: '#4a8c3f',
-  [TileType.Water]: '#3b7dd8',
-  [TileType.Dirt]: '#8b7355',
-  [TileType.Sand]: '#d4b876',
-  [TileType.Trees]: '#2d6b2e',
-}
-
 
 const BUILDING_COLORS: Record<string, string> = {
   'power.coal': '#555',

@@ -1,6 +1,10 @@
+import type { Result } from '@bitborough/core'
 import { Camera } from '../render/Camera.js'
 import { ToolManager } from '../tools/ToolManager.js'
+import type { Tool } from '../tools/Tool.js'
 import type { Engine } from '@bitborough/engine'
+
+export type ToolResultCallback = (tool: Tool, x: number, y: number, result: Result) => void
 
 export class InputManager {
   private isDragging = false
@@ -10,6 +14,7 @@ export class InputManager {
   private hoverTile: { x: number; y: number } | null = null
   private mapWidth = 0
   private mapHeight = 0
+  private onToolResult: ToolResultCallback | null = null
 
   constructor(
     private canvas: HTMLCanvasElement,
@@ -18,6 +23,10 @@ export class InputManager {
     private getEngine: () => Engine | null,
   ) {
     this.bindEvents()
+  }
+
+  setToolResultCallback(cb: ToolResultCallback): void {
+    this.onToolResult = cb
   }
 
   setMapSize(width: number, height: number): void {
@@ -93,10 +102,13 @@ export class InputManager {
     if (tile.x < 0 || tile.y < 0) return
     if (tile.x >= this.mapWidth || tile.y >= this.mapHeight) return
 
+    let result: Result
     if (this.isDragging && tool.onTileDrag) {
-      tool.onTileDrag(tile.x, tile.y, engine)
+      result = tool.onTileDrag(tile.x, tile.y, engine)
     } else {
-      tool.onTileClick(tile.x, tile.y, engine)
+      result = tool.onTileClick(tile.x, tile.y, engine)
     }
+
+    this.onToolResult?.(tool, tile.x, tile.y, result)
   }
 }

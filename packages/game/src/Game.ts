@@ -5,9 +5,14 @@ import { Camera } from './render/Camera.js'
 import { Renderer } from './render/Renderer.js'
 import { InputManager } from './input/InputManager.js'
 import { ToolManager } from './tools/ToolManager.js'
+import { QueryTool } from './tools/QueryTool.js'
 import { InfoBar } from './ui/InfoBar.js'
 import { Toolbar } from './ui/Toolbar.js'
 import { SpeedControls } from './ui/SpeedControls.js'
+import { BudgetPanel } from './ui/BudgetPanel.js'
+import { QueryPanel } from './ui/QueryPanel.js'
+import { MiniMap } from './ui/MiniMap.js'
+import { AudioManager } from './audio/AudioManager.js'
 import { SaveManager } from './storage/SaveManager.js'
 
 const TICK_INTERVALS: Record<SimSpeed, number> = {
@@ -20,6 +25,12 @@ const TICK_INTERVALS: Record<SimSpeed, number> = {
 
 const TILE_SIZE = 16
 
+interface GameAction {
+  label: string
+  key?: string
+  action: () => void
+}
+
 export class Game {
   private engine: Engine | null = null
   private ctx: CanvasRenderingContext2D
@@ -30,6 +41,10 @@ export class Game {
   private infoBar: InfoBar
   private toolbar: Toolbar
   private speedControls: SpeedControls
+  private budgetPanel: BudgetPanel
+  private queryPanel: QueryPanel
+  private miniMap: MiniMap
+  private audioManager: AudioManager
   private saveManager: SaveManager
 
   private speed: SimSpeed = SimSpeed.Normal
@@ -37,6 +52,9 @@ export class Game {
   private lastFrameTime = 0
   private animationId = 0
   private ticksSinceSave = 0
+  private frameCount = 0
+
+  private actions: GameAction[]
 
   constructor(
     private canvas: HTMLCanvasElement,
@@ -49,12 +67,50 @@ export class Game {
     this.toolManager = new ToolManager()
     this.inputManager = new InputManager(canvas, this.camera, this.toolManager, () => this.engine)
     this.saveManager = new SaveManager()
+    this.audioManager = new AudioManager()
 
     this.infoBar = new InfoBar(uiOverlay)
     this.toolbar = new Toolbar(uiOverlay, this.toolManager)
     this.speedControls = new SpeedControls(uiOverlay, (s) => {
       this.speed = s
     })
+    this.budgetPanel = new BudgetPanel(
+      uiOverlay,
+      (rate) => this.engine?.setTaxRate(rate),
+      (service, level) => this.engine?.setFunding(service, level),
+    )
+    this.queryPanel = new QueryPanel(uiOverlay)
+    this.miniMap = new MiniMap(uiOverlay)
+
+    // Shared actions for menu bar and keyboard shortcuts
+    this.actions = [
+      { label: 'Budget (B)', key: 'b', action: () => this.budgetPanel.toggle() },
+      { label: 'Power (P)', key: 'p', action: () => this.renderer.toggleOverlay('power') },
+      { label: 'Value (V)', key: 'v', action: () => this.renderer.toggleOverlay('landValue') },
+      { label: 'Grid (G)', key: 'g', action: () => this.renderer.toggleGridLines() },
+      { label: 'Export', action: () => { this.autoSave(); this.saveManager.exportToFile() } },
+    ]
+
+    this.createMenuBar(uiOverlay)
+
+    // Tool result callback for query panel + audio
+    this.inputManager.setToolResultCallback((tool, x, y, result) => {
+      if (tool instanceof QueryTool && tool.lastQuery && this.engine) {
+        this.queryPanel.show(tool.lastQuery, x, y, this.engine.getState())
+      }
+      if (tool.category === 'query') return
+      if (result.ok) {
+        switch (tool.category) {
+          case 'bulldoze': this.audioManager.playBulldoze(); break
+          case 'zone': this.audioManager.playZone(); break
+          default: this.audioManager.playPlace(); break
+        }
+      } else {
+        this.audioManager.playError()
+      }
+    })
+
+    this.bindKeyboard()
   }
 
   start(): void {
@@ -102,6 +158,9 @@ export class Game {
           Seed
           <input type="number" id="map-seed" value="${Math.floor(Math.random() * 100000)}">
         </label>
+        <div class="import-save-row">
+          <button type="button" id="import-save-btn">Import Save</button>
+        </div>
         <button type="submit">Start Game</button>
       </form>
     `
@@ -120,6 +179,44 @@ export class Game {
       this.setMapSize(size, size)
       screen.remove()
       this.startLoop()
+    })
+
+    screen.querySelector('#import-save-btn')!.addEventListener('click', async () => {
+      const save = await this.saveManager.importFromFile()
+      if (save) {
+        this.engine = Engine.restore(save)
+        this.setMapSize(save.map.width, save.map.height)
+        screen.remove()
+        this.startLoop()
+      }
+    })
+  }
+
+  private createMenuBar(container: HTMLElement): void {
+    const bar = document.createElement('div')
+    bar.id = 'menu-bar'
+
+    for (const item of this.actions) {
+      const btn = document.createElement('button')
+      btn.textContent = item.label
+      btn.addEventListener('click', item.action)
+      bar.appendChild(btn)
+    }
+
+    container.appendChild(bar)
+  }
+
+  private bindKeyboard(): void {
+    const keyMap = new Map<string, () => void>()
+    for (const item of this.actions) {
+      if (item.key) keyMap.set(item.key, item.action)
+    }
+    keyMap.set('Escape', () => { this.toolManager.clear(); this.queryPanel.hide() })
+
+    window.addEventListener('keydown', (e) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement) return
+      const action = keyMap.get(e.key)
+      if (action) action()
     })
   }
 
@@ -159,7 +256,14 @@ export class Game {
       const state = this.engine.getState()
       this.renderer.render(state)
       this.infoBar.update(state)
+      this.budgetPanel.update(state)
       this.drawToolPreview(state)
+
+      // Minimap every 10 frames
+      this.frameCount++
+      if (this.frameCount % 10 === 0) {
+        this.miniMap.render(state, this.camera)
+      }
     }
 
     this.animationId = requestAnimationFrame((t) => this.loop(t))

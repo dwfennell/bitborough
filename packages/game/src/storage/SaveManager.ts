@@ -22,4 +22,40 @@ export class SaveManager {
   deleteSave(): void {
     this.storage.removeItem(SAVE_KEY)
   }
+
+  exportToFile(): void {
+    const data = this.storage.getItem(SAVE_KEY)
+    if (!data) return
+    const blob = new Blob([data], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `bitborough-save-${Date.now()}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
+  importFromFile(): Promise<SaveFile | null> {
+    return new Promise((resolve) => {
+      const input = document.createElement('input')
+      input.type = 'file'
+      input.accept = '.json'
+      input.addEventListener('change', () => {
+        const file = input.files?.[0]
+        if (!file) { resolve(null); return }
+        const reader = new FileReader()
+        reader.onload = () => {
+          try {
+            const save = JSON.parse(reader.result as string) as SaveFile
+            resolve(save)
+          } catch {
+            resolve(null)
+          }
+        }
+        reader.readAsText(file)
+      })
+      input.addEventListener('cancel', () => resolve(null))
+      input.click()
+    })
+  }
 }

@@ -1,11 +1,13 @@
 import { type GameState, TileType, ZoneType, Infrastructure } from '@bitborough/core'
 import { Camera } from './Camera.js'
 import { type TileRenderer, ColorTileRenderer } from './TileRenderer.js'
+import { OverlayRenderer, type OverlayType } from './OverlayRenderer.js'
 import { BUILDING_DEFS } from '@bitborough/engine'
 
 export class Renderer {
   private tileRenderer: TileRenderer
   private gridLines = true
+  private overlayRenderer = new OverlayRenderer()
 
   constructor(
     private ctx: CanvasRenderingContext2D,
@@ -66,6 +68,14 @@ export class Renderer {
       this.tileRenderer.drawBuilding(ctx, building, def, sx, sy, ts)
     }
 
+    // Overlays (power grid, land value heatmaps)
+    this.overlayRenderer.render(ctx, state, {
+      ts, startX, startY, endX, endY,
+      mapWidth: map.width,
+      cameraX: camera.x,
+      cameraY: camera.y,
+    })
+
     // Grid lines (batched single stroke)
     if (this.gridLines && ts >= 8) {
       ctx.strokeStyle = 'rgba(0,0,0,0.15)'
@@ -87,5 +97,17 @@ export class Renderer {
 
   setGridLines(show: boolean): void {
     this.gridLines = show
+  }
+
+  getGridLines(): boolean {
+    return this.gridLines
+  }
+
+  toggleGridLines(): void {
+    this.gridLines = !this.gridLines
+  }
+
+  toggleOverlay(type: OverlayType): void {
+    this.overlayRenderer.toggle(type)
   }
 }

@@ -4,6 +4,7 @@ import type { Engine } from '@bitborough/engine'
 
 export class InfrastructureTool implements Tool {
   readonly cursor = 'crosshair'
+  readonly category = 'infrastructure' as const
 
   constructor(
     readonly name: string,

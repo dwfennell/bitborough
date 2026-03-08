@@ -11,6 +11,15 @@ export class InfoBar {
   private cBar: HTMLElement
   private iBar: HTMLElement
 
+  // Cached values to avoid redundant DOM writes
+  private lastPop = -1
+  private lastFunds = -1
+  private lastMonth = -1
+  private lastYear = -1
+  private lastDemandR = NaN
+  private lastDemandC = NaN
+  private lastDemandI = NaN
+
   constructor(container: HTMLElement) {
     this.el = document.createElement('div')
     this.el.id = 'info-bar'
@@ -35,16 +44,36 @@ export class InfoBar {
   }
 
   update(state: GameState): void {
-    this.popEl.textContent = `Pop: ${state.population.toLocaleString()}`
-    this.fundsEl.textContent = `$${state.funds.toLocaleString()}`
-    this.dateEl.textContent = `${MONTHS[state.time.month - 1]} ${state.time.year}`
+    if (state.population !== this.lastPop) {
+      this.lastPop = state.population
+      this.popEl.textContent = `Pop: ${state.population.toLocaleString()}`
+    }
+    if (state.funds !== this.lastFunds) {
+      this.lastFunds = state.funds
+      this.fundsEl.textContent = `$${state.funds.toLocaleString()}`
+    }
+    if (state.time.month !== this.lastMonth || state.time.year !== this.lastYear) {
+      this.lastMonth = state.time.month
+      this.lastYear = state.time.year
+      this.dateEl.textContent = `${MONTHS[state.time.month - 1]} ${state.time.year}`
+    }
 
     const maxH = 20
-    this.rBar.style.height = `${Math.max(4, Math.abs(state.demand.residential) * maxH)}px`
-    this.rBar.style.opacity = state.demand.residential >= 0 ? '1' : '0.4'
-    this.cBar.style.height = `${Math.max(4, Math.abs(state.demand.commercial) * maxH)}px`
-    this.cBar.style.opacity = state.demand.commercial >= 0 ? '1' : '0.4'
-    this.iBar.style.height = `${Math.max(4, Math.abs(state.demand.industrial) * maxH)}px`
-    this.iBar.style.opacity = state.demand.industrial >= 0 ? '1' : '0.4'
+    const { residential, commercial, industrial } = state.demand
+    if (residential !== this.lastDemandR) {
+      this.lastDemandR = residential
+      this.rBar.style.height = `${Math.max(4, Math.abs(residential) * maxH)}px`
+      this.rBar.style.opacity = residential >= 0 ? '1' : '0.4'
+    }
+    if (commercial !== this.lastDemandC) {
+      this.lastDemandC = commercial
+      this.cBar.style.height = `${Math.max(4, Math.abs(commercial) * maxH)}px`
+      this.cBar.style.opacity = commercial >= 0 ? '1' : '0.4'
+    }
+    if (industrial !== this.lastDemandI) {
+      this.lastDemandI = industrial
+      this.iBar.style.height = `${Math.max(4, Math.abs(industrial) * maxH)}px`
+      this.iBar.style.opacity = industrial >= 0 ? '1' : '0.4'
+    }
   }
 }
