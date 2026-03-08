@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="asphalt" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#707070"/>
+      <stop offset="100%" stop-color="#686868"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Grass base -->
+  <rect width="128" height="128" fill="#8cc870"/>
+  <ellipse cx="20" cy="18" rx="12" ry="9" fill="#95d07a" opacity="0.4"/>
+  <ellipse cx="108" cy="20" rx="11" ry="8" fill="#82c466" opacity="0.35"/>
+  <ellipse cx="20" cy="110" rx="12" ry="9" fill="#95d07a" opacity="0.38"/>
+  <ellipse cx="108" cy="108" rx="11" ry="8" fill="#82c466" opacity="0.4"/>
+  <ellipse cx="64" cy="18" rx="10" ry="7" fill="#a0da88" opacity="0.3"/>
+  <ellipse cx="64" cy="110" rx="10" ry="7" fill="#9ad680" opacity="0.32"/>
+
+  <!-- Grass blade clusters -->
+  <g fill="#6aaa50" opacity="0.45">
+    <path d="M24 28 L25.5 22 L27 28Z"/>
+    <path d="M26 28.5 L28 21 L29.5 28.5Z"/>
+  </g>
+  <g fill="#78b868" opacity="0.4">
+    <path d="M96 108 L97.5 102 L99 108Z"/>
+    <path d="M98 108.5 L100 101 L101.5 108.5Z"/>
+  </g>
+  <g fill="#6aaa50" opacity="0.42">
+    <path d="M50 20 L51.5 14 L53 20Z"/>
+    <path d="M52 20.5 L54 13 L55.5 20.5Z"/>
+  </g>
+
+  <!-- Sidewalks - horizontal full length -->
+  <rect x="0" y="40" width="128" height="8" fill="#b0b0a8" opacity="0.6"/>
+  <rect x="0" y="80" width="128" height="8" fill="#b0b0a8" opacity="0.6"/>
+
+  <!-- Road pavement - horizontal full length -->
+  <rect x="0" y="48" width="128" height="32" fill="url(#asphalt)"/>
+
+  <!-- Curb lines - horizontal -->
+  <g stroke="#989898" stroke-width="1.5" opacity="0.5">
+    <line x1="0" y1="40" x2="128" y2="40"/>
+    <line x1="0" y1="88" x2="128" y2="88"/>
+  </g>
+
+  <!-- Road surface texture -->
+  <g fill="#606060" opacity="0.12">
+    <circle cx="12" cy="56" r="0.8"/>
+    <circle cx="28" cy="70" r="0.7"/>
+    <circle cx="45" cy="52" r="0.9"/>
+    <circle cx="58" cy="74" r="0.7"/>
+    <circle cx="72" cy="60" r="0.8"/>
+    <circle cx="88" cy="68" r="0.7"/>
+    <circle cx="100" cy="54" r="0.8"/>
+    <circle cx="115" cy="72" r="0.7"/>
+    <circle cx="36" cy="64" r="0.6"/>
+    <circle cx="82" cy="58" r="0.7"/>
+    <circle cx="8" cy="76" r="0.6"/>
+    <circle cx="120" cy="50" r="0.7"/>
+  </g>
+
+  <!-- Center lane markings - dashed yellow, full length horizontal -->
+  <rect x="4" y="63.25" width="8" height="1.5" rx="0.75" fill="#e8d080" opacity="0.7"/>
+  <rect x="18" y="63.25" width="8" height="1.5" rx="0.75" fill="#e8d080" opacity="0.7"/>
+  <rect x="32" y="63.25" width="8" height="1.5" rx="0.75" fill="#e8d080" opacity="0.7"/>
+  <rect x="46" y="63.25" width="8" height="1.5" rx="0.75" fill="#e8d080" opacity="0.7"/>
+  <rect x="60" y="63.25" width="8" height="1.5" rx="0.75" fill="#e8d080" opacity="0.7"/>
+  <rect x="74" y="63.25" width="8" height="1.5" rx="0.75" fill="#e8d080" opacity="0.7"/>
+  <rect x="88" y="63.25" width="8" height="1.5" rx="0.75" fill="#e8d080" opacity="0.7"/>
+  <rect x="102" y="63.25" width="8" height="1.5" rx="0.75" fill="#e8d080" opacity="0.7"/>
+  <rect x="116" y="63.25" width="8" height="1.5" rx="0.75" fill="#e8d080" opacity="0.7"/>
+
+  <!-- Small flowers in grass -->
+  <circle cx="78" cy="20" r="1.5" fill="#e8c8d0" opacity="0.6"/>
+  <circle cx="50" cy="108" r="1.2" fill="#e8d8a0" opacity="0.6"/>
+</svg>
