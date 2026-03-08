@@ -17,6 +17,7 @@ import { bulldoze } from './actions/bulldoze.js'
 import { updateConnections } from './connections.js'
 import { propagatePower } from './simulation/power.js'
 import { calculateDemand } from './simulation/demand.js'
+import { updateZones } from './simulation/zones.js'
 import { BUILDING_DEFS } from './buildings-registry.js'
 
 export interface TileInfo {
@@ -106,6 +107,12 @@ export class Engine {
       }
       // Monthly systems
       this.demand = calculateDemand(this.map, this.population, this.taxRate)
+
+      // Zone development
+      const nextBuildingIdRef = { value: this.nextBuildingId }
+      const { populationDelta } = updateZones(this.map, this.powerGrid, this.demand, this.prng, nextBuildingIdRef)
+      this.nextBuildingId = nextBuildingIdRef.value
+      this.population += populationDelta
     }
   }
 

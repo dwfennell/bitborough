@@ -1,4 +1,4 @@
-import { type GameMap, Infrastructure, POWER } from '@rcity/core'
+import { type GameMap, Infrastructure, ZoneType, POWER } from '@rcity/core'
 import { BUILDING_DEFS } from '../buildings-registry.js'
 
 interface PowerPlant {
@@ -111,6 +111,8 @@ function isConductor(map: GameMap, idx: number): boolean {
   if (infra & Infrastructure.PowerLine) return true
   // Roads conduct
   if (infra & Infrastructure.Road) return true
+  // Zoned tiles conduct (so they can receive power from adjacent infrastructure)
+  if (map.zones[idx] !== ZoneType.None) return true
   // Tiles with buildings on them conduct
   // Check if any building covers this tile
   if (hasBuildingAt(map, idx)) return true
