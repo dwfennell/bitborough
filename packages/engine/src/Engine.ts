@@ -22,6 +22,7 @@ import { calculateLandValues } from './simulation/land-value.js'
 import { updateZones } from './simulation/zones.js'
 import { calculateBudget } from './simulation/budget.js'
 import { calculateCrime } from './simulation/services/crime.js'
+import { calculateFireCoverage, updateFires, createFireState, type FireState } from './simulation/services/fire.js'
 import { BUILDING_DEFS } from './buildings-registry.js'
 
 export interface TileInfo {
@@ -68,7 +69,12 @@ export class Engine {
   private landValues: Uint8Array
   private pollutionLevel: Uint8Array
   private crimeLevel: Uint8Array
+  private fireCoverage: Uint8Array
   private trafficDensity: Uint8Array
+
+  // Fire system
+  private fireState: FireState
+  private activeFires: number[] = []
 
   private constructor(map: GameMap, config: EngineConfig) {
     this.map = map
@@ -87,7 +93,9 @@ export class Engine {
     this.landValues = new Uint8Array(size)
     this.pollutionLevel = new Uint8Array(size)
     this.crimeLevel = new Uint8Array(size)
+    this.fireCoverage = new Uint8Array(size)
     this.trafficDensity = new Uint8Array(size)
+    this.fireState = createFireState()
 
     // Initialize demand
     this.demand = calculateDemand(this.map, this.population, this.taxRate)
@@ -123,6 +131,8 @@ export class Engine {
       this.demand = calculateDemand(this.map, this.population, this.taxRate)
       calculateLandValues(this.map, this.powerGrid, this.pollutionLevel, this.crimeLevel, this.landValues)
       calculateCrime(this.map, this.landValues, this.crimeLevel, this.population, this.funding.police)
+      calculateFireCoverage(this.map, this.fireCoverage, this.funding.fire)
+      this.activeFires = updateFires(this.map, this.fireState, this.fireCoverage, this.prng)
 
       // Zone development
       const nextBuildingIdRef = { value: this.nextBuildingId }
@@ -152,7 +162,9 @@ export class Engine {
       landValues: this.landValues,
       pollutionLevel: this.pollutionLevel,
       crimeLevel: this.crimeLevel,
+      fireCoverage: this.fireCoverage,
       trafficDensity: this.trafficDensity,
+      activeFires: this.activeFires,
     }
   }
 

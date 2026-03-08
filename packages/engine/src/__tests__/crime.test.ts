@@ -28,6 +28,8 @@ describe('Crime system', () => {
     for (let x = 0; x < 16; x++) {
       engine.placeTile(x, 3, Infrastructure.PowerLine)
     }
+    // Fire station to prevent zone destruction (testing crime, not fire)
+    engine.placeBuilding(8, 8, 'service.fire')
     // Advance to let zones develop
     for (let i = 0; i < 20; i++) advanceMonth(engine)
     const state = engine.getState()
@@ -50,6 +52,8 @@ describe('Crime system', () => {
     for (let x = 9; x < 21; x++) engine.placeTile(x, 9, Infrastructure.Road)
     engine.placeBuilding(0, 0, 'power.coal')
     for (let x = 0; x < 21; x++) engine.placeTile(x, 8, Infrastructure.PowerLine)
+    // Fire station to prevent zone destruction (testing crime, not fire)
+    engine.placeBuilding(20, 10, 'service.fire')
 
     // Measure crime without police
     for (let i = 0; i < 20; i++) advanceMonth(engine)
@@ -73,6 +77,8 @@ describe('Crime system', () => {
     for (let x = 9; x < 21; x++) engine.placeTile(x, 9, Infrastructure.Road)
     engine.placeBuilding(0, 0, 'power.coal')
     for (let x = 0; x < 21; x++) engine.placeTile(x, 8, Infrastructure.PowerLine)
+    // Fire station to prevent zone destruction (testing crime, not fire)
+    engine.placeBuilding(20, 10, 'service.fire')
     engine.placeBuilding(14, 14, 'service.police')
 
     // Full funding

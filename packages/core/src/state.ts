@@ -71,7 +71,9 @@ export interface GameState {
   landValues: Uint8Array
   pollutionLevel: Uint8Array
   crimeLevel: Uint8Array
+  fireCoverage: Uint8Array
   trafficDensity: Uint8Array
+  activeFires: number[]
 }
 
 export interface SaveFile {
