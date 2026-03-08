@@ -1,0 +1,131 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- Transparent background - terrain renders underneath -->
+
+  <!-- Park ground (grass) -->
+  <rect x="8" y="8" width="112" height="112" rx="3" fill="#7ab85f" opacity="0.5"/>
+
+  <!-- Park pathways (winding paths) -->
+  <!-- Main path (curved from bottom-left to top-right) -->
+  <path d="M 20 100 Q 40 80 60 60 Q 75 45 95 35" fill="none" stroke="#d4c5a0" stroke-width="6" opacity="0.4" stroke-linecap="round"/>
+
+  <!-- Secondary path -->
+  <path d="M 100 90 Q 85 75 70 65" fill="none" stroke="#d4c5a0" stroke-width="4" opacity="0.35" stroke-linecap="round"/>
+
+  <!-- Tree 1 (large, center-left) -->
+  <!-- Tree trunk -->
+  <rect x="28" y="50" width="5" height="12" rx="1" fill="#8b6f47"/>
+  <!-- Tree foliage (overlapping circles for soft look) -->
+  <circle cx="35" cy="42" r="14" fill="#66bb6a" opacity="0.65"/>
+  <circle cx="26" cy="40" r="11" fill="#7bc76f" opacity="0.55"/>
+  <circle cx="44" cy="38" r="10" fill="#5aad5a" opacity="0.5"/>
+  <circle cx="32" cy="30" r="9" fill="#6db563" opacity="0.45"/>
+
+  <!-- Tree 2 (medium, top-right) -->
+  <!-- Tree trunk -->
+  <rect x="82" y="28" width="4" height="10" rx="1" fill="#8b6f47"/>
+  <!-- Tree foliage -->
+  <circle cx="87" cy="18" r="12" fill="#66bb6a" opacity="0.6"/>
+  <circle cx="78" cy="20" r="9" fill="#7bc76f" opacity="0.5"/>
+  <circle cx="96" cy="22" r="8" fill="#5aad5a" opacity="0.45"/>
+
+  <!-- Tree 3 (small, bottom-left) -->
+  <!-- Tree trunk -->
+  <rect x="15" y="75" width="3" height="8" rx="0.5" fill="#8b6f47"/>
+  <!-- Tree foliage -->
+  <circle cx="19" cy="68" r="10" fill="#66bb6a" opacity="0.55"/>
+  <circle cx="12" cy="70" r="7" fill="#7bc76f" opacity="0.45"/>
+
+  <!-- Tree 4 (medium, bottom-right) -->
+  <!-- Tree trunk -->
+  <rect x="100" y="72" width="4" height="10" rx="1" fill="#8b6f47"/>
+  <!-- Tree foliage -->
+  <circle cx="105" cy="62" r="11" fill="#66bb6a" opacity="0.6"/>
+  <circle cx="96" cy="64" r="8" fill="#7bc76f" opacity="0.5"/>
+  <circle cx="112" cy="66" r="7" fill="#5aad5a" opacity="0.45"/>
+
+  <!-- Benches along the paths -->
+  <!-- Bench 1 (near path, center-left) -->
+  <rect x="48" y="75" width="14" height="2" rx="0.5" fill="#8b6f47" opacity="0.6"/>
+  <rect x="48" y="77" width="1.5" height="4" rx="0.5" fill="#7a5f37" opacity="0.5"/>
+  <rect x="60.5" y="77" width="1.5" height="4" rx="0.5" fill="#7a5f37" opacity="0.5"/>
+
+  <!-- Bench 2 (top-center area) -->
+  <rect x="58" y="50" width="14" height="2" rx="0.5" fill="#8b6f47" opacity="0.6"/>
+  <rect x="58" y="52" width="1.5" height="4" rx="0.5" fill="#7a5f37" opacity="0.5"/>
+  <rect x="70.5" y="52" width="1.5" height="4" rx="0.5" fill="#7a5f37" opacity="0.5"/>
+
+  <!-- Bench 3 (bottom-right) -->
+  <rect x="75" y="90" width="14" height="2" rx="0.5" fill="#8b6f47" opacity="0.6"/>
+  <rect x="75" y="92" width="1.5" height="4" rx="0.5" fill="#7a5f37" opacity="0.5"/>
+  <rect x="87.5" y="92" width="1.5" height="4" rx="0.5" fill="#7a5f37" opacity="0.5"/>
+
+  <!-- Flower clusters scattered throughout park -->
+  <!-- Flower cluster 1 (red/pink flowers near bench 1) -->
+  <circle cx="44" cy="82" r="2.5" fill="#e8a0a8" opacity="0.65"/>
+  <circle cx="42" cy="80" r="2" fill="#e8a0a8" opacity="0.55"/>
+  <circle cx="46" cy="80" r="1.8" fill="#f0b8c0" opacity="0.5"/>
+
+  <!-- Flower cluster 2 (yellow flowers, left side) -->
+  <circle cx="22" cy="60" r="2.2" fill="#f8d880" opacity="0.6"/>
+  <circle cx="20" cy="58" r="1.8" fill="#f8d880" opacity="0.5"/>
+  <circle cx="24" cy="58" r="1.8" fill="#f0cc68" opacity="0.45"/>
+
+  <!-- Flower cluster 3 (purple flowers, center) -->
+  <circle cx="72" cy="40" r="2" fill="#d8a8d8" opacity="0.6"/>
+  <circle cx="70" cy="38" r="1.8" fill="#d8a8d8" opacity="0.5"/>
+  <circle cx="74" cy="38" r="1.5" fill="#c898c8" opacity="0.45"/>
+
+  <!-- Flower cluster 4 (white flowers, bottom) -->
+  <circle cx="35" cy="105" r="1.8" fill="#f0f0e8" opacity="0.6"/>
+  <circle cx="33" cy="103" r="1.5" fill="#f0f0e8" opacity="0.5"/>
+
+  <!-- Flower cluster 5 (pink/purple mix near tree 4) -->
+  <circle cx="108" cy="85" r="2" fill="#e8a0d8" opacity="0.6"/>
+  <circle cx="106" cy="83" r="1.8" fill="#e8a0d8" opacity="0.5"/>
+
+  <!-- Grass tufts for natural detail -->
+  <g fill="#5aad5a" opacity="0.35">
+    <!-- Tuft cluster 1 -->
+    <path d="M 18 45 L 20 38 L 22 45Z"/>
+    <path d="M 22 45 L 24 37 L 26 45Z"/>
+    <!-- Tuft cluster 2 -->
+    <path d="M 92 85 L 94 78 L 96 85Z"/>
+    <path d="M 96 85 L 98 76 L 100 85Z"/>
+    <!-- Tuft cluster 3 -->
+    <path d="M 65 110 L 67 104 L 69 110Z"/>
+    <path d="M 69 110 L 71 102 L 73 110Z"/>
+  </g>
+
+  <!-- Decorative park sign area -->
+  <rect x="50" y="16" width="20" height="6" rx="1" fill="#66bb6a" opacity="0.4"/>
+  <rect x="52" y="18" width="16" height="2.5" rx="0.5" fill="#5aad5a" opacity="0.3"/>
+  <text x="60" y="22" font-size="2" fill="#4a8d4a" text-anchor="middle" opacity="0.5">PARK</text>
+
+  <!-- Playground area (small equipment outline, bottom-center) -->
+  <!-- Slide structure -->
+  <rect x="55" y="98" width="6" height="4" rx="0.5" fill="#d8a868" opacity="0.4"/>
+  <!-- Slide ramp -->
+  <path d="M 61 98 L 64 104" fill="none" stroke="#c89850" stroke-width="1.5" opacity="0.3" stroke-linecap="round"/>
+
+  <!-- Swing set structure (simple frame) -->
+  <line x1="70" y1="105" x2="70" y2="98" stroke="#8b6f47" stroke-width="1" opacity="0.35"/>
+  <line x1="75" y1="105" x2="75" y2="98" stroke="#8b6f47" stroke-width="1" opacity="0.35"/>
+  <line x1="70" y1="98" x2="75" y2="98" stroke="#8b6f47" stroke-width="1" opacity="0.35"/>
+  <!-- Swing seats (small) -->
+  <circle cx="71" cy="103" r="1" fill="#d8a868" opacity="0.4"/>
+  <circle cx="74" cy="103" r="1" fill="#d8a868" opacity="0.4"/>
+
+  <!-- Park border - subtle fence/boundary -->
+  <g stroke="#7ab85f" stroke-width="0.8" opacity="0.2" fill="none">
+    <rect x="12" y="12" width="104" height="104" rx="2"/>
+  </g>
+
+  <!-- Small water feature outline (pond) -->
+  <ellipse cx="25" cy="25" rx="8" ry="6" fill="#6db5d8" opacity="0.25"/>
+  <ellipse cx="25" cy="25" rx="8" ry="6" fill="none" stroke="#5aadcc" stroke-width="0.8" opacity="0.3"/>
+
+  <!-- Shadows from trees (soft ground shadows) -->
+  <ellipse cx="36" cy="60" rx="16" ry="4" fill="#000000" opacity="0.08"/>
+  <ellipse cx="87" cy="35" rx="13" ry="3" fill="#000000" opacity="0.07"/>
+  <ellipse cx="105" cy="78" rx="12" ry="3" fill="#000000" opacity="0.07"/>
+</svg>

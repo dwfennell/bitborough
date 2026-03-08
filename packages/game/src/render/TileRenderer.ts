@@ -6,6 +6,7 @@ import {
   type BuildingDef,
 } from '@bitborough/core'
 import { TERRAIN_COLORS, ZONE_OVERLAY_COLORS, ZONE_LETTERS } from './colors.js'
+import { SpriteCache } from './SpriteCache.js'
 
 export interface TileRenderer {
   drawTile(
@@ -48,7 +49,20 @@ const BUILDING_COLORS: Record<string, string> = {
   'special.park': '#66bb6a',
 }
 
+// Maps building defIds to SVG asset paths (served from publicDir)
+const BUILDING_SPRITES: Record<string, string> = {
+  'res.low': '/tiles/buildings/residential-small.svg',
+  'com.low': '/tiles/buildings/commercial-small.svg',
+  'ind.low': '/tiles/buildings/industrial-small.svg',
+  'power.coal': '/tiles/power/power-plant-coal.svg',
+  'power.nuclear': '/tiles/power/power-plant-nuclear.svg',
+  'service.police': '/tiles/buildings/service/police-station.svg',
+  'service.fire': '/tiles/buildings/service/fire-station.svg',
+  'special.park': '/tiles/buildings/park.svg',
+}
+
 export class ColorTileRenderer implements TileRenderer {
+  private sprites = new SpriteCache()
   drawTile(
     ctx: CanvasRenderingContext2D,
     tileType: TileType,
@@ -118,8 +132,19 @@ export class ColorTileRenderer implements TileRenderer {
   ): void {
     const w = def.size.w * tileSize
     const h = def.size.h * tileSize
-    const pad = tileSize * 0.1
 
+    // Try SVG sprite first
+    const spritePath = BUILDING_SPRITES[building.defId]
+    if (spritePath) {
+      const img = this.sprites.get(spritePath)
+      if (img) {
+        ctx.drawImage(img, screenX, screenY, w, h)
+        return
+      }
+    }
+
+    // Fallback: colored rectangle with label
+    const pad = tileSize * 0.1
     ctx.fillStyle = BUILDING_COLORS[building.defId] ?? '#888'
     ctx.fillRect(screenX + pad, screenY + pad, w - pad * 2, h - pad * 2)
 

@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- Transparent background - terrain renders underneath -->
+
+  <!-- Building shadow (4x4 facility) -->
+  <rect x="24" y="28" width="80" height="72" rx="2" fill="#000000" opacity="0.12" transform="translate(3, 3)"/>
+
+  <!-- Lot ground (concrete/industrial) -->
+  <rect x="8" y="8" width="112" height="112" rx="3" fill="#a8a898" opacity="0.4"/>
+
+  <!-- Cooling tower 1 - Large circular dome (left side) -->
+  <circle cx="40" cy="48" r="18" fill="#8a8a8a" opacity="0.6"/>
+  <circle cx="40" cy="48" r="16" fill="#989898"/>
+  <!-- Cooling tower interior curve detail -->
+  <ellipse cx="40" cy="48" rx="15" ry="13" fill="none" stroke="#7a7a7a" stroke-width="1" opacity="0.4"/>
+  <!-- Cooling tower ribbing -->
+  <g stroke="#7a7a7a" stroke-width="0.8" opacity="0.3">
+    <path d="M28 48 Q40 44 52 48"/>
+    <path d="M28 52 Q40 50 52 52"/>
+    <path d="M28 56 Q40 58 52 56"/>
+  </g>
+
+  <!-- Cooling tower 2 - Large circular dome (right side) -->
+  <circle cx="88" cy="48" r="18" fill="#8a8a8a" opacity="0.6"/>
+  <circle cx="88" cy="48" r="16" fill="#989898"/>
+  <!-- Cooling tower interior curve detail -->
+  <ellipse cx="88" cy="48" rx="15" ry="13" fill="none" stroke="#7a7a7a" stroke-width="1" opacity="0.4"/>
+  <!-- Cooling tower ribbing -->
+  <g stroke="#7a7a7a" stroke-width="0.8" opacity="0.3">
+    <path d="M76 48 Q88 44 100 48"/>
+    <path d="M76 52 Q88 50 100 52"/>
+    <path d="M76 56 Q88 58 100 56"/>
+  </g>
+
+  <!-- Containment building (center, rectangular, purple accent) -->
+  <rect x="48" y="38" width="32" height="36" rx="2" fill="#6b4a8f"/>
+  <rect x="48" y="38" width="32" height="36" rx="2" fill="#7e57c2" opacity="0.7"/>
+
+  <!-- Roof on containment building -->
+  <rect x="46" y="36" width="36" height="38" rx="2" fill="#5a3a7f"/>
+
+  <!-- Building shadow on walls -->
+  <rect x="48" y="38" width="32" height="36" rx="2" fill="#000000" opacity="0.15"/>
+
+  <!-- Central control tower detail (small rectangular structure on top) -->
+  <rect x="60" y="20" width="8" height="18" rx="1" fill="#6b4a8f"/>
+  <rect x="59" y="19" width="10" height="2" rx="0.5" fill="#5a3a7f"/>
+
+  <!-- Window on control tower -->
+  <rect x="62" y="24" width="4" height="4" rx="0.5" fill="#b8a8d8" opacity="0.6"/>
+  <rect x="62" y="24" width="4" height="4" rx="0.5" fill="none" stroke="#5a3a7f" stroke-width="0.5"/>
+
+  <!-- Radiation warning symbol (subtle) -->
+  <circle cx="64" cy="62" r="3" fill="#7e57c2" opacity="0.3"/>
+  <circle cx="62" cy="60" r="1" fill="#7e57c2" opacity="0.4"/>
+  <circle cx="66" cy="60" r="1" fill="#7e57c2" opacity="0.4"/>
+  <circle cx="64" cy="66" r="1" fill="#7e57c2" opacity="0.4"/>
+
+  <!-- Electrical transmission equipment (smaller structures) -->
+  <rect x="30" y="72" width="12" height="12" rx="1" fill="#8a8a8a" opacity="0.5"/>
+  <rect x="32" y="74" width="3" height="8" rx="0.5" fill="#989898" opacity="0.4"/>
+  <rect x="37" y="74" width="3" height="8" rx="0.5" fill="#989898" opacity="0.4"/>
+
+  <!-- Transformer/equipment on right -->
+  <rect x="86" y="72" width="12" height="12" rx="1" fill="#8a8a8a" opacity="0.5"/>
+  <circle cx="92" cy="78" r="2.5" fill="#989898" opacity="0.5"/>
+
+  <!-- Containment vessel walls detail -->
+  <line x1="48" y1="50" x2="80" y2="50" stroke="#5a3a7f" stroke-width="1" opacity="0.2"/>
+  <line x1="48" y1="60" x2="80" y2="60" stroke="#5a3a7f" stroke-width="1" opacity="0.2"/>
+
+  <!-- Access door to containment -->
+  <rect x="76" y="64" width="5" height="6" rx="0.5" fill="#4a2a6f"/>
+  <circle cx="79" cy="67" r="0.5" fill="#9a8ab8"/>
+
+  <!-- Fence outline (radiation containment area) -->
+  <g stroke="#7a7a7a" stroke-width="0.8" opacity="0.25" fill="none">
+    <rect x="12" y="12" width="104" height="104" rx="2"/>
+  </g>
+
+  <!-- Small utility buildings -->
+  <rect x="18" y="90" width="12" height="10" rx="1" fill="#8a8a8a" opacity="0.4"/>
+  <rect x="98" y="90" width="12" height="10" rx="1" fill="#8a8a8a" opacity="0.4"/>
+
+  <!-- Warning indicator lights (subtle) -->
+  <circle cx="70" cy="32" r="1.5" fill="#7e57c2" opacity="0.5"/>
+  <circle cx="58" cy="32" r="1.5" fill="#7e57c2" opacity="0.5"/>
+</svg>

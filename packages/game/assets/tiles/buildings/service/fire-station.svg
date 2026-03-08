@@ -1,0 +1,110 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- Transparent background - terrain renders underneath -->
+
+  <!-- Building shadow (3x3 facility) -->
+  <rect x="32" y="30" width="64" height="58" rx="2" fill="#000000" opacity="0.11" transform="translate(3, 3)"/>
+
+  <!-- Lot ground (paved fire station grounds) -->
+  <rect x="8" y="8" width="112" height="112" rx="3" fill="#b8b8a8" opacity="0.35"/>
+
+  <!-- Training yard area (back/right) -->
+  <rect x="78" y="75" width="38" height="35" rx="2" fill="#a8a898" opacity="0.25"/>
+
+  <!-- Main station building (3x3) -->
+  <rect x="32" y="30" width="64" height="58" rx="2" fill="#d8c8c0"/>
+  <rect x="32" y="30" width="64" height="58" rx="2" fill="#d0b8b0" opacity="0.35"/>
+
+  <!-- Roof (red/orange for fire station) -->
+  <rect x="30" y="28" width="68" height="60" rx="2" fill="#c62828" opacity="0.75"/>
+  <!-- Roof ridge detail -->
+  <line x1="30" y1="28" x2="98" y2="28" stroke="#b01818" stroke-width="1.5" opacity="0.5"/>
+
+  <!-- Large fire truck garage bay doors (front of building) -->
+  <!-- Bay 1 - Left door -->
+  <rect x="35" y="40" width="13" height="24" rx="1" fill="#8a2020"/>
+  <!-- Door panel lines -->
+  <line x1="35" y1="46" x2="48" y2="46" stroke="#b01818" stroke-width="0.5" opacity="0.4"/>
+  <line x1="35" y1="52" x2="48" y2="52" stroke="#b01818" stroke-width="0.5" opacity="0.4"/>
+  <line x1="35" y1="58" x2="48" y2="58" stroke="#b01818" stroke-width="0.5" opacity="0.4"/>
+
+  <!-- Bay 2 - Right door -->
+  <rect x="51" y="40" width="13" height="24" rx="1" fill="#8a2020"/>
+  <!-- Door panel lines -->
+  <line x1="51" y1="46" x2="64" y2="46" stroke="#b01818" stroke-width="0.5" opacity="0.4"/>
+  <line x1="51" y1="52" x2="64" y2="52" stroke="#b01818" stroke-width="0.5" opacity="0.4"/>
+  <line x1="51" y1="58" x2="64" y2="58" stroke="#b01818" stroke-width="0.5" opacity="0.4"/>
+
+  <!-- Fire truck visible in garage (red, large) -->
+  <rect x="36" y="42" width="10" height="20" rx="1" fill="#c62828" opacity="0.8"/>
+  <!-- Truck window -->
+  <rect x="38" y="44" width="4" height="4" rx="0.5" fill="#a8d0e8" opacity="0.5"/>
+  <!-- Truck light bar -->
+  <rect x="37" y="40" width="9" height="1.5" rx="0.5" fill="#ff6b6b" opacity="0.6"/>
+
+  <!-- Personnel entrance door (side, right of bays) -->
+  <rect x="68" y="74" width="6" height="10" rx="0.5" fill="#8a4020"/>
+  <circle cx="72" cy="79.5" r="0.6" fill="#c0a080"/>
+
+  <!-- Windows on side of building -->
+  <rect x="70" y="42" width="5" height="5" rx="0.5" fill="#a8d0e8" opacity="0.6"/>
+  <rect x="70" y="42" width="5" height="5" rx="0.5" fill="none" stroke="#6a3a20" stroke-width="0.5"/>
+
+  <rect x="78" y="42" width="5" height="5" rx="0.5" fill="#a8d0e8" opacity="0.6"/>
+  <rect x="78" y="42" width="5" height="5" rx="0.5" fill="none" stroke="#6a3a20" stroke-width="0.5"/>
+
+  <rect x="86" y="42" width="5" height="5" rx="0.5" fill="#a8d0e8" opacity="0.6"/>
+  <rect x="86" y="42" width="5" height="5" rx="0.5" fill="none" stroke="#6a3a20" stroke-width="0.5"/>
+
+  <!-- Hose tower (training/storage structure - tall, narrow) -->
+  <rect x="84" y="38" width="8" height="28" rx="1" fill="#9a7050"/>
+  <!-- Tower openings -->
+  <rect x="85" y="48" width="3" height="3" rx="0.5" fill="#6a5040" opacity="0.6"/>
+  <rect x="88" y="52" width="3" height="3" rx="0.5" fill="#6a5040" opacity="0.6"/>
+  <!-- Ladder detail -->
+  <g stroke="#8a6a40" stroke-width="0.5" opacity="0.4">
+    <line x1="84" y1="45" x2="92" y2="45"/>
+    <line x1="84" y1="52" x2="92" y2="52"/>
+    <line x1="84" y1="59" x2="92" y2="59"/>
+    <line x1="85.5" y1="45" x2="85.5" y2="65"/>
+    <line x1="90.5" y1="45" x2="90.5" y2="65"/>
+  </g>
+
+  <!-- Fire truck in front (parked out front area) -->
+  <rect x="20" y="82" width="18" height="12" rx="2" fill="#c62828" opacity="0.75"/>
+  <!-- Truck cab window -->
+  <rect x="22" y="84" width="6" height="6" rx="0.5" fill="#a8d0e8" opacity="0.5"/>
+  <!-- Emergency light bar -->
+  <rect x="21" y="80" width="16" height="1.5" rx="0.5" fill="#ff6b6b" opacity="0.7"/>
+  <!-- Hose reel -->
+  <circle cx="32" cy="92" r="2" fill="#9a8a7a" opacity="0.5"/>
+
+  <!-- Training equipment in yard area -->
+  <!-- Obstacle course element 1 -->
+  <rect x="82" y="78" width="8" height="8" rx="1" fill="#8a8a7a" opacity="0.4"/>
+  <!-- Obstacle course element 2 -->
+  <rect x="95" y="85" width="8" height="8" rx="1" fill="#8a8a7a" opacity="0.4"/>
+
+  <!-- Practice hydrant (small red structure) -->
+  <rect x="100" y="95" width="3" height="5" rx="0.5" fill="#c62828" opacity="0.6"/>
+
+  <!-- Flagpole with flag -->
+  <rect x="94" y="26" width="1.5" height="16" rx="0.5" fill="#8a8a7a"/>
+  <rect x="95.5" y="26" width="8" height="5" rx="0.5" fill="#c62828" opacity="0.8"/>
+
+  <!-- Building name sign area -->
+  <rect x="50" y="24" width="20" height="3" rx="0.5" fill="#c62828" opacity="0.5"/>
+  <text x="60" y="26.5" font-size="2" fill="#ffffff" text-anchor="middle" opacity="0.6">FIRE</text>
+
+  <!-- Security light posts -->
+  <rect x="18" y="50" width="2" height="8" rx="0.5" fill="#8a8a7a" opacity="0.4"/>
+  <circle cx="19" cy="48" r="1.5" fill="#b8a080" opacity="0.5"/>
+
+  <rect x="108" y="50" width="2" height="8" rx="0.5" fill="#8a8a7a" opacity="0.4"/>
+  <circle cx="109" cy="48" r="1.5" fill="#b8a080" opacity="0.5"/>
+
+  <!-- Ground detail - stucco/weathering on building sides -->
+  <g stroke="#a89080" stroke-width="0.5" opacity="0.15">
+    <line x1="32" y1="50" x2="40" y2="50"/>
+    <line x1="32" y1="60" x2="42" y2="60"/>
+  </g>
+</svg>
