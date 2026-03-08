@@ -244,7 +244,13 @@ export class Game {
     })
 
     window.addEventListener('keydown', (e) => {
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement) return
+      const inInput = e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement
+      if (e.key === 'Escape') {
+        const action = keyMap.get('Escape')
+        if (action) action()
+        return
+      }
+      if (inInput) return
       this.pressedKeys.add(e.key)
       const action = keyMap.get(e.key)
       if (action) action()
