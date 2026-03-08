@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="plGrassBaseNE" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#8cc870"/>
+      <stop offset="100%" stop-color="#7abb62"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Base grass fill -->
+  <rect width="128" height="128" fill="url(#plGrassBaseNE)"/>
+
+  <!-- Grass texture patches -->
+  <ellipse cx="25" cy="90" rx="16" ry="10" fill="#95d07a" opacity="0.45"/>
+  <ellipse cx="35" cy="110" rx="14" ry="8" fill="#82c466" opacity="0.35"/>
+  <ellipse cx="80" cy="100" rx="12" ry="9" fill="#95d07a" opacity="0.4"/>
+  <ellipse cx="15" cy="30" rx="10" ry="7" fill="#9ad680" opacity="0.35"/>
+  <ellipse cx="100" cy="85" rx="14" ry="8" fill="#a0da88" opacity="0.3"/>
+  <ellipse cx="15" cy="65" rx="11" ry="7" fill="#82c466" opacity="0.3"/>
+
+  <!-- Darker patches -->
+  <ellipse cx="30" cy="75" rx="9" ry="5" fill="#6aaa50" opacity="0.25"/>
+  <ellipse cx="85" cy="110" rx="10" ry="6" fill="#6aaa50" opacity="0.2"/>
+
+  <!-- Power line cables - N to center turn E -->
+  <!-- North cables (vertical, from top to center) -->
+  <g stroke="#585858" stroke-width="1.5" stroke-linecap="round" opacity="0.6">
+    <line x1="60" y1="0" x2="60" y2="64"/>
+    <line x1="68" y1="0" x2="68" y2="60"/>
+  </g>
+  <!-- East cables (horizontal, from center to right) -->
+  <g stroke="#585858" stroke-width="1.5" stroke-linecap="round" opacity="0.6">
+    <line x1="64" y1="60" x2="128" y2="60"/>
+    <line x1="68" y1="68" x2="128" y2="68"/>
+  </g>
+  <!-- Corner cable curves (connecting N to E) -->
+  <path d="M60 64 Q60 68 64 68" fill="none" stroke="#585858" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+  <path d="M68 60 Q68 60 68 60" fill="none" stroke="#585858" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+
+  <!-- Power tower at turn point -->
+  <rect x="61" y="61" width="6" height="6" rx="0.5" fill="#000000" opacity="0.05" transform="translate(1, 1)"/>
+  <rect x="61" y="61" width="6" height="6" rx="0.5" fill="#8a8878"/>
+  <!-- Cross-arm details (both axes for the turn) -->
+  <line x1="56" y1="64" x2="72" y2="64" stroke="#8a8878" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
+  <line x1="64" y1="56" x2="64" y2="72" stroke="#8a8878" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
+
+  <!-- Insulator dots -->
+  <circle cx="57" cy="64" r="1" fill="#8a8878" opacity="0.6"/>
+  <circle cx="71" cy="64" r="1" fill="#8a8878" opacity="0.6"/>
+  <circle cx="64" cy="57" r="1" fill="#8a8878" opacity="0.6"/>
+  <circle cx="64" cy="71" r="1" fill="#8a8878" opacity="0.6"/>
+</svg>
