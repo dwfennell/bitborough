@@ -29,7 +29,10 @@ export class SpeedControls {
 
     container.appendChild(this.el)
 
+    const speedOrder = [SimSpeed.Paused, SimSpeed.Slow, SimSpeed.Normal, SimSpeed.Fast]
+
     window.addEventListener('keydown', (e) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement) return
       if (e.key === ' ') {
         e.preventDefault()
         if (this._speed === SimSpeed.Paused) {
@@ -37,6 +40,12 @@ export class SpeedControls {
         } else {
           this.setSpeed(SimSpeed.Paused, this.buttons[0]!)
         }
+      } else if (e.key === 'a') {
+        const idx = Math.max(0, speedOrder.indexOf(this._speed) - 1)
+        this.setSpeed(speedOrder[idx]!, this.buttons[idx]!)
+      } else if (e.key === 's') {
+        const idx = Math.min(speedOrder.length - 1, speedOrder.indexOf(this._speed) + 1)
+        this.setSpeed(speedOrder[idx]!, this.buttons[idx]!)
       }
     })
   }
