@@ -208,7 +208,7 @@ export class Game {
     for (const item of this.actions) {
       if (item.key) keyMap.set(item.key, item.action)
     }
-    keyMap.set('Escape', () => { this.toolManager.clear(); this.queryPanel.hide() })
+    keyMap.set('Escape', () => { this.toolManager.clear(); this.queryPanel.hide(); this.budgetPanel.hide() })
 
     window.addEventListener('keydown', (e) => {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement) return

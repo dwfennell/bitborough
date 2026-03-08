@@ -80,6 +80,11 @@ export class BudgetPanel {
     this.el.classList.toggle('hidden', !this.visible)
   }
 
+  hide(): void {
+    this.visible = false
+    this.el.classList.add('hidden')
+  }
+
   update(state: GameState): void {
     if (!this.visible) return
     const b = state.budget
