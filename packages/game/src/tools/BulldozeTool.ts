@@ -10,10 +10,6 @@ export class BulldozeTool implements Tool {
     return engine.bulldoze(x, y)
   }
 
-  onTileDrag(x: number, y: number, engine: Engine): Result {
-    return engine.bulldoze(x, y)
-  }
-
   getPreviewColor(): string {
     return 'rgba(244, 67, 54, 0.4)'
   }

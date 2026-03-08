@@ -8,6 +8,8 @@ export class InputManager {
   private lastMouseX = 0
   private lastMouseY = 0
   private hoverTile: { x: number; y: number } | null = null
+  private mapWidth = 0
+  private mapHeight = 0
 
   constructor(
     private canvas: HTMLCanvasElement,
@@ -16,6 +18,11 @@ export class InputManager {
     private getEngine: () => Engine | null,
   ) {
     this.bindEvents()
+  }
+
+  setMapSize(width: number, height: number): void {
+    this.mapWidth = width
+    this.mapHeight = height
   }
 
   getHoverTile(): { x: number; y: number } | null {
@@ -84,9 +91,7 @@ export class InputManager {
 
     const tile = this.camera.screenToTile(screenX, screenY)
     if (tile.x < 0 || tile.y < 0) return
-
-    const state = engine.getState()
-    if (tile.x >= state.map.width || tile.y >= state.map.height) return
+    if (tile.x >= this.mapWidth || tile.y >= this.mapHeight) return
 
     if (this.isDragging && tool.onTileDrag) {
       tool.onTileDrag(tile.x, tile.y, engine)

@@ -1,7 +1,6 @@
-import { ZoneType } from '@bitborough/core'
+import { ZoneType, Infrastructure } from '@bitborough/core'
 import { ToolManager } from '../tools/ToolManager.js'
-import { RoadTool } from '../tools/RoadTool.js'
-import { PowerLineTool } from '../tools/PowerLineTool.js'
+import { InfrastructureTool } from '../tools/InfrastructureTool.js'
 import { ZoneTool } from '../tools/ZoneTool.js'
 import { BulldozeTool } from '../tools/BulldozeTool.js'
 import { BuildingTool } from '../tools/BuildingTool.js'
@@ -15,8 +14,8 @@ interface ToolEntry {
 }
 
 const TOOL_ENTRIES: ToolEntry[] = [
-  { label: 'Road', key: '1', factory: () => new RoadTool() },
-  { label: 'Power', key: '2', factory: () => new PowerLineTool() },
+  { label: 'Road', key: '1', factory: () => new InfrastructureTool('Road', Infrastructure.Road, 'rgba(85,85,85,0.5)') },
+  { label: 'Power', key: '2', factory: () => new InfrastructureTool('Power Line', Infrastructure.PowerLine, 'rgba(255,193,7,0.5)') },
   { label: 'Zone R', key: '3', factory: () => new ZoneTool(ZoneType.Residential) },
   { label: 'Zone C', key: '4', factory: () => new ZoneTool(ZoneType.Commercial) },
   { label: 'Zone I', key: '5', factory: () => new ZoneTool(ZoneType.Industrial) },

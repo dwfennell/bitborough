@@ -5,6 +5,7 @@ import {
   type Building,
   type BuildingDef,
 } from '@bitborough/core'
+import { ZONE_OVERLAY_COLORS, ZONE_LETTERS } from './colors.js'
 
 export interface TileRenderer {
   drawTile(
@@ -47,12 +48,6 @@ const TERRAIN_COLORS: Record<TileType, string> = {
   [TileType.Trees]: '#2d6b2e',
 }
 
-const ZONE_COLORS: Record<ZoneType, string> = {
-  [ZoneType.None]: 'transparent',
-  [ZoneType.Residential]: 'rgba(76, 175, 80, 0.3)',
-  [ZoneType.Commercial]: 'rgba(33, 150, 243, 0.3)',
-  [ZoneType.Industrial]: 'rgba(255, 193, 7, 0.3)',
-}
 
 const BUILDING_COLORS: Record<string, string> = {
   'power.coal': '#555',
@@ -106,31 +101,14 @@ export class ColorTileRenderer implements TileRenderer {
     if (infra & Infrastructure.PowerLine) {
       ctx.strokeStyle = '#ffc107'
       ctx.lineWidth = Math.max(1, tileSize * 0.08)
+      ctx.beginPath()
 
-      if (connections & 1) {
-        ctx.beginPath()
-        ctx.moveTo(cx, cy)
-        ctx.lineTo(cx, screenY)
-        ctx.stroke()
-      }
-      if (connections & 2) {
-        ctx.beginPath()
-        ctx.moveTo(cx, cy)
-        ctx.lineTo(screenX + tileSize, cy)
-        ctx.stroke()
-      }
-      if (connections & 4) {
-        ctx.beginPath()
-        ctx.moveTo(cx, cy)
-        ctx.lineTo(cx, screenY + tileSize)
-        ctx.stroke()
-      }
-      if (connections & 8) {
-        ctx.beginPath()
-        ctx.moveTo(cx, cy)
-        ctx.lineTo(screenX, cy)
-        ctx.stroke()
-      }
+      if (connections & 1) { ctx.moveTo(cx, cy); ctx.lineTo(cx, screenY) }
+      if (connections & 2) { ctx.moveTo(cx, cy); ctx.lineTo(screenX + tileSize, cy) }
+      if (connections & 4) { ctx.moveTo(cx, cy); ctx.lineTo(cx, screenY + tileSize) }
+      if (connections & 8) { ctx.moveTo(cx, cy); ctx.lineTo(screenX, cy) }
+
+      ctx.stroke()
 
       ctx.fillStyle = '#ffc107'
       ctx.beginPath()
@@ -174,21 +152,16 @@ export class ColorTileRenderer implements TileRenderer {
     tileSize: number,
   ): void {
     if (zone === ZoneType.None) return
-    ctx.fillStyle = ZONE_COLORS[zone]
+    ctx.fillStyle = ZONE_OVERLAY_COLORS[zone]
     ctx.fillRect(screenX, screenY, tileSize, tileSize)
 
     if (tileSize >= 12) {
-      const letters: Record<number, string> = {
-        [ZoneType.Residential]: 'R',
-        [ZoneType.Commercial]: 'C',
-        [ZoneType.Industrial]: 'I',
-      }
       ctx.fillStyle = 'rgba(255,255,255,0.5)'
       ctx.font = `${Math.max(8, tileSize * 0.4)}px system-ui`
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
       ctx.fillText(
-        letters[zone] ?? '',
+        ZONE_LETTERS[zone] ?? '',
         screenX + tileSize / 2,
         screenY + tileSize / 2,
       )

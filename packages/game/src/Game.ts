@@ -1,4 +1,4 @@
-import { SimSpeed, type GameState } from '@bitborough/core'
+import { SimSpeed, type MapSize, MAP_SIZES, type GameState } from '@bitborough/core'
 import { Engine } from '@bitborough/engine'
 import { generateMap, type MapGenConfig } from '@bitborough/map-gen'
 import { Camera } from './render/Camera.js'
@@ -22,6 +22,7 @@ const TILE_SIZE = 16
 
 export class Game {
   private engine: Engine | null = null
+  private ctx: CanvasRenderingContext2D
   private camera: Camera
   private renderer: Renderer
   private inputManager: InputManager
@@ -41,10 +42,10 @@ export class Game {
     private canvas: HTMLCanvasElement,
     private uiOverlay: HTMLElement,
   ) {
-    const ctx = canvas.getContext('2d')!
+    this.ctx = canvas.getContext('2d')!
 
     this.camera = new Camera(canvas.width, canvas.height, TILE_SIZE)
-    this.renderer = new Renderer(ctx, this.camera)
+    this.renderer = new Renderer(this.ctx, this.camera)
     this.toolManager = new ToolManager()
     this.inputManager = new InputManager(canvas, this.camera, this.toolManager, () => this.engine)
     this.saveManager = new SaveManager()
@@ -61,7 +62,7 @@ export class Game {
       const save = this.saveManager.load()
       if (save) {
         this.engine = Engine.restore(save)
-        this.camera.setMapSize(save.map.width, save.map.height)
+        this.setMapSize(save.map.width, save.map.height)
         this.startLoop()
         return
       }
@@ -70,7 +71,17 @@ export class Game {
     this.showNewGameScreen()
   }
 
+  private setMapSize(width: number, height: number): void {
+    this.camera.setMapSize(width, height)
+    this.inputManager.setMapSize(width, height)
+  }
+
   private showNewGameScreen(): void {
+    const sizeOptions = MAP_SIZES
+      .filter(s => s >= 64 && s <= 256)
+      .map(s => `<option value="${s}"${s === 128 ? ' selected' : ''}>${s}x${s}</option>`)
+      .join('\n')
+
     const screen = document.createElement('div')
     screen.id = 'new-game-screen'
     screen.innerHTML = `
@@ -78,11 +89,7 @@ export class Game {
         <h1>Bitborough</h1>
         <label>
           Map Size
-          <select id="map-size">
-            <option value="64">64x64 (Small)</option>
-            <option value="128" selected>128x128 (Medium)</option>
-            <option value="256">256x256 (Large)</option>
-          </select>
+          <select id="map-size">${sizeOptions}</select>
         </label>
         <label>
           Preset
@@ -103,14 +110,14 @@ export class Game {
     const form = screen.querySelector('form')!
     form.addEventListener('submit', (e) => {
       e.preventDefault()
-      const size = parseInt((screen.querySelector('#map-size') as HTMLSelectElement).value, 10) as 64 | 128 | 256
+      const size = parseInt((screen.querySelector('#map-size') as HTMLSelectElement).value, 10) as MapSize
       const preset = (screen.querySelector('#map-preset') as HTMLSelectElement).value as 'plains' | 'island'
       const seed = parseInt((screen.querySelector('#map-seed') as HTMLInputElement).value, 10)
 
       const config: MapGenConfig = { size, seed, preset }
       const map = generateMap(config)
       this.engine = Engine.create(map)
-      this.camera.setMapSize(size, size)
+      this.setMapSize(size, size)
       screen.remove()
       this.startLoop()
     })
@@ -164,11 +171,10 @@ export class Game {
     if (!hover || !tool?.getPreviewColor) return
     if (hover.x < 0 || hover.y < 0 || hover.x >= state.map.width || hover.y >= state.map.height) return
 
-    const ctx = this.canvas.getContext('2d')!
     const screen = this.camera.tileToScreen(hover.x, hover.y)
     const tileSize = this.camera.tileSize * this.camera.zoom
-    ctx.fillStyle = tool.getPreviewColor()
-    ctx.fillRect(screen.x, screen.y, tileSize, tileSize)
+    this.ctx.fillStyle = tool.getPreviewColor()
+    this.ctx.fillRect(screen.x, screen.y, tileSize, tileSize)
   }
 
   private autoSave(): void {

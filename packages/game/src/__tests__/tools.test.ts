@@ -1,8 +1,7 @@
 import { describe, test, expect } from 'vitest'
 import { Engine } from '@bitborough/engine'
 import { createEmptyMap, Infrastructure, ZoneType, TileType } from '@bitborough/core'
-import { RoadTool } from '../tools/RoadTool.js'
-import { PowerLineTool } from '../tools/PowerLineTool.js'
+import { InfrastructureTool } from '../tools/InfrastructureTool.js'
 import { ZoneTool } from '../tools/ZoneTool.js'
 import { BulldozeTool } from '../tools/BulldozeTool.js'
 import { BuildingTool } from '../tools/BuildingTool.js'
@@ -18,21 +17,19 @@ function createTestEngine(size = 10) {
   return Engine.create(map)
 }
 
-describe('RoadTool', () => {
+describe('InfrastructureTool', () => {
   test('places road on grass tile', () => {
     const engine = createTestEngine()
-    const tool = new RoadTool()
+    const tool = new InfrastructureTool('Road', Infrastructure.Road, 'rgba(85,85,85,0.5)')
     const result = tool.onTileClick(5, 5, engine)
     expect(result.ok).toBe(true)
     const tile = engine.getTile(5, 5)
     expect(tile.infrastructure & Infrastructure.Road).toBeTruthy()
   })
-})
 
-describe('PowerLineTool', () => {
   test('places power line on grass tile', () => {
     const engine = createTestEngine()
-    const tool = new PowerLineTool()
+    const tool = new InfrastructureTool('Power Line', Infrastructure.PowerLine, 'rgba(255,193,7,0.5)')
     const result = tool.onTileClick(5, 5, engine)
     expect(result.ok).toBe(true)
     const tile = engine.getTile(5, 5)
@@ -83,8 +80,8 @@ describe('QueryTool', () => {
 describe('ToolManager', () => {
   test('tracks active tool', () => {
     const manager = new ToolManager()
-    const road = new RoadTool()
-    manager.setTool(road)
-    expect(manager.activeTool).toBe(road)
+    const tool = new InfrastructureTool('Road', Infrastructure.Road, 'rgba(85,85,85,0.5)')
+    manager.setTool(tool)
+    expect(manager.activeTool).toBe(tool)
   })
 })
