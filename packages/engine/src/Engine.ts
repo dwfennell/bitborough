@@ -1,6 +1,7 @@
 import {
   type GameMap,
   type GameState,
+  type SaveFile,
   type BudgetInfo,
   type Building,
   type Result,
@@ -257,5 +258,89 @@ export class Engine {
   setFunding(service: 'police' | 'fire' | 'transit', level: number): void {
     this.funding[service] = Math.max(0, Math.min(100, level))
     this.budgetInfo = calculateBudget(this.map, this.population, this.taxRate, this.landValues, this.funding)
+  }
+
+  serialize(): SaveFile {
+    return {
+      version: 1,
+      map: {
+        version: this.map.version,
+        width: this.map.width,
+        height: this.map.height,
+        terrain: Array.from(this.map.terrain) as unknown as Uint8Array,
+        zones: Array.from(this.map.zones) as unknown as Uint8Array,
+        infrastructure: Array.from(this.map.infrastructure) as unknown as Uint16Array,
+        connections: Array.from(this.map.connections) as unknown as Uint8Array,
+        elevation: Array.from(this.map.elevation) as unknown as Uint8Array,
+        buildings: this.map.buildings.map((b) => ({ ...b })),
+        meta: { ...this.map.meta },
+      },
+      state: {
+        funds: this.funds,
+        population: this.population,
+        month: this.month,
+        year: this.year,
+        tickCount: this.tickCount,
+        taxRate: this.taxRate,
+        funding: { ...this.funding },
+        seed: this.prng.getInternalState(),
+      },
+      timestamp: new Date().toISOString(),
+    }
+  }
+
+  static restore(save: SaveFile): Engine {
+    const size = save.map.width * save.map.height
+
+    // Rebuild typed arrays from saved number arrays
+    const map: GameMap = {
+      version: save.map.version,
+      width: save.map.width,
+      height: save.map.height,
+      terrain: new Uint8Array(save.map.terrain),
+      zones: new Uint8Array(save.map.zones),
+      infrastructure: new Uint16Array(save.map.infrastructure),
+      connections: new Uint8Array(save.map.connections),
+      elevation: new Uint8Array(save.map.elevation),
+      buildings: save.map.buildings.map((b) => ({ ...b })),
+      meta: { ...save.map.meta },
+    }
+
+    // Create engine with minimal config (we'll override everything)
+    const engine = new Engine(map, {
+      seed: 0,
+      startingFunds: save.state.funds,
+      startMonth: save.state.month,
+      startYear: save.state.year,
+      taxRate: save.state.taxRate,
+    })
+
+    // Restore PRNG state
+    engine.prng = PRNG.fromState(save.state.seed)
+
+    // Restore simulation state
+    engine.tickCount = save.state.tickCount
+    engine.funds = save.state.funds
+    engine.population = save.state.population
+    engine.funding = {
+      police: save.state.funding.police ?? 100,
+      fire: save.state.funding.fire ?? 100,
+      transit: save.state.funding.transit ?? 100,
+    }
+
+    // Restore nextBuildingId from existing buildings
+    let maxId = 0
+    for (const b of map.buildings) {
+      const num = parseInt(b.id.replace('b', ''), 10)
+      if (num > maxId) maxId = num
+    }
+    engine.nextBuildingId = maxId + 1
+
+    // Rebuild derived state
+    propagatePower(engine.map, engine.powerGrid)
+    engine.demand = calculateDemand(engine.map, engine.population, engine.taxRate)
+    engine.budgetInfo = calculateBudget(engine.map, engine.population, engine.taxRate, engine.landValues, engine.funding)
+
+    return engine
   }
 }

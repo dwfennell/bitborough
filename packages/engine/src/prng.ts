@@ -24,4 +24,11 @@ export class PRNG {
   getInternalState(): number {
     return this.state
   }
+
+  // Create a PRNG restored to a specific internal state
+  static fromState(state: number): PRNG {
+    const prng = new PRNG(0)
+    prng.state = state | 0
+    return prng
+  }
 }
