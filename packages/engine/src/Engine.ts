@@ -23,6 +23,7 @@ import { updateZones } from './simulation/zones.js'
 import { calculateBudget } from './simulation/budget.js'
 import { calculateCrime } from './simulation/services/crime.js'
 import { calculateFireCoverage, updateFires, createFireState, type FireState } from './simulation/services/fire.js'
+import { calculateTraffic } from './simulation/traffic.js'
 import { BUILDING_DEFS } from './buildings-registry.js'
 
 export interface TileInfo {
@@ -135,6 +136,7 @@ export class Engine {
       calculateCrime(this.map, this.landValues, this.crimeLevel, this.funding.police, this.influenceBuffer)
       calculateFireCoverage(this.map, this.fireCoverage, this.funding.fire, this.influenceBuffer)
       updateFires(this.map, this.fireState, this.fireCoverage, this.prng)
+      calculateTraffic(this.map, this.trafficDensity)
 
       // Zone development
       const nextBuildingIdRef = { value: this.nextBuildingId }
