@@ -123,4 +123,8 @@ export class OverlayRenderer {
   toggle(overlay: OverlayType): void {
     this.activeOverlay = this.activeOverlay === overlay ? 'none' : overlay
   }
+
+  get active(): OverlayType {
+    return this.activeOverlay
+  }
 }

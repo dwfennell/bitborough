@@ -14,6 +14,7 @@ import { QueryPanel } from './ui/QueryPanel.js'
 import { MiniMap } from './ui/MiniMap.js'
 import { EscapeMenu } from './ui/EscapeMenu.js'
 import { DocsPanel } from './ui/DocsPanel.js'
+import { OverlayLegend } from './ui/OverlayLegend.js'
 import { AudioManager } from './audio/AudioManager.js'
 import { SaveManager } from './storage/SaveManager.js'
 import { TICK_INTERVALS, advanceTicks } from './utils/tick-accumulator.js'
@@ -43,6 +44,7 @@ export class Game {
   private saveManager: SaveManager
   private escapeMenu: EscapeMenu
   private docsPanel: DocsPanel
+  private overlayLegend: OverlayLegend
 
   private speed: SimSpeed = SimSpeed.Normal
   private simAccumulator = 0
@@ -96,6 +98,7 @@ export class Game {
       },
     })
     this.docsPanel = new DocsPanel(uiOverlay)
+    this.overlayLegend = new OverlayLegend(uiOverlay)
 
     // Shared actions for menu bar and keyboard shortcuts
     this.actions = [
@@ -313,6 +316,7 @@ export class Game {
       this.renderer.render(state)
       this.infoBar.update(state)
       this.budgetPanel.update(state)
+      this.overlayLegend.update(this.renderer.activeOverlay)
       this.drawToolPreview(state)
 
       // Minimap every 10 frames

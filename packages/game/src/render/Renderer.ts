@@ -110,4 +110,8 @@ export class Renderer {
   toggleOverlay(type: OverlayType): void {
     this.overlayRenderer.toggle(type)
   }
+
+  get activeOverlay(): OverlayType {
+    return this.overlayRenderer.active
+  }
 }
