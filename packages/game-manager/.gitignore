@@ -1,0 +1,15 @@
+# Build outputs
+bin/
+web/dist/
+web/node_modules/
+
+# Database (local dev data)
+data/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
