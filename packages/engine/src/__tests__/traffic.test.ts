@@ -44,9 +44,6 @@ describe('Traffic system', () => {
     for (let i = 0; i < 30; i++) advanceMonth(engine)
 
     const state = engine.getState()
-    // Road tiles between the zones should have traffic
-    const roadTraffic = state.trafficDensity[4 * 32 + 15]! // mid-road tile
-    // Traffic may or may not exist depending on zone development
     // At minimum, the system should run without error
     expect(state.trafficDensity.length).toBe(32 * 32)
   })

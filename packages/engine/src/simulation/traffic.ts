@@ -133,6 +133,6 @@ function findPathDFS(
     return false
   }
 
-  if (dfs(startRoad, 0)) return [...path]
+  if (dfs(startRoad, 0)) return path
   return null
 }
