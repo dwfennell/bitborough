@@ -13,6 +13,7 @@ import { BudgetPanel } from './ui/BudgetPanel.js'
 import { QueryPanel } from './ui/QueryPanel.js'
 import { MiniMap } from './ui/MiniMap.js'
 import { EscapeMenu } from './ui/EscapeMenu.js'
+import { DocsPanel } from './ui/DocsPanel.js'
 import { AudioManager } from './audio/AudioManager.js'
 import { SaveManager } from './storage/SaveManager.js'
 import { TICK_INTERVALS, advanceTicks } from './utils/tick-accumulator.js'
@@ -41,6 +42,7 @@ export class Game {
   private audioManager: AudioManager
   private saveManager: SaveManager
   private escapeMenu: EscapeMenu
+  private docsPanel: DocsPanel
 
   private speed: SimSpeed = SimSpeed.Normal
   private simAccumulator = 0
@@ -93,10 +95,12 @@ export class Game {
         this.showNewGameScreen()
       },
     })
+    this.docsPanel = new DocsPanel(uiOverlay)
 
     // Shared actions for menu bar and keyboard shortcuts
     this.actions = [
       { label: 'Budget (B)', key: 'b', action: () => this.budgetPanel.toggle() },
+      { label: 'Guide (D)', key: 'd', action: () => this.docsPanel.toggle() },
       { label: 'Power (P)', key: 'p', action: () => this.renderer.toggleOverlay('power') },
       { label: 'Value (V)', key: 'v', action: () => this.renderer.toggleOverlay('landValue') },
       { label: 'Crime (C)', key: 'c', action: () => this.renderer.toggleOverlay('crime') },
@@ -229,10 +233,11 @@ export class Game {
     keyMap.set('Escape', () => {
       if (this.escapeMenu.isVisible) {
         this.escapeMenu.hide()
-      } else if (this.budgetPanel.isVisible || this.queryPanel.isVisible || this.toolManager.activeTool) {
+      } else if (this.docsPanel.isVisible || this.budgetPanel.isVisible || this.queryPanel.isVisible || this.toolManager.activeTool) {
         this.toolManager.clear()
         this.queryPanel.hide()
         this.budgetPanel.hide()
+        this.docsPanel.hide()
       } else {
         this.escapeMenu.show()
       }
