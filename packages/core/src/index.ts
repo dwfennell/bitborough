@@ -1,2 +1,4 @@
 // @rcity/core — shared types, constants, formats
-export {}
+export { TileType } from './tiles.js'
+export { ZoneType } from './zones.js'
+export { Infrastructure, type ConnectionMask } from './infrastructure.js'
