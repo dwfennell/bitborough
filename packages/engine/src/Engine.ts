@@ -2,10 +2,12 @@ import {
   type GameMap,
   type GameState,
   type BudgetInfo,
+  type Building,
   type Result,
   TileType,
   ZoneType,
   Infrastructure,
+  FailReason,
   SimSpeed,
   DEFAULTS,
 } from '@rcity/core'
@@ -13,6 +15,8 @@ import { PRNG } from './prng.js'
 import { placeTile, placeZone } from './actions/place.js'
 import { bulldoze } from './actions/bulldoze.js'
 import { updateConnections } from './connections.js'
+import { propagatePower } from './simulation/power.js'
+import { BUILDING_DEFS } from './buildings-registry.js'
 
 export interface TileInfo {
   terrain: TileType
@@ -77,8 +81,13 @@ export class Engine {
     return new Engine(map, config)
   }
 
+  private nextBuildingId = 1
+
   tick(): void {
     this.tickCount++
+
+    // Power propagation runs every tick
+    propagatePower(this.map, this.powerGrid)
 
     // Monthly systems
     if (this.tickCount % this.ticksPerMonth === 0) {
@@ -145,6 +154,64 @@ export class Engine {
       updateConnections(this.map, x, y)
     }
     return result
+  }
+
+  placeBuilding(x: number, y: number, defId: string): Result {
+    const def = BUILDING_DEFS[defId]
+    if (!def) {
+      return { ok: false, reason: FailReason.InvalidLocation, detail: `Unknown building: ${defId}` }
+    }
+
+    // Check funds
+    if (this.funds < def.cost) {
+      return { ok: false, reason: FailReason.InsufficientFunds }
+    }
+
+    // Check footprint fits on map, no water, no existing buildings
+    for (let dy = 0; dy < def.size.h; dy++) {
+      for (let dx = 0; dx < def.size.w; dx++) {
+        const tx = x + dx
+        const ty = y + dy
+        if (tx < 0 || ty < 0 || tx >= this.map.width || ty >= this.map.height) {
+          return { ok: false, reason: FailReason.InvalidLocation, detail: 'Footprint out of bounds' }
+        }
+        const idx = ty * this.map.width + tx
+        if (this.map.terrain[idx] === TileType.Water) {
+          return { ok: false, reason: FailReason.InvalidLocation, detail: 'Cannot build on water' }
+        }
+      }
+    }
+
+    // Check overlap with existing buildings
+    for (const existing of this.map.buildings) {
+      const eDef = BUILDING_DEFS[existing.defId]
+      if (!eDef) continue
+      // Check if footprints overlap
+      if (
+        x < existing.x + eDef.size.w &&
+        x + def.size.w > existing.x &&
+        y < existing.y + eDef.size.h &&
+        y + def.size.h > existing.y
+      ) {
+        return { ok: false, reason: FailReason.Occupied }
+      }
+    }
+
+    // Create building
+    const building: Building = {
+      id: `b${this.nextBuildingId++}`,
+      defId,
+      x,
+      y,
+      powered: false,
+      density: def.density,
+      age: 0,
+    }
+
+    this.map.buildings.push(building)
+    this.funds -= def.cost
+
+    return { ok: true }
   }
 
   private buildBudgetInfo(): BudgetInfo {
