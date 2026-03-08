@@ -42,4 +42,8 @@ export class QueryPanel {
   hide(): void {
     this.el.classList.add('hidden')
   }
+
+  get isVisible(): boolean {
+    return !this.el.classList.contains('hidden')
+  }
 }

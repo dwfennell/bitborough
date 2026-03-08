@@ -12,6 +12,7 @@ import { SpeedControls } from './ui/SpeedControls.js'
 import { BudgetPanel } from './ui/BudgetPanel.js'
 import { QueryPanel } from './ui/QueryPanel.js'
 import { MiniMap } from './ui/MiniMap.js'
+import { EscapeMenu } from './ui/EscapeMenu.js'
 import { AudioManager } from './audio/AudioManager.js'
 import { SaveManager } from './storage/SaveManager.js'
 import { TICK_INTERVALS, advanceTicks } from './utils/tick-accumulator.js'
@@ -39,6 +40,7 @@ export class Game {
   private miniMap: MiniMap
   private audioManager: AudioManager
   private saveManager: SaveManager
+  private escapeMenu: EscapeMenu
 
   private speed: SimSpeed = SimSpeed.Normal
   private simAccumulator = 0
@@ -75,6 +77,22 @@ export class Game {
     )
     this.queryPanel = new QueryPanel(uiOverlay)
     this.miniMap = new MiniMap(uiOverlay)
+    this.escapeMenu = new EscapeMenu(uiOverlay, {
+      onResume: () => {},
+      onSave: () => { this.autoSave(); this.saveManager.exportToFile() },
+      onLoad: async () => {
+        const save = await this.saveManager.importFromFile()
+        if (save) {
+          this.engine = Engine.restore(save)
+          this.setMapSize(save.map.width, save.map.height)
+        }
+      },
+      onNewGame: () => {
+        cancelAnimationFrame(this.animationId)
+        this.engine = null
+        this.showNewGameScreen()
+      },
+    })
 
     // Shared actions for menu bar and keyboard shortcuts
     this.actions = [
@@ -208,7 +226,17 @@ export class Game {
     for (const item of this.actions) {
       if (item.key) keyMap.set(item.key, item.action)
     }
-    keyMap.set('Escape', () => { this.toolManager.clear(); this.queryPanel.hide(); this.budgetPanel.hide() })
+    keyMap.set('Escape', () => {
+      if (this.escapeMenu.isVisible) {
+        this.escapeMenu.hide()
+      } else if (this.budgetPanel.isVisible || this.queryPanel.isVisible || this.toolManager.activeTool) {
+        this.toolManager.clear()
+        this.queryPanel.hide()
+        this.budgetPanel.hide()
+      } else {
+        this.escapeMenu.show()
+      }
+    })
 
     window.addEventListener('keydown', (e) => {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement) return
