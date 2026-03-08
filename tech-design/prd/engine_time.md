@@ -102,7 +102,7 @@ Tick 2: traffic
 Tick 3: services + pollution
 ```
 
-This distributes the work more evenly. Decision: start with all-at-once, stagger if profiling shows spikes.
+This distributes the work more evenly, inspired by Micropolis's 16-phase simulation cycle which distributes map scanning, power, pollution, crime, and population density across separate phases. Start with all-at-once, stagger if profiling shows spikes.
 
 ---
 

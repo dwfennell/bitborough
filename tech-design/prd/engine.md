@@ -508,6 +508,26 @@ test('city grows with proper infrastructure', () => {
 
 ---
 
+## Research References
+
+These PRDs were informed by research into actual SimCity mechanics:
+
+- **Micropolis (open-source SimCity)** — Primary source for power propagation (BFS flood fill, capacity 700/2000), zone growth mechanics (12.5% probability, ROG momentum), demand valves, crime formula (`128 - landValue + popDensity - policeEffect`), land value (center-of-mass calculation), traffic (30-step DFS), and the 16-phase simulation cycle.
+- **SimCity 2000** — Population thresholds for density unlocks, service demand scaling, weather/ordinance effects.
+- **SimCity 4** — Wealth-class differentiated demand, desirability vs demand distinction, power propagation through adjacent buildings (4-tile range).
+- **Cities: Skylines** — Building level-up domino effect (high-level buildings boost neighbor land value, causing cascading upgrades), education-driven demand shifts.
+- **Anno 1800** — Tiered population needs system, where satisfying needs unlocks new tiers with new demands. Considered for future "Dwarf Fortress layer."
+- **SimCity 2013 (GlassBox)** — Agent-based simulation architecture. Referenced for future individual citizen simulation.
+- **Tax rate Laffer Curve analysis** — Optimal revenue at ~9%, steep decline at 15%+.
+
+Key sources:
+- [Micropolis GitHub](https://github.com/SimHacker/micropolis)
+- [MicropolisJ (Java rewrite)](https://github.com/jason17055/micropolis-java)
+- [SC2k-docs simulation spec](https://github.com/OpenCity2k/SC2k-docs)
+- [SC4 Devotion Encyclopaedia](https://wiki.sc4devotion.com)
+
+---
+
 ## Resolved Questions
 
 - **Seeded PRNG:** Engine owns it. Seed passed via `EngineConfig`, engine creates PRNG internally.

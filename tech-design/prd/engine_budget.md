@@ -32,11 +32,20 @@ This circular dependency is the engine of the game. Players must:
 
 ### Tax Income
 
-Taxes are collected annually (every 48 ticks). Revenue is calculated from developed zones.
+Taxes are collected annually (every 48 ticks). Revenue is calculated from population and land value, not just zone count. This is adapted from the Micropolis formula:
 
 ```
-taxIncome = sum(each developed tile's taxable value) × taxRate
+taxIncome = totalPopulation × averageLandValue / 120 × taxRate × difficultyModifier
+
+difficultyModifier:
+  Easy:   1.4
+  Normal: 1.0
+  Hard:   0.8
 ```
+
+This means higher land values generate more tax revenue per capita — wealthy neighborhoods contribute more than slums. This creates a powerful incentive to invest in land value (parks, services, infrastructure), as the return comes through increased tax revenue.
+
+Additionally, each developed tile has a base taxable value used for budget projections:
 
 **Taxable value per tile** depends on density and zone type:
 
@@ -50,20 +59,25 @@ Commercial generates the most tax per tile at high density, but requires residen
 
 **Tax rate** range: 0% to 20%, default 7%.
 
-### Tax Rate Effects on Growth
+### Tax Rate Effects on Growth (The Laffer Curve)
 
-The tax rate directly affects zone demand. Higher taxes suppress demand, lower taxes boost it.
+The tax rate directly affects zone demand. Higher taxes suppress demand, lower taxes boost it. Research into SimCity's economics reveals a Laffer Curve effect — there's an optimal revenue-maximizing rate around 9%, with steep population decline above 15%.
 
 ```
 demandModifier = 1.0 - ((taxRate - 0.07) × 5.0)
-// At 7%: modifier = 1.0 (neutral)
-// At 5%: modifier = 1.5 (strong growth boost)
-// At 10%: modifier = 0.85 (mild suppression)
-// At 15%: modifier = 0.6 (significant suppression)
-// At 20%: modifier = 0.35 (near-stagnation)
+// At 4%: modifier = 1.15 (growth boost, but less revenue)
+// At 7%: modifier = 1.0 (neutral — the sweet spot for growth)
+// At 9%: modifier = 0.9 (slightly suppressed growth, max revenue)
+// At 12%: modifier = 0.75 (noticeable suppression)
+// At 15%: modifier = 0.6 (significant suppression, population leaving)
+// At 20%: modifier = 0.35 (near-stagnation, only existing residents stay)
 ```
 
-This modifier is applied to all zone demand calculations. Very low taxes boost growth but may not generate enough revenue to sustain services.
+This modifier is applied to all zone demand calculations. The tension:
+- **4-6% tax:** Fast growth but may not cover infrastructure costs → budget deficit spiral
+- **7-9% tax:** The playable range. Most players will settle here.
+- **10-12% tax:** Revenue boost but growth stalls. Works for mature cities with established tax base.
+- **13%+ tax:** Actively harmful. Population begins to leave. Only useful as a temporary emergency measure.
 
 ---
 
@@ -78,8 +92,8 @@ Ongoing costs deducted annually. Players can't avoid these — they're the cost 
 | Roads | $1/tile/year | per road tile |
 | Rails | $1.5/tile/year | per rail tile |
 | Power lines | $0.50/tile/year | per power line tile |
-| Coal power plant | $120/year | per plant |
-| Nuclear power plant | $250/year | per plant |
+| Coal power plant (capacity: 700) | $120/year | per plant |
+| Nuclear power plant (capacity: 2000) | $250/year | per plant |
 
 ### Service Funding
 
@@ -116,12 +130,14 @@ One-time costs when placing infrastructure or buildings.
 | Nuclear power plant | $5,000 |
 | Police station | $500 |
 | Fire station | $500 |
-| Stadium | $3,000 |
-| Seaport | $5,000 |
-| Airport | $10,000 |
-| Park (1x1) | $10 |
+| Stadium | $3,000 | Raises residential population cap by 5,000 |
+| Seaport | $5,000 | Unlocks high-density industrial, boosts demand |
+| Airport | $10,000 | Unlocks high-density commercial, boosts demand |
+| Park (1x1) | $10 | Raises population cap by 500, boosts land value |
 
 Zoning is free — the cost of development is borne by the simulation (it just happens or doesn't). The player's investment is in infrastructure to make zones attractive.
+
+**Special building investment decisions** are some of the most interesting in the game. A stadium costs $3,000 — roughly the same as a coal power plant — but unlocks 5,000 more potential residents. Timing this investment (too early = waste, too late = stalled growth) is a key skill players develop.
 
 ---
 

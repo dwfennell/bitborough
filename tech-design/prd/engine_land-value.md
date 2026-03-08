@@ -75,16 +75,30 @@ Park (3x3):  +35 at park, -3 per tile distance, max radius 9
 Parks are cheap ($10 for 1x1) but take up zoneable land. The tradeoff: sacrifice a tile for a park to boost surrounding tiles' value.
 
 ### Center Bonus
-Tiles closer to the center of developed area have higher base value (urban core premium). This encourages dense, centralized development.
+Tiles closer to the city center have higher base value (urban core premium). This encourages dense, centralized development.
+
+**Critically, the city center is NOT the geometric center of the map.** It's the population-weighted center of mass — the average position of all developed tiles, weighted by their population. This is how Micropolis calculates it, and it creates a dynamic "downtown" that moves with the city's growth.
 
 ```
-developmentCenter = average position of all developed tiles
-distanceFromCenter = manhattan distance from (x, y) to developmentCenter
-maxDistance = map diagonal / 2
-centerBonus = 30 × (1 - distanceFromCenter / maxDistance)
+// Calculate city center of mass (updated monthly)
+centerX = sum(tile.x × tile.population for all developed tiles) / totalPopulation
+centerY = sum(tile.y × tile.population for all developed tiles) / totalPopulation
+
+// If no population yet, fall back to map center
+if (totalPopulation === 0):
+  centerX = mapWidth / 2
+  centerY = mapHeight / 2
+
+distanceFromCenter = manhattan(x, y, centerX, centerY)
+maxDistance = (mapWidth + mapHeight) / 2
+centerBonus = 34 × (1 - distanceFromCenter / maxDistance)
 ```
 
-This bonus shifts dynamically as the city grows, creating a natural "downtown" that moves with the city's center of mass.
+This creates important emergent behavior:
+- Early cities have a center wherever you start building
+- The center shifts toward wherever population concentrates
+- High-density areas pull the center toward them (more population weight)
+- Players can deliberately shift downtown by building dense residential clusters
 
 ### Development Density Bonus
 Developed areas near other developed areas get a small boost (agglomeration effect). Cities are more valuable than empty land.

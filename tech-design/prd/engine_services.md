@@ -57,27 +57,26 @@ This means two overlapping stations don't provide double benefit at the overlap 
 
 ### Crime Calculation
 
-Crime is calculated monthly (every 4 ticks).
+Crime is calculated monthly (every 4 ticks). The formula is adapted from Micropolis, where crime is fundamentally the tension between population density and land value, moderated by police:
 
 ```
-baseCrime(x, y):
-  Undeveloped: 0
-  Residential low: 5
-  Residential medium: 15
-  Residential high: 30
-  Commercial low: 8
-  Commercial medium: 20
-  Commercial high: 35
-  Industrial low: 3
-  Industrial medium: 8
-  Industrial high: 12
+// Micropolis formula: crime = 128 - landValue + popDensity - policeEffect
+// We adapt this to our 0-255 scale:
+
+rawCrime(x, y) = 128 - landValue(x, y) + populationDensity(x, y)
+rawCrime = clamp(rawCrime, 0, 300)
 
 policeCoverage = totalPoliceInfluence(x, y)  // 0.0 to 1.0
-
-crimeLevel(x, y) = baseCrime × (1.0 - policeCoverage × 0.8)
+crimeLevel(x, y) = clamp(rawCrime - (policeCoverage × 150), 0, 255)
 ```
 
-Police can reduce crime by up to 80%. Some baseline crime always exists — you can't eliminate it entirely. Dense areas generate more crime, requiring more police coverage.
+This means:
+- **High land value + low density = low crime** (wealthy suburbs)
+- **Low land value + high density = high crime** (overcrowded slums)
+- **Police coverage directly subtracts from crime** (up to 150 points at full coverage)
+- **Crime can never be fully eliminated** in dense, low-value areas — the formula ensures some baseline
+
+This creates the classic SimCity dynamic where crime is a symptom of deeper problems (low land value, overcrowding) rather than just "not enough police." Police help, but improving land value (parks, services) is the real fix.
 
 ### Crime Effects
 

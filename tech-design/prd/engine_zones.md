@@ -278,6 +278,98 @@ When a zone develops, the engine picks a random building variant for that zone t
 
 ---
 
+## Growth Momentum (Rate of Growth)
+
+Inspired by Micropolis, each 8x8 region of the map tracks a "Rate of Growth" (ROG) value that provides momentum to development. This prevents cities from feeling static — areas that are growing tend to keep growing, and areas in decline tend to keep declining.
+
+```
+ROG is stored per 8x8 block: rogMap[y/8][x/8]
+Range: -200 to +200
+
+When a building is placed:   ROG += 10
+When a building upgrades:    ROG += 5
+When a building declines:    ROG -= 10
+When a building is abandoned: ROG -= 15
+
+Each month, ROG decays toward zero by 1:
+  if (ROG > 0) ROG--
+  if (ROG < 0) ROG++
+```
+
+ROG affects development chance:
+```
+rogFactor = 1.0 + (ROG / 200.0) × 0.5
+// At ROG +200: 1.5x development chance (growth hotspot)
+// At ROG 0: 1.0x (neutral)
+// At ROG -200: 0.5x development chance (declining area)
+```
+
+This creates visible "waves" of development and decline across the city, rather than uniform behavior.
+
+---
+
+## Population Caps (Special Building Requirements)
+
+Population growth has hard caps that require specific special buildings to unlock. This creates clear milestones and investment decisions. Inspired by SimCity's stadium/airport/seaport requirements.
+
+```
+Residential population cap:
+  Base: 2,000 (no special buildings needed)
+  + Stadium: raises cap by 5,000
+  + Park (any): raises cap by 500 per park
+
+Commercial demand cap:
+  Base: uncapped in low/medium density
+  High density commercial: requires Airport
+  Airport boosts commercial demand by +0.3
+
+Industrial demand cap:
+  Base: uncapped in low/medium density
+  High density industrial: requires Seaport
+  Seaport boosts industrial demand by +0.3
+```
+
+Without a stadium, a city plateaus around 2,000 residents. Players must invest $3,000 in a stadium to unlock growth — a significant early-game decision. This creates the "what should I build next?" tension that makes SimCity engaging.
+
+---
+
+## Traffic Impact on Zones
+
+When the traffic system is active (Milestone 7+), traffic routing directly affects zone health. This is one of the strongest feedback mechanisms in the game.
+
+Each developed zone attempts to find a road path to a compatible destination:
+- Residential → Commercial or Industrial
+- Commercial → Residential or Industrial
+- Industrial → Residential or Commercial
+
+The result affects the zone:
+
+| Traffic Result | Meaning | Zone Effect |
+|---------------|---------|-------------|
+| Route found (< 30 road tiles) | Good connectivity | Normal growth |
+| Route found (30+ tiles) | Long commute | Slight development penalty |
+| Route failed (dead end) | Poor connectivity | Zone declines |
+| No road access at all | Isolated | **Immediate abandonment** |
+
+The 30-tile threshold (from Micropolis) means that distant zones need efficient road networks. This is what transforms roads from a checkbox into a real optimization problem.
+
+---
+
+## Land Value Classes
+
+Land value determines which building variants appear, creating visual distinction between wealthy and poor neighborhoods. Adapted from Micropolis's 4-class system:
+
+| Class | Land Value Range | Residential Visual | Commercial Visual |
+|-------|-----------------|-------------------|-------------------|
+| 0 (Low) | 0–30 | Shacks, basic houses | Pawn shop, vacant storefront |
+| 1 (Working) | 31–80 | Modest homes, duplexes | Corner store, small office |
+| 2 (Middle) | 81–150 | Nice houses, apartments | Office building, retail |
+| 3 (Wealthy) | 151–255 | Mansions, luxury towers | Glass skyscraper, mall |
+
+When a building develops, the engine selects from variants matching both the density level AND the land value class. This means the same "low density residential" looks different in a rich neighborhood vs a poor one.
+
+---
+
 ## Emergent Behaviors
 
 This system creates several emergent patterns that experienced players will discover:

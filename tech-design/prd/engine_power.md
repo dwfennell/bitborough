@@ -31,10 +31,12 @@ RCity follows this model with minor refinements for depth.
 
 | Building       | Size | Capacity | Cost     | Maintenance | Notes                    |
 |---------------|------|----------|----------|-------------|--------------------------|
-| Coal plant    | 4x4  | 200 tiles | $3,000  | $120/year   | Pollutes surrounding area |
-| Nuclear plant | 4x4  | 500 tiles | $5,000  | $250/year   | Meltdown risk (future)    |
+| Coal plant    | 4x4  | 700 tiles | $3,000  | $120/year   | Pollutes surrounding area |
+| Nuclear plant | 4x4  | 2000 tiles | $5,000  | $250/year   | Meltdown risk (future)    |
 
-**Capacity** limits how many tiles a single plant can power. This forces players to build multiple plants as the city grows — a key economic pressure.
+**Capacity** limits how many tiles a single plant can power. These numbers are calibrated from Micropolis (open-source SimCity): coal powers a small city, nuclear powers a large district. This forces players to build multiple plants as the city grows — a key economic pressure.
+
+Note: in Micropolis, corner and intersection tiles can consume extra power due to the recursive flood-fill visiting them multiple times. We avoid this by using BFS with a visited set, so each tile consumes exactly 1 unit.
 
 ### Power Conductors
 

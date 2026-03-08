@@ -44,11 +44,19 @@ The number of trips scales with building density. A high-rise residential genera
 
 ### Trip Routing
 
-Each trip follows the shortest road path from origin to destination. If no road path exists, the trip fails (zone is disconnected).
+Each trip follows a road path from origin to destination, with a **maximum path length of 30 road tiles** (adapted from Micropolis's `MAX_TRAFFIC_DISTANCE = 30`). This limit is critical — it means distant zones need efficient road networks, not just any connection.
 
-**Pathfinding:** A* on the road network graph. Cache commonly-used routes to avoid recalculating every tick.
+**Pathfinding:** Start with DFS (depth-first search) as Micropolis does — simpler to implement, and the 30-step limit keeps it fast. Can upgrade to A* later if more realistic routing is needed.
 
-**Simplification:** Don't route individual cars. Instead, calculate the "traffic load" on each road segment as the number of trips passing through it.
+**Traffic density:** Each road tile traversed by a trip receives +50 traffic density (Micropolis convention). This accumulates across all trips, creating hotspots at bottleneck intersections.
+
+**Route result categories:**
+- Path found in ≤30 steps → success, normal zone behavior
+- Path found but >30 steps → long commute penalty (slight demand reduction)
+- Path dead-ends (no route to destination) → zone declines
+- No road adjacent to zone → **immediate abandonment** (strongest penalty)
+
+**Simplification:** Don't simulate individual vehicles. Calculate aggregate traffic load per road tile from all trip routes. Visual traffic (car sprites on roads) is a rendering concern scaled from the density number.
 
 ### Congestion
 
