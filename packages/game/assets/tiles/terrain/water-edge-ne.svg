@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="waterEdgeNEBase" x1="0.5" y1="0" x2="1" y2="0.5">
+      <stop offset="0%" stop-color="#88c8e8"/>
+      <stop offset="100%" stop-color="#78b8d8"/>
+    </linearGradient>
+    <linearGradient id="grassEdgeNEBase" x1="0" y1="0.5" x2="0.5" y2="1">
+      <stop offset="0%" stop-color="#8cc870"/>
+      <stop offset="100%" stop-color="#7abb62"/>
+    </linearGradient>
+    <!-- Water fills top-right corner. Shoreline arcs from left edge y=64 to bottom edge x=64 -->
+    <clipPath id="waterClipNE">
+      <path d="M0 64 Q32 52 64 40 Q80 20 64 0 L128 0 L128 128 L64 128 Q80 108 64 88 Q32 76 0 64 Z"/>
+    </clipPath>
+  </defs>
+
+  <!-- Grass background (full tile) -->
+  <rect width="128" height="128" fill="url(#grassEdgeNEBase)"/>
+
+  <!-- Grass texture patches (bottom-left area) -->
+  <ellipse cx="22" cy="95" rx="14" ry="9" fill="#95d07a" opacity="0.45"/>
+  <ellipse cx="15" cy="25" rx="12" ry="7" fill="#82c466" opacity="0.4"/>
+  <ellipse cx="38" cy="118" rx="10" ry="6" fill="#9ad680" opacity="0.35"/>
+
+  <!-- Dark grass patch -->
+  <ellipse cx="28" cy="112" rx="8" ry="5" fill="#6aaa50" opacity="0.25"/>
+
+  <!-- Grass blade cluster -->
+  <g fill="#6aaa50" opacity="0.45">
+    <path d="M20 100 L22 92 L24 100Z"/>
+    <path d="M22 101 L25 91 L27 101Z"/>
+    <path d="M18 101 L20 94 L23 101Z"/>
+  </g>
+
+  <!-- Water corner (top-right), clipped to arc region -->
+  <g clip-path="url(#waterClipNE)">
+    <rect width="128" height="128" fill="url(#waterEdgeNEBase)"/>
+
+    <!-- Depth patch -->
+    <ellipse cx="100" cy="30" rx="18" ry="12" fill="#6aaccf" opacity="0.18"/>
+
+    <!-- Ripple lines -->
+    <g fill="none" stroke="#a0d8f0" stroke-width="1" stroke-linecap="round" opacity="0.35">
+      <path d="M78 18 Q93 15 108 18"/>
+      <path d="M85 95 Q88 108 85 118"/>
+    </g>
+
+    <!-- Secondary ripple -->
+    <g fill="none" stroke="#b0e0f4" stroke-width="0.7" stroke-linecap="round" opacity="0.3">
+      <path d="M98 50 Q101 60 98 70"/>
+    </g>
+
+    <!-- Sparkle highlights -->
+    <circle cx="95" cy="12" r="1.1" fill="#d0eef8" opacity="0.55"/>
+    <circle cx="112" cy="80" r="0.9" fill="#d0eef8" opacity="0.5"/>
+  </g>
+
+  <!-- Shoreline sand strip (single arc from left edge y=64 to bottom edge x=64) -->
+  <path d="M0 64 Q32 52 64 40 Q80 20 64 0"
+        fill="none" stroke="#d8c498" stroke-width="3" stroke-linecap="round" opacity="0.4"/>
+  <path d="M64 128 Q80 108 64 88 Q32 76 0 64"
+        fill="none" stroke="#d8c498" stroke-width="3" stroke-linecap="round" opacity="0.4"/>
+
+  <!-- Pebbles along shoreline -->
+  <circle cx="8" cy="63" r="1.1" fill="#d8c498" opacity="0.35"/>
+  <circle cx="30" cy="54" r="1" fill="#c8b480" opacity="0.3"/>
+  <circle cx="55" cy="42" r="1.2" fill="#d8c498" opacity="0.3"/>
+  <circle cx="66" cy="15" r="0.9" fill="#c8b480" opacity="0.35"/>
+  <circle cx="35" cy="74" r="1.1" fill="#d8c498" opacity="0.3"/>
+  <circle cx="56" cy="95" r="1" fill="#c8b480" opacity="0.3"/>
+  <circle cx="66" cy="120" r="1.2" fill="#d8c498" opacity="0.35"/>
+</svg>
