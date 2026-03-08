@@ -2,10 +2,25 @@ import {
   type GameMap,
   type GameState,
   type BudgetInfo,
+  type Result,
+  TileType,
+  ZoneType,
+  Infrastructure,
   SimSpeed,
   DEFAULTS,
 } from '@rcity/core'
 import { PRNG } from './prng.js'
+import { placeTile, placeZone } from './actions/place.js'
+import { bulldoze } from './actions/bulldoze.js'
+
+export interface TileInfo {
+  terrain: TileType
+  zone: ZoneType
+  infrastructure: number
+  connections: number
+  elevation: number
+  powered: boolean
+}
 
 export interface EngineConfig {
   seed?: number
@@ -95,6 +110,34 @@ export class Engine {
       crimeLevel: this.crimeLevel,
       trafficDensity: this.trafficDensity,
     }
+  }
+
+  getTile(x: number, y: number): TileInfo {
+    const idx = y * this.map.width + x
+    return {
+      terrain: this.map.terrain[idx] as TileType,
+      zone: this.map.zones[idx] as ZoneType,
+      infrastructure: this.map.infrastructure[idx],
+      connections: this.map.connections[idx],
+      elevation: this.map.elevation[idx],
+      powered: this.powerGrid[idx] !== 0,
+    }
+  }
+
+  placeTile(x: number, y: number, infra: Infrastructure): Result {
+    const { result, cost } = placeTile(this.map, x, y, infra, this.funds)
+    this.funds -= cost
+    return result
+  }
+
+  placeZone(x: number, y: number, zone: ZoneType): Result {
+    return placeZone(this.map, x, y, zone)
+  }
+
+  bulldoze(x: number, y: number): Result {
+    const { result, cost } = bulldoze(this.map, x, y, this.funds)
+    this.funds -= cost
+    return result
   }
 
   private buildBudgetInfo(): BudgetInfo {
