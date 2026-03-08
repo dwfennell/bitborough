@@ -253,7 +253,7 @@ export class Game {
       if (inInput) return
       this.pressedKeys.add(e.key)
       const action = keyMap.get(e.key)
-      if (action) action()
+      if (action) { e.preventDefault(); action() }
     })
     window.addEventListener('keyup', (e) => {
       this.pressedKeys.delete(e.key)
