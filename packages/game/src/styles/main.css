@@ -374,7 +374,7 @@ html, body {
   background: rgba(20, 20, 40, 0.95);
   border: 1px solid rgba(255,255,255,0.2);
   border-radius: 8px;
-  width: 520px;
+  width: 680px;
   max-width: 90vw;
   max-height: 80vh;
   display: flex;
@@ -409,7 +409,49 @@ html, body {
   border-color: #5c9ce6;
 }
 
+.docs-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.docs-toc {
+  width: 160px;
+  flex-shrink: 0;
+  border-right: 1px solid rgba(255,255,255,0.1);
+  overflow-y: auto;
+  padding: 8px 0;
+}
+
+.docs-toc-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.docs-toc-item {
+  padding: 6px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  color: rgba(224, 224, 224, 0.7);
+  border-left: 2px solid transparent;
+}
+
+.docs-toc-item:hover {
+  color: #e0e0e0;
+  background: rgba(255,255,255,0.05);
+}
+
+.docs-toc-item.active {
+  color: #5c9ce6;
+  border-left-color: #5c9ce6;
+  background: rgba(92, 156, 230, 0.08);
+}
+
+.docs-toc-item.hidden { display: none; }
+
 .docs-sections {
+  flex: 1;
   overflow-y: auto;
   padding: 12px;
 }
