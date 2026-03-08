@@ -16,6 +16,7 @@ import { placeTile, placeZone } from './actions/place.js'
 import { bulldoze } from './actions/bulldoze.js'
 import { updateConnections } from './connections.js'
 import { propagatePower } from './simulation/power.js'
+import { calculateDemand } from './simulation/demand.js'
 import { BUILDING_DEFS } from './buildings-registry.js'
 
 export interface TileInfo {
@@ -50,6 +51,9 @@ export class Engine {
   private ticksPerMonth: number
   private monthsPerYear: number
 
+  // Demand
+  private demand: { residential: number; commercial: number; industrial: number }
+
   // Simulation layers
   private powerGrid: Uint8Array
   private landValues: Uint8Array
@@ -75,6 +79,9 @@ export class Engine {
     this.pollutionLevel = new Uint8Array(size)
     this.crimeLevel = new Uint8Array(size)
     this.trafficDensity = new Uint8Array(size)
+
+    // Initialize demand
+    this.demand = calculateDemand(this.map, this.population, this.taxRate)
   }
 
   static create(map: GameMap, config: EngineConfig = {}): Engine {
@@ -97,7 +104,8 @@ export class Engine {
         this.year++
         // Annual systems (budget) will go here
       }
-      // Monthly systems (zones, land value, etc.) will go here
+      // Monthly systems
+      this.demand = calculateDemand(this.map, this.population, this.taxRate)
     }
   }
 
@@ -112,7 +120,7 @@ export class Engine {
       },
       population: this.population,
       funds: this.funds,
-      demand: { residential: 0, commercial: 0, industrial: 0 },
+      demand: this.demand,
       budget: this.buildBudgetInfo(),
       powerGrid: this.powerGrid,
       landValues: this.landValues,
@@ -120,6 +128,10 @@ export class Engine {
       crimeLevel: this.crimeLevel,
       trafficDensity: this.trafficDensity,
     }
+  }
+
+  getDemand() {
+    return this.demand
   }
 
   getTile(x: number, y: number): TileInfo {
