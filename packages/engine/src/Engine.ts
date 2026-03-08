@@ -21,6 +21,7 @@ import { calculateDemand } from './simulation/demand.js'
 import { calculateLandValues } from './simulation/land-value.js'
 import { updateZones } from './simulation/zones.js'
 import { calculateBudget } from './simulation/budget.js'
+import { calculateCrime } from './simulation/services/crime.js'
 import { BUILDING_DEFS } from './buildings-registry.js'
 
 export interface TileInfo {
@@ -121,6 +122,7 @@ export class Engine {
       // Monthly systems
       this.demand = calculateDemand(this.map, this.population, this.taxRate)
       calculateLandValues(this.map, this.powerGrid, this.pollutionLevel, this.crimeLevel, this.landValues)
+      calculateCrime(this.map, this.landValues, this.crimeLevel, this.population, this.funding.police)
 
       // Zone development
       const nextBuildingIdRef = { value: this.nextBuildingId }

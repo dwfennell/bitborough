@@ -35,7 +35,7 @@ export function calculateLandValues(
       value -= pollutionLevel[idx]! * 0.5
 
       // Crime penalty (negative)
-      value -= crimeLevel[idx]! * 0.3
+      value -= crimeLevel[idx]! * 0.1
 
       // Clamp to [0, 255]
       landValues[idx] = Math.max(0, Math.min(255, Math.round(value)))
