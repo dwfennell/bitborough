@@ -1,0 +1,23 @@
+{
+  "name": "@rcity/game",
+  "version": "0.0.1",
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "build": "tsc",
+    "build:tiles": "tsx scripts/rasterize-tiles.ts",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@rcity/core": "workspace:*"
+  },
+  "devDependencies": {
+    "@resvg/resvg-js": "^2.6.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
+  }
+}
