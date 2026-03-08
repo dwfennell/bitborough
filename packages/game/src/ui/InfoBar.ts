@@ -1,6 +1,5 @@
 import type { GameState } from '@bitborough/core'
-
-const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']
+import { formatGameDate, computeDemandBarStyle } from '../utils/format.js'
 
 export class InfoBar {
   private el: HTMLElement
@@ -55,25 +54,28 @@ export class InfoBar {
     if (state.time.month !== this.lastMonth || state.time.year !== this.lastYear) {
       this.lastMonth = state.time.month
       this.lastYear = state.time.year
-      this.dateEl.textContent = `${MONTHS[state.time.month - 1]} ${state.time.year}`
+      this.dateEl.textContent = formatGameDate(state.time.month, state.time.year)
     }
 
     const maxH = 20
     const { residential, commercial, industrial } = state.demand
     if (residential !== this.lastDemandR) {
       this.lastDemandR = residential
-      this.rBar.style.height = `${Math.max(4, Math.abs(residential) * maxH)}px`
-      this.rBar.style.opacity = residential >= 0 ? '1' : '0.4'
+      const style = computeDemandBarStyle(residential, maxH)
+      this.rBar.style.height = `${style.height}px`
+      this.rBar.style.opacity = style.opacity
     }
     if (commercial !== this.lastDemandC) {
       this.lastDemandC = commercial
-      this.cBar.style.height = `${Math.max(4, Math.abs(commercial) * maxH)}px`
-      this.cBar.style.opacity = commercial >= 0 ? '1' : '0.4'
+      const style = computeDemandBarStyle(commercial, maxH)
+      this.cBar.style.height = `${style.height}px`
+      this.cBar.style.opacity = style.opacity
     }
     if (industrial !== this.lastDemandI) {
       this.lastDemandI = industrial
-      this.iBar.style.height = `${Math.max(4, Math.abs(industrial) * maxH)}px`
-      this.iBar.style.opacity = industrial >= 0 ? '1' : '0.4'
+      const style = computeDemandBarStyle(industrial, maxH)
+      this.iBar.style.height = `${style.height}px`
+      this.iBar.style.opacity = style.opacity
     }
   }
 }

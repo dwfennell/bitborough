@@ -1,26 +1,6 @@
-import { TileType, ZoneType, type GameState } from '@bitborough/core'
+import type { GameState } from '@bitborough/core'
 import type { Camera } from '../render/Camera.js'
-
-// Precomputed RGB lookup tables for minimap (avoids hex string parsing per tile)
-function hexToRgb(hex: string): [number, number, number] {
-  const n = parseInt(hex.slice(1), 16)
-  return [(n >> 16) & 0xff, (n >> 8) & 0xff, n & 0xff]
-}
-
-const TERRAIN_RGB: [number, number, number][] = [
-  hexToRgb('#4a8c3f'), // Grass
-  hexToRgb('#3b7dd8'), // Water
-  hexToRgb('#8b7355'), // Dirt
-  hexToRgb('#d4b876'), // Sand
-  hexToRgb('#2d6b2e'), // Trees
-]
-const FALLBACK_RGB: [number, number, number] = TERRAIN_RGB[0]!
-
-const ZONE_RGB: Record<number, [number, number, number]> = {
-  [ZoneType.Residential]: hexToRgb('#4caf50'),
-  [ZoneType.Commercial]: hexToRgb('#2196f3'),
-  [ZoneType.Industrial]: hexToRgb('#ffc107'),
-}
+import { fillMinimapBuffer } from '../render/minimap-buffer.js'
 
 export class MiniMap {
   private canvas: HTMLCanvasElement
@@ -49,22 +29,7 @@ export class MiniMap {
       this.imageData = this.ctx.createImageData(w, h)
     }
 
-    const data = this.imageData.data
-
-    for (let i = 0, len = w * h; i < len; i++) {
-      const zone = map.zones[i] as ZoneType
-      let rgb: [number, number, number]
-      if (zone !== ZoneType.None) {
-        rgb = ZONE_RGB[zone] ?? FALLBACK_RGB
-      } else {
-        rgb = TERRAIN_RGB[map.terrain[i] as TileType] ?? FALLBACK_RGB
-      }
-      const off = i * 4
-      data[off] = rgb[0]
-      data[off + 1] = rgb[1]
-      data[off + 2] = rgb[2]
-      data[off + 3] = 255
-    }
+    fillMinimapBuffer(map.terrain, map.zones, w, h, this.imageData.data)
 
     this.ctx.putImageData(this.imageData, 0, 0)
 

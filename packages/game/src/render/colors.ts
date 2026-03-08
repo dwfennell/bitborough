@@ -1,5 +1,18 @@
 import { TileType, ZoneType } from '@bitborough/core'
 
+export function hexToRgb(hex: string): [number, number, number] {
+  const n = parseInt(hex.slice(1), 16)
+  return [(n >> 16) & 0xff, (n >> 8) & 0xff, n & 0xff]
+}
+
+export function landValueToRgba(value: number): string {
+  const v = value / 255
+  const r = Math.floor(v * 255)
+  const g = Math.floor((1 - Math.abs(v - 0.5) * 2) * 255)
+  const b = Math.floor((1 - v) * 255)
+  return `rgba(${r}, ${g}, ${b}, 0.4)`
+}
+
 export const TERRAIN_COLORS: Record<number, string> = {
   [TileType.Grass]: '#4a8c3f',
   [TileType.Water]: '#3b7dd8',

@@ -1,5 +1,6 @@
-import { TileType, ZoneType, Infrastructure, type GameState } from '@bitborough/core'
+import type { GameState } from '@bitborough/core'
 import type { TileInfo } from '@bitborough/engine'
+import { describeTile } from '../utils/tile-info.js'
 
 export class QueryPanel {
   private el: HTMLElement
@@ -26,20 +27,15 @@ export class QueryPanel {
 
   show(tile: TileInfo, x: number, y: number, state: GameState): void {
     this.el.classList.remove('hidden')
-    const idx = y * state.map.width + x
-
-    const infraParts: string[] = []
-    if (tile.infrastructure & Infrastructure.Road) infraParts.push('Road')
-    if (tile.infrastructure & Infrastructure.PowerLine) infraParts.push('Power Line')
-    if (tile.infrastructure & Infrastructure.Rail) infraParts.push('Rail')
+    const desc = describeTile(tile, x, y, state)
 
     this.bodyEl.innerHTML = `
-      <div class="query-line"><span>Position</span><span>(${x}, ${y})</span></div>
-      <div class="query-line"><span>Terrain</span><span>${TileType[tile.terrain] ?? '?'}</span></div>
-      <div class="query-line"><span>Zone</span><span>${ZoneType[tile.zone] ?? 'None'}</span></div>
-      <div class="query-line"><span>Infrastructure</span><span>${infraParts.join(', ') || 'None'}</span></div>
-      <div class="query-line"><span>Powered</span><span>${tile.powered ? 'Yes' : 'No'}</span></div>
-      <div class="query-line"><span>Land Value</span><span>${state.landValues[idx]}</span></div>
+      <div class="query-line"><span>Position</span><span>(${desc.position.x}, ${desc.position.y})</span></div>
+      <div class="query-line"><span>Terrain</span><span>${desc.terrain}</span></div>
+      <div class="query-line"><span>Zone</span><span>${desc.zone}</span></div>
+      <div class="query-line"><span>Infrastructure</span><span>${desc.infrastructure.join(', ') || 'None'}</span></div>
+      <div class="query-line"><span>Powered</span><span>${desc.powered ? 'Yes' : 'No'}</span></div>
+      <div class="query-line"><span>Land Value</span><span>${desc.landValue}</span></div>
     `
   }
 

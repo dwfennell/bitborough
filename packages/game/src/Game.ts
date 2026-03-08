@@ -14,14 +14,7 @@ import { QueryPanel } from './ui/QueryPanel.js'
 import { MiniMap } from './ui/MiniMap.js'
 import { AudioManager } from './audio/AudioManager.js'
 import { SaveManager } from './storage/SaveManager.js'
-
-const TICK_INTERVALS: Record<SimSpeed, number> = {
-  [SimSpeed.Paused]: 0,
-  [SimSpeed.Slow]: 1000,
-  [SimSpeed.Normal]: 250,
-  [SimSpeed.Fast]: 100,
-  [SimSpeed.Turbo]: 25,
-}
+import { TICK_INTERVALS, advanceTicks } from './utils/tick-accumulator.js'
 
 const TILE_SIZE = 16
 
@@ -239,10 +232,10 @@ export class Game {
 
     const tickInterval = TICK_INTERVALS[this.speed]
     if (tickInterval > 0 && this.engine) {
-      this.simAccumulator += delta
-      while (this.simAccumulator >= tickInterval) {
+      const result = advanceTicks(this.simAccumulator, delta, tickInterval)
+      this.simAccumulator = result.remainder
+      for (let i = 0; i < result.ticks; i++) {
         this.engine.tick()
-        this.simAccumulator -= tickInterval
         this.ticksSinceSave++
 
         if (this.ticksSinceSave >= 48) {

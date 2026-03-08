@@ -1,15 +1,12 @@
 import type { GameState } from '@bitborough/core'
+import { landValueToRgba } from './colors.js'
 
 export type OverlayType = 'power' | 'landValue' | 'none'
 
 // Precomputed color lookup for land values (0-255)
 const LAND_VALUE_COLORS: string[] = new Array(256)
 for (let i = 0; i < 256; i++) {
-  const v = i / 255
-  const r = Math.floor(v * 255)
-  const g = Math.floor((1 - Math.abs(v - 0.5) * 2) * 255)
-  const b = Math.floor((1 - v) * 255)
-  LAND_VALUE_COLORS[i] = `rgba(${r}, ${g}, ${b}, 0.4)`
+  LAND_VALUE_COLORS[i] = landValueToRgba(i)
 }
 
 const POWER_ON = 'rgba(255, 235, 59, 0.4)'
