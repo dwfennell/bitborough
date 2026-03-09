@@ -5,7 +5,7 @@
   <rect x="32" y="30" width="64" height="58" rx="2" fill="#000000" opacity="0.11" transform="translate(3, 3)"/>
 
   <!-- Lot ground (paved parking/grounds) -->
-  <rect x="8" y="8" width="112" height="112" rx="3" fill="#b8b8a8" opacity="0.35"/>
+  <rect x="8" y="8" width="112" height="112" rx="3" fill="#b8b8a8"/>
 
   <!-- Parking lot detail (front area) -->
   <rect x="20" y="78" width="88" height="32" rx="2" fill="#a0a090" opacity="0.25"/>

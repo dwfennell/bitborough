@@ -3,7 +3,7 @@
   <rect x="16" y="18" width="96" height="88" rx="2" fill="#000000" opacity="0.1" transform="translate(3, 3)"/>
 
   <!-- Lot ground (industrial yard) -->
-  <rect x="8" y="8" width="112" height="112" rx="3" fill="#c0c0b0" opacity="0.35"/>
+  <rect x="8" y="8" width="112" height="112" rx="3" fill="#c0c0b0"/>
 
   <!-- Fuel/loading area (dark rectangle) -->
   <rect x="12" y="96" width="28" height="18" rx="1" fill="#585858" opacity="0.4"/>

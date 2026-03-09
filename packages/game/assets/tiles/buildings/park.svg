@@ -2,7 +2,7 @@
   <!-- Transparent background - terrain renders underneath -->
 
   <!-- Park ground (grass) -->
-  <rect x="8" y="8" width="112" height="112" rx="3" fill="#7ab85f" opacity="0.5"/>
+  <rect x="8" y="8" width="112" height="112" rx="3" fill="#7ab85f"/>
 
   <!-- Park pathways (winding paths) -->
   <!-- Main path (curved from bottom-left to top-right) -->

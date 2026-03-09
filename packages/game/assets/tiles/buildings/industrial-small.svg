@@ -5,7 +5,7 @@
   <rect x="40" y="38" width="48" height="40" rx="2" fill="#000000" opacity="0.1" transform="translate(3, 3)"/>
 
   <!-- Lot ground (industrial yard) -->
-  <rect x="8" y="8" width="112" height="112" rx="3" fill="#c0c0b0" opacity="0.3"/>
+  <rect x="8" y="8" width="112" height="112" rx="3" fill="#c0c0b0"/>
 
   <!-- Workshop walls -->
   <rect x="40" y="38" width="48" height="40" rx="2" fill="#d8d8d0"/>

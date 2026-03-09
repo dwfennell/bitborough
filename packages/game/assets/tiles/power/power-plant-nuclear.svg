@@ -5,7 +5,7 @@
   <rect x="24" y="28" width="80" height="72" rx="2" fill="#000000" opacity="0.12" transform="translate(3, 3)"/>
 
   <!-- Lot ground (concrete/industrial) -->
-  <rect x="8" y="8" width="112" height="112" rx="3" fill="#a8a898" opacity="0.4"/>
+  <rect x="8" y="8" width="112" height="112" rx="3" fill="#a8a898"/>
 
   <!-- Cooling tower 1 - Large circular dome (left side) -->
   <circle cx="40" cy="48" r="18" fill="#8a8a8a" opacity="0.6"/>

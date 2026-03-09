@@ -5,7 +5,7 @@
   <rect x="44" y="38" width="40" height="32" rx="2" fill="#000000" opacity="0.1" transform="translate(3, 3)"/>
 
   <!-- Yard / lot ground -->
-  <rect x="8" y="8" width="112" height="112" rx="3" fill="#a0d48a" opacity="0.6"/>
+  <rect x="8" y="8" width="112" height="112" rx="3" fill="#a0d48a"/>
 
   <!-- Garden path from house to south edge -->
   <rect x="60" y="72" width="8" height="48" rx="1" fill="#c8b898" opacity="0.45"/>

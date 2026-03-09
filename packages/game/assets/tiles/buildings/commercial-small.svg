@@ -5,7 +5,7 @@
   <rect x="44" y="30" width="40" height="48" rx="2" fill="#000000" opacity="0.1" transform="translate(3, 3)"/>
 
   <!-- Lot ground (paved commercial lot) -->
-  <rect x="8" y="8" width="112" height="112" rx="3" fill="#d8d8d0" opacity="0.3"/>
+  <rect x="8" y="8" width="112" height="112" rx="3" fill="#d8d8d0"/>
 
   <!-- Parking lines in front (south of building) -->
   <g stroke="#e0e0e0" stroke-width="0.8" opacity="0.5">
