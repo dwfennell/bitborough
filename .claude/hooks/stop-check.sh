@@ -23,3 +23,51 @@ PACKAGES=$(echo "$TS_FILES" | grep -oE '^packages/[^/]+' | sed 's|^packages/||' 
 if [ -z "$PACKAGES" ]; then
   exit 0
 fi
+
+MAX_RETRIES=2
+FAILURES=""
+
+# Check if a package.json has a given script
+has_script() {
+  local pkg_dir="$PROJECT_ROOT/packages/$1"
+  local script="$2"
+  if [ -f "$pkg_dir/package.json" ]; then
+    grep -q "\"$script\"" "$pkg_dir/package.json" 2>/dev/null
+  else
+    return 1
+  fi
+}
+
+# Run checks for all affected packages, collect failures
+run_checks() {
+  local failures=""
+
+  for pkg in $PACKAGES; do
+    if has_script "$pkg" "typecheck"; then
+      local output
+      if ! output=$(pnpm --filter "@bitborough/$pkg" typecheck 2>&1); then
+        failures="${failures}\n--- @bitborough/${pkg} typecheck FAILED ---\n${output}\n"
+      fi
+    fi
+
+    if has_script "$pkg" "test"; then
+      local output
+      if ! output=$(pnpm --filter "@bitborough/$pkg" test 2>&1); then
+        failures="${failures}\n--- @bitborough/${pkg} test FAILED ---\n${output}\n"
+      fi
+    fi
+  done
+
+  echo "$failures"
+}
+
+FAILURES=$(run_checks)
+
+# All checks passed
+if [ -z "$FAILURES" ]; then
+  exit 0
+fi
+
+# Checks failed — report to stderr
+echo -e "The following checks failed:\n$FAILURES" >&2
+exit 2

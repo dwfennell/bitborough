@@ -109,4 +109,151 @@ describe('stop-check.sh', () => {
       await fixture.cleanup()
     }
   })
+
+  test('runs typecheck and test for affected package when checks pass', async () => {
+    const fixture = await createTestFixture()
+    try {
+      const logFile = join(fixture.tmpDir, 'pnpm-calls.log')
+      await fixture.createMockBin('pnpm', `echo "$@" >> "${logFile}"\nexit 0`)
+
+      await mkdir(join(fixture.tmpDir, 'packages', 'engine', 'src'), { recursive: true })
+      await writeFile(join(fixture.tmpDir, 'packages', 'engine', 'package.json'), JSON.stringify({
+        name: '@bitborough/engine',
+        scripts: { typecheck: 'tsc --noEmit', test: 'vitest run' }
+      }))
+      await writeFile(join(fixture.tmpDir, 'packages', 'engine', 'src', 'index.ts'), 'export const x = 1')
+      await execFileAsync('git', ['add', '.'], { cwd: fixture.tmpDir })
+      await execFileAsync('git', ['-c', 'user.name=Test', '-c', 'user.email=test@test.com', 'commit', '-m', 'add engine'], { cwd: fixture.tmpDir })
+      await writeFile(join(fixture.tmpDir, 'packages', 'engine', 'src', 'index.ts'), 'export const x = 2')
+
+      const result = await runScript(fixture.env)
+      expect(result.exitCode).toBe(0)
+
+      const { readFile } = await import('node:fs/promises')
+      const calls = (await readFile(logFile, 'utf-8')).trim().split('\n')
+      expect(calls).toContainEqual(expect.stringContaining('--filter @bitborough/engine typecheck'))
+      expect(calls).toContainEqual(expect.stringContaining('--filter @bitborough/engine test'))
+    } finally {
+      await fixture.cleanup()
+    }
+  })
+
+  test('exits 2 when typecheck fails', async () => {
+    const fixture = await createTestFixture()
+    try {
+      await fixture.createMockBin('pnpm', `
+if echo "$@" | grep -q "typecheck"; then
+  echo "error TS2322: Type 'string' is not assignable to type 'number'" >&2
+  exit 1
+fi
+exit 0
+`)
+
+      await mkdir(join(fixture.tmpDir, 'packages', 'engine', 'src'), { recursive: true })
+      await writeFile(join(fixture.tmpDir, 'packages', 'engine', 'package.json'), JSON.stringify({
+        name: '@bitborough/engine',
+        scripts: { typecheck: 'tsc --noEmit', test: 'vitest run' }
+      }))
+      await writeFile(join(fixture.tmpDir, 'packages', 'engine', 'src', 'index.ts'), 'export const x = 1')
+      await execFileAsync('git', ['add', '.'], { cwd: fixture.tmpDir })
+      await execFileAsync('git', ['-c', 'user.name=Test', '-c', 'user.email=test@test.com', 'commit', '-m', 'add engine'], { cwd: fixture.tmpDir })
+      await writeFile(join(fixture.tmpDir, 'packages', 'engine', 'src', 'index.ts'), 'export const x: number = "bad"')
+
+      const result = await runScript(fixture.env)
+      expect(result.exitCode).toBe(2)
+      expect(result.stderr).toContain('typecheck')
+    } finally {
+      await fixture.cleanup()
+    }
+  })
+
+  test('exits 2 when test fails', async () => {
+    const fixture = await createTestFixture()
+    try {
+      await fixture.createMockBin('pnpm', `
+if echo "$@" | grep -q " test$"; then
+  echo "FAIL src/__tests__/foo.test.ts" >&2
+  exit 1
+fi
+exit 0
+`)
+
+      await mkdir(join(fixture.tmpDir, 'packages', 'engine', 'src'), { recursive: true })
+      await writeFile(join(fixture.tmpDir, 'packages', 'engine', 'package.json'), JSON.stringify({
+        name: '@bitborough/engine',
+        scripts: { typecheck: 'tsc --noEmit', test: 'vitest run' }
+      }))
+      await writeFile(join(fixture.tmpDir, 'packages', 'engine', 'src', 'index.ts'), 'export const x = 1')
+      await execFileAsync('git', ['add', '.'], { cwd: fixture.tmpDir })
+      await execFileAsync('git', ['-c', 'user.name=Test', '-c', 'user.email=test@test.com', 'commit', '-m', 'add engine'], { cwd: fixture.tmpDir })
+      await writeFile(join(fixture.tmpDir, 'packages', 'engine', 'src', 'index.ts'), 'export const x = 2')
+
+      const result = await runScript(fixture.env)
+      expect(result.exitCode).toBe(2)
+      expect(result.stderr).toContain('test')
+    } finally {
+      await fixture.cleanup()
+    }
+  })
+
+  test('skips test for package without test script', async () => {
+    const fixture = await createTestFixture()
+    try {
+      const logFile = join(fixture.tmpDir, 'pnpm-calls.log')
+      await fixture.createMockBin('pnpm', `echo "$@" >> "${logFile}"\nexit 0`)
+
+      await mkdir(join(fixture.tmpDir, 'packages', 'core', 'src'), { recursive: true })
+      await writeFile(join(fixture.tmpDir, 'packages', 'core', 'package.json'), JSON.stringify({
+        name: '@bitborough/core',
+        scripts: { typecheck: 'tsc --noEmit' }
+      }))
+      await writeFile(join(fixture.tmpDir, 'packages', 'core', 'src', 'types.ts'), 'export type X = number')
+      await execFileAsync('git', ['add', '.'], { cwd: fixture.tmpDir })
+      await execFileAsync('git', ['-c', 'user.name=Test', '-c', 'user.email=test@test.com', 'commit', '-m', 'add core'], { cwd: fixture.tmpDir })
+      await writeFile(join(fixture.tmpDir, 'packages', 'core', 'src', 'types.ts'), 'export type X = string')
+
+      const result = await runScript(fixture.env)
+      expect(result.exitCode).toBe(0)
+
+      const { readFile } = await import('node:fs/promises')
+      const calls = (await readFile(logFile, 'utf-8')).trim().split('\n')
+      expect(calls).toContainEqual(expect.stringContaining('typecheck'))
+      expect(calls.some(c => c.includes(' test'))).toBe(false)
+    } finally {
+      await fixture.cleanup()
+    }
+  })
+
+  test('checks multiple affected packages', async () => {
+    const fixture = await createTestFixture()
+    try {
+      const logFile = join(fixture.tmpDir, 'pnpm-calls.log')
+      await fixture.createMockBin('pnpm', `echo "$@" >> "${logFile}"\nexit 0`)
+
+      for (const pkg of ['engine', 'game']) {
+        await mkdir(join(fixture.tmpDir, 'packages', pkg, 'src'), { recursive: true })
+        await writeFile(join(fixture.tmpDir, 'packages', pkg, 'package.json'), JSON.stringify({
+          name: `@bitborough/${pkg}`,
+          scripts: { typecheck: 'tsc --noEmit', test: 'vitest run' }
+        }))
+        await writeFile(join(fixture.tmpDir, 'packages', pkg, 'src', 'index.ts'), 'export const x = 1')
+      }
+      await execFileAsync('git', ['add', '.'], { cwd: fixture.tmpDir })
+      await execFileAsync('git', ['-c', 'user.name=Test', '-c', 'user.email=test@test.com', 'commit', '-m', 'add packages'], { cwd: fixture.tmpDir })
+      await writeFile(join(fixture.tmpDir, 'packages', 'engine', 'src', 'index.ts'), 'export const x = 2')
+      await writeFile(join(fixture.tmpDir, 'packages', 'game', 'src', 'index.ts'), 'export const x = 2')
+
+      const result = await runScript(fixture.env)
+      expect(result.exitCode).toBe(0)
+
+      const { readFile } = await import('node:fs/promises')
+      const calls = (await readFile(logFile, 'utf-8')).trim().split('\n')
+      expect(calls).toContainEqual(expect.stringContaining('@bitborough/engine typecheck'))
+      expect(calls).toContainEqual(expect.stringContaining('@bitborough/game typecheck'))
+      expect(calls).toContainEqual(expect.stringContaining('@bitborough/engine test'))
+      expect(calls).toContainEqual(expect.stringContaining('@bitborough/game test'))
+    } finally {
+      await fixture.cleanup()
+    }
+  })
 })
