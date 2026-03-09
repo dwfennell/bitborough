@@ -109,7 +109,7 @@ export class Game {
       { label: 'Crime (C)', key: 'c', action: () => this.renderer.toggleOverlay('crime') },
       { label: 'Fire (F)', key: 'f', action: () => this.renderer.toggleOverlay('fire') },
       { label: 'Traffic (T)', key: 't', action: () => this.renderer.toggleOverlay('traffic') },
-      { label: 'Grid (D)', key: 'd', action: () => this.renderer.toggleGridLines() },
+      { label: 'Grid (X)', key: 'x', action: () => this.renderer.toggleGridLines() },
       { label: 'Export', action: () => { this.autoSave(); this.saveManager.exportToFile() } },
     ]
 
@@ -280,15 +280,15 @@ export class Game {
       this.camera.setViewport(this.canvas.width, this.canvas.height)
     }
 
-    // Keyboard panning (arrow keys)
+    // Keyboard panning (WASD + arrow keys)
     const panSpeed = 12 / (this.camera.tileSize * this.camera.zoom) * (delta / 16)
     const k = this.pressedKeys
-    if (k.has('ArrowLeft')) this.camera.pan(-panSpeed, 0)
-    if (k.has('ArrowRight')) this.camera.pan(panSpeed, 0)
-    if (k.has('ArrowUp')) this.camera.pan(0, -panSpeed)
-    if (k.has('ArrowDown')) this.camera.pan(0, panSpeed)
+    if (k.has('a') || k.has('ArrowLeft')) this.camera.pan(-panSpeed, 0)
+    if (k.has('d') || k.has('ArrowRight')) this.camera.pan(panSpeed, 0)
+    if (k.has('w') || k.has('ArrowUp')) this.camera.pan(0, -panSpeed)
+    if (k.has('s') || k.has('ArrowDown')) this.camera.pan(0, panSpeed)
     const zoomSpeed = 1.02 ** (delta / 16)
-    if (k.has('q') || k.has('w')) {
+    if (k.has('q') || k.has('e')) {
       // Zoom relative to viewport center
       const cx = this.canvas.width / 2
       const cy = this.canvas.height / 2
@@ -297,15 +297,16 @@ export class Game {
       const worldY = cy / ts + this.camera.y
 
       if (k.has('q')) this.camera.zoom /= zoomSpeed
-      if (k.has('w')) this.camera.zoom *= zoomSpeed
+      if (k.has('e')) this.camera.zoom *= zoomSpeed
       this.camera.clampZoom()
 
       const newTs = this.camera.tileSize * this.camera.zoom
       this.camera.x = worldX - cx / newTs
       this.camera.y = worldY - cy / newTs
     }
-    if (k.has('ArrowLeft') || k.has('ArrowRight') || k.has('ArrowUp') || k.has('ArrowDown') ||
-        k.has('q') || k.has('w')) {
+    if (k.has('a') || k.has('d') || k.has('w') || k.has('s') ||
+        k.has('ArrowLeft') || k.has('ArrowRight') || k.has('ArrowUp') || k.has('ArrowDown') ||
+        k.has('q') || k.has('e')) {
       this.camera.clamp()
     }
 

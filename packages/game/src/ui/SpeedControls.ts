@@ -40,10 +40,10 @@ export class SpeedControls {
         } else {
           this.setSpeed(SimSpeed.Paused, this.buttons[0]!)
         }
-      } else if (e.key === 'a') {
+      } else if (e.key === '[') {
         const idx = Math.max(0, speedOrder.indexOf(this._speed) - 1)
         this.setSpeed(speedOrder[idx]!, this.buttons[idx]!)
-      } else if (e.key === 's') {
+      } else if (e.key === ']') {
         const idx = Math.min(speedOrder.length - 1, speedOrder.indexOf(this._speed) + 1)
         this.setSpeed(speedOrder[idx]!, this.buttons[idx]!)
       }
