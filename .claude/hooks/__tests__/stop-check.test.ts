@@ -224,6 +224,80 @@ exit 0
     }
   })
 
+  test('invokes claude -p with failure context when checks fail', async () => {
+    const fixture = await createTestFixture()
+    try {
+      const claudeLogFile = join(fixture.tmpDir, 'claude-calls.log')
+
+      // pnpm typecheck fails on first call, succeeds after claude fixes
+      const callCountFile = join(fixture.tmpDir, 'pnpm-call-count')
+      await writeFile(callCountFile, '0')
+      await fixture.createMockBin('pnpm', `
+count=$(cat "${callCountFile}")
+count=$((count + 1))
+echo $count > "${callCountFile}"
+if [ $count -le 2 ] && echo "$@" | grep -q "typecheck"; then
+  echo "error TS2322: Type error" >&2
+  exit 1
+fi
+exit 0
+`)
+      // claude mock: log the prompt, exit 0
+      await fixture.createMockBin('claude', `echo "$@" >> "${claudeLogFile}"\nexit 0`)
+
+      await mkdir(join(fixture.tmpDir, 'packages', 'engine', 'src'), { recursive: true })
+      await writeFile(join(fixture.tmpDir, 'packages', 'engine', 'package.json'), JSON.stringify({
+        name: '@bitborough/engine',
+        scripts: { typecheck: 'tsc --noEmit', test: 'vitest run' }
+      }))
+      await writeFile(join(fixture.tmpDir, 'packages', 'engine', 'src', 'index.ts'), 'export const x = 1')
+      await execFileAsync('git', ['add', '.'], { cwd: fixture.tmpDir })
+      await execFileAsync('git', ['-c', 'user.name=Test', '-c', 'user.email=test@test.com', 'commit', '-m', 'add engine'], { cwd: fixture.tmpDir })
+      await writeFile(join(fixture.tmpDir, 'packages', 'engine', 'src', 'index.ts'), 'export const x = 2')
+
+      const result = await runScript(fixture.env)
+      expect(result.exitCode).toBe(0)
+
+      const { readFile } = await import('node:fs/promises')
+      const claudeCalls = await readFile(claudeLogFile, 'utf-8')
+      expect(claudeCalls).toContain('-p')
+      expect(claudeCalls).toContain('typecheck')
+    } finally {
+      await fixture.cleanup()
+    }
+  })
+
+  test('exits 2 after MAX_RETRIES when claude cannot fix', async () => {
+    const fixture = await createTestFixture()
+    try {
+      // pnpm always fails
+      await fixture.createMockBin('pnpm', `
+if echo "$@" | grep -q "typecheck"; then
+  echo "error TS2322: Unfixable error" >&2
+  exit 1
+fi
+exit 0
+`)
+      await fixture.createMockBin('claude', 'exit 0')
+
+      await mkdir(join(fixture.tmpDir, 'packages', 'engine', 'src'), { recursive: true })
+      await writeFile(join(fixture.tmpDir, 'packages', 'engine', 'package.json'), JSON.stringify({
+        name: '@bitborough/engine',
+        scripts: { typecheck: 'tsc --noEmit', test: 'vitest run' }
+      }))
+      await writeFile(join(fixture.tmpDir, 'packages', 'engine', 'src', 'index.ts'), 'export const x = 1')
+      await execFileAsync('git', ['add', '.'], { cwd: fixture.tmpDir })
+      await execFileAsync('git', ['-c', 'user.name=Test', '-c', 'user.email=test@test.com', 'commit', '-m', 'add engine'], { cwd: fixture.tmpDir })
+      await writeFile(join(fixture.tmpDir, 'packages', 'engine', 'src', 'index.ts'), 'export const x = 2')
+
+      const result = await runScript(fixture.env)
+      expect(result.exitCode).toBe(2)
+      expect(result.stderr).toContain('typecheck')
+    } finally {
+      await fixture.cleanup()
+    }
+  })
+
   test('checks multiple affected packages', async () => {
     const fixture = await createTestFixture()
     try {

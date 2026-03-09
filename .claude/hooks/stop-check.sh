@@ -68,6 +68,19 @@ if [ -z "$FAILURES" ]; then
   exit 0
 fi
 
-# Checks failed — report to stderr
-echo -e "The following checks failed:\n$FAILURES" >&2
+# Retry loop: invoke claude -p to fix, then re-check
+for attempt in $(seq 1 $MAX_RETRIES); do
+  claude -p "The following typecheck/test failures were found in this project. Fix them and verify your fix by re-running the failing commands.
+
+$FAILURES" 2>/dev/null
+
+  FAILURES=$(run_checks)
+
+  if [ -z "$FAILURES" ]; then
+    exit 0
+  fi
+done
+
+# Still failing after retries — report to main Claude via stderr
+echo -e "Checks still failing after $MAX_RETRIES fix attempts:\n$FAILURES" >&2
 exit 2
