@@ -29,6 +29,7 @@ export interface VisibleTileRange {
   mapWidth: number
   cameraX: number
   cameraY: number
+  rawTs?: number
 }
 
 export class OverlayRenderer {
@@ -37,7 +38,8 @@ export class OverlayRenderer {
   render(ctx: CanvasRenderingContext2D, state: GameState, range: VisibleTileRange): void {
     if (this.activeOverlay === 'none') return
 
-    const { ts, startX, startY, endX, endY, mapWidth, cameraX, cameraY } = range
+    const { ts, startX, startY, endX, endY, mapWidth, cameraX, cameraY, rawTs } = range
+    const posTs = rawTs ?? ts
 
     switch (this.activeOverlay) {
       case 'power': {
@@ -45,7 +47,7 @@ export class OverlayRenderer {
         for (let y = startY; y <= endY; y++) {
           for (let x = startX; x <= endX; x++) {
             ctx.fillStyle = grid[y * mapWidth + x] ? POWER_ON : POWER_OFF
-            ctx.fillRect((x - cameraX) * ts, (y - cameraY) * ts, ts, ts)
+            ctx.fillRect(Math.floor((x - cameraX) * posTs), Math.floor((y - cameraY) * posTs), ts, ts)
           }
         }
         break
@@ -56,7 +58,7 @@ export class OverlayRenderer {
         for (let y = startY; y <= endY; y++) {
           for (let x = startX; x <= endX; x++) {
             ctx.fillStyle = LAND_VALUE_COLORS[values[y * mapWidth + x]!]!
-            ctx.fillRect((x - cameraX) * ts, (y - cameraY) * ts, ts, ts)
+            ctx.fillRect(Math.floor((x - cameraX) * posTs), Math.floor((y - cameraY) * posTs), ts, ts)
           }
         }
         break
@@ -69,7 +71,7 @@ export class OverlayRenderer {
             const v = crime[y * mapWidth + x]!
             if (v === 0) continue
             ctx.fillStyle = CRIME_COLORS[v]!
-            ctx.fillRect((x - cameraX) * ts, (y - cameraY) * ts, ts, ts)
+            ctx.fillRect(Math.floor((x - cameraX) * posTs), Math.floor((y - cameraY) * posTs), ts, ts)
           }
         }
         break
@@ -86,7 +88,7 @@ export class OverlayRenderer {
             // Active fires: bright orange (check small array directly)
             if (fires.includes(idx)) {
               ctx.fillStyle = FIRE_ACTIVE
-              ctx.fillRect((x - cameraX) * ts, (y - cameraY) * ts, ts, ts)
+              ctx.fillRect(Math.floor((x - cameraX) * posTs), Math.floor((y - cameraY) * posTs), ts, ts)
               continue
             }
 
@@ -94,7 +96,7 @@ export class OverlayRenderer {
             const v = coverage[idx]!
             if (v > 0 || state.map.zones[idx] !== 0) {
               ctx.fillStyle = FIRE_COVERAGE_COLORS[v]!
-              ctx.fillRect((x - cameraX) * ts, (y - cameraY) * ts, ts, ts)
+              ctx.fillRect(Math.floor((x - cameraX) * posTs), Math.floor((y - cameraY) * posTs), ts, ts)
             }
           }
         }
@@ -112,7 +114,7 @@ export class OverlayRenderer {
             const v = traffic[idx]!
             if (v === 0) continue
             ctx.fillStyle = TRAFFIC_COLORS[v]!
-            ctx.fillRect((x - cameraX) * ts, (y - cameraY) * ts, ts, ts)
+            ctx.fillRect(Math.floor((x - cameraX) * posTs), Math.floor((y - cameraY) * posTs), ts, ts)
           }
         }
         break

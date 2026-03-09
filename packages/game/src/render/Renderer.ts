@@ -31,26 +31,29 @@ export class Renderer {
     const endX = Math.min(map.width - 1, bounds.maxX)
     const endY = Math.min(map.height - 1, bounds.maxY)
 
+    // Snap tile size up to avoid sub-pixel gaps between adjacent tiles
+    const snappedTs = Math.ceil(ts)
+
     // Single pass: terrain + zone overlays + infrastructure per tile
     for (let y = startY; y <= endY; y++) {
       for (let x = startX; x <= endX; x++) {
         const idx = y * map.width + x
-        const sx = (x - camera.x) * ts
-        const sy = (y - camera.y) * ts
+        const sx = Math.floor((x - camera.x) * ts)
+        const sy = Math.floor((y - camera.y) * ts)
 
         // Terrain
-        this.tileRenderer.drawTile(ctx, map.terrain[idx] as TileType, sx, sy, ts)
+        this.tileRenderer.drawTile(ctx, map.terrain[idx] as TileType, sx, sy, snappedTs)
 
         // Zone overlay
         const zone = map.zones[idx] as ZoneType
         if (zone !== ZoneType.None) {
-          this.tileRenderer.drawZoneOverlay(ctx, zone, sx, sy, ts)
+          this.tileRenderer.drawZoneOverlay(ctx, zone, sx, sy, snappedTs)
         }
 
         // Infrastructure
         const infra = map.infrastructure[idx]!
         if (infra !== Infrastructure.None) {
-          this.tileRenderer.drawInfrastructure(ctx, infra, map.connections[idx]!, sx, sy, ts)
+          this.tileRenderer.drawInfrastructure(ctx, infra, map.connections[idx]!, sx, sy, snappedTs)
         }
       }
     }
@@ -63,17 +66,18 @@ export class Renderer {
         building.x + def.size.w < startX || building.x > endX ||
         building.y + def.size.h < startY || building.y > endY
       ) continue
-      const sx = (building.x - camera.x) * ts
-      const sy = (building.y - camera.y) * ts
-      this.tileRenderer.drawBuilding(ctx, building, def, sx, sy, ts)
+      const sx = Math.floor((building.x - camera.x) * ts)
+      const sy = Math.floor((building.y - camera.y) * ts)
+      this.tileRenderer.drawBuilding(ctx, building, def, sx, sy, snappedTs)
     }
 
     // Overlays (power grid, land value heatmaps)
     this.overlayRenderer.render(ctx, state, {
-      ts, startX, startY, endX, endY,
+      ts: snappedTs, startX, startY, endX, endY,
       mapWidth: map.width,
       cameraX: camera.x,
       cameraY: camera.y,
+      rawTs: ts,
     })
 
     // Grid lines (batched single stroke)

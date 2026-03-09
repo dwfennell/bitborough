@@ -1,6 +1,5 @@
-import { type GameMap, type BudgetInfo, Infrastructure, MAINTENANCE } from '@bitborough/core'
+import { type GameMap, type BudgetInfo, Infrastructure, MAINTENANCE, BuildingCategory } from '@bitborough/core'
 import { BUILDING_DEFS } from '../buildings-registry.js'
-import { getZoneBuildingDef } from './zones.js'
 
 export function calculateBudget(
   map: GameMap,
@@ -59,8 +58,8 @@ export function calculateBudget(
   let totalLandValue = 0
   let developedTileCount = 0
   for (const building of map.buildings) {
-    const def = getZoneBuildingDef(building.defId)
-    if (!def) continue // skip special buildings
+    const def = BUILDING_DEFS[building.defId]
+    if (!def || def.category === BuildingCategory.Special) continue // only zone buildings
     const idx = building.y * map.width + building.x
     totalLandValue += landValues[idx]!
     developedTileCount++

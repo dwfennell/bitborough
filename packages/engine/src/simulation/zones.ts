@@ -1,58 +1,6 @@
-import { type GameMap, type DemandInfo, type Building, type BuildingDef, ZoneType, Infrastructure, DensityLevel, BuildingCategory } from '@bitborough/core'
+import { type GameMap, type DemandInfo, type Building, ZoneType, Infrastructure, DensityLevel } from '@bitborough/core'
 import { PRNG } from '../prng.js'
-
-// Zone building definitions (auto-placed by simulation, not by player)
-const ZONE_BUILDINGS: Record<string, BuildingDef> = {
-  'res.low': {
-    id: 'res.low',
-    category: BuildingCategory.Residential,
-    density: DensityLevel.Low,
-    size: { w: 1, h: 1 },
-    population: 10,
-    jobs: 0,
-    taxValue: 20,
-    pollutionRadius: 0,
-    pollutionAmount: 0,
-    powerRequired: true,
-    roadRequired: true,
-    cost: 0,
-    maintenanceCost: 0,
-  },
-  'com.low': {
-    id: 'com.low',
-    category: BuildingCategory.Commercial,
-    density: DensityLevel.Low,
-    size: { w: 1, h: 1 },
-    population: 0,
-    jobs: 5,
-    taxValue: 25,
-    pollutionRadius: 0,
-    pollutionAmount: 0,
-    powerRequired: true,
-    roadRequired: true,
-    cost: 0,
-    maintenanceCost: 0,
-  },
-  'ind.low': {
-    id: 'ind.low',
-    category: BuildingCategory.Industrial,
-    density: DensityLevel.Low,
-    size: { w: 1, h: 1 },
-    population: 0,
-    jobs: 10,
-    taxValue: 15,
-    pollutionRadius: 3,
-    pollutionAmount: 10,
-    powerRequired: true,
-    roadRequired: true,
-    cost: 0,
-    maintenanceCost: 0,
-  },
-}
-
-export function getZoneBuildingDef(defId: string): BuildingDef | undefined {
-  return ZONE_BUILDINGS[defId]
-}
+import { BUILDING_DEFS } from '../buildings-registry.js'
 
 export function updateZones(
   map: GameMap,
@@ -94,7 +42,7 @@ export function updateZones(
             age: 0,
           }
           map.buildings.push(building)
-          const def = ZONE_BUILDINGS[defId]
+          const def = BUILDING_DEFS[defId]
           if (def) {
             populationDelta += def.population
           }

@@ -269,6 +269,14 @@ export class Engine {
     this.map.buildings.push(building)
     this.funds -= def.cost
 
+    // Clear zones under the building footprint
+    for (let dy = 0; dy < def.size.h; dy++) {
+      for (let dx = 0; dx < def.size.w; dx++) {
+        const idx = (y + dy) * this.map.width + (x + dx)
+        this.map.zones[idx] = ZoneType.None
+      }
+    }
+
     return { ok: true }
   }
 

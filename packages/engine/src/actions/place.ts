@@ -24,6 +24,11 @@ export function placeTile(
     return { result: { ok: false, reason: FailReason.InvalidLocation }, cost: 0 }
   }
 
+  // Already has this infrastructure — no-op, no charge
+  if ((map.infrastructure[idx]! & infra) === infra) {
+    return { result: { ok: true }, cost: 0 }
+  }
+
   const cost = infraCost(infra)
   if (funds < cost) {
     return { result: { ok: false, reason: FailReason.InsufficientFunds }, cost: 0 }
@@ -46,6 +51,11 @@ export function placeZone(
   const idx = y * map.width + x
   if (map.terrain[idx] === TileType.Water) {
     return { ok: false, reason: FailReason.NotZonable }
+  }
+
+  // Already this zone — no-op
+  if (map.zones[idx] === zone) {
+    return { ok: true }
   }
 
   map.zones[idx] = zone

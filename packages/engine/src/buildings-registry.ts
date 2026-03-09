@@ -1,6 +1,54 @@
 import { type BuildingDef, BuildingCategory, DensityLevel } from '@bitborough/core'
 
 export const BUILDING_DEFS: Record<string, BuildingDef> = {
+  // Zone buildings (auto-placed by simulation)
+  'res.low': {
+    id: 'res.low',
+    category: BuildingCategory.Residential,
+    density: DensityLevel.Low,
+    size: { w: 1, h: 1 },
+    population: 10,
+    jobs: 0,
+    taxValue: 20,
+    pollutionRadius: 0,
+    pollutionAmount: 0,
+    powerRequired: true,
+    roadRequired: true,
+    cost: 0,
+    maintenanceCost: 0,
+  },
+  'com.low': {
+    id: 'com.low',
+    category: BuildingCategory.Commercial,
+    density: DensityLevel.Low,
+    size: { w: 1, h: 1 },
+    population: 0,
+    jobs: 5,
+    taxValue: 25,
+    pollutionRadius: 0,
+    pollutionAmount: 0,
+    powerRequired: true,
+    roadRequired: true,
+    cost: 0,
+    maintenanceCost: 0,
+  },
+  'ind.low': {
+    id: 'ind.low',
+    category: BuildingCategory.Industrial,
+    density: DensityLevel.Low,
+    size: { w: 1, h: 1 },
+    population: 0,
+    jobs: 10,
+    taxValue: 15,
+    pollutionRadius: 3,
+    pollutionAmount: 10,
+    powerRequired: true,
+    roadRequired: true,
+    cost: 0,
+    maintenanceCost: 0,
+  },
+
+  // Player-placed buildings
   'power.coal': {
     id: 'power.coal',
     category: BuildingCategory.Special,
