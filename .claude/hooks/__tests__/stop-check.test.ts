@@ -77,4 +77,36 @@ describe('stop-check.sh', () => {
       await fixture.cleanup()
     }
   })
+
+  test('exits 0 when only non-TS files changed', async () => {
+    const fixture = await createTestFixture()
+    try {
+      // Create and commit a file, then modify it (so git diff HEAD shows changes)
+      await writeFile(join(fixture.tmpDir, 'README.md'), 'hello')
+      await execFileAsync('git', ['add', 'README.md'], { cwd: fixture.tmpDir })
+      await execFileAsync('git', ['-c', 'user.name=Test', '-c', 'user.email=test@test.com', 'commit', '-m', 'add readme'], { cwd: fixture.tmpDir })
+      await writeFile(join(fixture.tmpDir, 'README.md'), 'changed')
+
+      const result = await runScript(fixture.env)
+      expect(result.exitCode).toBe(0)
+    } finally {
+      await fixture.cleanup()
+    }
+  })
+
+  test('exits 0 when TS files changed outside packages/', async () => {
+    const fixture = await createTestFixture()
+    try {
+      // Create a TS file at root (not in packages/)
+      await writeFile(join(fixture.tmpDir, 'config.ts'), 'export const x = 1')
+      await execFileAsync('git', ['add', 'config.ts'], { cwd: fixture.tmpDir })
+      await execFileAsync('git', ['-c', 'user.name=Test', '-c', 'user.email=test@test.com', 'commit', '-m', 'add config'], { cwd: fixture.tmpDir })
+      await writeFile(join(fixture.tmpDir, 'config.ts'), 'export const x = 2')
+
+      const result = await runScript(fixture.env)
+      expect(result.exitCode).toBe(0)
+    } finally {
+      await fixture.cleanup()
+    }
+  })
 })

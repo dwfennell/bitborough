@@ -15,3 +15,11 @@ TS_FILES=$(echo "$CHANGED_FILES" | grep -E '\.(tsx?)$' || true)
 if [ -z "$TS_FILES" ]; then
   exit 0
 fi
+
+# Extract unique package names from paths like packages/<name>/...
+PACKAGES=$(echo "$TS_FILES" | grep -oE '^packages/[^/]+' | sed 's|^packages/||' | sort -u || true)
+
+# No packages affected — nothing to check
+if [ -z "$PACKAGES" ]; then
+  exit 0
+fi
