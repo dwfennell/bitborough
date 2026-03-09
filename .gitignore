@@ -1,6 +1,8 @@
 .worktrees/
 .claude/**
 !.claude/settings.json
+!.claude/hooks/
+!.claude/hooks/**
 node_modules/
 dist/
 *.tsbuildinfo
