@@ -87,9 +87,20 @@ export class InputManager {
 
   private onWheel(e: WheelEvent): void {
     e.preventDefault()
-    const zoomDelta = e.deltaY > 0 ? 0.9 : 1.1
+    const zoomDelta = e.deltaY > 0 ? 0.96 : 1.04
+
+    // World-space point under cursor before zoom
+    const ts = this.camera.tileSize * this.camera.zoom
+    const worldX = e.clientX / ts + this.camera.x
+    const worldY = e.clientY / ts + this.camera.y
+
     this.camera.zoom *= zoomDelta
     this.camera.clampZoom()
+
+    // Adjust camera so the same world point stays under cursor
+    const newTs = this.camera.tileSize * this.camera.zoom
+    this.camera.x = worldX - e.clientX / newTs
+    this.camera.y = worldY - e.clientY / newTs
     this.camera.clamp()
   }
 

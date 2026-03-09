@@ -138,6 +138,9 @@ export class ColorTileRenderer implements TileRenderer {
     if (spritePath) {
       const img = this.sprites.get(spritePath)
       if (img) {
+        // Opaque background so terrain doesn't bleed through semi-transparent SVG elements
+        ctx.fillStyle = '#e8dcc8'
+        ctx.fillRect(screenX, screenY, w, h)
         ctx.drawImage(img, screenX, screenY, w, h)
         return
       }

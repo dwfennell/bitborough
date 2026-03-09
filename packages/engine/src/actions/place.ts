@@ -35,6 +35,12 @@ export function placeTile(
   }
 
   map.infrastructure[idx]! |= infra
+
+  // Infrastructure replaces zones — roads/power lines over zoned tiles clear the zone
+  if (map.zones[idx] !== ZoneType.None) {
+    map.zones[idx] = ZoneType.None
+  }
+
   return { result: { ok: true }, cost }
 }
 

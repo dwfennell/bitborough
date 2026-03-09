@@ -98,6 +98,32 @@ describe('Duplicate placement', () => {
   })
 })
 
+describe('Infrastructure clears zones', () => {
+  test('placing road on zoned tile clears the zone', () => {
+    const engine = Engine.create(createTestMap(32))
+    engine.placeZone(5, 5, ZoneType.Residential)
+    expect(engine.getTile(5, 5).zone).toBe(ZoneType.Residential)
+
+    engine.placeTile(5, 5, Infrastructure.Road)
+    expect(engine.getTile(5, 5).zone).toBe(ZoneType.None)
+  })
+
+  test('placing power line on zoned tile clears the zone', () => {
+    const engine = Engine.create(createTestMap(32))
+    engine.placeZone(5, 5, ZoneType.Commercial)
+    expect(engine.getTile(5, 5).zone).toBe(ZoneType.Commercial)
+
+    engine.placeTile(5, 5, Infrastructure.PowerLine)
+    expect(engine.getTile(5, 5).zone).toBe(ZoneType.None)
+  })
+
+  test('placing road on unzoned tile leaves zone as None', () => {
+    const engine = Engine.create(createTestMap(32))
+    engine.placeTile(5, 5, Infrastructure.Road)
+    expect(engine.getTile(5, 5).zone).toBe(ZoneType.None)
+  })
+})
+
 describe('Building placement', () => {
   test('placing building on zone clears the zone', () => {
     const engine = Engine.create(createTestMap(32))

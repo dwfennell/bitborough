@@ -288,9 +288,22 @@ export class Game {
     if (k.has('ArrowUp')) this.camera.pan(0, -panSpeed)
     if (k.has('ArrowDown')) this.camera.pan(0, panSpeed)
     const zoomSpeed = 1.02 ** (delta / 16)
-    if (k.has('q')) this.camera.zoom /= zoomSpeed
-    if (k.has('w')) this.camera.zoom *= zoomSpeed
-    if (k.has('q') || k.has('w')) this.camera.clampZoom()
+    if (k.has('q') || k.has('w')) {
+      // Zoom relative to viewport center
+      const cx = this.canvas.width / 2
+      const cy = this.canvas.height / 2
+      const ts = this.camera.tileSize * this.camera.zoom
+      const worldX = cx / ts + this.camera.x
+      const worldY = cy / ts + this.camera.y
+
+      if (k.has('q')) this.camera.zoom /= zoomSpeed
+      if (k.has('w')) this.camera.zoom *= zoomSpeed
+      this.camera.clampZoom()
+
+      const newTs = this.camera.tileSize * this.camera.zoom
+      this.camera.x = worldX - cx / newTs
+      this.camera.y = worldY - cy / newTs
+    }
     if (k.has('ArrowLeft') || k.has('ArrowRight') || k.has('ArrowUp') || k.has('ArrowDown') ||
         k.has('q') || k.has('w')) {
       this.camera.clamp()

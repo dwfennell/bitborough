@@ -29,14 +29,19 @@ export class QueryPanel {
     this.el.classList.remove('hidden')
     const desc = describeTile(tile, x, y, state)
 
-    this.bodyEl.innerHTML = `
+    let html = `
       <div class="query-line"><span>Position</span><span>(${desc.position.x}, ${desc.position.y})</span></div>
       <div class="query-line"><span>Terrain</span><span>${desc.terrain}</span></div>
       <div class="query-line"><span>Zone</span><span>${desc.zone}</span></div>
       <div class="query-line"><span>Infrastructure</span><span>${desc.infrastructure.join(', ') || 'None'}</span></div>
+      <div class="query-line"><span>Building</span><span>${desc.building ?? 'None'}</span></div>
       <div class="query-line"><span>Powered</span><span>${desc.powered ? 'Yes' : 'No'}</span></div>
       <div class="query-line"><span>Land Value</span><span>${desc.landValue}</span></div>
-    `
+      <div class="query-line"><span>Crime</span><span>${desc.crime}</span></div>
+      <div class="query-line"><span>Fire Coverage</span><span>${Math.round(desc.fireCoverage / 255 * 100)}%</span></div>`
+    if (desc.onFire) html += `<div class="query-line"><span>Status</span><span style="color:#ff6600">ON FIRE</span></div>`
+    if (desc.traffic > 0) html += `<div class="query-line"><span>Traffic</span><span>${desc.traffic}%</span></div>`
+    this.bodyEl.innerHTML = html
   }
 
   hide(): void {

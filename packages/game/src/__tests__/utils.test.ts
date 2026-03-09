@@ -43,9 +43,14 @@ describe('describeInfrastructure', () => {
 // ---------------------------------------------------------------------------
 describe('describeTile', () => {
   function makeState(width: number, landValues: number[]): GameState {
+    const size = landValues.length
     return {
-      map: { width, height: 1, terrain: new Uint8Array(), zones: new Uint8Array(), buildings: [] },
+      map: { width, height: 1, terrain: new Uint8Array(size), zones: new Uint8Array(size), buildings: [], infrastructure: new Uint8Array(size) },
       landValues,
+      crimeLevel: new Uint8Array(size),
+      fireCoverage: new Uint8Array(size),
+      activeFires: [],
+      trafficDensity: new Uint8Array(size),
     } as unknown as GameState
   }
 

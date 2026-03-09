@@ -43,9 +43,11 @@ export function updateFires(
     const newRemaining = remaining - 1 - ticksToExtinguish
 
     if (newRemaining <= 0) {
-      // Fire burns out — destroy zone
+      // Fire burns out — destroy zone and any building on it
       fireState.activeFires.delete(idx)
       map.zones[idx] = 0
+      const bIdx = map.buildings.findIndex(b => b.x === idx % width && b.y === Math.floor(idx / width))
+      if (bIdx !== -1) map.buildings.splice(bIdx, 1)
     } else {
       fireState.activeFires.set(idx, newRemaining)
 
