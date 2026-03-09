@@ -501,6 +501,48 @@ html, body {
   white-space: nowrap;
 }
 
+.docs-formula {
+  background: rgba(92, 156, 230, 0.08);
+  border-left: 3px solid rgba(92, 156, 230, 0.4);
+  padding: 6px 10px;
+  margin: 8px 0;
+  font-size: 13px;
+}
+
+.docs-formula code {
+  color: #7fb8f0;
+  font-family: 'SF Mono', 'Consolas', monospace;
+  font-size: 12px;
+}
+
+.docs-ref-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 8px;
+  font-size: 11px;
+}
+
+.docs-ref-table th {
+  font-size: 11px;
+  text-align: left;
+  padding: 4px 6px;
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+  color: rgba(224, 224, 224, 0.7);
+}
+
+.docs-ref-table td {
+  padding: 4px 6px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  white-space: nowrap;
+}
+
+.docs-ref-sprite img {
+  height: 40px;
+  width: auto;
+  display: block;
+  image-rendering: pixelated;
+}
+
 /* Escape Menu */
 #escape-menu {
   position: absolute;
