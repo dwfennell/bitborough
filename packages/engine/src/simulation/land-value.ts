@@ -18,7 +18,8 @@ export function calculateLandValues(
         continue
       }
 
-      let value = 0
+      // Base land value for all non-water tiles
+      let value = 10
 
       // Terrain bonus: water adjacency
       value += waterAdjacencyBonus(map, x, y) // +15 per adjacent water tile
@@ -28,7 +29,7 @@ export function calculateLandValues(
 
       // Road access bonus
       if (hasNearbyRoad(map, x, y, 3)) {
-        value += 5
+        value += 10
       }
 
       // Pollution penalty (negative)

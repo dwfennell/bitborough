@@ -10,7 +10,7 @@ Features to faithfully replicate before expanding.
 Zone mechanics:
 - Place zone, it develops automatically if conditions are met
 - Density increases over time (small houses → apartments)
-- Zones need road access and power to develop
+- Zones need road access (within 3 tiles, Manhattan distance) and power to develop
 - Land value affects development quality
 
 ## Infrastructure

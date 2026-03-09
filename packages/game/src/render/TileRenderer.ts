@@ -42,6 +42,7 @@ export interface TileRenderer {
 }
 
 const BUILDING_COLORS: Record<string, string> = {
+  'power.diesel': '#8d6e63',
   'power.coal': '#555',
   'power.nuclear': '#7e57c2',
   'service.police': '#1565c0',
@@ -54,6 +55,7 @@ const BUILDING_SPRITES: Record<string, string> = {
   'res.low': '/tiles/buildings/residential-small.svg',
   'com.low': '/tiles/buildings/commercial-small.svg',
   'ind.low': '/tiles/buildings/industrial-small.svg',
+  'power.diesel': '/tiles/power/diesel-generator.svg',
   'power.coal': '/tiles/power/power-plant-coal.svg',
   'power.nuclear': '/tiles/power/power-plant-nuclear.svg',
   'service.police': '/tiles/buildings/service/police-station.svg',

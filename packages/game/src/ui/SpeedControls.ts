@@ -1,13 +1,25 @@
 import { SimSpeed } from '@bitborough/core'
 
+const SPEED_KEY = 'bitborough-speed'
+
+function loadSpeed(): SimSpeed {
+  const stored = localStorage.getItem(SPEED_KEY)
+  if (stored !== null) {
+    const val = Number(stored)
+    if (val >= SimSpeed.Paused && val <= SimSpeed.Fast) return val as SimSpeed
+  }
+  return SimSpeed.Normal
+}
+
 export class SpeedControls {
   private el: HTMLElement
   private buttons: HTMLButtonElement[] = []
-  private _speed: SimSpeed = SimSpeed.Normal
+  private _speed: SimSpeed
   private onChange: (speed: SimSpeed) => void
 
   constructor(container: HTMLElement, onChange: (speed: SimSpeed) => void) {
     this.onChange = onChange
+    this._speed = loadSpeed()
     this.el = document.createElement('div')
     this.el.id = 'speed-controls'
 
@@ -26,6 +38,9 @@ export class SpeedControls {
       this.buttons.push(btn)
       if (s.speed === this._speed) btn.classList.add('active')
     }
+
+    // Notify the game of the restored speed
+    onChange(this._speed)
 
     container.appendChild(this.el)
 
@@ -52,6 +67,7 @@ export class SpeedControls {
 
   private setSpeed(speed: SimSpeed, btn: HTMLButtonElement): void {
     this._speed = speed
+    localStorage.setItem(SPEED_KEY, String(speed))
     this.buttons.forEach(b => b.classList.remove('active'))
     btn.classList.add('active')
     this.onChange(speed)

@@ -68,7 +68,7 @@ export function updateFires(
         if (map.zones[nIdx] === 0) continue
 
         const nCoverage = fireCoverage[nIdx]! / 255
-        const spreadChance = 0.3 * (1.0 - nCoverage * 0.7)
+        const spreadChance = 0.15 * (1.0 - nCoverage * 0.7)
         if (prng.next() < spreadChance) {
           fireState.activeFires.set(nIdx, prng.nextInt(3, 5))
         }
@@ -81,7 +81,7 @@ export function updateFires(
     if (map.zones[i] === 0) continue
     if (fireState.activeFires.has(i)) continue
 
-    const baseRisk = 0.003
+    const baseRisk = 0.001
     const coverage = fireCoverage[i]! / 255
     const effectiveRisk = baseRisk * (1.0 - coverage * 0.9)
 

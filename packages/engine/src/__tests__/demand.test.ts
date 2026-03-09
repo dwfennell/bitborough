@@ -72,8 +72,8 @@ describe('Zone demand', () => {
   test('commercial demand caps at reasonable level', () => {
     const map = createTestMap(32)
     const demand = calculateDemand(map, 100_000, 0.07)
-    // cBase = min(100000/500, 0.5) = 0.5; taxModifier = 1.0
-    expect(demand.commercial).toBe(0.5)
+    // cBase = min(100000/200, 0.6) = 0.6; taxModifier = 1.0
+    expect(demand.commercial).toBe(0.6)
   })
 
   test('industrial demand is less sensitive to tax than residential', () => {

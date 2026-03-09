@@ -49,6 +49,21 @@ export const BUILDING_DEFS: Record<string, BuildingDef> = {
   },
 
   // Player-placed buildings
+  'power.diesel': {
+    id: 'power.diesel',
+    category: BuildingCategory.Special,
+    density: DensityLevel.Low,
+    size: { w: 2, h: 2 },
+    population: 0,
+    jobs: 0,
+    taxValue: 0,
+    pollutionRadius: 2,
+    pollutionAmount: 5,
+    powerRequired: false,
+    roadRequired: false,
+    cost: 300,
+    maintenanceCost: 15,
+  },
   'power.coal': {
     id: 'power.coal',
     category: BuildingCategory.Special,
@@ -61,8 +76,8 @@ export const BUILDING_DEFS: Record<string, BuildingDef> = {
     pollutionAmount: 20,
     powerRequired: false,
     roadRequired: false,
-    cost: 3000,
-    maintenanceCost: 120,
+    cost: 2000,
+    maintenanceCost: 60,
   },
   'power.nuclear': {
     id: 'power.nuclear',
@@ -77,7 +92,7 @@ export const BUILDING_DEFS: Record<string, BuildingDef> = {
     powerRequired: false,
     roadRequired: false,
     cost: 5000,
-    maintenanceCost: 250,
+    maintenanceCost: 100,
   },
   'service.police': {
     id: 'service.police',
@@ -91,8 +106,8 @@ export const BUILDING_DEFS: Record<string, BuildingDef> = {
     pollutionAmount: 0,
     powerRequired: true,
     roadRequired: true,
-    cost: 500,
-    maintenanceCost: 100,
+    cost: 300,
+    maintenanceCost: 50,
   },
   'service.fire': {
     id: 'service.fire',
@@ -106,8 +121,8 @@ export const BUILDING_DEFS: Record<string, BuildingDef> = {
     pollutionAmount: 0,
     powerRequired: true,
     roadRequired: true,
-    cost: 500,
-    maintenanceCost: 100,
+    cost: 300,
+    maintenanceCost: 50,
   },
   'special.park': {
     id: 'special.park',

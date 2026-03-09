@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- Building shadow -->
+  <rect x="32" y="40" width="64" height="60" rx="2" fill="#000000" opacity="0.1" transform="translate(3, 3)"/>
+
+  <!-- Lot ground (industrial concrete) -->
+  <rect x="8" y="8" width="112" height="112" rx="3" fill="#b8b8a8"/>
+
+  <!-- Base mounting plate (darker concrete pad) -->
+  <rect x="28" y="52" width="72" height="50" rx="2" fill="#9a9a8a" opacity="0.6"/>
+  <rect x="30" y="54" width="68" height="46" rx="1.5" fill="#a8a898"/>
+
+  <!-- Main engine block (boxy, central) -->
+  <rect x="40" y="48" width="48" height="38" rx="2" fill="#6a6a5a"/>
+  <rect x="42" y="50" width="44" height="34" rx="1.5" fill="#7a7a6a"/>
+
+  <!-- Engine ribbing/cooling fins (horizontal lines) -->
+  <g stroke="#5a5a4a" stroke-width="0.8" opacity="0.4">
+    <line x1="42" y1="58" x2="86" y2="58"/>
+    <line x1="42" y1="66" x2="86" y2="66"/>
+    <line x1="42" y1="74" x2="86" y2="74"/>
+  </g>
+
+  <!-- Engine block detail shading -->
+  <rect x="42" y="50" width="44" height="3" rx="0.5" fill="#8a8a7a" opacity="0.3"/>
+
+  <!-- Fuel cap/maintenance access (circular) -->
+  <circle cx="55" cy="60" r="3.5" fill="#585848"/>
+  <circle cx="55" cy="60" r="2.5" fill="#707060" opacity="0.6"/>
+
+  <!-- Exhaust manifold connection (right side) -->
+  <rect x="84" y="62" width="6" height="10" rx="1" fill="#6a6a5a"/>
+  <rect x="85" y="61" width="5" height="2" rx="0.5" fill="#8a8a7a" opacity="0.4"/>
+
+  <!-- Exhaust pipe (angled upward) -->
+  <rect x="88" y="35" width="5" height="30" rx="2" fill="#5a4a3a"/>
+  <rect x="88.5" y="34" width="4" height="4" rx="1" fill="#6a5a4a"/>
+  <!-- Pipe heat marks -->
+  <rect x="87" y="40" width="7" height="1" rx="0.5" fill="#b8905a" opacity="0.4"/>
+  <rect x="87" y="48" width="7" height="1" rx="0.5" fill="#b8905a" opacity="0.3"/>
+
+  <!-- Exhaust outlet (top of pipe, angled) -->
+  <rect x="89" y="30" width="3" height="5" rx="0.5" fill="#4a3a2a" transform="rotate(-15 90.5 32.5)"/>
+  <!-- Smoke wisp -->
+  <path d="M91 28 Q94 22 91 16 Q88 12 92 8" fill="none" stroke="#d0d0c8" stroke-width="1.5" stroke-linecap="round" opacity="0.2"/>
+  <path d="M92 26 Q95 20 92 14 Q89 10 93 6" fill="none" stroke="#d0d0c8" stroke-width="1" stroke-linecap="round" opacity="0.12"/>
+
+  <!-- Engine mounting bolts (corner accent details) -->
+  <circle cx="42" cy="50" r="1.2" fill="#707060" opacity="0.5"/>
+  <circle cx="86" cy="50" r="1.2" fill="#707060" opacity="0.5"/>
+  <circle cx="42" cy="82" r="1.2" fill="#707060" opacity="0.5"/>
+  <circle cx="86" cy="82" r="1.2" fill="#707060" opacity="0.5"/>
+
+  <!-- Control panel/access door (left side) -->
+  <rect x="32" y="65" width="8" height="12" rx="1" fill="#585848" opacity="0.6"/>
+  <rect x="33" y="67" width="3" height="3" rx="0.4" fill="#909080" opacity="0.4"/>
+  <rect x="37" y="67" width="3" height="3" rx="0.4" fill="#909080" opacity="0.4"/>
+  <rect x="33" y="72" width="3" height="3" rx="0.4" fill="#909080" opacity="0.4"/>
+  <rect x="37" y="72" width="3" height="3" rx="0.4" fill="#909080" opacity="0.4"/>
+
+  <!-- Warning stripe accent (industrial yellow/brown) -->
+  <rect x="40" y="82" width="48" height="2" rx="0.5" fill="#c8a060" opacity="0.5"/>
+
+  <!-- Fuel tank indicator (round gauge on right) -->
+  <circle cx="91" cy="75" r="3" fill="#585848" opacity="0.5"/>
+  <circle cx="91" cy="75" r="2" fill="#707060" opacity="0.4"/>
+  <circle cx="91" cy="75" r="1" fill="#909080" opacity="0.3"/>
+
+  <!-- Ground stain/oil mark detail -->
+  <ellipse cx="64" cy="108" rx="12" ry="4" fill="#8a7a5a" opacity="0.12"/>
+
+  <!-- Subtle rust weathering on engine block -->
+  <rect x="50" y="70" width="20" height="1" rx="0.5" fill="#a8805a" opacity="0.15"/>
+  <rect x="52" y="58" width="8" height="1" rx="0.5" fill="#a8805a" opacity="0.12"/>
+</svg>

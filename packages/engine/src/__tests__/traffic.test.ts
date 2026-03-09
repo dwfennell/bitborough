@@ -100,7 +100,6 @@ describe('Traffic system', () => {
     // Single road at y=4 (already placed by setupCity)
     for (let x = 5; x < 10; x++) {
       engine1.placeZone(x, 5, ZoneType.Residential)
-      engine1.placeZone(x, 6, ZoneType.Residential)
     }
     for (let x = 20; x < 25; x++) {
       engine1.placeZone(x, 5, ZoneType.Commercial)
@@ -111,11 +110,10 @@ describe('Traffic system', () => {
     // Second engine with parallel road
     const engine2 = Engine.create(createTestMap(32), { startingFunds: 100_000, seed: 42 })
     setupCity(engine2, 32)
-    // Add parallel road at y=6
-    for (let x = 0; x < 32; x++) engine2.placeTile(x, 6, Infrastructure.Road)
+    // Add parallel road at y=10 (far enough that zones sit between roads)
+    for (let x = 0; x < 32; x++) engine2.placeTile(x, 10, Infrastructure.Road)
     for (let x = 5; x < 10; x++) {
       engine2.placeZone(x, 5, ZoneType.Residential)
-      engine2.placeZone(x, 7, ZoneType.Residential)
     }
     for (let x = 20; x < 25; x++) {
       engine2.placeZone(x, 5, ZoneType.Commercial)

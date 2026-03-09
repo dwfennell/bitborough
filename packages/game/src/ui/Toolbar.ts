@@ -1,4 +1,5 @@
-import { ZoneType, Infrastructure } from '@bitborough/core'
+import { ZoneType, Infrastructure, COSTS } from '@bitborough/core'
+import { BUILDING_DEFS } from '@bitborough/engine'
 import { ToolManager } from '../tools/ToolManager.js'
 import { InfrastructureTool } from '../tools/InfrastructureTool.js'
 import { ZoneTool } from '../tools/ZoneTool.js'
@@ -6,6 +7,10 @@ import { BulldozeTool } from '../tools/BulldozeTool.js'
 import { BuildingTool } from '../tools/BuildingTool.js'
 import { QueryTool } from '../tools/QueryTool.js'
 import type { Tool } from '../tools/Tool.js'
+
+function fmtCost(cost: number): string {
+  return cost >= 1000 ? `$${cost / 1000}k` : `$${cost}`
+}
 
 interface ToolEntry {
   label: string
@@ -15,20 +20,22 @@ interface ToolEntry {
 
 const TOOL_ENTRIES: ToolEntry[] = [
   // Infrastructure
-  { label: 'Road $10', key: '1', factory: () => new InfrastructureTool('Road', Infrastructure.Road, 'rgba(85,85,85,0.5)') },
-  { label: 'Power $5', key: '2', factory: () => new InfrastructureTool('Power Line', Infrastructure.PowerLine, 'rgba(255,193,7,0.5)') },
+  { label: `Road ${fmtCost(COSTS.road)}`, key: '1', factory: () => new InfrastructureTool('Road', Infrastructure.Road, 'rgba(85,85,85,0.5)') },
+  { label: `Power ${fmtCost(COSTS.powerLine)}`, key: '2', factory: () => new InfrastructureTool('Power Line', Infrastructure.PowerLine, 'rgba(255,193,7,0.5)') },
   // Zones (free)
   { label: 'Zone R', key: '3', factory: () => new ZoneTool(ZoneType.Residential) },
   { label: 'Zone C', key: '4', factory: () => new ZoneTool(ZoneType.Commercial) },
   { label: 'Zone I', key: '5', factory: () => new ZoneTool(ZoneType.Industrial) },
-  // Buildings
-  { label: 'Coal $3k', key: '6', factory: () => new BuildingTool('power.coal') },
-  { label: 'Nuclear $5k', key: '7', factory: () => new BuildingTool('power.nuclear') },
-  { label: 'Police $500', key: '8', factory: () => new BuildingTool('service.police') },
-  { label: 'Fire $500', key: '9', factory: () => new BuildingTool('service.fire') },
-  { label: 'Park $10', key: '0', factory: () => new BuildingTool('special.park') },
+  // Power
+  { label: `Diesel ${fmtCost(BUILDING_DEFS['power.diesel']!.cost)}`, key: '6', factory: () => new BuildingTool('power.diesel') },
+  { label: `Coal ${fmtCost(BUILDING_DEFS['power.coal']!.cost)}`, key: '7', factory: () => new BuildingTool('power.coal') },
+  { label: `Nuclear ${fmtCost(BUILDING_DEFS['power.nuclear']!.cost)}`, key: '8', factory: () => new BuildingTool('power.nuclear') },
+  // Services
+  { label: `Police ${fmtCost(BUILDING_DEFS['service.police']!.cost)}`, key: '9', factory: () => new BuildingTool('service.police') },
+  { label: `Fire ${fmtCost(BUILDING_DEFS['service.fire']!.cost)}`, key: '0', factory: () => new BuildingTool('service.fire') },
+  { label: `Park ${fmtCost(BUILDING_DEFS['special.park']!.cost)}`, key: 'n', factory: () => new BuildingTool('special.park') },
   // Utility
-  { label: 'Bulldoze $1', key: '-', factory: () => new BulldozeTool() },
+  { label: `Bulldoze ${fmtCost(COSTS.bulldoze)}`, key: '-', factory: () => new BulldozeTool() },
   { label: 'Query', key: '=', factory: () => new QueryTool() },
 ]
 

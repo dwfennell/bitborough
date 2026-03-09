@@ -20,7 +20,7 @@ export function calculateBudget(
     if (infra & Infrastructure.Rail) railCount++
   }
 
-  // Count building maintenance
+  // Count building maintenance from building defs (single source of truth)
   let powerPlantMaintenance = 0
   let policeStationCount = 0
   let fireStationCount = 0
@@ -28,8 +28,7 @@ export function calculateBudget(
   for (const building of map.buildings) {
     const def = BUILDING_DEFS[building.defId]
     if (!def) continue
-    if (building.defId === 'power.coal') powerPlantMaintenance += MAINTENANCE.coalPlant
-    if (building.defId === 'power.nuclear') powerPlantMaintenance += MAINTENANCE.nuclearPlant
+    if (building.defId.startsWith('power.')) powerPlantMaintenance += def.maintenanceCost
     if (building.defId === 'service.police') policeStationCount++
     if (building.defId === 'service.fire') fireStationCount++
   }
@@ -66,7 +65,7 @@ export function calculateBudget(
   }
 
   const avgLandValue = developedTileCount > 0 ? totalLandValue / developedTileCount : 0
-  const taxIncome = population * avgLandValue / 120 * taxRate
+  const taxIncome = population * avgLandValue / 20 * taxRate
 
   const balance = taxIncome - maintenanceCosts.total - serviceCosts.total
 

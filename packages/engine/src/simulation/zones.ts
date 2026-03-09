@@ -19,7 +19,7 @@ export function updateZones(
       if (zone === ZoneType.None) continue
 
       const powered = powerGrid[idx] !== 0
-      const hasRoad = hasAdjacentRoad(map, x, y)
+      const hasRoad = hasNearbyRoad(map, x, y)
       const hasBuilding = map.buildings.some(b => b.x === x && b.y === y)
 
       // Development: zone is empty, powered, has road, and demand is positive
@@ -29,7 +29,7 @@ export function updateZones(
 
         // Development probability based on demand
         // baseProbability = 0.05 (5% chance per month per tile)
-        const probability = 0.05 * zoneDemand
+        const probability = 0.12 * zoneDemand
         if (prng.next() < probability) {
           const defId = getZoneBuildingDefId(zone)
           const building: Building = {
@@ -54,14 +54,18 @@ export function updateZones(
   return { populationDelta }
 }
 
-function hasAdjacentRoad(map: GameMap, x: number, y: number): boolean {
-  const dirs = [[0, -1], [1, 0], [0, 1], [-1, 0]]
-  for (const [dx, dy] of dirs) {
-    const nx = x + dx!
-    const ny = y + dy!
-    if (nx < 0 || ny < 0 || nx >= map.width || ny >= map.height) continue
-    const nIdx = ny * map.width + nx
-    if (map.infrastructure[nIdx]! & Infrastructure.Road) return true
+/** Zone develops if a road exists within 3 tiles (Manhattan distance), per SC2K rules. */
+function hasNearbyRoad(map: GameMap, x: number, y: number): boolean {
+  const range = 3
+  for (let dy = -range; dy <= range; dy++) {
+    for (let dx = -range; dx <= range; dx++) {
+      if (Math.abs(dx) + Math.abs(dy) > range) continue
+      const nx = x + dx
+      const ny = y + dy
+      if (nx < 0 || ny < 0 || nx >= map.width || ny >= map.height) continue
+      const nIdx = ny * map.width + nx
+      if (map.infrastructure[nIdx]! & Infrastructure.Road) return true
+    }
   }
   return false
 }

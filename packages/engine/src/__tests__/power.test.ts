@@ -171,7 +171,7 @@ describe('placeBuilding', () => {
     const engine = Engine.create(createTestMap(32), { startingFunds: 50_000 })
     const fundsBefore = engine.getState().funds
     engine.placeBuilding(0, 0, 'power.coal')
-    expect(engine.getState().funds).toBe(fundsBefore - 3000)
+    expect(engine.getState().funds).toBe(fundsBefore - 2000)
   })
 
   test('placeBuilding fails with insufficient funds', () => {

@@ -27,15 +27,15 @@ export function calculateDemand(
   const taxModifier = 1.0 - ((taxRate - 0.07) * 5.0)
 
   // Residential demand:
-  const rBase = 0.5
+  const rBase = 0.7
   let rDemand = rBase * taxModifier
 
   // Commercial demand:
-  const cBase = population > 0 ? Math.min(population / 500, 0.5) : 0
+  const cBase = population > 0 ? Math.min(population / 200, 0.6) : 0
   let cDemand = cBase * taxModifier
 
   // Industrial demand:
-  const iBase = 0.3
+  const iBase = 0.4
   let iDemand = iBase * (taxModifier * 0.5 + 0.5)
 
   // Congestion suppression: high average road congestion reduces demand

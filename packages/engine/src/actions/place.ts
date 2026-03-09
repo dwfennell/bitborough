@@ -7,6 +7,7 @@ import {
   FailReason,
   COSTS,
 } from '@bitborough/core'
+import { BUILDING_DEFS } from '../buildings-registry.js'
 
 export function placeTile(
   map: GameMap,
@@ -27,6 +28,11 @@ export function placeTile(
   // Already has this infrastructure — no-op, no charge
   if ((map.infrastructure[idx]! & infra) === infra) {
     return { result: { ok: true }, cost: 0 }
+  }
+
+  // Cannot place infrastructure on a building footprint
+  if (hasBuildingAt(map, x, y)) {
+    return { result: { ok: false, reason: FailReason.Occupied }, cost: 0 }
   }
 
   const cost = infraCost(infra)
@@ -64,12 +70,31 @@ export function placeZone(
     return { ok: true }
   }
 
+  // Cannot zone on infrastructure or building footprints
+  if (map.infrastructure[idx] !== 0) {
+    return { ok: false, reason: FailReason.Occupied }
+  }
+  if (hasBuildingAt(map, x, y)) {
+    return { ok: false, reason: FailReason.Occupied }
+  }
+
   map.zones[idx] = zone
   return { ok: true }
 }
 
 function inBounds(map: GameMap, x: number, y: number): boolean {
   return x >= 0 && y >= 0 && x < map.width && y < map.height
+}
+
+function hasBuildingAt(map: GameMap, x: number, y: number): boolean {
+  for (const b of map.buildings) {
+    const def = BUILDING_DEFS[b.defId]
+    if (!def) continue
+    if (x >= b.x && x < b.x + def.size.w && y >= b.y && y < b.y + def.size.h) {
+      return true
+    }
+  }
+  return false
 }
 
 function infraCost(infra: Infrastructure): number {

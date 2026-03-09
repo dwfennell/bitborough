@@ -10,7 +10,7 @@ const SECTIONS: DocSection[] = [
       <p>Welcome to Bitborough! Build and manage a thriving city.</p>
       <p><strong>Basic steps:</strong></p>
       <ol>
-        <li>Place a <em>Coal Power Plant</em> (key 6) to generate electricity</li>
+        <li>Place a <em>Diesel Generator</em> (key 6) or <em>Coal Power Plant</em> (key 7) to generate electricity</li>
         <li>Run <em>Power Lines</em> (key 2) from the plant toward your city</li>
         <li>Build <em>Roads</em> (key 1) for access</li>
         <li>Zone <em>Residential</em> (3), <em>Commercial</em> (4), and <em>Industrial</em> (5) areas next to roads</li>
@@ -44,11 +44,12 @@ const SECTIONS: DocSection[] = [
         <tr><td><strong>3</strong></td><td>Residential Zone</td></tr>
         <tr><td><strong>4</strong></td><td>Commercial Zone</td></tr>
         <tr><td><strong>5</strong></td><td>Industrial Zone</td></tr>
-        <tr><td><strong>6</strong></td><td>Coal Power Plant ($3,000)</td></tr>
-        <tr><td><strong>7</strong></td><td>Nuclear Power Plant ($5,000)</td></tr>
-        <tr><td><strong>8</strong></td><td>Police Station ($500)</td></tr>
-        <tr><td><strong>9</strong></td><td>Fire Station ($500)</td></tr>
-        <tr><td><strong>0</strong></td><td>Park ($10)</td></tr>
+        <tr><td><strong>6</strong></td><td>Diesel Generator ($300)</td></tr>
+        <tr><td><strong>7</strong></td><td>Coal Power Plant ($2,000)</td></tr>
+        <tr><td><strong>8</strong></td><td>Nuclear Power Plant ($5,000)</td></tr>
+        <tr><td><strong>9</strong></td><td>Police Station ($300)</td></tr>
+        <tr><td><strong>0</strong></td><td>Fire Station ($300)</td></tr>
+        <tr><td><strong>N</strong></td><td>Park ($10)</td></tr>
         <tr><td><strong>-</strong></td><td>Bulldoze ($1)</td></tr>
         <tr><td><strong>=</strong></td><td>Query (inspect tile)</td></tr>
       </table>
@@ -72,9 +73,10 @@ const SECTIONS: DocSection[] = [
   {
     title: 'Power',
     content: `
-      <p>Buildings and zones need electricity to function. Power propagates from plants through adjacent powered tiles.</p>
-      <p><strong>Coal Plant</strong> — $3,000, $120/mo maintenance, powers ~700 tiles, 4x4 footprint.</p>
-      <p><strong>Nuclear Plant</strong> — $5,000, $250/mo maintenance, powers ~2,000 tiles, 4x4 footprint.</p>
+      <p>Buildings and zones need electricity to function. Power propagates from plants through adjacent powered tiles. Larger plants cost more total but are cheaper per unit of power.</p>
+      <p><strong>Diesel Generator</strong> — $300, $15/mo, powers ~50 tiles, 2x2. Small and polluting, but great for getting started.</p>
+      <p><strong>Coal Plant</strong> — $2,000, $60/mo, powers ~700 tiles, 4x4. Workhorse mid-game plant. Pollutes.</p>
+      <p><strong>Nuclear Plant</strong> — $5,000, $100/mo, powers ~2,000 tiles, 4x4. Most efficient per tile. Clean energy.</p>
       <p><strong>Power Lines</strong> — $5 each, $0.50/mo maintenance. Use them to bridge gaps between your plant and developed areas.</p>
       <p>Roads and zoned tiles also conduct power, so you often don't need power lines within a developed area.</p>
     `,
@@ -124,7 +126,7 @@ const SECTIONS: DocSection[] = [
     title: 'Crime',
     content: `
       <p>Crime appears in zoned areas, especially where land values are low.</p>
-      <p><strong>Police Stations</strong> ($500, $100/mo) reduce crime in a radius around them. Their effectiveness depends on funding level (adjustable in the Budget panel, 0-100%).</p>
+      <p><strong>Police Stations</strong> ($300, $50/mo) reduce crime in a radius around them. Their effectiveness depends on funding level (adjustable in the Budget panel, 0-100%).</p>
       <p>High crime reduces land values, which in turn reduces tax income — a downward spiral if left unchecked.</p>
       <p>Use the <strong>Crime overlay (C)</strong> to identify problem areas.</p>
     `,
@@ -133,7 +135,7 @@ const SECTIONS: DocSection[] = [
     title: 'Fire',
     content: `
       <p>Fires can ignite randomly in zoned areas that lack fire coverage. They spread to neighboring tiles and <strong>destroy zones</strong> when they burn out.</p>
-      <p><strong>Fire Stations</strong> ($500, $100/mo) provide coverage that dramatically reduces fire risk (90% reduction) and slows fire spread. Effectiveness depends on funding level.</p>
+      <p><strong>Fire Stations</strong> ($300, $50/mo) provide coverage that dramatically reduces fire risk (90% reduction) and slows fire spread. Effectiveness depends on funding level.</p>
       <p>Water, roads, and empty land act as natural firebreaks.</p>
       <p>Use the <strong>Fire overlay (F)</strong> to see coverage (green = safe) and active fires (orange).</p>
     `,

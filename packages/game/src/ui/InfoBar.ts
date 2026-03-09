@@ -5,6 +5,7 @@ export class InfoBar {
   private el: HTMLElement
   private popEl: HTMLElement
   private fundsEl: HTMLElement
+  private balanceEl: HTMLElement
   private dateEl: HTMLElement
   private rBar: HTMLElement
   private cBar: HTMLElement
@@ -13,6 +14,7 @@ export class InfoBar {
   // Cached values to avoid redundant DOM writes
   private lastPop = -1
   private lastFunds = -1
+  private lastBalance = NaN
   private lastMonth = -1
   private lastYear = -1
   private lastDemandR = NaN
@@ -25,6 +27,7 @@ export class InfoBar {
     this.el.innerHTML = `
       <span id="info-population">Pop: 0</span>
       <span id="info-funds">$0</span>
+      <span id="info-balance"></span>
       <span id="info-date">Jan 1900</span>
       <span id="info-demand" class="demand-bars">
         <span class="demand-r" title="Residential">R</span>
@@ -36,6 +39,7 @@ export class InfoBar {
 
     this.popEl = this.el.querySelector('#info-population')!
     this.fundsEl = this.el.querySelector('#info-funds')!
+    this.balanceEl = this.el.querySelector('#info-balance')!
     this.dateEl = this.el.querySelector('#info-date')!
     this.rBar = this.el.querySelector('.demand-r') as HTMLElement
     this.cBar = this.el.querySelector('.demand-c') as HTMLElement
@@ -50,6 +54,13 @@ export class InfoBar {
     if (state.funds !== this.lastFunds) {
       this.lastFunds = state.funds
       this.fundsEl.textContent = `$${state.funds.toLocaleString()}`
+    }
+    const balance = state.budget.balance
+    if (balance !== this.lastBalance) {
+      this.lastBalance = balance
+      const sign = balance >= 0 ? '+' : ''
+      this.balanceEl.textContent = `${sign}$${balance.toLocaleString()}/mo`
+      this.balanceEl.style.color = balance >= 0 ? '#4caf50' : '#f44336'
     }
     if (state.time.month !== this.lastMonth || state.time.year !== this.lastYear) {
       this.lastMonth = state.time.month

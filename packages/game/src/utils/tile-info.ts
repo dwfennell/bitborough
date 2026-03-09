@@ -31,6 +31,7 @@ function describeBuildingName(defId: string): string {
     'res.low': 'Residential (Low)',
     'com.low': 'Commercial (Low)',
     'ind.low': 'Industrial (Low)',
+    'power.diesel': 'Diesel Generator',
     'power.coal': 'Coal Power Plant',
     'power.nuclear': 'Nuclear Power Plant',
     'service.police': 'Police Station',

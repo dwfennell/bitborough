@@ -29,7 +29,9 @@ function findPowerPlants(map: GameMap): PowerPlant[] {
     if (!def) continue
 
     let capacity = 0
-    if (building.defId === 'power.coal') {
+    if (building.defId === 'power.diesel') {
+      capacity = POWER.dieselCapacity
+    } else if (building.defId === 'power.coal') {
       capacity = POWER.coalCapacity
     } else if (building.defId === 'power.nuclear') {
       capacity = POWER.nuclearCapacity

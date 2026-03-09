@@ -24,8 +24,8 @@ describe('Budget system', () => {
     const afterPlacement = engine.getState().funds
     advanceYear(engine)
     const afterYear = engine.getState().funds
-    // Coal plant maintenance: $120/year
-    expect(afterYear).toBe(afterPlacement - 120)
+    // Coal plant maintenance: $60/year
+    expect(afterYear).toBe(afterPlacement - 60)
   })
 
   test('tax income collected from developed zones', () => {
@@ -77,8 +77,8 @@ describe('Budget system', () => {
     advanceYear(engine)
     const budget = engine.getState().budget
     expect(budget.maintenanceCosts.roads).toBe(10) // 10 roads × $1
-    expect(budget.maintenanceCosts.powerPlants).toBe(120) // 1 coal × $120
-    expect(budget.maintenanceCosts.total).toBe(130)
+    expect(budget.maintenanceCosts.powerPlants).toBe(60) // 1 coal × $60
+    expect(budget.maintenanceCosts.total).toBe(70)
   })
 
   test('insufficient funds blocks construction in austerity', () => {
