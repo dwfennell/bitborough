@@ -1,9 +1,9 @@
 import { execFile } from 'node:child_process'
-import { mkdtemp, mkdir, writeFile, rm } from 'node:fs/promises'
+import { mkdtemp, mkdir, writeFile, readFile, rm } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { promisify } from 'node:util'
-import { describe, test, expect, beforeEach, afterEach } from 'vitest'
+import { describe, test, expect } from 'vitest'
 
 const execFileAsync = promisify(execFile)
 
@@ -129,7 +129,6 @@ describe('stop-check.sh', () => {
       const result = await runScript(fixture.env)
       expect(result.exitCode).toBe(0)
 
-      const { readFile } = await import('node:fs/promises')
       const calls = (await readFile(logFile, 'utf-8')).trim().split('\n')
       expect(calls).toContainEqual(expect.stringContaining('--filter @bitborough/engine typecheck'))
       expect(calls).toContainEqual(expect.stringContaining('--filter @bitborough/engine test'))
@@ -215,7 +214,6 @@ exit 0
       const result = await runScript(fixture.env)
       expect(result.exitCode).toBe(0)
 
-      const { readFile } = await import('node:fs/promises')
       const calls = (await readFile(logFile, 'utf-8')).trim().split('\n')
       expect(calls).toContainEqual(expect.stringContaining('typecheck'))
       expect(calls.some(c => c.includes(' test'))).toBe(false)
@@ -258,7 +256,6 @@ exit 0
       const result = await runScript(fixture.env)
       expect(result.exitCode).toBe(0)
 
-      const { readFile } = await import('node:fs/promises')
       const claudeCalls = await readFile(claudeLogFile, 'utf-8')
       expect(claudeCalls).toContain('-p')
       expect(claudeCalls).toContain('typecheck')
@@ -320,7 +317,6 @@ exit 0
       const result = await runScript(fixture.env)
       expect(result.exitCode).toBe(0)
 
-      const { readFile } = await import('node:fs/promises')
       const calls = (await readFile(logFile, 'utf-8')).trim().split('\n')
       expect(calls).toContainEqual(expect.stringContaining('@bitborough/engine typecheck'))
       expect(calls).toContainEqual(expect.stringContaining('@bitborough/game typecheck'))

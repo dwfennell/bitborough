@@ -25,14 +25,14 @@ if [ -z "$PACKAGES" ]; then
 fi
 
 MAX_RETRIES=2
-FAILURES=""
 
-# Check if a package.json has a given script
+# Check if a package.json has a given script in its "scripts" block
 has_script() {
   local pkg_dir="$PROJECT_ROOT/packages/$1"
   local script="$2"
   if [ -f "$pkg_dir/package.json" ]; then
-    grep -q "\"$script\"" "$pkg_dir/package.json" 2>/dev/null
+    # Use sed to extract the scripts block, then grep for the script name
+    sed -n '/"scripts"/,/}/p' "$pkg_dir/package.json" | grep -q "\"$script\"" 2>/dev/null
   else
     return 1
   fi
@@ -70,9 +70,7 @@ fi
 
 # Retry loop: invoke claude -p to fix, then re-check
 for attempt in $(seq 1 $MAX_RETRIES); do
-  claude -p "The following typecheck/test failures were found in this project. Fix them and verify your fix by re-running the failing commands.
-
-$FAILURES" 2>/dev/null
+  claude -p "$(printf 'The following typecheck/test failures were found in this project. Fix them and verify your fix by re-running the failing commands.\n\n%s' "$FAILURES")" 2>/dev/null
 
   FAILURES=$(run_checks)
 
