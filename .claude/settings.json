@@ -4,9 +4,9 @@
       {
         "hooks": [
           {
-            "type": "agent",
-            "prompt": "First, run `git diff --name-only HEAD` to check if any source files (.ts, .tsx) were modified. If no source files changed, do nothing and stop. If source files changed, determine which packages under `packages/` were affected and run `pnpm --filter <package> typecheck` and `pnpm --filter <package> test` only for those packages. If any checks fail, fix the issues and re-run the failing checks to confirm the fix.",
-            "timeout": 180
+            "type": "command",
+            "command": ".claude/hooks/stop-check.sh",
+            "timeout": 300
           }
         ]
       }
