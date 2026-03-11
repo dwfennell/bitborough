@@ -5,7 +5,7 @@ import { BUILDING_DEFS } from '../buildings-registry.js'
 export const TRANSIT_RADIUS = 10
 export const MEDIUM_DENSITY_POP_THRESHOLD = 500
 
-/** Weighted center of all active buildings. Returns map center if no buildings. */
+/** Center of all active buildings (arithmetic mean of positions). Returns map center if no buildings. */
 export function cityCenter(map: GameMap): { cx: number; cy: number } {
   const active = map.buildings.filter(b => b.state === 'active')
   if (active.length === 0) return { cx: map.width / 2, cy: map.height / 2 }
@@ -60,9 +60,11 @@ export function mediumRadius(population: number): number {
 export function hasCriticalMass(map: GameMap, x: number, y: number): boolean {
   let developed = 0
   let total = 0
-  for (let dy = -3; dy <= 3; dy++) {
-    for (let dx = -3; dx <= 3; dx++) {
+  const range = 3
+  for (let dy = -range; dy <= range; dy++) {
+    for (let dx = -range; dx <= range; dx++) {
       if (dx === 0 && dy === 0) continue
+      if (Math.abs(dx) + Math.abs(dy) > range) continue  // Manhattan distance guard
       const nx = x + dx
       const ny = y + dy
       if (nx < 0 || ny < 0 || nx >= map.width || ny >= map.height) continue

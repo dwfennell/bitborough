@@ -7,6 +7,8 @@ import {
   hasNearbyPavedRoad,
   hasNearbyTransitStop,
   upgradeProb,
+  mediumRadius,
+  hasCriticalMass,
 } from '../simulation/density.js'
 
 describe('PavedRoad infrastructure', () => {
@@ -116,5 +118,45 @@ describe('density helpers', () => {
     const highDemand = upgradeProb(0.8, 5, 10)
     const lowDemand = upgradeProb(0.2, 5, 10)
     expect(highDemand).toBeGreaterThan(lowDemand)
+  })
+
+  test('mediumRadius starts at 5 for small population', () => {
+    expect(mediumRadius(0)).toBe(5)
+    expect(mediumRadius(100)).toBeCloseTo(5.1, 1)
+  })
+
+  test('mediumRadius caps at 30 for large population', () => {
+    expect(mediumRadius(50_000)).toBe(30)
+    expect(mediumRadius(1_000_000)).toBe(30)
+  })
+
+  test('hasCriticalMass returns false when no medium/high neighbors', () => {
+    const map = createTestMap(32)
+    // Only low-density neighbors
+    map.buildings.push(
+      { id: 'b1', defId: 'res.low', x: 9, y: 10, powered: true, density: 0, age: 0, state: 'active' },
+      { id: 'b2', defId: 'res.low', x: 11, y: 10, powered: true, density: 0, age: 0, state: 'active' },
+    )
+    expect(hasCriticalMass(map, 10, 10)).toBe(false)
+  })
+
+  test('hasCriticalMass returns true when majority of neighbors are medium density', () => {
+    const map = createTestMap(32)
+    // Fill all cells in the Manhattan-distance-3 diamond with medium buildings.
+    // hasCriticalMass counts 24 cells in the diamond; placing a building in every
+    // cell gives ratio 24/24 = 1.0, well above the 0.5 threshold.
+    const range = 3
+    let id = 0
+    for (let dy = -range; dy <= range; dy++) {
+      for (let dx = -range; dx <= range; dx++) {
+        if (dx === 0 && dy === 0) continue
+        if (Math.abs(dx) + Math.abs(dy) > range) continue
+        map.buildings.push({
+          id: `m${id++}`, defId: 'res.med', x: 10 + dx, y: 10 + dy,
+          powered: true, density: 1, age: 0, state: 'active',
+        })
+      }
+    }
+    expect(hasCriticalMass(map, 10, 10)).toBe(true)
   })
 })
