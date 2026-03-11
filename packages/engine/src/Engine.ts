@@ -264,6 +264,7 @@ export class Engine {
       powered: false,
       density: def.density,
       age: 0,
+      state: 'active',
     }
 
     this.map.buildings.push(building)
@@ -336,7 +337,7 @@ export class Engine {
       infrastructure: new Uint16Array(save.map.infrastructure),
       connections: new Uint8Array(save.map.connections),
       elevation: new Uint8Array(save.map.elevation),
-      buildings: save.map.buildings.map((b) => ({ ...b })),
+      buildings: save.map.buildings.map((b) => ({ ...b, state: b.state ?? 'active' })),
       meta: { ...save.map.meta },
     }
 

@@ -5,6 +5,7 @@ export { Infrastructure, type ConnectionMask } from './infrastructure.js'
 export {
   BuildingCategory,
   DensityLevel,
+  type BuildingState,
   type BuildingDef,
   type Building,
 } from './buildings.js'

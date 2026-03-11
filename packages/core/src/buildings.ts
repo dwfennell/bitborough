@@ -27,6 +27,8 @@ export interface BuildingDef {
   maintenanceCost: number
 }
 
+export type BuildingState = 'active' | 'under_construction' | 'derelict'
+
 export interface Building {
   id: string
   defId: string
@@ -35,4 +37,10 @@ export interface Building {
   powered: boolean
   density: DensityLevel
   age: number // months since placed
+  state: BuildingState
+  // under_construction only:
+  constructionMonthsRemaining?: number
+  upgradingToDefId?: string
+  // derelict only:
+  derelictMonths?: number
 }

@@ -3,6 +3,15 @@ import { Engine } from '../Engine.js'
 import { createTestMap, advanceMonth } from '../test-helpers.js'
 import { Infrastructure, ZoneType } from '@bitborough/core'
 
+describe('Building state', () => {
+  test('building has active state by default', () => {
+    const engine = Engine.create(createTestMap(32), { seed: 42 })
+    engine.placeBuilding(0, 0, 'power.coal')
+    const b = engine.getState().map.buildings[0]!
+    expect(b.state).toBe('active')
+  })
+})
+
 describe('Zone development', () => {
   function setupPoweredZonedCity(engine: ReturnType<typeof Engine.create>) {
     // Place coal power plant at (0,0) — 4x4 footprint

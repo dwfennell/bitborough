@@ -40,6 +40,7 @@ export function updateZones(
             powered: true,
             density: DensityLevel.Low,
             age: 0,
+            state: 'active',
           }
           map.buildings.push(building)
           const def = BUILDING_DEFS[defId]
