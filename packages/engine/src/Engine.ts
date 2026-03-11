@@ -25,6 +25,7 @@ import { calculateBudget } from './simulation/budget.js'
 import { calculateCrime } from './simulation/services/crime.js'
 import { calculateFireCoverage, updateFires, createFireState, type FireState } from './simulation/services/fire.js'
 import { calculateTraffic } from './simulation/traffic.js'
+import { updateDensity, checkDereliction } from './simulation/density.js'
 import { BUILDING_DEFS } from './buildings-registry.js'
 
 export interface TileInfo {
@@ -145,6 +146,13 @@ export class Engine {
       this.nextBuildingId = nextBuildingIdRef.value
       this.population += populationDelta
 
+      // Density progression
+      const { populationDelta: densityDelta } = updateDensity(
+        this.map, this.powerGrid, this.demand, this.population, this.prng, nextBuildingIdRef
+      )
+      this.nextBuildingId = nextBuildingIdRef.value
+      this.population = Math.max(0, this.population + densityDelta)
+
       // Budget projections (balance applied annually)
       this.budgetInfo = calculateBudget(this.map, this.population, this.taxRate, this.landValues, this.funding)
       if (this.month === 1) {
@@ -232,6 +240,7 @@ export class Engine {
     this.funds -= cost
     if (result.ok) {
       updateConnections(this.map, x, y)
+      checkDereliction(this.map, this.powerGrid)
     }
     return result
   }

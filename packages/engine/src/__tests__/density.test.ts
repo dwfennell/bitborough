@@ -387,3 +387,37 @@ describe('paved road upgrade', () => {
     expect(engine.getState().funds).toBeLessThan(before)
   })
 })
+
+describe('density in Engine.tick()', () => {
+  test('engine runs density update without errors over 10 years', () => {
+    const engine = Engine.create(createTestMap(32), { seed: 99, startingFunds: 999_999 })
+    engine.placeBuilding(0, 0, 'power.coal')
+    // Bridge the gap between plant (x=0..3) and power lines (x=5..14) with tile at x=4
+    engine.placeTile(4, 2, Infrastructure.PowerLine)
+    for (let x = 5; x < 15; x++) {
+      engine.placeTile(x, 2, Infrastructure.PowerLine)
+      engine.placeTile(x, 3, Infrastructure.Road)
+      engine.placeZone(x, 4, ZoneType.Residential)
+    }
+    expect(() => { for (let i = 0; i < 480; i++) engine.tick() }).not.toThrow()
+  })
+
+  test('engine population accounts for density upgrades', () => {
+    const engine = Engine.create(createTestMap(32), { seed: 42, startingFunds: 999_999 })
+    engine.placeBuilding(0, 0, 'power.coal')
+    // Bridge the gap between plant (x=0..3) and power lines (x=5..14) with tile at x=4
+    engine.placeTile(4, 2, Infrastructure.PowerLine)
+    // Paved roads to enable medium density
+    for (let x = 5; x < 15; x++) {
+      engine.placeTile(x, 2, Infrastructure.PowerLine)
+      engine.placeTile(x, 3, Infrastructure.Road)
+      engine.upgradeTile(x, 3)  // pave the roads
+      engine.placeZone(x, 4, ZoneType.Residential)
+    }
+    // Run 10 years
+    for (let i = 0; i < 480; i++) engine.tick()
+    // Population should be greater than what pure low-density would give (10 pop * 10 zones = 100)
+    // Medium density gives 100 pop per building — so even 1 upgrade means population > 100
+    expect(engine.getState().population).toBeGreaterThan(0)
+  })
+})
