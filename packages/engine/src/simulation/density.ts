@@ -117,7 +117,7 @@ export function updateDensity(
     }
 
     if (building.state === 'derelict') {
-      tickDerelict(map, building)
+      populationDelta += tickDerelict(map, building)
       continue
     }
 
@@ -268,7 +268,8 @@ const DOWNGRADE_TARGET: Record<string, string> = {
  * Recovers derelict buildings if infrastructure is restored.
  * Called by Engine after any bulldoze action.
  */
-export function checkDereliction(map: GameMap, powerGrid: Uint8Array): void {
+export function checkDereliction(map: GameMap, powerGrid: Uint8Array): { populationDelta: number } {
+  let populationDelta = 0
   for (const building of map.buildings) {
     const def = BUILDING_DEFS[building.defId]
     if (!def || def.category === BuildingCategory.Special) continue
@@ -280,6 +281,7 @@ export function checkDereliction(map: GameMap, powerGrid: Uint8Array): void {
       if (!infraOk) {
         building.state = 'derelict'
         building.derelictMonths = 0
+        populationDelta -= def.population  // subtract lost population
       }
     } else if (building.state === 'derelict' && def.density > DensityLevel.Low) {
       const infraRestored = def.density === DensityLevel.Medium
@@ -288,21 +290,27 @@ export function checkDereliction(map: GameMap, powerGrid: Uint8Array): void {
       if (infraRestored) {
         building.state = 'active'
         building.derelictMonths = undefined
+        populationDelta += def.population  // restore population on recovery
       }
     }
   }
+  return { populationDelta }
 }
 
-export function tickDerelict(map: GameMap, building: Building): void {
+export function tickDerelict(map: GameMap, building: Building): number {
   building.derelictMonths = (building.derelictMonths ?? 0) + 1
   if (building.derelictMonths >= DERELICT_DOWNGRADE_MONTHS) {
     const downgradeTarget = DOWNGRADE_TARGET[building.defId]
+    const currentPop = BUILDING_DEFS[building.defId]?.population ?? 0
     if (downgradeTarget) {
       startConstruction(building, downgradeTarget)
+      return -currentPop  // subtract current building's population when downgrade starts
     } else {
       // Already lowest density — reset to active so it can redevelop naturally
       building.state = 'active'
       building.derelictMonths = undefined
+      return currentPop  // restore population for low-density buildings resetting to active
     }
   }
+  return 0
 }

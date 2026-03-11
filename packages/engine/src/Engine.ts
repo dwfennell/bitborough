@@ -153,6 +153,10 @@ export class Engine {
       this.nextBuildingId = nextBuildingIdRef.value
       this.population = Math.max(0, this.population + densityDelta)
 
+      // Dereliction check (monthly)
+      const { populationDelta: derelictDelta } = checkDereliction(this.map, this.powerGrid)
+      this.population = Math.max(0, this.population + derelictDelta)
+
       // Budget projections (balance applied annually)
       this.budgetInfo = calculateBudget(this.map, this.population, this.taxRate, this.landValues, this.funding)
       if (this.month === 1) {
@@ -240,7 +244,8 @@ export class Engine {
     this.funds -= cost
     if (result.ok) {
       updateConnections(this.map, x, y)
-      checkDereliction(this.map, this.powerGrid)
+      const { populationDelta } = checkDereliction(this.map, this.powerGrid)
+      this.population = Math.max(0, this.population + populationDelta)
     }
     return result
   }
