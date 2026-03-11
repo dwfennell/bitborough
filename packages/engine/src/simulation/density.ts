@@ -117,7 +117,7 @@ export function updateDensity(
     }
 
     if (building.state === 'derelict') {
-      // tickDerelict will be wired in Task 7
+      tickDerelict(map, building, powerGrid)
       continue
     }
 
@@ -250,4 +250,59 @@ function occupiesTile(b: Building, x: number, y: number): boolean {
   const def = BUILDING_DEFS[b.defId]
   if (!def) return false
   return x >= b.x && x < b.x + def.size.w && y >= b.y && y < b.y + def.size.h
+}
+
+const DERELICT_DOWNGRADE_MONTHS = 6
+
+const DOWNGRADE_TARGET: Record<string, string> = {
+  'res.med': 'res.low', 'res.med.b': 'res.low',
+  'com.med': 'com.low', 'com.med.b': 'com.low',
+  'ind.med': 'ind.low', 'ind.med.b': 'ind.low',
+  'res.high': 'res.med', 'com.high': 'com.med',
+  'com.high.b': 'com.med', 'ind.high': 'ind.med', 'ind.high.b': 'ind.med',
+}
+
+/**
+ * Check all active non-Low zone buildings for missing infrastructure.
+ * Marks them derelict if requirements are no longer met.
+ * Recovers derelict buildings if infrastructure is restored.
+ * Called by Engine after any bulldoze action.
+ */
+export function checkDereliction(map: GameMap, powerGrid: Uint8Array): void {
+  for (const building of map.buildings) {
+    const def = BUILDING_DEFS[building.defId]
+    if (!def || def.category === BuildingCategory.Special) continue
+
+    if (building.state === 'active' && def.density > DensityLevel.Low) {
+      const infraOk = def.density === DensityLevel.Medium
+        ? hasNearbyPavedRoad(map, building.x, building.y)
+        : hasNearbyTransitStop(map, building.x, building.y)
+      if (!infraOk) {
+        building.state = 'derelict'
+        building.derelictMonths = 0
+      }
+    } else if (building.state === 'derelict') {
+      const infraRestored = def.density === DensityLevel.Medium
+        ? hasNearbyPavedRoad(map, building.x, building.y)
+        : hasNearbyTransitStop(map, building.x, building.y)
+      if (infraRestored) {
+        building.state = 'active'
+        building.derelictMonths = undefined
+      }
+    }
+  }
+}
+
+export function tickDerelict(map: GameMap, building: Building, powerGrid: Uint8Array): void {
+  building.derelictMonths = (building.derelictMonths ?? 0) + 1
+  if (building.derelictMonths >= DERELICT_DOWNGRADE_MONTHS) {
+    const downgradeTarget = DOWNGRADE_TARGET[building.defId]
+    if (downgradeTarget) {
+      startConstruction(building, downgradeTarget)
+    } else {
+      // Already lowest density — reset to active so it can redevelop naturally
+      building.state = 'active'
+      building.derelictMonths = undefined
+    }
+  }
 }
