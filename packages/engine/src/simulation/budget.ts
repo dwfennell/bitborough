@@ -10,12 +10,14 @@ export function calculateBudget(
 ): BudgetInfo {
   // Count infrastructure for maintenance
   let roadCount = 0
+  let pavedRoadCount = 0
   let railCount = 0
   let powerLineCount = 0
 
   for (let i = 0; i < map.infrastructure.length; i++) {
     const infra = map.infrastructure[i]!
     if (infra & Infrastructure.Road) roadCount++
+    if (infra & Infrastructure.PavedRoad) pavedRoadCount++
     if (infra & Infrastructure.PowerLine) powerLineCount++
     if (infra & Infrastructure.Rail) railCount++
   }
@@ -24,6 +26,7 @@ export function calculateBudget(
   let powerPlantMaintenance = 0
   let policeStationCount = 0
   let fireStationCount = 0
+  let transitStopCount = 0
 
   for (const building of map.buildings) {
     const def = BUILDING_DEFS[building.defId]
@@ -31,10 +34,11 @@ export function calculateBudget(
     if (building.defId.startsWith('power.')) powerPlantMaintenance += def.maintenanceCost
     if (building.defId === 'service.police') policeStationCount++
     if (building.defId === 'service.fire') fireStationCount++
+    if (building.defId === 'transit.stop') transitStopCount++
   }
 
   const maintenanceCosts = {
-    roads: roadCount * MAINTENANCE.road,
+    roads: roadCount * MAINTENANCE.road + pavedRoadCount * MAINTENANCE.pavedRoadSurcharge,
     rails: railCount * MAINTENANCE.rail,
     powerLines: powerLineCount * MAINTENANCE.powerLine,
     powerPlants: powerPlantMaintenance,
@@ -47,7 +51,7 @@ export function calculateBudget(
   const serviceCosts = {
     police: policeStationCount * MAINTENANCE.policeStation * (funding.police / 100),
     fire: fireStationCount * MAINTENANCE.fireStation * (funding.fire / 100),
-    transit: 0, // future
+    transit: transitStopCount * MAINTENANCE.transitStop * (funding.transit / 100),
     total: 0,
   }
   serviceCosts.total = serviceCosts.police + serviceCosts.fire + serviceCosts.transit
@@ -84,7 +88,7 @@ export function calculateBudget(
     serviceCosts: {
       police: Math.round(serviceCosts.police),
       fire: Math.round(serviceCosts.fire),
-      transit: 0,
+      transit: Math.round(serviceCosts.transit),
       total: Math.round(serviceCosts.total),
     },
     balance: Math.round(balance),

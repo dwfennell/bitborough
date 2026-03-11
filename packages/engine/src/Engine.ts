@@ -11,6 +11,7 @@ import {
   FailReason,
   SimSpeed,
   DEFAULTS,
+  COSTS,
 } from '@bitborough/core'
 import { PRNG } from './prng.js'
 import { placeTile, placeZone } from './actions/place.js'
@@ -203,6 +204,27 @@ export class Engine {
 
   placeZone(x: number, y: number, zone: ZoneType): Result {
     return placeZone(this.map, x, y, zone)
+  }
+
+  upgradeTile(x: number, y: number): Result {
+    const idx = y * this.map.width + x
+    const infra = this.map.infrastructure[idx]!
+
+    if (!(infra & Infrastructure.Road)) {
+      return { ok: false, reason: FailReason.InvalidLocation, detail: 'No road to upgrade' }
+    }
+    if (infra & Infrastructure.PavedRoad) {
+      return { ok: false, reason: FailReason.Occupied, detail: 'Road already paved' }
+    }
+
+    const cost = COSTS.pavedRoadUpgrade
+    if (this.funds < cost) {
+      return { ok: false, reason: FailReason.InsufficientFunds }
+    }
+
+    this.map.infrastructure[idx]! |= Infrastructure.PavedRoad
+    this.funds -= cost
+    return { ok: true }
   }
 
   bulldoze(x: number, y: number): Result {

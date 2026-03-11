@@ -1,8 +1,9 @@
 import { describe, test, expect } from 'vitest'
-import { Infrastructure, BuildingCategory, DensityLevel } from '@bitborough/core'
+import { Infrastructure, BuildingCategory, DensityLevel, ZoneType } from '@bitborough/core'
 import { BUILDING_DEFS } from '../buildings-registry.js'
-import { createTestMap } from '../test-helpers.js'
+import { createTestMap, advanceMonth } from '../test-helpers.js'
 import { PRNG } from '../prng.js'
+import { Engine } from '../Engine.js'
 import {
   cityCenter,
   hasNearbyPavedRoad,
@@ -351,5 +352,38 @@ describe('derelict buildings', () => {
     updateDensity(map, powerGrid, demand, 5000, prng, { value: 100 })
     // After one tick, derelictMonths should be 1
     expect(map.buildings[0]!.derelictMonths).toBe(1)
+  })
+})
+
+describe('paved road upgrade', () => {
+  test('can upgrade a dirt road to paved', () => {
+    const engine = Engine.create(createTestMap(32), { seed: 1, startingFunds: 10_000 })
+    engine.placeTile(5, 5, Infrastructure.Road)
+    const result = engine.upgradeTile(5, 5)
+    expect(result.ok).toBe(true)
+    const infra = engine.getTile(5, 5).infrastructure
+    expect(infra & Infrastructure.PavedRoad).toBeTruthy()
+  })
+
+  test('cannot upgrade a tile with no road', () => {
+    const engine = Engine.create(createTestMap(32), { seed: 1, startingFunds: 10_000 })
+    const result = engine.upgradeTile(5, 5)
+    expect(result.ok).toBe(false)
+  })
+
+  test('cannot upgrade an already paved road', () => {
+    const engine = Engine.create(createTestMap(32), { seed: 1, startingFunds: 10_000 })
+    engine.placeTile(5, 5, Infrastructure.Road)
+    engine.upgradeTile(5, 5)
+    const result = engine.upgradeTile(5, 5)
+    expect(result.ok).toBe(false)
+  })
+
+  test('upgrading costs money', () => {
+    const engine = Engine.create(createTestMap(32), { seed: 1, startingFunds: 10_000 })
+    engine.placeTile(5, 5, Infrastructure.Road)
+    const before = engine.getState().funds
+    engine.upgradeTile(5, 5)
+    expect(engine.getState().funds).toBeLessThan(before)
   })
 })
