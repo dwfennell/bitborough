@@ -321,9 +321,8 @@ describe('derelict buildings', () => {
       id: 'b1', defId: 'res.med', x: 10, y: 10,
       powered: true, density: DensityLevel.Medium, age: 5, state: 'derelict', derelictMonths: 5,
     })
-    const powerGrid = new Uint8Array(map.width * map.height)
     // Tick once more (5+1=6) — should trigger downgrade
-    tickDerelict(map, map.buildings[0]!, powerGrid)
+    tickDerelict(map, map.buildings[0]!)
     // Should now be under_construction heading to res.low
     expect(map.buildings[0]!.state).toBe('under_construction')
     expect(map.buildings[0]!.upgradingToDefId).toBe('res.low')
@@ -335,8 +334,7 @@ describe('derelict buildings', () => {
       id: 'b1', defId: 'res.low', x: 10, y: 10,
       powered: true, density: DensityLevel.Low, age: 5, state: 'derelict', derelictMonths: 5,
     })
-    const powerGrid = new Uint8Array(map.width * map.height)
-    tickDerelict(map, map.buildings[0]!, powerGrid)
+    tickDerelict(map, map.buildings[0]!)
     // Low density has nowhere to downgrade — resets to active
     expect(map.buildings[0]!.state).toBe('active')
   })

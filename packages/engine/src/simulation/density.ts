@@ -102,7 +102,7 @@ export function updateDensity(
   demand: DemandInfo,
   population: number,
   prng: PRNG,
-  nextBuildingId: { value: number },
+  nextBuildingId: { value: number }, // reserved: may be needed if upgrade creates separate building objects
 ): { populationDelta: number } {
   let populationDelta = 0
 
@@ -117,7 +117,7 @@ export function updateDensity(
     }
 
     if (building.state === 'derelict') {
-      tickDerelict(map, building, powerGrid)
+      tickDerelict(map, building)
       continue
     }
 
@@ -281,7 +281,7 @@ export function checkDereliction(map: GameMap, powerGrid: Uint8Array): void {
         building.state = 'derelict'
         building.derelictMonths = 0
       }
-    } else if (building.state === 'derelict') {
+    } else if (building.state === 'derelict' && def.density > DensityLevel.Low) {
       const infraRestored = def.density === DensityLevel.Medium
         ? hasNearbyPavedRoad(map, building.x, building.y)
         : hasNearbyTransitStop(map, building.x, building.y)
@@ -293,7 +293,7 @@ export function checkDereliction(map: GameMap, powerGrid: Uint8Array): void {
   }
 }
 
-export function tickDerelict(map: GameMap, building: Building, powerGrid: Uint8Array): void {
+export function tickDerelict(map: GameMap, building: Building): void {
   building.derelictMonths = (building.derelictMonths ?? 0) + 1
   if (building.derelictMonths >= DERELICT_DOWNGRADE_MONTHS) {
     const downgradeTarget = DOWNGRADE_TARGET[building.defId]
