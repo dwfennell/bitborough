@@ -143,6 +143,24 @@ export function updateDensity(
         startConstruction(building, targetDefId)
       }
     }
+
+    // Medium → High
+    if (def.density === DensityLevel.Medium) {
+      const variants = HIGH_VARIANTS[building.defId]
+      if (!variants) continue
+      if (!hasNearbyTransitStop(map, building.x, building.y)) continue
+      if (!hasCriticalMass(map, building.x, building.y)) continue
+
+      const distToTransit = nearestTransitDist(map, building.x, building.y)
+      const demandFactor = getZoneDemand(building.defId, demand)
+      const p = upgradeProb(demandFactor, distToTransit, TRANSIT_RADIUS)
+
+      if (prng.next() < p) {
+        const targetDefId = pickVariant(variants, prng)
+        populationDelta -= def.population
+        startConstruction(building, targetDefId)
+      }
+    }
   }
 
   return { populationDelta }
@@ -153,6 +171,16 @@ function getZoneDemand(defId: string, demand: DemandInfo): number {
   if (defId.startsWith('com')) return demand.commercial
   if (defId.startsWith('ind')) return demand.industrial
   return 0
+}
+
+function nearestTransitDist(map: GameMap, x: number, y: number): number {
+  let minDist = Infinity
+  for (const b of map.buildings) {
+    if (b.defId !== 'transit.stop' || b.state !== 'active') continue
+    const dist = Math.abs(b.x - x) + Math.abs(b.y - y)
+    if (dist < minDist) minDist = dist
+  }
+  return minDist === Infinity ? TRANSIT_RADIUS + 1 : minDist
 }
 
 function pickVariant(variants: Array<[string, number]>, prng: PRNG): string {

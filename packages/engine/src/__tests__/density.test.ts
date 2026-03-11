@@ -242,3 +242,43 @@ describe('Low→Medium upgrade', () => {
     expect(result.populationDelta).toBe(100) // res.med has 100 population
   })
 })
+
+describe('Medium→High upgrade', () => {
+  test('medium building without transit stop does not upgrade to high', () => {
+    const map = createTestMap(32)
+    map.buildings.push({
+      id: 'b1', defId: 'res.med', x: 10, y: 10,
+      powered: true, density: DensityLevel.Medium, age: 0, state: 'active',
+    })
+    // No transit stop in map
+    const prng = new PRNG(1)
+    const demand = { residential: 1.0, commercial: 1.0, industrial: 1.0 }
+    const powerGrid = new Uint8Array(map.width * map.height)
+    for (let i = 0; i < 1000; i++) {
+      updateDensity(map, powerGrid, demand, 5000, prng, { value: 100 })
+    }
+    expect(map.buildings[0]!.defId).toBe('res.med')
+    expect(map.buildings[0]!.state).toBe('active')
+  })
+
+  test('medium building without critical mass does not upgrade to high', () => {
+    const map = createTestMap(32)
+    map.buildings.push({
+      id: 'b1', defId: 'res.med', x: 10, y: 10,
+      powered: true, density: DensityLevel.Medium, age: 0, state: 'active',
+    })
+    // Add transit stop nearby
+    map.buildings.push({
+      id: 'ts', defId: 'transit.stop', x: 12, y: 10,
+      powered: true, density: DensityLevel.Low, age: 0, state: 'active',
+    })
+    // No medium-density neighbors for critical mass
+    const prng = new PRNG(1)
+    const demand = { residential: 1.0, commercial: 1.0, industrial: 1.0 }
+    const powerGrid = new Uint8Array(map.width * map.height)
+    for (let i = 0; i < 1000; i++) {
+      updateDensity(map, powerGrid, demand, 5000, prng, { value: 100 })
+    }
+    expect(map.buildings[0]!.defId).toBe('res.med')
+  })
+})
