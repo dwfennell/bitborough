@@ -2,6 +2,7 @@ import { describe, test, expect } from 'vitest'
 import { Infrastructure, BuildingCategory, DensityLevel } from '@bitborough/core'
 import { BUILDING_DEFS } from '../buildings-registry.js'
 import { createTestMap } from '../test-helpers.js'
+import { PRNG } from '../prng.js'
 import {
   cityCenter,
   hasNearbyPavedRoad,
@@ -9,6 +10,7 @@ import {
   upgradeProb,
   mediumRadius,
   hasCriticalMass,
+  updateDensity,
 } from '../simulation/density.js'
 
 describe('PavedRoad infrastructure', () => {
@@ -158,5 +160,85 @@ describe('density helpers', () => {
       }
     }
     expect(hasCriticalMass(map, 10, 10)).toBe(true)
+  })
+})
+
+describe('Low→Medium upgrade', () => {
+  test('low building without paved road does not upgrade', () => {
+    const map = createTestMap(32)
+    map.buildings.push({
+      id: 'b1', defId: 'res.low', x: 10, y: 10,
+      powered: true, density: DensityLevel.Low, age: 0, state: 'active',
+    })
+    // Only dirt road nearby
+    map.infrastructure[10 * map.width + 10] = Infrastructure.Road
+    const prng = new PRNG(1)
+    const demand = { residential: 1.0, commercial: 1.0, industrial: 1.0 }
+    const powerGrid = new Uint8Array(map.width * map.height)
+    // Run many iterations — should never upgrade
+    for (let i = 0; i < 500; i++) {
+      updateDensity(map, powerGrid, demand, 5000, prng, { value: 100 })
+    }
+    expect(map.buildings[0]!.state).toBe('active')
+    expect(map.buildings[0]!.defId).toBe('res.low')
+  })
+
+  test('low building without sufficient population does not upgrade', () => {
+    const map = createTestMap(32)
+    map.buildings.push({
+      id: 'b1', defId: 'res.low', x: 10, y: 10,
+      powered: true, density: DensityLevel.Low, age: 0, state: 'active',
+    })
+    // Paved road nearby
+    map.infrastructure[10 * map.width + 10] = Infrastructure.Road | Infrastructure.PavedRoad
+    const prng = new PRNG(1)
+    const demand = { residential: 1.0, commercial: 1.0, industrial: 1.0 }
+    const powerGrid = new Uint8Array(map.width * map.height)
+    // Population below threshold (499)
+    for (let i = 0; i < 500; i++) {
+      updateDensity(map, powerGrid, demand, 499, prng, { value: 100 })
+    }
+    expect(map.buildings[0]!.state).toBe('active')
+    expect(map.buildings[0]!.defId).toBe('res.low')
+  })
+
+  test('low building near paved road with sufficient population eventually upgrades', () => {
+    const map = createTestMap(32)
+    // Put paved road right on the building tile
+    map.infrastructure[10 * map.width + 10] = Infrastructure.Road | Infrastructure.PavedRoad
+    map.buildings.push({
+      id: 'b1', defId: 'res.low', x: 10, y: 10,
+      powered: true, density: DensityLevel.Low, age: 0, state: 'active',
+    })
+    const prng = new PRNG(42)
+    const demand = { residential: 1.0, commercial: 1.0, industrial: 1.0 }
+    const powerGrid = new Uint8Array(map.width * map.height)
+    // Run many iterations with high demand and pop — should eventually upgrade
+    let upgraded = false
+    for (let i = 0; i < 2000; i++) {
+      updateDensity(map, powerGrid, demand, 5000, prng, { value: 100 })
+      if (map.buildings[0]!.state === 'under_construction' || map.buildings[0]!.defId.includes('med')) {
+        upgraded = true
+        break
+      }
+    }
+    expect(upgraded).toBe(true)
+  })
+
+  test('building in under_construction state ticks down and completes', () => {
+    const map = createTestMap(32)
+    map.buildings.push({
+      id: 'b1', defId: 'res.low', x: 10, y: 10,
+      powered: true, density: DensityLevel.Low, age: 0, state: 'under_construction',
+      constructionMonthsRemaining: 1, upgradingToDefId: 'res.med',
+    })
+    const prng = new PRNG(1)
+    const demand = { residential: 1.0, commercial: 1.0, industrial: 1.0 }
+    const powerGrid = new Uint8Array(map.width * map.height)
+    const result = updateDensity(map, powerGrid, demand, 5000, prng, { value: 100 })
+    // Should complete construction (1 month remaining → 0 → complete)
+    expect(map.buildings[0]!.state).toBe('active')
+    expect(map.buildings[0]!.defId).toBe('res.med')
+    expect(result.populationDelta).toBe(100) // res.med has 100 population
   })
 })

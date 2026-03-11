@@ -1,6 +1,7 @@
-import { Infrastructure, DensityLevel } from '@bitborough/core'
-import type { GameMap } from '@bitborough/core'
+import { Infrastructure, DensityLevel, BuildingCategory } from '@bitborough/core'
+import type { Building, DemandInfo, GameMap } from '@bitborough/core'
 import { BUILDING_DEFS } from '../buildings-registry.js'
+import type { PRNG } from '../prng.js'
 
 export const TRANSIT_RADIUS = 10
 export const MEDIUM_DENSITY_POP_THRESHOLD = 500
@@ -77,4 +78,148 @@ export function hasCriticalMass(map: GameMap, x: number, y: number): boolean {
     }
   }
   return total > 0 && developed / total > 0.5
+}
+
+// Weighted variants per zone tier: [defId, weight]
+const MEDIUM_VARIANTS: Record<string, Array<[string, number]>> = {
+  'res.low': [['res.med', 1], ['res.med.b', 1]],
+  'com.low': [['com.med', 1], ['com.med.b', 2]],
+  'ind.low': [['ind.med', 3], ['ind.med.b', 2]],
+}
+
+const HIGH_VARIANTS: Record<string, Array<[string, number]>> = {
+  'res.med':   [['res.high', 1]],
+  'res.med.b': [['res.high', 1]],
+  'com.med':   [['com.high', 1], ['com.high.b', 1]],
+  'com.med.b': [['com.high', 1], ['com.high.b', 1]],
+  'ind.med':   [['ind.high', 3], ['ind.high.b', 2]],
+  'ind.med.b': [['ind.high', 3], ['ind.high.b', 2]],
+}
+
+export function updateDensity(
+  map: GameMap,
+  powerGrid: Uint8Array,
+  demand: DemandInfo,
+  population: number,
+  prng: PRNG,
+  nextBuildingId: { value: number },
+): { populationDelta: number } {
+  let populationDelta = 0
+
+  const { cx, cy } = cityCenter(map)
+  const radius = mediumRadius(population)
+  const popThresholdMet = population >= MEDIUM_DENSITY_POP_THRESHOLD
+
+  for (const building of map.buildings) {
+    if (building.state === 'under_construction') {
+      populationDelta += tickConstruction(map, building)
+      continue
+    }
+
+    if (building.state === 'derelict') {
+      // tickDerelict will be wired in Task 7
+      continue
+    }
+
+    // Active buildings age each month
+    building.age++
+
+    const def = BUILDING_DEFS[building.defId]
+    if (!def || def.category === BuildingCategory.Special) continue
+
+    // Low → Medium
+    if (def.density === DensityLevel.Low && popThresholdMet) {
+      const variants = MEDIUM_VARIANTS[building.defId]
+      if (!variants) continue
+      if (!hasNearbyPavedRoad(map, building.x, building.y)) continue
+
+      const dist = Math.hypot(building.x - cx, building.y - cy)
+      const demandFactor = getZoneDemand(building.defId, demand)
+      const p = upgradeProb(demandFactor, dist, radius)
+
+      if (prng.next() < p) {
+        const targetDefId = pickVariant(variants, prng)
+        populationDelta -= def.population
+        startConstruction(building, targetDefId)
+      }
+    }
+  }
+
+  return { populationDelta }
+}
+
+function getZoneDemand(defId: string, demand: DemandInfo): number {
+  if (defId.startsWith('res')) return demand.residential
+  if (defId.startsWith('com')) return demand.commercial
+  if (defId.startsWith('ind')) return demand.industrial
+  return 0
+}
+
+function pickVariant(variants: Array<[string, number]>, prng: PRNG): string {
+  const total = variants.reduce((s, [, w]) => s + w, 0)
+  let r = prng.next() * total
+  for (const [id, w] of variants) {
+    r -= w
+    if (r <= 0) return id
+  }
+  return variants[variants.length - 1]![0]
+}
+
+function startConstruction(building: Building, targetDefId: string): void {
+  building.state = 'under_construction'
+  building.upgradingToDefId = targetDefId
+  building.constructionMonthsRemaining = 2  // fixed 2 months (deterministic)
+}
+
+function tickConstruction(map: GameMap, building: Building): number {
+  if (building.constructionMonthsRemaining === undefined) return 0
+  building.constructionMonthsRemaining--
+  if (building.constructionMonthsRemaining > 0) return 0
+
+  const newDefId = building.upgradingToDefId!
+  const newDef = BUILDING_DEFS[newDefId]
+  if (!newDef) return 0
+
+  // Check if expanded footprint fits
+  if (!footprintFits(map, building.x, building.y, newDef.size, building.id)) {
+    // Wait one more month
+    building.constructionMonthsRemaining = 1
+    return 0
+  }
+
+  building.defId = newDefId
+  building.density = newDef.density
+  building.state = 'active'
+  building.constructionMonthsRemaining = undefined
+  building.upgradingToDefId = undefined
+  building.age = 0
+
+  return newDef.population
+}
+
+function footprintFits(
+  map: GameMap,
+  x: number,
+  y: number,
+  size: { w: number; h: number },
+  ownId: string,
+): boolean {
+  for (let dy = 0; dy < size.h; dy++) {
+    for (let dx = 0; dx < size.w; dx++) {
+      const tx = x + dx
+      const ty = y + dy
+      if (tx >= map.width || ty >= map.height) return false
+      const conflict = map.buildings.find(
+        b => b.id !== ownId && b.state !== 'under_construction' && occupiesTile(b, tx, ty)
+      )
+      if (conflict) return false
+    }
+  }
+  return true
+}
+
+function occupiesTile(b: Building, x: number, y: number): boolean {
+  const def = BUILDING_DEFS[b.defId]
+  if (!def) return false
+  return x >= b.x && x < b.x + def.size.w && y >= b.y && y < b.y + def.size.h
 }
