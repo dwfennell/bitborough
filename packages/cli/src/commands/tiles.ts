@@ -12,12 +12,21 @@ export function tilesCommand(program: Command) {
     .action((x1, y1, x2, y2, opts) => {
       const engine = loadEngine(opts.file)
       const state = engine.getState()
+      const x1i = parseInt(x1), y1i = parseInt(y1), x2i = parseInt(x2), y2i = parseInt(y2)
+      if (
+        isNaN(x1i) || isNaN(y1i) || isNaN(x2i) || isNaN(y2i) ||
+        x1i < 0 || y1i < 0 || x2i < 0 || y2i < 0 ||
+        x1i >= state.map.width || y1i >= state.map.height ||
+        x2i >= state.map.width || y2i >= state.map.height
+      ) {
+        out({ ok: false, error: `Coordinates (${x1i},${y1i})-(${x2i},${y2i}) out of bounds` })
+      }
       const tiles = []
       const gridRows: string[] = []
 
-      for (let y = parseInt(y1); y <= parseInt(y2); y++) {
+      for (let y = y1i; y <= y2i; y++) {
         const rowCells: string[] = []
-        for (let x = parseInt(x1); x <= parseInt(x2); x++) {
+        for (let x = x1i; x <= x2i; x++) {
           const info = engine.getTile(x, y)
           const building = state.map.buildings.find((b: Building) => b.x === x && b.y === y)
           tiles.push({

@@ -13,6 +13,9 @@ export function tileCommand(program: Command) {
       const engine = loadEngine(opts.file)
       const tx = parseInt(x), ty = parseInt(y)
       const state = engine.getState()
+      if (isNaN(tx) || isNaN(ty) || tx < 0 || ty < 0 || tx >= state.map.width || ty >= state.map.height) {
+        out({ ok: false, error: `Coordinates (${tx},${ty}) out of bounds` })
+      }
       const info = engine.getTile(tx, ty)
       const building = state.map.buildings.find((b: Building) => b.x === tx && b.y === ty)
       out({

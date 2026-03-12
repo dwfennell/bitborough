@@ -23,6 +23,7 @@ export function zoneCommand(program: Command) {
       out({
         ok: result.ok,
         reason: result.ok ? undefined : String((result as { ok: false; reason: unknown }).reason),
+        funds: engine.getState().funds,
       })
     })
 }

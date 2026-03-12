@@ -10,6 +10,9 @@ export function tickCommand(program: Command) {
     .option('--file <path>', 'game file', 'game.json')
     .action((n, opts) => {
       const months = parseInt(n ?? '1')
+      if (isNaN(months) || months < 1) {
+        out({ ok: false, error: `Invalid tick count: ${n}` })
+      }
       const engine = loadEngine(opts.file)
       // ticksPerMonth = 4 by default; advance that many ticks per month
       const ticksPerMonth = DEFAULTS.ticksPerMonth

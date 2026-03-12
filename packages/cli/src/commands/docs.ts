@@ -13,8 +13,11 @@ export function docsCommand(program: Command) {
         out(getBuildingReference())
       } else {
         const s = SECTIONS.find(x => x.id === section)
-        if (!s) out({ ok: false, error: `Unknown section: ${section}. Run 'bitt docs' to list sections.` })
-        out({ id: s!.id, title: s!.title, body: s!.body })
+        if (!s) {
+          out({ ok: false, error: `Unknown section: ${section}. Run 'bitt docs' to list sections.` })
+        } else {
+          out({ id: s.id, title: s.title, body: s.body })
+        }
       }
     })
 }

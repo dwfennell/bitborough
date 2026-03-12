@@ -27,22 +27,24 @@ export function placeCommand(program: Command) {
       const engine = loadEngine(opts.file)
       const tx = parseInt(x), ty = parseInt(y)
 
+      if (!(type in INFRA_MAP) && type !== 'pave' && !(type in BUILDING_MAP)) {
+        out({ ok: false, error: `Unknown type: ${type}. Valid: road, powerline, pave, ${Object.keys(BUILDING_MAP).join(', ')}` })
+      }
+
       let result: { ok: boolean; reason?: unknown; detail?: string }
 
       if (type in INFRA_MAP) {
         result = engine.placeTile(tx, ty, INFRA_MAP[type]!)
       } else if (type === 'pave') {
         result = engine.upgradeTile(tx, ty)
-      } else if (type in BUILDING_MAP) {
-        result = engine.placeBuilding(tx, ty, BUILDING_MAP[type]!)
       } else {
-        out({ ok: false, error: `Unknown type: ${type}. Valid: road, powerline, pave, ${Object.keys(BUILDING_MAP).join(', ')}` })
+        result = engine.placeBuilding(tx, ty, BUILDING_MAP[type]!)
       }
 
-      if (result!.ok) saveEngine(engine, opts.file)
+      if (result.ok) saveEngine(engine, opts.file)
       out({
-        ok: result!.ok,
-        reason: result!.ok ? undefined : String(result!.reason),
+        ok: result.ok,
+        reason: result.ok ? undefined : String(result.reason),
         detail: (result as { detail?: string }).detail,
         funds: engine.getState().funds,
       })
