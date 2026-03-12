@@ -93,6 +93,42 @@ describe('Full city lifecycle', () => {
     expect(engine.getState().population).toBeLessThanOrEqual(normalEngine.getState().population)
   })
 
+  test('no density upgrades occur in first 3 months (buildings need time to fill)', () => {
+    const engine = Engine.create(createTestMap(32), { seed: 42, startingFunds: 999_999 })
+    engine.placeBuilding(0, 0, 'power.coal')
+    // Connect power and build paved roads with residential zones
+    for (let x = 2; x < 12; x++) {
+      engine.placeTile(x, 2, Infrastructure.PowerLine)
+      engine.placeTile(x, 3, Infrastructure.Road)
+      engine.upgradeTile(x, 3)
+      engine.placeZone(x, 4, ZoneType.Residential)
+    }
+    // Only 3 months (12 ticks at 4 ticks/month)
+    for (let i = 0; i < 12; i++) engine.tick()
+    // No building should be medium density yet (need time to fill)
+    const hasMed = engine.getState().map.buildings.some(b =>
+      b.state !== 'under_construction' && (b.defId.includes('med') || b.defId.includes('high'))
+    )
+    expect(hasMed).toBe(false)
+  })
+
+  test('population grows gradually, not instantly on zone development', () => {
+    const engine = Engine.create(createTestMap(32), { seed: 99, startingFunds: 999_999 })
+    engine.placeBuilding(0, 0, 'power.coal')
+    for (let x = 2; x < 8; x++) {
+      engine.placeTile(x, 2, Infrastructure.PowerLine)
+      engine.placeTile(x, 3, Infrastructure.Road)
+      engine.placeZone(x, 4, ZoneType.Residential)
+    }
+    // After first monthly tick, population should be very low (buildings just placed, residents=0)
+    for (let i = 0; i < 4; i++) engine.tick()  // ~1 month
+    const popAfter1Month = engine.getState().population
+    // After 12 months, population should be higher (fill loop working)
+    for (let i = 0; i < 44; i++) engine.tick()  // ~11 more months
+    const popAfter12Months = engine.getState().population
+    expect(popAfter12Months).toBeGreaterThan(popAfter1Month)
+  })
+
   test('save and load preserves city', () => {
     const engine = Engine.create(createTestMap(64), { seed: 42 })
     engine.placeBuilding(10, 10, 'power.coal')
