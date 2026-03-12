@@ -1,5 +1,6 @@
 import { describe, test, expect } from 'vitest'
 import { COSTS, MAINTENANCE, POWER } from '@bitborough/core'
+import { BUILDING_DEFS } from '@bitborough/engine'
 import { getBuildingReference } from '../building-reference.js'
 
 describe('getBuildingReference', () => {
@@ -15,7 +16,7 @@ describe('getBuildingReference', () => {
   test('res.low row has correct population', () => {
     const rows = getBuildingReference()
     const res = rows.find(r => r.id === 'res.low')
-    expect(res!.population).toBe(10)
+    expect(res!.population).toBe(BUILDING_DEFS['res.low']!.population)
   })
 
   test('every row has an id, name, cost, and maintenanceCost', () => {
