@@ -112,7 +112,11 @@ describe('Full city lifecycle', () => {
     const parsed = JSON.parse(json)
     const restored = Engine.restore(parsed)
 
-    expect(restored.getState().population).toBe(popBefore)
+    // population is recomputed from Σ b.residents on restore; funds are preserved
+    const expectedPop = restored.getState().map.buildings
+      .filter(b => b.state === 'active')
+      .reduce((sum, b) => sum + b.residents, 0)
+    expect(restored.getState().population).toBe(expectedPop)
     expect(restored.getState().funds).toBe(fundsBefore)
   })
 })

@@ -301,6 +301,7 @@ export class Engine {
       density: def.density,
       age: 0,
       state: 'active',
+      residents: 0,
     }
 
     this.map.buildings.push(building)
@@ -332,7 +333,7 @@ export class Engine {
     const activeFires: Array<[number, number]> = Array.from(this.fireState.activeFires.entries())
 
     return {
-      version: 1,
+      version: 2,
       map: {
         version: this.map.version,
         width: this.map.width,
@@ -373,7 +374,17 @@ export class Engine {
       infrastructure: new Uint16Array(save.map.infrastructure),
       connections: new Uint8Array(save.map.connections),
       elevation: new Uint8Array(save.map.elevation),
-      buildings: save.map.buildings.map((b) => ({ ...b, state: b.state ?? 'active' })),
+      buildings: save.map.buildings.map((b) => ({
+        ...b,
+        state: b.state ?? 'active',
+        residents: b.residents ?? (
+          // v1 save: default to capacity so old cities aren't empty
+          save.version < 2
+            ? (BUILDING_DEFS[b.defId]?.capacity ?? 0)
+            : 0
+        ),
+        lowOccupancyMonths: b.lowOccupancyMonths,
+      })),
       meta: { ...save.map.meta },
     }
 
@@ -392,7 +403,6 @@ export class Engine {
     // Restore simulation state
     engine.tickCount = save.state.tickCount
     engine.funds = save.state.funds
-    engine.population = save.state.population
     engine.funding = {
       police: save.state.funding.police ?? 100,
       fire: save.state.funding.fire ?? 100,
@@ -414,6 +424,11 @@ export class Engine {
       if (num > maxId) maxId = num
     }
     engine.nextBuildingId = maxId + 1
+
+    // Recompute population as Σ b.residents — always correct regardless of save version
+    engine.population = map.buildings
+      .filter(b => b.state === 'active')
+      .reduce((sum, b) => sum + (b.residents ?? 0), 0)
 
     // Rebuild derived state
     propagatePower(engine.map, engine.powerGrid)
