@@ -5,7 +5,6 @@ import type { PRNG } from '../prng.js'
 import { computeDesirability } from './desirability.js'
 
 export const TRANSIT_RADIUS = 10
-export const MEDIUM_DENSITY_POP_THRESHOLD = 500
 export const FILL_RATE = 0.12
 export const DRAIN_RATE = 0.20
 
@@ -83,6 +82,21 @@ export function hasCriticalMass(map: GameMap, x: number, y: number): boolean {
   return total > 0 && developed / total > 0.5
 }
 
+export function neighbourhoodAvgOccupancy(map: GameMap, x: number, y: number, radius: number): number {
+  let total = 0
+  let count = 0
+  for (const b of map.buildings) {
+    if (b.x === x && b.y === y) continue  // exclude self
+    if (b.state !== 'active') continue
+    const def = BUILDING_DEFS[b.defId]
+    if (!def || def.capacity === 0 || def.category === BuildingCategory.Special) continue
+    if (Math.abs(b.x - x) + Math.abs(b.y - y) > radius) continue
+    total += b.residents / def.capacity
+    count++
+  }
+  return count === 0 ? 0 : total / count
+}
+
 // Weighted variants per zone tier: [defId, weight]
 const MEDIUM_VARIANTS: Record<string, Array<[string, number]>> = {
   'res.low': [['res.med', 1], ['res.med.b', 1]],
@@ -135,7 +149,6 @@ export function updateDensity(
 
   const { cx, cy } = cityCenter(map)
   const radius = mediumRadius(population)
-  const popThresholdMet = population >= MEDIUM_DENSITY_POP_THRESHOLD
 
   for (const building of map.buildings) {
     if (building.state === 'under_construction') {
@@ -155,10 +168,15 @@ export function updateDensity(
     if (!def || def.category === BuildingCategory.Special) continue
 
     // Low → Medium
-    if (def.density === DensityLevel.Low && popThresholdMet) {
+    if (def.density === DensityLevel.Low) {
       const variants = MEDIUM_VARIANTS[building.defId]
       if (!variants) continue
       if (!hasNearbyPavedRoad(map, building.x, building.y)) continue
+
+      const occupancy = def.capacity > 0 ? building.residents / def.capacity : 0
+      if (occupancy < 0.80) continue
+      const neighbourAvg = neighbourhoodAvgOccupancy(map, building.x, building.y, 5)
+      if (neighbourAvg < 0.75) continue
 
       const dist = Math.hypot(building.x - cx, building.y - cy)
       const demandFactor = getZoneDemand(building.defId, demand)
