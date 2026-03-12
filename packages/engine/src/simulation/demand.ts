@@ -21,7 +21,7 @@ function totalResCap(map: GameMap): number {
  *
  * Key formulas (from PRD):
  * - Tax modifier: 1.0 - ((taxRate - 0.07) * 5.0) — neutral at 7%
- * - Residential base: 0.5 (always positive base demand)
+ * - Residential base: 0.7 (always positive base demand)
  * - Commercial: follows total residential capacity (planning intent, not actual residents)
  * - Industrial: base 0.3 with dampened tax sensitivity
  * - Congestion: average road congestion > 0.8 suppresses all demand

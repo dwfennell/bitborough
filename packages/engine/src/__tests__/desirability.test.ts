@@ -39,6 +39,26 @@ describe('infrastructure gate', () => {
     expect(d).toBeGreaterThan(0)
     expect(d).toBeLessThanOrEqual(1)
   })
+
+  test('road within 3 tiles (not on tile itself) → non-zero desirability', () => {
+    const map = createTestMap(16)
+    const { powerGrid, crimeLevel, fireCoverage, pollutionLevel } = makeLayers(16 * 16)
+    powerGrid[5 * 16 + 5] = 1
+    // Road on adjacent tile (1 tile away), NOT on (5,5) itself
+    map.infrastructure[5 * 16 + 6] = 0b1  // Road on (6,5)
+    const d = computeDesirability(ZoneType.Residential, 5, 5, map, powerGrid, crimeLevel, fireCoverage, pollutionLevel)
+    expect(d).toBeGreaterThan(0)  // should get road access bonus from nearby road
+  })
+
+  test('road more than 3 tiles away → 0 (no road access)', () => {
+    const map = createTestMap(16)
+    const { powerGrid, crimeLevel, fireCoverage, pollutionLevel } = makeLayers(16 * 16)
+    powerGrid[5 * 16 + 5] = 1
+    // Road 4 tiles away (beyond the 3-tile radius)
+    map.infrastructure[5 * 16 + 9] = 0b1  // Road on (9,5) — distance 4
+    const d = computeDesirability(ZoneType.Residential, 5, 5, map, powerGrid, crimeLevel, fireCoverage, pollutionLevel)
+    expect(d).toBe(0)  // too far away
+  })
 })
 
 describe('residential desirability', () => {
