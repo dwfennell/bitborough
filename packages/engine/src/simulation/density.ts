@@ -219,6 +219,9 @@ export function updateDensity(
       if (!hasNearbyTransitStop(map, building.x, building.y)) continue
       if (!hasCriticalMass(map, building.x, building.y)) continue
 
+      const occupancy = def.capacity > 0 ? building.residents / def.capacity : 0
+      if (occupancy < 0.85) continue
+
       const distToTransit = nearestTransitDist(map, building.x, building.y)
       const demandFactor = getZoneDemand(building.defId, demand)
       const p = upgradeProb(demandFactor, distToTransit, TRANSIT_RADIUS)
@@ -397,7 +400,9 @@ export function tickDerelict(map: GameMap, building: Building): number {
       // Already lowest density — reset to active so it can redevelop naturally
       building.state = 'active'
       building.derelictMonths = undefined
-      return currentPop  // restore population for low-density buildings resetting to active
+      building.residents = 0
+      building.lowOccupancyMonths = undefined
+      return 0  // fill loop restores occupancy naturally
     }
   }
   return 0

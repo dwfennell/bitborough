@@ -321,6 +321,49 @@ describe('Medium→High upgrade', () => {
     }
     expect(map.buildings[0]!.defId).toBe('res.med')
   })
+
+  test('medium→high upgrade blocked if occupancy below 0.85 despite transit and critical mass', () => {
+    const map = createTestMap(32)
+    // Main building: res.med with only 5 out of 100 capacity (5% occupancy)
+    map.buildings.push({
+      id: 'b1', defId: 'res.med', x: 10, y: 10,
+      powered: true, density: DensityLevel.Medium, age: 0, state: 'active', residents: 5,
+    })
+    // Transit stop within 10 tiles
+    map.buildings.push({
+      id: 'ts', defId: 'transit.stop', x: 12, y: 10,
+      powered: true, density: DensityLevel.Low, age: 0, state: 'active',
+    })
+    // Fill >50% of neighbours in 3-tile radius with medium buildings to satisfy criticalMass
+    const range = 3
+    let id = 0
+    for (let dy = -range; dy <= range; dy++) {
+      for (let dx = -range; dx <= range; dx++) {
+        if (dx === 0 && dy === 0) continue
+        if (Math.abs(dx) + Math.abs(dy) > range) continue
+        map.buildings.push({
+          id: `m${id++}`, defId: 'res.med', x: 10 + dx, y: 10 + dy,
+          powered: true, density: DensityLevel.Medium, age: 0, state: 'active', residents: 90,
+        })
+      }
+    }
+    const prng = new PRNG(1)
+    const demand = { residential: 1.0, commercial: 1.0, industrial: 1.0 }
+    const powerGrid = new Uint8Array(map.width * map.height)
+    const crimeLevel = new Uint8Array(map.width * map.height)
+    const fireCoverage = new Uint8Array(map.width * map.height)
+    const pollutionLevel = new Uint8Array(map.width * map.height)
+    // Run many iterations — pin main building occupancy to 5% each tick
+    // Also reset lowOccupancyMonths to prevent dereliction (testing upgrade gate, not dereliction)
+    for (let i = 0; i < 500; i++) {
+      map.buildings[0]!.residents = 5  // keep occupancy at 5%, well below 0.85
+      map.buildings[0]!.lowOccupancyMonths = undefined  // prevent dereliction from firing
+      updateDensity(map, powerGrid, demand, 5000, prng, { value: 100 }, crimeLevel, fireCoverage, pollutionLevel)
+    }
+    // Despite transit and critical mass, low occupancy must block upgrade
+    expect(map.buildings[0]!.state).toBe('active')
+    expect(map.buildings[0]!.defId).toBe('res.med')
+  })
 })
 
 describe('derelict buildings', () => {
