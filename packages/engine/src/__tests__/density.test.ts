@@ -747,6 +747,11 @@ describe('occupancy-based upgrade gates', () => {
     }
     expect(upgraded).toBe(true)
   })
+
+  test('MEDIUM_DENSITY_POP_THRESHOLD is not exported (removed)', () => {
+    // @ts-expect-error — should not exist
+    expect(typeof MEDIUM_DENSITY_POP_THRESHOLD).toBe('undefined')
+  })
 })
 
 describe('density in Engine.tick()', () => {
