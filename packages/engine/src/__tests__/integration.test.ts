@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'vitest'
 import { Engine } from '../Engine.js'
-import { createTestMap, advanceYear } from '../test-helpers.js'
+import { createTestMap, advanceMonth, advanceYear } from '../test-helpers.js'
 import { Infrastructure, ZoneType } from '@bitborough/core'
 
 describe('Full city lifecycle', () => {
@@ -104,7 +104,7 @@ describe('Full city lifecycle', () => {
       engine.placeZone(x, 4, ZoneType.Residential)
     }
     // Only 3 months (12 ticks at 4 ticks/month)
-    for (let i = 0; i < 12; i++) engine.tick()
+    for (let m = 0; m < 3; m++) advanceMonth(engine)
     // No building should be medium density yet (need time to fill)
     const hasMed = engine.getState().map.buildings.some(b =>
       b.state !== 'under_construction' && (b.defId.includes('med') || b.defId.includes('high'))
@@ -121,12 +121,15 @@ describe('Full city lifecycle', () => {
       engine.placeZone(x, 4, ZoneType.Residential)
     }
     // After first monthly tick, population should be very low (buildings just placed, residents=0)
-    for (let i = 0; i < 4; i++) engine.tick()  // ~1 month
+    advanceMonth(engine)
     const popAfter1Month = engine.getState().population
     // After 12 months, population should be higher (fill loop working)
-    for (let i = 0; i < 44; i++) engine.tick()  // ~11 more months
+    for (let m = 0; m < 11; m++) advanceMonth(engine)
     const popAfter12Months = engine.getState().population
-    expect(popAfter12Months).toBeGreaterThan(popAfter1Month)
+    // After 1 month, residents should still be very low (gradual fill, not instant)
+    expect(popAfter1Month).toBeLessThan(5)
+    // After 12 months, population should have grown substantially
+    expect(popAfter12Months).toBeGreaterThan(5)
   })
 
   test('save and load preserves city', () => {
