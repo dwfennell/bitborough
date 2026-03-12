@@ -82,7 +82,7 @@ function hasParkNearby(x: number, y: number, map: GameMap): boolean {
 function hasTransitNearby(x: number, y: number, map: GameMap): boolean {
   for (const b of map.buildings) {
     if (b.defId !== 'transit.stop' || b.state !== 'active') continue
-    if (Math.abs(b.x - x) + Math.abs(b.y - y) < COM_TRANSIT_RADIUS) return true
+    if (Math.abs(b.x - x) + Math.abs(b.y - y) <= COM_TRANSIT_RADIUS) return true
   }
   return false
 }

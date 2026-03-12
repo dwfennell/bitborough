@@ -175,7 +175,7 @@ describe('commercial desirability', () => {
   test('transit stop >10 tiles away does not add bonus', () => {
     const { map, powerGrid, crimeLevel, fireCoverage, pollutionLevel } = setup()
     map.buildings.push({
-      id: 'ts1', defId: 'transit.stop', x: 0, y: 0,  // >10 tiles from (5,5)
+      id: 'ts1', defId: 'transit.stop', x: 15, y: 15,  // distance 20 from (5,5)
       powered: true, density: DensityLevel.Low, age: 0, state: 'active', residents: 0,
     })
     const d = computeDesirability(ZoneType.Commercial, 5, 5, map, powerGrid, crimeLevel, fireCoverage, pollutionLevel)
