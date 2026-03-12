@@ -1,0 +1,23 @@
+{
+  "name": "@bitborough/cli",
+  "version": "0.0.1",
+  "type": "module",
+  "bin": { "bitt": "./src/index.ts" },
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@bitborough/core": "workspace:*",
+    "@bitborough/engine": "workspace:*",
+    "@bitborough/map-gen": "workspace:*",
+    "@bitborough/docs": "workspace:*",
+    "commander": "^12.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0",
+    "tsx": "^4.0.0"
+  }
+}
