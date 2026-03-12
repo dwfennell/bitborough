@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- Under construction — 3×3 building footprint -->
+
+  <!-- === Dirt/excavation ground === -->
+  <rect x="0" y="0" width="128" height="128" fill="#d8c498"/>
+  <!-- Wider excavation trench (foundation pit outline) -->
+  <rect x="16" y="16" width="96" height="96" rx="2" fill="#c8b480" opacity="0.18"/>
+  <!-- Dirt texture patches -->
+  <ellipse cx="28" cy="26" rx="14" ry="9" fill="#c8b480" opacity="0.4"/>
+  <ellipse cx="96" cy="34" rx="18" ry="11" fill="#e8d8b0" opacity="0.3"/>
+  <ellipse cx="38" cy="90" rx="16" ry="9" fill="#c8b480" opacity="0.35"/>
+  <ellipse cx="100" cy="100" rx="16" ry="9" fill="#e8d8b0" opacity="0.28"/>
+  <ellipse cx="12" cy="62" rx="7" ry="6" fill="#c8b480" opacity="0.3"/>
+  <ellipse cx="66" cy="60" rx="16" ry="11" fill="#e8d8b0" opacity="0.22"/>
+  <ellipse cx="100" cy="62" rx="10" ry="7" fill="#c8b480" opacity="0.25"/>
+
+  <!-- === Safety fence (orange perimeter) === -->
+  <!-- North fence -->
+  <rect x="4" y="4" width="120" height="8" rx="1" fill="#b09070"/>
+  <g fill="#e8d080" opacity="0.7">
+    <rect x="4" y="4" width="10" height="4" rx="0.5"/>
+    <rect x="24" y="4" width="10" height="4" rx="0.5"/>
+    <rect x="44" y="4" width="10" height="4" rx="0.5"/>
+    <rect x="64" y="4" width="10" height="4" rx="0.5"/>
+    <rect x="84" y="4" width="10" height="4" rx="0.5"/>
+    <rect x="104" y="4" width="10" height="4" rx="0.5"/>
+  </g>
+  <!-- South fence -->
+  <rect x="4" y="116" width="120" height="8" rx="1" fill="#b09070"/>
+  <g fill="#e8d080" opacity="0.7">
+    <rect x="4" y="116" width="10" height="4" rx="0.5"/>
+    <rect x="24" y="116" width="10" height="4" rx="0.5"/>
+    <rect x="44" y="116" width="10" height="4" rx="0.5"/>
+    <rect x="64" y="116" width="10" height="4" rx="0.5"/>
+    <rect x="84" y="116" width="10" height="4" rx="0.5"/>
+    <rect x="104" y="116" width="10" height="4" rx="0.5"/>
+  </g>
+  <!-- West fence -->
+  <rect x="4" y="12" width="8" height="104" rx="1" fill="#b09070"/>
+  <g fill="#e8d080" opacity="0.7">
+    <rect x="4" y="14" width="4" height="10" rx="0.5"/>
+    <rect x="4" y="34" width="4" height="10" rx="0.5"/>
+    <rect x="4" y="54" width="4" height="10" rx="0.5"/>
+    <rect x="4" y="74" width="4" height="10" rx="0.5"/>
+    <rect x="4" y="94" width="4" height="10" rx="0.5"/>
+  </g>
+  <!-- East fence -->
+  <rect x="116" y="12" width="8" height="104" rx="1" fill="#b09070"/>
+  <g fill="#e8d080" opacity="0.7">
+    <rect x="120" y="14" width="4" height="10" rx="0.5"/>
+    <rect x="120" y="34" width="4" height="10" rx="0.5"/>
+    <rect x="120" y="54" width="4" height="10" rx="0.5"/>
+    <rect x="120" y="74" width="4" height="10" rx="0.5"/>
+    <rect x="120" y="94" width="4" height="10" rx="0.5"/>
+  </g>
+
+  <!-- === Large tower crane (top-down, centered slightly right) === -->
+  <!-- Crane tower base (larger footprint) -->
+  <rect x="62" y="38" width="12" height="12" rx="2" fill="#989880" opacity="0.85"/>
+  <!-- Crane jib (very long arm spanning most of site) -->
+  <rect x="14" y="41" width="48" height="5" rx="0.5" fill="#989880" opacity="0.75"/>
+  <!-- Counter jib -->
+  <rect x="74" y="41" width="30" height="5" rx="0.5" fill="#989880" opacity="0.7"/>
+  <!-- Trolley on jib -->
+  <rect x="28" y="40" width="6" height="7" rx="0.5" fill="#b09070" opacity="0.6"/>
+  <!-- Hoist cable -->
+  <line x1="31" y1="47" x2="46" y2="80" stroke="#8a8878" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+  <!-- Hook/load block -->
+  <rect x="40" y="80" width="14" height="8" rx="1" fill="#c8b480" opacity="0.55"/>
+
+  <!-- === Scaffolding corner markers === -->
+  <!-- NW corner scaffold -->
+  <rect x="16" y="16" width="12" height="12" rx="0.5" fill="none" stroke="#989880" stroke-width="1.5" opacity="0.45"/>
+  <!-- NE corner scaffold -->
+  <rect x="100" y="16" width="12" height="12" rx="0.5" fill="none" stroke="#989880" stroke-width="1.5" opacity="0.45"/>
+  <!-- SE corner scaffold -->
+  <rect x="100" y="100" width="12" height="12" rx="0.5" fill="none" stroke="#989880" stroke-width="1.5" opacity="0.45"/>
+
+  <!-- === Three material piles spread across site === -->
+  <!-- Pile 1 (lower-left) -->
+  <rect x="18" y="94" width="22" height="12" rx="1" fill="#c8b898" opacity="0.55"/>
+  <rect x="20" y="92" width="16" height="4" rx="0.5" fill="#d8c498" opacity="0.5"/>
+  <!-- Pile 2 (right, middle) -->
+  <rect x="88" y="64" width="22" height="14" rx="1" fill="#c8b898" opacity="0.5"/>
+  <rect x="91" y="62" width="15" height="4" rx="0.5" fill="#d8c498" opacity="0.45"/>
+  <!-- Pile 3 (right, lower) -->
+  <rect x="88" y="96" width="20" height="12" rx="1" fill="#c8b898" opacity="0.45"/>
+
+  <!-- === Foundation grid (3×3 layout marks) === -->
+  <rect x="18" y="18" width="92" height="92" rx="1" fill="none" stroke="#b09070" stroke-width="1" opacity="0.3"/>
+  <!-- Grid subdivisions -->
+  <line x1="49" y1="18" x2="49" y2="110" stroke="#b09070" stroke-width="0.5" opacity="0.25"/>
+  <line x1="79" y1="18" x2="79" y2="110" stroke="#b09070" stroke-width="0.5" opacity="0.25"/>
+  <line x1="18" y1="49" x2="110" y2="49" stroke="#b09070" stroke-width="0.5" opacity="0.25"/>
+  <line x1="18" y1="79" x2="110" y2="79" stroke="#b09070" stroke-width="0.5" opacity="0.25"/>
+</svg>

@@ -1,4 +1,4 @@
-import { Infrastructure, DensityLevel, BuildingCategory } from '@bitborough/core'
+import { Infrastructure, DensityLevel, BuildingCategory, ZoneType } from '@bitborough/core'
 import type { Building, DemandInfo, GameMap } from '@bitborough/core'
 import { BUILDING_DEFS } from '../buildings-registry.js'
 import type { PRNG } from '../prng.js'
@@ -208,11 +208,20 @@ function tickConstruction(map: GameMap, building: Building): number {
   const newDef = BUILDING_DEFS[newDefId]
   if (!newDef) return 0
 
-  // Check if expanded footprint fits
-  if (!footprintFits(map, building.x, building.y, newDef.size, building.id)) {
-    // Wait one more month
+  const currentSize = BUILDING_DEFS[building.defId]?.size ?? { w: 1, h: 1 }
+  const check = checkFootprintForUpgrade(
+    map, building.x, building.y, newDef.size, building.id, currentSize, newDef.category,
+  )
+
+  if (!check.ok) {
     building.constructionMonthsRemaining = 1
     return 0
+  }
+
+  // Consume same-zone buildings in the expansion area
+  for (const id of check.toConsume) {
+    const idx = map.buildings.findIndex(b => b.id === id)
+    if (idx !== -1) map.buildings.splice(idx, 1)
   }
 
   building.defId = newDefId
@@ -222,28 +231,73 @@ function tickConstruction(map: GameMap, building: Building): number {
   building.upgradingToDefId = undefined
   building.age = 0
 
-  return newDef.population
+  return newDef.population - check.consumedPop
 }
 
-function footprintFits(
+export type FootprintCheck = { ok: false } | { ok: true; toConsume: string[]; consumedPop: number }
+
+/**
+ * Check if the new footprint is compatible with the map for an upgrade.
+ * For zone buildings (res/com/ind), expansion tiles must:
+ *   1. Be in bounds
+ *   2. Have the correct zone type
+ *   3. Either be empty or occupied by a same-category active building (which will be consumed)
+ * Tiles already part of the current building footprint are skipped.
+ */
+export function checkFootprintForUpgrade(
   map: GameMap,
   x: number,
   y: number,
-  size: { w: number; h: number },
+  newSize: { w: number; h: number },
   ownId: string,
-): boolean {
-  for (let dy = 0; dy < size.h; dy++) {
-    for (let dx = 0; dx < size.w; dx++) {
+  currentSize: { w: number; h: number },
+  targetCategory: BuildingCategory,
+): FootprintCheck {
+  const toConsume: string[] = []
+  let consumedPop = 0
+
+  for (let dy = 0; dy < newSize.h; dy++) {
+    for (let dx = 0; dx < newSize.w; dx++) {
       const tx = x + dx
       const ty = y + dy
-      if (tx >= map.width || ty >= map.height) return false
-      const conflict = map.buildings.find(
-        b => b.id !== ownId && b.state !== 'under_construction' && occupiesTile(b, tx, ty)
-      )
-      if (conflict) return false
+      if (tx >= map.width || ty >= map.height) return { ok: false }
+
+      // Skip tiles already part of the current building footprint
+      if (dx < currentSize.w && dy < currentSize.h) continue
+
+      // Expansion tile: zone check for zone buildings
+      if (targetCategory !== BuildingCategory.Special) {
+        const tileZone = map.zones[ty * map.width + tx] as ZoneType
+        if (tileZone !== categoryToZone(targetCategory)) return { ok: false }
+      }
+
+      // Check for buildings in this expansion tile
+      for (const b of map.buildings) {
+        if (b.id === ownId) continue
+        if (!occupiesTile(b, tx, ty)) continue
+        const bDef = BUILDING_DEFS[b.defId]
+        if (!bDef) return { ok: false }
+        // Same-category active zone buildings can be consumed (merged into the upgrade)
+        if (bDef.category === targetCategory && bDef.category !== BuildingCategory.Special && b.state === 'active') {
+          if (!toConsume.includes(b.id)) {
+            toConsume.push(b.id)
+            consumedPop += bDef.population
+          }
+        } else {
+          return { ok: false }
+        }
+      }
     }
   }
-  return true
+
+  return { ok: true, toConsume, consumedPop }
+}
+
+function categoryToZone(category: BuildingCategory): ZoneType {
+  if (category === BuildingCategory.Residential) return ZoneType.Residential
+  if (category === BuildingCategory.Commercial) return ZoneType.Commercial
+  if (category === BuildingCategory.Industrial) return ZoneType.Industrial
+  return ZoneType.None
 }
 
 function occupiesTile(b: Building, x: number, y: number): boolean {

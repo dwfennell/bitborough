@@ -52,9 +52,26 @@ const BUILDING_COLORS: Record<string, string> = {
 
 // Maps building defIds to SVG asset paths (served from publicDir)
 const BUILDING_SPRITES: Record<string, string> = {
+  // Low density
   'res.low': '/tiles/buildings/residential-small.svg',
   'com.low': '/tiles/buildings/commercial-small.svg',
   'ind.low': '/tiles/buildings/industrial-small.svg',
+  // Medium density
+  'res.med': '/tiles/buildings/residential-medium.svg',
+  'res.med.b': '/tiles/buildings/residential-medium.svg',
+  'com.med': '/tiles/buildings/commercial-medium.svg',
+  'com.med.b': '/tiles/buildings/commercial-medium.svg',
+  'ind.med': '/tiles/buildings/industrial-medium.svg',
+  'ind.med.b': '/tiles/buildings/industrial-medium-b.svg',
+  // High density
+  'res.high': '/tiles/buildings/residential-large.svg',
+  'com.high': '/tiles/buildings/commercial-large.svg',
+  'com.high.b': '/tiles/buildings/commercial-large-b.svg',
+  'ind.high': '/tiles/buildings/industrial-large.svg',
+  'ind.high.b': '/tiles/buildings/industrial-large-b.svg',
+  // Transit
+  'transit.stop': '/tiles/buildings/transit-stop.svg',
+  // Power / service / special
   'power.diesel': '/tiles/power/diesel-generator.svg',
   'power.coal': '/tiles/power/power-plant-coal.svg',
   'power.nuclear': '/tiles/power/power-plant-nuclear.svg',
@@ -89,7 +106,8 @@ export class ColorTileRenderer implements TileRenderer {
     const half = tileSize / 2
 
     if (infra & Infrastructure.Road) {
-      ctx.fillStyle = '#555'
+      const isPaved = !!(infra & Infrastructure.PavedRoad)
+      ctx.fillStyle = isPaved ? '#404040' : '#555'
       const roadWidth = tileSize * 0.4
       const offset = (tileSize - roadWidth) / 2
       ctx.fillRect(screenX + offset, screenY + offset, roadWidth, roadWidth)
@@ -103,6 +121,17 @@ export class ColorTileRenderer implements TileRenderer {
         ctx.fillRect(cx - roadWidth / 2, cy, roadWidth, half)
       if (connections & 8)
         ctx.fillRect(screenX, cy - roadWidth / 2, half, roadWidth)
+
+      // Yellow center stripe on paved roads
+      if (isPaved && tileSize >= 8) {
+        ctx.fillStyle = '#e8d080'
+        ctx.globalAlpha = 0.5
+        if (connections & 1) ctx.fillRect(cx - 0.5, screenY, 1, half)
+        if (connections & 4) ctx.fillRect(cx - 0.5, cy, 1, half)
+        if (connections & 2) ctx.fillRect(cx, cy - 0.5, half, 1)
+        if (connections & 8) ctx.fillRect(screenX, cy - 0.5, half, 1)
+        ctx.globalAlpha = 1.0
+      }
     }
 
     if (infra & Infrastructure.PowerLine) {
@@ -134,6 +163,35 @@ export class ColorTileRenderer implements TileRenderer {
   ): void {
     const w = def.size.w * tileSize
     const h = def.size.h * tileSize
+
+    // State-based sprites override normal building sprites
+    if (building.state === 'under_construction') {
+      const maxDim = Math.max(def.size.w, def.size.h)
+      const constructionSprite = maxDim >= 4
+        ? '/tiles/buildings/construction-4x4.svg'
+        : maxDim >= 3
+          ? '/tiles/buildings/construction-3x3.svg'
+          : maxDim >= 2
+            ? '/tiles/buildings/construction-2x2.svg'
+            : '/tiles/buildings/construction.svg'
+      const img = this.sprites.get(constructionSprite)
+      if (img) {
+        ctx.fillStyle = '#d8c498'
+        ctx.fillRect(screenX, screenY, w, h)
+        ctx.drawImage(img, screenX, screenY, w, h)
+        return
+      }
+    }
+
+    if (building.state === 'derelict') {
+      const img = this.sprites.get('/tiles/buildings/derelict.svg')
+      if (img) {
+        ctx.fillStyle = '#c8c0a8'
+        ctx.fillRect(screenX, screenY, w, h)
+        ctx.drawImage(img, screenX, screenY, w, h)
+        return
+      }
+    }
 
     // Try SVG sprite first
     const spritePath = BUILDING_SPRITES[building.defId]

@@ -14,6 +14,7 @@ import {
   updateDensity,
   checkDereliction,
   tickDerelict,
+  checkFootprintForUpgrade,
 } from '../simulation/density.js'
 
 describe('PavedRoad infrastructure', () => {
@@ -385,6 +386,109 @@ describe('paved road upgrade', () => {
     const before = engine.getState().funds
     engine.upgradeTile(5, 5)
     expect(engine.getState().funds).toBeLessThan(before)
+  })
+})
+
+describe('checkFootprintForUpgrade — building consumption', () => {
+  test('non-expanding upgrade (1x1 → 1x1) always succeeds with no buildings to consume', () => {
+    const map = createTestMap(32)
+    map.zones[10 * map.width + 10] = ZoneType.Residential
+    map.buildings.push({ id: 'b1', defId: 'res.low', x: 10, y: 10, powered: true, density: DensityLevel.Low, age: 0, state: 'under_construction', constructionMonthsRemaining: 0, upgradingToDefId: 'res.med' })
+    const result = checkFootprintForUpgrade(map, 10, 10, { w: 1, h: 1 }, 'b1', { w: 1, h: 1 }, BuildingCategory.Residential)
+    expect(result).toEqual({ ok: true, toConsume: [], consumedPop: 0 })
+  })
+
+  test('expanding upgrade consumes same-zone building in new footprint', () => {
+    const map = createTestMap(32)
+    // Zone both tiles as Residential
+    map.zones[10 * map.width + 10] = ZoneType.Residential
+    map.zones[10 * map.width + 11] = ZoneType.Residential
+    // res.low at (10,10) upgrading to res.med.b (2×1); res.low at (11,10) should be consumed
+    map.buildings.push({ id: 'b1', defId: 'res.low', x: 10, y: 10, powered: true, density: DensityLevel.Low, age: 0, state: 'under_construction', constructionMonthsRemaining: 0, upgradingToDefId: 'res.med.b' })
+    map.buildings.push({ id: 'b2', defId: 'res.low', x: 11, y: 10, powered: true, density: DensityLevel.Low, age: 0, state: 'active' })
+    const result = checkFootprintForUpgrade(map, 10, 10, { w: 2, h: 1 }, 'b1', { w: 1, h: 1 }, BuildingCategory.Residential)
+    expect(result).toEqual({ ok: true, toConsume: ['b2'], consumedPop: 10 })
+  })
+
+  test('expansion tile with wrong zone type blocks the upgrade', () => {
+    const map = createTestMap(32)
+    map.zones[10 * map.width + 10] = ZoneType.Residential
+    map.zones[10 * map.width + 11] = ZoneType.Commercial  // wrong zone
+    map.buildings.push({ id: 'b1', defId: 'res.low', x: 10, y: 10, powered: true, density: DensityLevel.Low, age: 0, state: 'under_construction', constructionMonthsRemaining: 0, upgradingToDefId: 'res.med.b' })
+    const result = checkFootprintForUpgrade(map, 10, 10, { w: 2, h: 1 }, 'b1', { w: 1, h: 1 }, BuildingCategory.Residential)
+    expect(result.ok).toBe(false)
+  })
+
+  test('expansion tile with unzoned land blocks the upgrade', () => {
+    const map = createTestMap(32)
+    map.zones[10 * map.width + 10] = ZoneType.Residential
+    // tile (11,10) has ZoneType.None (default)
+    map.buildings.push({ id: 'b1', defId: 'res.low', x: 10, y: 10, powered: true, density: DensityLevel.Low, age: 0, state: 'under_construction', constructionMonthsRemaining: 0, upgradingToDefId: 'res.med.b' })
+    const result = checkFootprintForUpgrade(map, 10, 10, { w: 2, h: 1 }, 'b1', { w: 1, h: 1 }, BuildingCategory.Residential)
+    expect(result.ok).toBe(false)
+  })
+
+  test('different-zone building in expansion area blocks the upgrade', () => {
+    const map = createTestMap(32)
+    map.zones[10 * map.width + 10] = ZoneType.Residential
+    map.zones[10 * map.width + 11] = ZoneType.Residential
+    map.buildings.push({ id: 'b1', defId: 'res.low', x: 10, y: 10, powered: true, density: DensityLevel.Low, age: 0, state: 'under_construction', constructionMonthsRemaining: 0, upgradingToDefId: 'res.med.b' })
+    // Commercial building on an R-zoned tile (unusual but should still block)
+    map.buildings.push({ id: 'b2', defId: 'com.low', x: 11, y: 10, powered: true, density: DensityLevel.Low, age: 0, state: 'active' })
+    const result = checkFootprintForUpgrade(map, 10, 10, { w: 2, h: 1 }, 'b1', { w: 1, h: 1 }, BuildingCategory.Residential)
+    expect(result.ok).toBe(false)
+  })
+
+  test('under_construction building in expansion area blocks (waits)', () => {
+    const map = createTestMap(32)
+    map.zones[10 * map.width + 10] = ZoneType.Residential
+    map.zones[10 * map.width + 11] = ZoneType.Residential
+    map.buildings.push({ id: 'b1', defId: 'res.low', x: 10, y: 10, powered: true, density: DensityLevel.Low, age: 0, state: 'under_construction', constructionMonthsRemaining: 0, upgradingToDefId: 'res.med.b' })
+    map.buildings.push({ id: 'b2', defId: 'res.low', x: 11, y: 10, powered: true, density: DensityLevel.Low, age: 0, state: 'under_construction', constructionMonthsRemaining: 1 })
+    const result = checkFootprintForUpgrade(map, 10, 10, { w: 2, h: 1 }, 'b1', { w: 1, h: 1 }, BuildingCategory.Residential)
+    expect(result.ok).toBe(false)
+  })
+
+  test('out-of-bounds expansion blocks the upgrade', () => {
+    const map = createTestMap(32)
+    map.zones[10 * map.width + 31] = ZoneType.Residential
+    map.buildings.push({ id: 'b1', defId: 'res.low', x: 31, y: 10, powered: true, density: DensityLevel.Low, age: 0, state: 'under_construction', constructionMonthsRemaining: 0, upgradingToDefId: 'res.med.b' })
+    // Expanding to x=32 which is out of bounds for a 32-wide map
+    const result = checkFootprintForUpgrade(map, 31, 10, { w: 2, h: 1 }, 'b1', { w: 1, h: 1 }, BuildingCategory.Residential)
+    expect(result.ok).toBe(false)
+  })
+
+  test('multiple buildings consumed in a 2×2 upgrade', () => {
+    const map = createTestMap(32)
+    // Zone all four tiles
+    for (const [dx, dy] of [[0,0],[1,0],[0,1],[1,1]]) {
+      map.zones[(10 + dy) * map.width + (10 + dx)] = ZoneType.Residential
+    }
+    map.buildings.push({ id: 'b1', defId: 'res.low', x: 10, y: 10, powered: true, density: DensityLevel.Low, age: 0, state: 'under_construction', constructionMonthsRemaining: 0, upgradingToDefId: 'res.high' })
+    map.buildings.push({ id: 'b2', defId: 'res.low', x: 11, y: 10, powered: true, density: DensityLevel.Low, age: 0, state: 'active' })
+    map.buildings.push({ id: 'b3', defId: 'res.low', x: 10, y: 11, powered: true, density: DensityLevel.Low, age: 0, state: 'active' })
+    map.buildings.push({ id: 'b4', defId: 'res.low', x: 11, y: 11, powered: true, density: DensityLevel.Low, age: 0, state: 'active' })
+    const result = checkFootprintForUpgrade(map, 10, 10, { w: 2, h: 2 }, 'b1', { w: 1, h: 1 }, BuildingCategory.Residential)
+    expect(result).toMatchObject({ ok: true, consumedPop: 30 })
+    if (result.ok) expect(result.toConsume.sort()).toEqual(['b2', 'b3', 'b4'])
+  })
+
+  test('tickConstruction removes consumed buildings and corrects population delta', () => {
+    const map = createTestMap(32)
+    map.zones[10 * map.width + 10] = ZoneType.Residential
+    map.zones[10 * map.width + 11] = ZoneType.Residential
+    map.buildings.push({ id: 'b1', defId: 'res.low', x: 10, y: 10, powered: true, density: DensityLevel.Low, age: 0, state: 'under_construction', constructionMonthsRemaining: 1, upgradingToDefId: 'res.med.b' })
+    map.buildings.push({ id: 'b2', defId: 'res.low', x: 11, y: 10, powered: true, density: DensityLevel.Low, age: 0, state: 'active' })
+    const prng = new PRNG(1)
+    const demand = { residential: 1.0, commercial: 1.0, industrial: 1.0 }
+    const powerGrid = new Uint8Array(map.width * map.height)
+    const result = updateDensity(map, powerGrid, demand, 5000, prng, { value: 100 })
+    // b2 (res.low, pop=10) consumed; b1 becomes res.med.b (pop=120)
+    // delta = 120 - 10 = 110
+    expect(result.populationDelta).toBe(110)
+    expect(map.buildings).toHaveLength(1)
+    expect(map.buildings[0]!.defId).toBe('res.med.b')
+    expect(map.buildings[0]!.state).toBe('active')
   })
 })
 

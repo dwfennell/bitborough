@@ -1,0 +1,117 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- Under construction — 4×4 building footprint (massive site) -->
+
+  <!-- === Dirt/excavation ground === -->
+  <rect x="0" y="0" width="128" height="128" fill="#d8c498"/>
+  <!-- Large excavation pit area -->
+  <rect x="14" y="14" width="100" height="100" rx="2" fill="#c8b480" opacity="0.2"/>
+  <!-- Dirt texture patches -->
+  <ellipse cx="26" cy="24" rx="12" ry="8" fill="#c8b480" opacity="0.4"/>
+  <ellipse cx="98" cy="28" rx="16" ry="10" fill="#e8d8b0" opacity="0.32"/>
+  <ellipse cx="32" cy="96" rx="14" ry="8" fill="#c8b480" opacity="0.35"/>
+  <ellipse cx="100" cy="102" rx="14" ry="8" fill="#e8d8b0" opacity="0.28"/>
+  <ellipse cx="10" cy="60" rx="6" ry="5" fill="#c8b480" opacity="0.3"/>
+  <ellipse cx="62" cy="58" rx="18" ry="12" fill="#e8d8b0" opacity="0.2"/>
+  <ellipse cx="100" cy="58" rx="8" ry="6" fill="#c8b480" opacity="0.25"/>
+
+  <!-- === Safety fence (perimeter with entrance gap on south) === -->
+  <!-- North fence -->
+  <rect x="4" y="4" width="120" height="8" rx="1" fill="#b09070"/>
+  <g fill="#e8d080" opacity="0.7">
+    <rect x="4" y="4" width="10" height="4" rx="0.5"/>
+    <rect x="24" y="4" width="10" height="4" rx="0.5"/>
+    <rect x="44" y="4" width="10" height="4" rx="0.5"/>
+    <rect x="64" y="4" width="10" height="4" rx="0.5"/>
+    <rect x="84" y="4" width="10" height="4" rx="0.5"/>
+    <rect x="104" y="4" width="10" height="4" rx="0.5"/>
+  </g>
+  <!-- South fence (with entrance gap 50–78) -->
+  <rect x="4" y="116" width="46" height="8" rx="1" fill="#b09070"/>
+  <rect x="78" y="116" width="46" height="8" rx="1" fill="#b09070"/>
+  <g fill="#e8d080" opacity="0.7">
+    <rect x="4" y="116" width="10" height="4" rx="0.5"/>
+    <rect x="24" y="116" width="10" height="4" rx="0.5"/>
+    <rect x="40" y="116" width="10" height="4" rx="0.5"/>
+    <rect x="78" y="116" width="10" height="4" rx="0.5"/>
+    <rect x="98" y="116" width="10" height="4" rx="0.5"/>
+    <rect x="114" y="116" width="4" height="4" rx="0.5"/>
+  </g>
+  <!-- Entrance posts -->
+  <rect x="48" y="112" width="4" height="12" rx="0.5" fill="#b09070"/>
+  <rect x="76" y="112" width="4" height="12" rx="0.5" fill="#b09070"/>
+  <rect x="48" y="112" width="28" height="4" rx="0.5" fill="#e8d080" opacity="0.6"/>
+  <!-- West fence -->
+  <rect x="4" y="12" width="8" height="104" rx="1" fill="#b09070"/>
+  <g fill="#e8d080" opacity="0.7">
+    <rect x="4" y="14" width="4" height="10" rx="0.5"/>
+    <rect x="4" y="34" width="4" height="10" rx="0.5"/>
+    <rect x="4" y="54" width="4" height="10" rx="0.5"/>
+    <rect x="4" y="74" width="4" height="10" rx="0.5"/>
+    <rect x="4" y="94" width="4" height="10" rx="0.5"/>
+  </g>
+  <!-- East fence -->
+  <rect x="116" y="12" width="8" height="104" rx="1" fill="#b09070"/>
+  <g fill="#e8d080" opacity="0.7">
+    <rect x="120" y="14" width="4" height="10" rx="0.5"/>
+    <rect x="120" y="34" width="4" height="10" rx="0.5"/>
+    <rect x="120" y="54" width="4" height="10" rx="0.5"/>
+    <rect x="120" y="74" width="4" height="10" rx="0.5"/>
+    <rect x="120" y="94" width="4" height="10" rx="0.5"/>
+  </g>
+
+  <!-- === Crane 1 (left side, large) === -->
+  <!-- Tower base -->
+  <rect x="30" y="36" width="10" height="10" rx="2" fill="#989880" opacity="0.85"/>
+  <!-- Jib (pointing right) -->
+  <rect x="40" y="38" width="46" height="5" rx="0.5" fill="#989880" opacity="0.75"/>
+  <!-- Counter jib (pointing left) -->
+  <rect x="14" y="38" width="16" height="5" rx="0.5" fill="#989880" opacity="0.7"/>
+  <!-- Trolley -->
+  <rect x="66" y="37" width="6" height="7" rx="0.5" fill="#b09070" opacity="0.6"/>
+  <!-- Hoist cable 1 -->
+  <line x1="69" y1="44" x2="60" y2="72" stroke="#8a8878" stroke-width="1.5" stroke-linecap="round" opacity="0.6"/>
+  <!-- Load 1 -->
+  <rect x="53" y="72" width="14" height="8" rx="1" fill="#c8b480" opacity="0.55"/>
+
+  <!-- === Crane 2 (right side, pointing left) === -->
+  <!-- Tower base -->
+  <rect x="88" y="50" width="10" height="10" rx="2" fill="#989880" opacity="0.8"/>
+  <!-- Jib (pointing left) -->
+  <rect x="48" y="52" width="40" height="5" rx="0.5" fill="#989880" opacity="0.7"/>
+  <!-- Counter jib (pointing right) -->
+  <rect x="98" y="52" width="20" height="5" rx="0.5" fill="#989880" opacity="0.65"/>
+  <!-- Trolley 2 -->
+  <rect x="56" y="51" width="6" height="7" rx="0.5" fill="#b09070" opacity="0.6"/>
+  <!-- Hoist cable 2 -->
+  <line x1="59" y1="58" x2="48" y2="88" stroke="#8a8878" stroke-width="1.5" stroke-linecap="round" opacity="0.55"/>
+  <!-- Load 2 -->
+  <rect x="41" y="88" width="14" height="8" rx="1" fill="#c8b480" opacity="0.5"/>
+
+  <!-- === Scaffolding corner markers === -->
+  <rect x="14" y="14" width="12" height="12" rx="0.5" fill="none" stroke="#989880" stroke-width="1.5" opacity="0.45"/>
+  <rect x="102" y="14" width="12" height="12" rx="0.5" fill="none" stroke="#989880" stroke-width="1.5" opacity="0.45"/>
+  <rect x="14" y="102" width="12" height="12" rx="0.5" fill="none" stroke="#989880" stroke-width="1.5" opacity="0.45"/>
+  <rect x="102" y="102" width="12" height="12" rx="0.5" fill="none" stroke="#989880" stroke-width="1.5" opacity="0.45"/>
+
+  <!-- === Material piles at corners and edges === -->
+  <!-- Pile NW -->
+  <rect x="16" y="28" width="20" height="10" rx="1" fill="#c8b898" opacity="0.55"/>
+  <rect x="18" y="26" width="14" height="4" rx="0.5" fill="#d8c498" opacity="0.5"/>
+  <!-- Pile NE -->
+  <rect x="90" y="18" width="22" height="11" rx="1" fill="#c8b898" opacity="0.5"/>
+  <!-- Pile SE -->
+  <rect x="88" y="98" width="22" height="11" rx="1" fill="#c8b898" opacity="0.5"/>
+  <rect x="91" y="96" width="15" height="4" rx="0.5" fill="#d8c498" opacity="0.45"/>
+  <!-- Pile SW -->
+  <rect x="16" y="98" width="20" height="11" rx="1" fill="#c8b898" opacity="0.5"/>
+
+  <!-- === Foundation grid (4×4 layout) === -->
+  <rect x="16" y="16" width="96" height="96" rx="1" fill="none" stroke="#b09070" stroke-width="1" opacity="0.28"/>
+  <!-- Grid subdivisions -->
+  <line x1="40" y1="16" x2="40" y2="112" stroke="#b09070" stroke-width="0.5" opacity="0.22"/>
+  <line x1="64" y1="16" x2="64" y2="112" stroke="#b09070" stroke-width="0.5" opacity="0.22"/>
+  <line x1="88" y1="16" x2="88" y2="112" stroke="#b09070" stroke-width="0.5" opacity="0.22"/>
+  <line x1="16" y1="40" x2="112" y2="40" stroke="#b09070" stroke-width="0.5" opacity="0.22"/>
+  <line x1="16" y1="64" x2="112" y2="64" stroke="#b09070" stroke-width="0.5" opacity="0.22"/>
+  <line x1="16" y1="88" x2="112" y2="88" stroke="#b09070" stroke-width="0.5" opacity="0.22"/>
+</svg>
