@@ -1,7 +1,8 @@
-import { Infrastructure, DensityLevel, BuildingCategory } from '@bitborough/core'
+import { DensityLevel, BuildingCategory } from '@bitborough/core'
 import type { Building, DemandInfo, GameMap } from '@bitborough/core'
 import { BUILDING_DEFS } from '../buildings-registry.js'
 import type { PRNG } from '../prng.js'
+import { hasNearbyPavedRoad } from './road-access.js'
 
 export const TRANSIT_RADIUS = 10
 export const MEDIUM_DENSITY_POP_THRESHOLD = 500
@@ -13,22 +14,6 @@ export function cityCenter(map: GameMap): { cx: number; cy: number } {
   const cx = active.reduce((sum, b) => sum + b.x, 0) / active.length
   const cy = active.reduce((sum, b) => sum + b.y, 0) / active.length
   return { cx, cy }
-}
-
-/** True if any paved road exists within 3 tiles (Manhattan distance). */
-export function hasNearbyPavedRoad(map: GameMap, x: number, y: number): boolean {
-  const range = 3
-  for (let dy = -range; dy <= range; dy++) {
-    for (let dx = -range; dx <= range; dx++) {
-      if (Math.abs(dx) + Math.abs(dy) > range) continue
-      const nx = x + dx
-      const ny = y + dy
-      if (nx < 0 || ny < 0 || nx >= map.width || ny >= map.height) continue
-      const infra = map.infrastructure[ny * map.width + nx]!
-      if (infra & Infrastructure.PavedRoad) return true
-    }
-  }
-  return false
 }
 
 /** True if any active transit stop building exists within TRANSIT_RADIUS tiles (Manhattan distance). */

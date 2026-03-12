@@ -1,4 +1,5 @@
-import { type GameMap, TileType, Infrastructure } from '@bitborough/core'
+import { type GameMap, TileType } from '@bitborough/core'
+import { hasNearbyRoad } from './road-access.js'
 
 export function calculateLandValues(
   map: GameMap,
@@ -28,7 +29,9 @@ export function calculateLandValues(
       value += parkBonus(map, x, y) // +10, decaying with distance
 
       // Road access bonus
-      if (hasNearbyRoad(map, x, y, 3)) {
+      // Uses Manhattan-distance road check (range 3), consistent with zones.ts.
+      // Previously used a square scan — now corrected to match game rules.
+      if (hasNearbyRoad(map, x, y)) {
         value += 10
       }
 
@@ -71,14 +74,3 @@ function parkBonus(map: GameMap, x: number, y: number): number {
   return bonus
 }
 
-function hasNearbyRoad(map: GameMap, x: number, y: number, radius: number): boolean {
-  for (let dy = -radius; dy <= radius; dy++) {
-    for (let dx = -radius; dx <= radius; dx++) {
-      const nx = x + dx
-      const ny = y + dy
-      if (nx < 0 || ny < 0 || nx >= map.width || ny >= map.height) continue
-      if (map.infrastructure[ny * map.width + nx]! & Infrastructure.Road) return true
-    }
-  }
-  return false
-}

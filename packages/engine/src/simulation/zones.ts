@@ -1,6 +1,7 @@
-import { type GameMap, type DemandInfo, type Building, ZoneType, Infrastructure, DensityLevel } from '@bitborough/core'
+import { type GameMap, type DemandInfo, type Building, ZoneType, DensityLevel } from '@bitborough/core'
 import { PRNG } from '../prng.js'
 import { BUILDING_DEFS } from '../buildings-registry.js'
+import { hasNearbyRoad } from './road-access.js'
 
 export function updateZones(
   map: GameMap,
@@ -55,21 +56,6 @@ export function updateZones(
   return { populationDelta }
 }
 
-/** Zone develops if a road exists within 3 tiles (Manhattan distance), per SC2K rules. */
-function hasNearbyRoad(map: GameMap, x: number, y: number): boolean {
-  const range = 3
-  for (let dy = -range; dy <= range; dy++) {
-    for (let dx = -range; dx <= range; dx++) {
-      if (Math.abs(dx) + Math.abs(dy) > range) continue
-      const nx = x + dx
-      const ny = y + dy
-      if (nx < 0 || ny < 0 || nx >= map.width || ny >= map.height) continue
-      const nIdx = ny * map.width + nx
-      if (map.infrastructure[nIdx]! & Infrastructure.Road) return true
-    }
-  }
-  return false
-}
 
 function getZoneDemand(zone: ZoneType, demand: DemandInfo): number {
   switch (zone) {
