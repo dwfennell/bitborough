@@ -1,4 +1,5 @@
 import type { GameState } from '@bitborough/core'
+import { BUILDING_DEFS } from '@bitborough/engine'
 import { formatGameDate, computeDemandBarStyle } from '../utils/format.js'
 
 export class InfoBar {
@@ -13,6 +14,7 @@ export class InfoBar {
 
   // Cached values to avoid redundant DOM writes
   private lastPop = -1
+  private lastOccupancy = -1
   private lastFunds = -1
   private lastBalance = NaN
   private lastMonth = -1
@@ -47,9 +49,14 @@ export class InfoBar {
   }
 
   update(state: GameState): void {
-    if (state.population !== this.lastPop) {
+    const buildings = state.map.buildings.filter(b => b.state === 'active')
+    const totalCap = buildings.reduce((s, b) => s + (BUILDING_DEFS[b.defId]?.capacity ?? 0), 0)
+    const totalRes = buildings.reduce((s, b) => s + (b.residents ?? 0), 0)
+    const occupancyPct = totalCap > 0 ? Math.round(totalRes / totalCap * 100) : 0
+    if (state.population !== this.lastPop || occupancyPct !== this.lastOccupancy) {
       this.lastPop = state.population
-      this.popEl.textContent = `Pop: ${state.population.toLocaleString()}`
+      this.lastOccupancy = occupancyPct
+      this.popEl.textContent = `Pop: ${state.population.toLocaleString()} (${occupancyPct}% full)`
     }
     if (state.funds !== this.lastFunds) {
       this.lastFunds = state.funds
