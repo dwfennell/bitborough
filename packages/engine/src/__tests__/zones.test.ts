@@ -2,6 +2,8 @@ import { describe, test, expect } from 'vitest'
 import { Engine } from '../Engine.js'
 import { createTestMap, advanceMonth } from '../test-helpers.js'
 import { Infrastructure, ZoneType } from '@bitborough/core'
+import { updateZones } from '../simulation/zones.js'
+import { PRNG } from '../prng.js'
 
 describe('Building state', () => {
   test('building has active state by default', () => {
@@ -20,7 +22,7 @@ describe('Zone development', () => {
     for (let x = 4; x < 10; x++) {
       engine.placeTile(x, 2, Infrastructure.PowerLine)
     }
-    // Road adjacent to zones
+    // Road adjacent to zones (zones can't be placed on road tiles)
     for (let x = 4; x < 10; x++) {
       engine.placeTile(x, 4, Infrastructure.Road)
     }
@@ -72,5 +74,33 @@ describe('Zone development', () => {
     setupPoweredZonedCity(engine)
     for (let i = 0; i < 24; i++) advanceMonth(engine)
     expect(engine.getState().population).toBeGreaterThan(0)
+  })
+})
+
+describe('updateZones unit', () => {
+  test('newly developed zone building starts with residents=0 and adds zero population', () => {
+    const map = createTestMap(32)
+    // Set up a zoned tile with power and road
+    map.infrastructure[5 * map.width + 5] = Infrastructure.Road
+    map.zones[5 * map.width + 5] = ZoneType.Residential
+    const powerGrid = new Uint8Array(map.width * map.height)
+    powerGrid[5 * map.width + 5] = 1
+    const nextId = { value: 1 }
+    const prng = new PRNG(42)
+
+    // Force development by running many times (probability 0.12 per tick)
+    let populationDelta = 0
+    for (let i = 0; i < 100; i++) {
+      const result = updateZones(map, powerGrid, { residential: 1.0, commercial: 1.0, industrial: 1.0 }, prng, nextId)
+      populationDelta += result.populationDelta
+      if (map.buildings.some(b => b.x === 5 && b.y === 5)) break
+    }
+
+    // Population delta should be 0 — new buildings start empty
+    expect(populationDelta).toBe(0)
+    // Building should exist with residents=0
+    const b = map.buildings.find(b => b.x === 5 && b.y === 5)
+    expect(b).toBeDefined()
+    expect(b!.residents).toBe(0)
   })
 })

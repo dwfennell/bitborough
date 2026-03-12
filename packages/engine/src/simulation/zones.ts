@@ -44,10 +44,7 @@ export function updateZones(
             residents: 0,
           }
           map.buildings.push(building)
-          const def = BUILDING_DEFS[defId]
-          if (def) {
-            populationDelta += def.capacity
-          }
+          // New buildings start at residents=0; population grows via the fill loop in density.ts
         }
       }
     }

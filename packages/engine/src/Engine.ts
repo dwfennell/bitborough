@@ -104,7 +104,7 @@ export class Engine {
     this.influenceBuffer = new Float32Array(size)
 
     // Initialize demand
-    this.demand = calculateDemand(this.map, this.population, this.taxRate)
+    this.demand = calculateDemand(this.map, this.taxRate)
 
     // Initialize budget
     this.funding = { police: 100, fire: 100, transit: 100 }
@@ -131,7 +131,7 @@ export class Engine {
         this.year++
       }
 
-      this.demand = calculateDemand(this.map, this.population, this.taxRate, this.trafficDensity)
+      this.demand = calculateDemand(this.map, this.taxRate, this.trafficDensity)
 
       // Land values use previous month's crime; crime uses updated land values
       calculateLandValues(this.map, this.powerGrid, this.pollutionLevel, this.crimeLevel, this.landValues)
@@ -427,7 +427,7 @@ export class Engine {
 
     // Rebuild derived state
     propagatePower(engine.map, engine.powerGrid)
-    engine.demand = calculateDemand(engine.map, engine.population, engine.taxRate)
+    engine.demand = calculateDemand(engine.map, engine.taxRate)
     engine.budgetInfo = calculateBudget(engine.map, engine.population, engine.taxRate, engine.landValues, engine.funding)
 
     return engine

@@ -1,22 +1,33 @@
 import { type GameMap, type DemandInfo, ZoneType, Infrastructure } from '@bitborough/core'
+import { BUILDING_DEFS } from '../buildings-registry.js'
 
 const TRAFFIC_CAPACITY = 100
 
+export const COMMERCIAL_DEMAND_CAPACITY_DIVISOR = 500
+
+function totalResCap(map: GameMap): number {
+  let total = 0
+  for (const b of map.buildings) {
+    if (!b.defId.startsWith('res') || b.state !== 'active') continue
+    total += BUILDING_DEFS[b.defId]?.capacity ?? 0
+  }
+  return total
+}
+
 /**
- * Calculate zone demand based on current map state, population, tax rate, and traffic.
+ * Calculate zone demand based on current map state, tax rate, and traffic.
  *
  * Demand values range from -1 (strong decline) to 1 (strong growth).
  *
  * Key formulas (from PRD):
  * - Tax modifier: 1.0 - ((taxRate - 0.07) * 5.0) — neutral at 7%
  * - Residential base: 0.5 (always positive base demand)
- * - Commercial: follows population (needs customers)
+ * - Commercial: follows total residential capacity (planning intent, not actual residents)
  * - Industrial: base 0.3 with dampened tax sensitivity
  * - Congestion: average road congestion > 0.8 suppresses all demand
  */
 export function calculateDemand(
   map: GameMap,
-  population: number,
   taxRate: number,
   trafficDensity?: Uint8Array,
 ): DemandInfo {
@@ -30,8 +41,9 @@ export function calculateDemand(
   const rBase = 0.7
   let rDemand = rBase * taxModifier
 
-  // Commercial demand:
-  const cBase = population > 0 ? Math.min(population / 200, 0.6) : 0
+  // Commercial demand uses total residential capacity (not actual residents).
+  // This avoids a deadlock where 0 residents → 0 commercial demand → no foot traffic.
+  const cBase = Math.min(totalResCap(map) / COMMERCIAL_DEMAND_CAPACITY_DIVISOR, 0.6)
   let cDemand = cBase * taxModifier
 
   // Industrial demand:

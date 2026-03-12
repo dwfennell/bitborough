@@ -109,7 +109,7 @@ describe('Serialization', () => {
     const expectedPop = restored.getState().map.buildings
       .filter(b => b.state === 'active')
       .reduce((sum, b) => sum + b.residents, 0)
-    expect(restored.getState().population).toBe(Math.round(expectedPop))
+    expect(restored.getState().population).toBe(expectedPop)
   })
 
   test('restored engine is deterministic with original', () => {
