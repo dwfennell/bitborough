@@ -119,7 +119,7 @@ export function updateDensity(
     if (!def || def.capacity === 0 || def.category === BuildingCategory.Special) continue
 
     const desirability = computeDesirability(
-      zoneTypeForCategory(def.category),
+      categoryToZone(def.category),
       building.x, building.y,
       map, powerGrid, crimeLevel, fireCoverage, pollutionLevel,
     )
@@ -166,7 +166,7 @@ export function updateDensity(
 
       if (prng.next() < p) {
         const targetDefId = pickVariant(variants, prng)
-        populationDelta -= def.capacity
+        populationDelta -= building.residents
         startConstruction(building, targetDefId)
       }
     }
@@ -184,7 +184,7 @@ export function updateDensity(
 
       if (prng.next() < p) {
         const targetDefId = pickVariant(variants, prng)
-        populationDelta -= def.capacity
+        populationDelta -= building.residents
         startConstruction(building, targetDefId)
       }
     }
@@ -325,10 +325,6 @@ function categoryToZone(category: BuildingCategory): ZoneType {
   if (category === BuildingCategory.Commercial) return ZoneType.Commercial
   if (category === BuildingCategory.Industrial) return ZoneType.Industrial
   return ZoneType.None
-}
-
-function zoneTypeForCategory(category: BuildingCategory): ZoneType {
-  return categoryToZone(category)
 }
 
 function occupiesTile(b: Building, x: number, y: number): boolean {
