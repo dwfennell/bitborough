@@ -1,0 +1,33 @@
+import type { DocSection } from '../types.js'
+
+export const budgetTaxes: DocSection = {
+  id: 'budget-taxes',
+  title: 'Budget & Taxes',
+  body: [
+    'Open the budget panel with **B**.',
+    '',
+    '**Income** comes from property taxes on developed zones. It\'s based on your population, the average land value across developed tiles, and your tax rate:',
+    '',
+    '`Tax Income = Population × (Avg Land Value ÷ 20) × Tax Rate`',
+    '',
+    '**Tax Rate** — Default 7% (neutral). The demand system treats 7% as the baseline. Every 1% above or below shifts demand by ±5%:',
+    '',
+    '`Tax Modifier = 1.0 − (Tax Rate − 7%) × 5`',
+    '',
+    'Lower taxes boost demand but reduce income. Higher taxes suppress growth. Range: 0–20%.',
+    '',
+    '**Maintenance costs per month:**',
+    '',
+    '| Infrastructure | Cost |',
+    '|---|---|',
+    '| Roads | $1/tile |',
+    '| Rail | $1.50/tile |',
+    '| Power Lines | $0.50/tile |',
+    '| Diesel Generator | $15 |',
+    '| Coal Plant | $60 |',
+    '| Nuclear Plant | $100 |',
+    '| Police/Fire Stations | $50 × (Funding ÷ 100) |',
+    '',
+    '**Balance** is calculated monthly but applied to your funds each January. If your funds run out, you can\'t build — but existing buildings continue to function.',
+  ].join('\n'),
+}
