@@ -285,6 +285,55 @@ describe('bitt buildings', () => {
   })
 })
 
+describe('bug regressions', () => {
+  test('failed placement reason is a string name, not a number', () => {
+    // Bug: FailReason enum was serialised as its numeric value ("2") instead of name ("Occupied")
+    const file = tempFile()
+    try {
+      bitt(['new', '--seed', '42', '--size', '32', '--preset', 'plains'], file)
+      bitt(['place', 'diesel', '10', '10'], file)
+      // Try to place something on an occupied footprint tile
+      const result = bitt(['place', 'road', '10', '10'], file) as Record<string, unknown>
+      expect(result.ok).toBe(false)
+      expect(typeof result.reason).toBe('string')
+      expect(result.reason).not.toMatch(/^\d+$/)  // must not be a bare number
+    } finally {
+      if (existsSync(file)) unlinkSync(file)
+    }
+  })
+
+  test('tile inside multi-tile building footprint shows the building', () => {
+    // Bug: only origin tile showed building; footprint tiles showed building: null
+    // Diesel is 2×2, so origin (10,10) and footprint tile (11,10) both belong to it
+    const file = tempFile()
+    try {
+      bitt(['new', '--seed', '42', '--size', '32', '--preset', 'plains'], file)
+      bitt(['place', 'diesel', '10', '10'], file)
+      const origin = bitt(['tile', '10', '10'], file) as Record<string, unknown>
+      const footprint = bitt(['tile', '11', '10'], file) as Record<string, unknown>
+      expect((origin.building as Record<string, unknown>).id).toBe('power.diesel')
+      expect((footprint.building as Record<string, unknown>).id).toBe('power.diesel')
+    } finally {
+      if (existsSync(file)) unlinkSync(file)
+    }
+  })
+
+  test('tiles grid shows B for building footprint tiles', () => {
+    // Bug: grid used "." for all building tiles, hiding their presence
+    const file = tempFile()
+    try {
+      bitt(['new', '--seed', '42', '--size', '32', '--preset', 'plains'], file)
+      bitt(['place', 'diesel', '10', '10'], file)
+      const result = bitt(['tiles', '10', '10', '12', '11'], file) as Record<string, unknown>
+      const grid = result.grid as string
+      // 2×2 diesel at (10,10) means both rows of a 3-wide, 2-tall region start with BB
+      expect(grid).toContain('BB')
+    } finally {
+      if (existsSync(file)) unlinkSync(file)
+    }
+  })
+})
+
 describe('bitt docs', () => {
   test('without section returns sections list with id and title', () => {
     const result = bitt(['docs']) as Record<string, unknown>

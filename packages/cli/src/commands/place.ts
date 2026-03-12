@@ -1,5 +1,5 @@
 import { Command } from 'commander'
-import { Infrastructure } from '@bitborough/core'
+import { Infrastructure, FailReason } from '@bitborough/core'
 import { loadEngine, saveEngine } from '../state.js'
 import { out } from '../output.js'
 
@@ -44,7 +44,7 @@ export function placeCommand(program: Command) {
       if (result.ok) saveEngine(engine, opts.file)
       out({
         ok: result.ok,
-        reason: result.ok ? undefined : String(result.reason),
+        reason: result.ok ? undefined : FailReason[result.reason as FailReason],
         detail: (result as { detail?: string }).detail,
         funds: engine.getState().funds,
       })

@@ -1,4 +1,5 @@
 import { Command } from 'commander'
+import { FailReason } from '@bitborough/core'
 import { loadEngine, saveEngine } from '../state.js'
 import { out } from '../output.js'
 
@@ -13,7 +14,7 @@ export function bulldozeCommand(program: Command) {
       if (result.ok) saveEngine(engine, opts.file)
       out({
         ok: result.ok,
-        reason: result.ok ? undefined : String((result as { ok: false; reason: unknown }).reason),
+        reason: result.ok ? undefined : FailReason[(result as { ok: false; reason: FailReason }).reason],
         funds: engine.getState().funds,
       })
     })

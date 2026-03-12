@@ -3,6 +3,7 @@ import { loadEngine } from '../state.js'
 import { out } from '../output.js'
 import { TileType, ZoneType, Infrastructure } from '@bitborough/core'
 import type { Building } from '@bitborough/core'
+import { BUILDING_DEFS } from '@bitborough/engine'
 
 export function tilesCommand(program: Command) {
   program
@@ -28,7 +29,10 @@ export function tilesCommand(program: Command) {
         const rowCells: string[] = []
         for (let x = x1i; x <= x2i; x++) {
           const info = engine.getTile(x, y)
-          const building = state.map.buildings.find((b: Building) => b.x === x && b.y === y)
+          const building = state.map.buildings.find((b: Building) => {
+            const size = BUILDING_DEFS[b.defId]?.size ?? { w: 1, h: 1 }
+            return x >= b.x && x < b.x + size.w && y >= b.y && y < b.y + size.h
+          })
           tiles.push({
             x, y,
             terrain: TileType[info.terrain],
@@ -39,6 +43,7 @@ export function tilesCommand(program: Command) {
           })
           let cell = '.'
           if (info.terrain === TileType.Water) cell = '~'
+          else if (building) cell = 'B'
           else if (info.infrastructure & Infrastructure.Road) {
             cell = info.infrastructure & Infrastructure.PavedRoad ? '=' : '-'
           } else if (info.zone === ZoneType.Residential) cell = 'R'

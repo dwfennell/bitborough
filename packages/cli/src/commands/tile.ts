@@ -3,6 +3,7 @@ import { loadEngine } from '../state.js'
 import { out } from '../output.js'
 import { TileType, ZoneType, Infrastructure } from '@bitborough/core'
 import type { Building } from '@bitborough/core'
+import { BUILDING_DEFS } from '@bitborough/engine'
 
 export function tileCommand(program: Command) {
   program
@@ -17,7 +18,10 @@ export function tileCommand(program: Command) {
         out({ ok: false, error: `Coordinates (${tx},${ty}) out of bounds` })
       }
       const info = engine.getTile(tx, ty)
-      const building = state.map.buildings.find((b: Building) => b.x === tx && b.y === ty)
+      const building = state.map.buildings.find((b: Building) => {
+        const size = BUILDING_DEFS[b.defId]?.size ?? { w: 1, h: 1 }
+        return tx >= b.x && tx < b.x + size.w && ty >= b.y && ty < b.y + size.h
+      })
       out({
         x: tx, y: ty,
         terrain: TileType[info.terrain],
