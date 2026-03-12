@@ -2,9 +2,12 @@ import { Infrastructure, DensityLevel, BuildingCategory, ZoneType } from '@bitbo
 import type { Building, DemandInfo, GameMap } from '@bitborough/core'
 import { BUILDING_DEFS } from '../buildings-registry.js'
 import type { PRNG } from '../prng.js'
+import { computeDesirability } from './desirability.js'
 
 export const TRANSIT_RADIUS = 10
 export const MEDIUM_DENSITY_POP_THRESHOLD = 500
+export const FILL_RATE = 0.12
+export const DRAIN_RATE = 0.20
 
 /** Center of all active buildings (arithmetic mean of positions). Returns map center if no buildings. */
 export function cityCenter(map: GameMap): { cx: number; cy: number } {
@@ -103,8 +106,32 @@ export function updateDensity(
   population: number,
   prng: PRNG,
   nextBuildingId: { value: number }, // reserved: may be needed if upgrade creates separate building objects
+  crimeLevel: Uint8Array,
+  fireCoverage: Uint8Array,
+  pollutionLevel: Uint8Array,
 ): { populationDelta: number } {
   let populationDelta = 0
+
+  // --- Fill/drain loop ---
+  for (const building of map.buildings) {
+    if (building.state !== 'active') continue
+    const def = BUILDING_DEFS[building.defId]
+    if (!def || def.capacity === 0 || def.category === BuildingCategory.Special) continue
+
+    const desirability = computeDesirability(
+      zoneTypeForCategory(def.category),
+      building.x, building.y,
+      map, powerGrid, crimeLevel, fireCoverage, pollutionLevel,
+    )
+    const zoneDemand = getZoneDemand(building.defId, demand)
+    const target = def.capacity * Math.max(0, zoneDemand) * desirability
+
+    const before = building.residents
+    const rate = target > building.residents ? FILL_RATE : DRAIN_RATE
+    building.residents = Math.max(0, Math.min(def.capacity, building.residents + (target - building.residents) * rate))
+
+    populationDelta += building.residents - before
+  }
 
   const { cx, cy } = cityCenter(map)
   const radius = mediumRadius(population)
@@ -231,7 +258,7 @@ function tickConstruction(map: GameMap, building: Building): number {
   building.upgradingToDefId = undefined
   building.age = 0
 
-  return newDef.capacity - check.consumedPop
+  return -check.consumedPop
 }
 
 export type FootprintCheck = { ok: false } | { ok: true; toConsume: string[]; consumedPop: number }
@@ -281,7 +308,7 @@ export function checkFootprintForUpgrade(
         if (bDef.category === targetCategory && bDef.category !== BuildingCategory.Special && b.state === 'active') {
           if (!toConsume.includes(b.id)) {
             toConsume.push(b.id)
-            consumedPop += bDef.capacity
+            consumedPop += b.residents
           }
         } else {
           return { ok: false }
@@ -298,6 +325,10 @@ function categoryToZone(category: BuildingCategory): ZoneType {
   if (category === BuildingCategory.Commercial) return ZoneType.Commercial
   if (category === BuildingCategory.Industrial) return ZoneType.Industrial
   return ZoneType.None
+}
+
+function zoneTypeForCategory(category: BuildingCategory): ZoneType {
+  return categoryToZone(category)
 }
 
 function occupiesTile(b: Building, x: number, y: number): boolean {

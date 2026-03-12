@@ -179,9 +179,12 @@ describe('Low→Medium upgrade', () => {
     const prng = new PRNG(1)
     const demand = { residential: 1.0, commercial: 1.0, industrial: 1.0 }
     const powerGrid = new Uint8Array(map.width * map.height)
+    const crimeLevel = new Uint8Array(map.width * map.height)
+    const fireCoverage = new Uint8Array(map.width * map.height)
+    const pollutionLevel = new Uint8Array(map.width * map.height)
     // Run many iterations — should never upgrade
     for (let i = 0; i < 500; i++) {
-      updateDensity(map, powerGrid, demand, 5000, prng, { value: 100 })
+      updateDensity(map, powerGrid, demand, 5000, prng, { value: 100 }, crimeLevel, fireCoverage, pollutionLevel)
     }
     expect(map.buildings[0]!.state).toBe('active')
     expect(map.buildings[0]!.defId).toBe('res.low')
@@ -198,9 +201,12 @@ describe('Low→Medium upgrade', () => {
     const prng = new PRNG(1)
     const demand = { residential: 1.0, commercial: 1.0, industrial: 1.0 }
     const powerGrid = new Uint8Array(map.width * map.height)
+    const crimeLevel = new Uint8Array(map.width * map.height)
+    const fireCoverage = new Uint8Array(map.width * map.height)
+    const pollutionLevel = new Uint8Array(map.width * map.height)
     // Population below threshold (499)
     for (let i = 0; i < 500; i++) {
-      updateDensity(map, powerGrid, demand, 499, prng, { value: 100 })
+      updateDensity(map, powerGrid, demand, 499, prng, { value: 100 }, crimeLevel, fireCoverage, pollutionLevel)
     }
     expect(map.buildings[0]!.state).toBe('active')
     expect(map.buildings[0]!.defId).toBe('res.low')
@@ -210,17 +216,22 @@ describe('Low→Medium upgrade', () => {
     const map = createTestMap(32)
     // Put paved road right on the building tile
     map.infrastructure[10 * map.width + 10] = Infrastructure.Road | Infrastructure.PavedRoad
+    map.zones[10 * map.width + 10] = ZoneType.Residential
     map.buildings.push({
       id: 'b1', defId: 'res.low', x: 10, y: 10,
-      powered: true, density: DensityLevel.Low, age: 0, state: 'active',
+      powered: true, density: DensityLevel.Low, age: 0, state: 'active', residents: 0,
     })
     const prng = new PRNG(42)
     const demand = { residential: 1.0, commercial: 1.0, industrial: 1.0 }
     const powerGrid = new Uint8Array(map.width * map.height)
+    powerGrid[10 * map.width + 10] = 1
+    const crimeLevel = new Uint8Array(map.width * map.height)
+    const fireCoverage = new Uint8Array(map.width * map.height)
+    const pollutionLevel = new Uint8Array(map.width * map.height)
     // Run many iterations with high demand and pop — should eventually upgrade
     let upgraded = false
     for (let i = 0; i < 2000; i++) {
-      updateDensity(map, powerGrid, demand, 5000, prng, { value: 100 })
+      updateDensity(map, powerGrid, demand, 5000, prng, { value: 100 }, crimeLevel, fireCoverage, pollutionLevel)
       if (map.buildings[0]!.state === 'under_construction' || map.buildings[0]!.defId.includes('med')) {
         upgraded = true
         break
@@ -239,11 +250,15 @@ describe('Low→Medium upgrade', () => {
     const prng = new PRNG(1)
     const demand = { residential: 1.0, commercial: 1.0, industrial: 1.0 }
     const powerGrid = new Uint8Array(map.width * map.height)
-    const result = updateDensity(map, powerGrid, demand, 5000, prng, { value: 100 })
+    const crimeLevel = new Uint8Array(map.width * map.height)
+    const fireCoverage = new Uint8Array(map.width * map.height)
+    const pollutionLevel = new Uint8Array(map.width * map.height)
+    const result = updateDensity(map, powerGrid, demand, 5000, prng, { value: 100 }, crimeLevel, fireCoverage, pollutionLevel)
     // Should complete construction (1 month remaining → 0 → complete)
     expect(map.buildings[0]!.state).toBe('active')
     expect(map.buildings[0]!.defId).toBe('res.med')
-    expect(result.populationDelta).toBe(100) // res.med has 100 population
+    // New building starts at residents=0; no consumed buildings; fill loop skips under_construction
+    expect(result.populationDelta).toBe(0)
   })
 })
 
@@ -258,8 +273,11 @@ describe('Medium→High upgrade', () => {
     const prng = new PRNG(1)
     const demand = { residential: 1.0, commercial: 1.0, industrial: 1.0 }
     const powerGrid = new Uint8Array(map.width * map.height)
+    const crimeLevel = new Uint8Array(map.width * map.height)
+    const fireCoverage = new Uint8Array(map.width * map.height)
+    const pollutionLevel = new Uint8Array(map.width * map.height)
     for (let i = 0; i < 1000; i++) {
-      updateDensity(map, powerGrid, demand, 5000, prng, { value: 100 })
+      updateDensity(map, powerGrid, demand, 5000, prng, { value: 100 }, crimeLevel, fireCoverage, pollutionLevel)
     }
     expect(map.buildings[0]!.defId).toBe('res.med')
     expect(map.buildings[0]!.state).toBe('active')
@@ -280,8 +298,11 @@ describe('Medium→High upgrade', () => {
     const prng = new PRNG(1)
     const demand = { residential: 1.0, commercial: 1.0, industrial: 1.0 }
     const powerGrid = new Uint8Array(map.width * map.height)
+    const crimeLevel = new Uint8Array(map.width * map.height)
+    const fireCoverage = new Uint8Array(map.width * map.height)
+    const pollutionLevel = new Uint8Array(map.width * map.height)
     for (let i = 0; i < 1000; i++) {
-      updateDensity(map, powerGrid, demand, 5000, prng, { value: 100 })
+      updateDensity(map, powerGrid, demand, 5000, prng, { value: 100 }, crimeLevel, fireCoverage, pollutionLevel)
     }
     expect(map.buildings[0]!.defId).toBe('res.med')
   })
@@ -350,7 +371,10 @@ describe('derelict buildings', () => {
     const prng = new PRNG(1)
     const demand = { residential: 1.0, commercial: 1.0, industrial: 1.0 }
     const powerGrid = new Uint8Array(map.width * map.height)
-    updateDensity(map, powerGrid, demand, 5000, prng, { value: 100 })
+    const crimeLevel = new Uint8Array(map.width * map.height)
+    const fireCoverage = new Uint8Array(map.width * map.height)
+    const pollutionLevel = new Uint8Array(map.width * map.height)
+    updateDensity(map, powerGrid, demand, 5000, prng, { value: 100 }, crimeLevel, fireCoverage, pollutionLevel)
     // After one tick, derelictMonths should be 1
     expect(map.buildings[0]!.derelictMonths).toBe(1)
   })
@@ -405,7 +429,7 @@ describe('checkFootprintForUpgrade — building consumption', () => {
     map.zones[10 * map.width + 11] = ZoneType.Residential
     // res.low at (10,10) upgrading to res.med.b (2×1); res.low at (11,10) should be consumed
     map.buildings.push({ id: 'b1', defId: 'res.low', x: 10, y: 10, powered: true, density: DensityLevel.Low, age: 0, state: 'under_construction', constructionMonthsRemaining: 0, upgradingToDefId: 'res.med.b' })
-    map.buildings.push({ id: 'b2', defId: 'res.low', x: 11, y: 10, powered: true, density: DensityLevel.Low, age: 0, state: 'active' })
+    map.buildings.push({ id: 'b2', defId: 'res.low', x: 11, y: 10, powered: true, density: DensityLevel.Low, age: 0, state: 'active', residents: 10 })
     const result = checkFootprintForUpgrade(map, 10, 10, { w: 2, h: 1 }, 'b1', { w: 1, h: 1 }, BuildingCategory.Residential)
     expect(result).toEqual({ ok: true, toConsume: ['b2'], consumedPop: 10 })
   })
@@ -465,9 +489,9 @@ describe('checkFootprintForUpgrade — building consumption', () => {
       map.zones[(10 + dy) * map.width + (10 + dx)] = ZoneType.Residential
     }
     map.buildings.push({ id: 'b1', defId: 'res.low', x: 10, y: 10, powered: true, density: DensityLevel.Low, age: 0, state: 'under_construction', constructionMonthsRemaining: 0, upgradingToDefId: 'res.high' })
-    map.buildings.push({ id: 'b2', defId: 'res.low', x: 11, y: 10, powered: true, density: DensityLevel.Low, age: 0, state: 'active' })
-    map.buildings.push({ id: 'b3', defId: 'res.low', x: 10, y: 11, powered: true, density: DensityLevel.Low, age: 0, state: 'active' })
-    map.buildings.push({ id: 'b4', defId: 'res.low', x: 11, y: 11, powered: true, density: DensityLevel.Low, age: 0, state: 'active' })
+    map.buildings.push({ id: 'b2', defId: 'res.low', x: 11, y: 10, powered: true, density: DensityLevel.Low, age: 0, state: 'active', residents: 10 })
+    map.buildings.push({ id: 'b3', defId: 'res.low', x: 10, y: 11, powered: true, density: DensityLevel.Low, age: 0, state: 'active', residents: 10 })
+    map.buildings.push({ id: 'b4', defId: 'res.low', x: 11, y: 11, powered: true, density: DensityLevel.Low, age: 0, state: 'active', residents: 10 })
     const result = checkFootprintForUpgrade(map, 10, 10, { w: 2, h: 2 }, 'b1', { w: 1, h: 1 }, BuildingCategory.Residential)
     expect(result).toMatchObject({ ok: true, consumedPop: 30 })
     if (result.ok) expect(result.toConsume.sort()).toEqual(['b2', 'b3', 'b4'])
@@ -478,17 +502,125 @@ describe('checkFootprintForUpgrade — building consumption', () => {
     map.zones[10 * map.width + 10] = ZoneType.Residential
     map.zones[10 * map.width + 11] = ZoneType.Residential
     map.buildings.push({ id: 'b1', defId: 'res.low', x: 10, y: 10, powered: true, density: DensityLevel.Low, age: 0, state: 'under_construction', constructionMonthsRemaining: 1, upgradingToDefId: 'res.med.b' })
-    map.buildings.push({ id: 'b2', defId: 'res.low', x: 11, y: 10, powered: true, density: DensityLevel.Low, age: 0, state: 'active' })
+    // b2 has 8 residents; fill loop will drain it (no power/road) before construction consumes it
+    map.buildings.push({ id: 'b2', defId: 'res.low', x: 11, y: 10, powered: true, density: DensityLevel.Low, age: 0, state: 'active', residents: 8 })
     const prng = new PRNG(1)
     const demand = { residential: 1.0, commercial: 1.0, industrial: 1.0 }
     const powerGrid = new Uint8Array(map.width * map.height)
-    const result = updateDensity(map, powerGrid, demand, 5000, prng, { value: 100 })
-    // b2 (res.low, pop=10) consumed; b1 becomes res.med.b (pop=120)
-    // delta = 120 - 10 = 110
-    expect(result.populationDelta).toBe(110)
+    const crimeLevel = new Uint8Array(map.width * map.height)
+    const fireCoverage = new Uint8Array(map.width * map.height)
+    const pollutionLevel = new Uint8Array(map.width * map.height)
+    const result = updateDensity(map, powerGrid, demand, 5000, prng, { value: 100 }, crimeLevel, fireCoverage, pollutionLevel)
+    // Fill loop: b2 drains (no power/road → desirability=0 → target=0): 8 - 8*0.20 = 6.4, delta = -1.6
+    // Construction: b2 (now 6.4 residents) consumed, consumedPop=6.4; b1→res.med.b (residents=0), return -6.4
+    // Total populationDelta ≈ -1.6 + (-6.4) = -8
+    expect(result.populationDelta).toBeCloseTo(-8)
     expect(map.buildings).toHaveLength(1)
     expect(map.buildings[0]!.defId).toBe('res.med.b')
     expect(map.buildings[0]!.state).toBe('active')
+  })
+})
+
+describe('fill/drain loop', () => {
+  function setupBuildingWithInfra(map: ReturnType<typeof createTestMap>, x = 5, y = 5) {
+    map.infrastructure[y * map.width + x] = Infrastructure.Road
+    map.zones[y * map.width + x] = ZoneType.Residential
+    map.buildings.push({
+      id: 'b1', defId: 'res.low', x, y,
+      powered: true, density: DensityLevel.Low, age: 0, state: 'active', residents: 0,
+    })
+  }
+
+  test('building fills toward target at FILL_RATE per month', () => {
+    const map = createTestMap(32)
+    setupBuildingWithInfra(map)
+    const powerGrid = new Uint8Array(map.width * map.height)
+    powerGrid[5 * map.width + 5] = 1
+    const crimeLevel = new Uint8Array(map.width * map.height)
+    const fireCoverage = new Uint8Array(map.width * map.height)
+    const pollutionLevel = new Uint8Array(map.width * map.height)
+    const prng = new PRNG(1)
+    const demand = { residential: 1.0, commercial: 1.0, industrial: 1.0 }
+    const nextId = { value: 100 }
+
+    updateDensity(map, powerGrid, demand, 0, prng, nextId, crimeLevel, fireCoverage, pollutionLevel)
+
+    const b = map.buildings[0]!
+    // desirability ≈ 0.60 (baseline 0.30 + safety 0.30, no crime)
+    // target = 10 * 1.0 * 0.60 = 6
+    // after 1 month at FILL_RATE=0.12: residents = 0 + 6 * 0.12 ≈ 0.72
+    expect(b.residents).toBeGreaterThan(0)
+    expect(b.residents).toBeLessThan(5)  // hasn't jumped to full
+  })
+
+  test('building drains faster than it fills', () => {
+    const map = createTestMap(32)
+    setupBuildingWithInfra(map)
+    map.buildings[0]!.residents = 10  // start full
+    const powerGrid = new Uint8Array(map.width * map.height)
+    // no power → desirability = 0 → target = 0
+    const crimeLevel = new Uint8Array(map.width * map.height)
+    const fireCoverage = new Uint8Array(map.width * map.height)
+    const pollutionLevel = new Uint8Array(map.width * map.height)
+    const prng = new PRNG(1)
+    const demand = { residential: 1.0, commercial: 1.0, industrial: 1.0 }
+    const nextId = { value: 100 }
+
+    // Run 3 months — measure drain
+    let drainTotal = 0
+    for (let i = 0; i < 3; i++) {
+      const before = map.buildings[0]!.residents
+      updateDensity(map, powerGrid, demand, 0, prng, nextId, crimeLevel, fireCoverage, pollutionLevel)
+      drainTotal += before - map.buildings[0]!.residents
+    }
+
+    // Now test fill with power on
+    map.buildings[0]!.residents = 0
+    powerGrid[5 * map.width + 5] = 1
+    map.infrastructure[5 * map.width + 5] = Infrastructure.Road
+    let fillTotal = 0
+    for (let i = 0; i < 3; i++) {
+      const before = map.buildings[0]!.residents
+      updateDensity(map, powerGrid, demand, 0, prng, nextId, crimeLevel, fireCoverage, pollutionLevel)
+      fillTotal += map.buildings[0]!.residents - before
+    }
+
+    expect(drainTotal).toBeGreaterThan(fillTotal)  // drain is faster
+  })
+
+  test('special buildings (power plants) are not affected by fill loop', () => {
+    const map = createTestMap(32)
+    map.buildings.push({
+      id: 'p1', defId: 'power.diesel', x: 0, y: 0,
+      powered: false, density: DensityLevel.Low, age: 0, state: 'active', residents: 0,
+    })
+    const powerGrid = new Uint8Array(map.width * map.height)
+    const crimeLevel = new Uint8Array(map.width * map.height)
+    const fireCoverage = new Uint8Array(map.width * map.height)
+    const pollutionLevel = new Uint8Array(map.width * map.height)
+    const prng = new PRNG(1)
+    const demand = { residential: 1.0, commercial: 1.0, industrial: 1.0 }
+    const nextId = { value: 100 }
+
+    updateDensity(map, powerGrid, demand, 0, prng, nextId, crimeLevel, fireCoverage, pollutionLevel)
+    expect(map.buildings[0]!.residents).toBe(0)
+  })
+
+  test('populationDelta from fill reflects net change in residents', () => {
+    const map = createTestMap(32)
+    setupBuildingWithInfra(map)
+    const powerGrid = new Uint8Array(map.width * map.height)
+    powerGrid[5 * map.width + 5] = 1
+    const prng = new PRNG(1)
+    const demand = { residential: 1.0, commercial: 1.0, industrial: 1.0 }
+    const nextId = { value: 100 }
+    const crimeLevel = new Uint8Array(map.width * map.height)
+    const fireCoverage = new Uint8Array(map.width * map.height)
+    const pollutionLevel = new Uint8Array(map.width * map.height)
+
+    const { populationDelta } = updateDensity(map, powerGrid, demand, 0, prng, nextId, crimeLevel, fireCoverage, pollutionLevel)
+    expect(populationDelta).toBeGreaterThan(0)  // building gained residents
+    expect(populationDelta).toBe(map.buildings[0]!.residents)  // started at 0, gained residents
   })
 })
 

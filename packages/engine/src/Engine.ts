@@ -148,7 +148,8 @@ export class Engine {
 
       // Density progression
       const { populationDelta: densityDelta } = updateDensity(
-        this.map, this.powerGrid, this.demand, this.population, this.prng, nextBuildingIdRef
+        this.map, this.powerGrid, this.demand, this.population, this.prng, nextBuildingIdRef,
+        this.crimeLevel, this.fireCoverage, this.pollutionLevel,
       )
       this.nextBuildingId = nextBuildingIdRef.value
       this.population = Math.max(0, this.population + densityDelta)
