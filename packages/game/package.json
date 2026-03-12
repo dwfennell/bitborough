@@ -14,8 +14,10 @@
   },
   "dependencies": {
     "@bitborough/core": "workspace:*",
+    "@bitborough/docs": "workspace:*",
     "@bitborough/engine": "workspace:*",
-    "@bitborough/map-gen": "workspace:*"
+    "@bitborough/map-gen": "workspace:*",
+    "marked": "^12.0.0"
   },
   "devDependencies": {
     "@resvg/resvg-js": "^2.6.0",
