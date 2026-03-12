@@ -56,10 +56,11 @@ export class InfoBar {
       totalRes += b.residents
     }
     const occupancyPct = totalCap > 0 ? Math.round(totalRes / totalCap * 100) : 0
-    if (state.population !== this.lastPop || occupancyPct !== this.lastOccupancy) {
-      this.lastPop = state.population
+    const popRounded = Math.round(state.population)
+    if (popRounded !== this.lastPop || occupancyPct !== this.lastOccupancy) {
+      this.lastPop = popRounded
       this.lastOccupancy = occupancyPct
-      this.popEl.textContent = `Pop: ${state.population.toLocaleString()} (${occupancyPct}% full)`
+      this.popEl.textContent = `Pop: ${popRounded.toLocaleString()} (${occupancyPct}% full)`
     }
     if (state.funds !== this.lastFunds) {
       this.lastFunds = state.funds
