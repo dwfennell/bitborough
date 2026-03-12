@@ -139,7 +139,7 @@ export function updateDensity(
 
       if (prng.next() < p) {
         const targetDefId = pickVariant(variants, prng)
-        populationDelta -= def.population
+        populationDelta -= def.capacity
         startConstruction(building, targetDefId)
       }
     }
@@ -157,7 +157,7 @@ export function updateDensity(
 
       if (prng.next() < p) {
         const targetDefId = pickVariant(variants, prng)
-        populationDelta -= def.population
+        populationDelta -= def.capacity
         startConstruction(building, targetDefId)
       }
     }
@@ -231,7 +231,7 @@ function tickConstruction(map: GameMap, building: Building): number {
   building.upgradingToDefId = undefined
   building.age = 0
 
-  return newDef.population - check.consumedPop
+  return newDef.capacity - check.consumedPop
 }
 
 export type FootprintCheck = { ok: false } | { ok: true; toConsume: string[]; consumedPop: number }
@@ -281,7 +281,7 @@ export function checkFootprintForUpgrade(
         if (bDef.category === targetCategory && bDef.category !== BuildingCategory.Special && b.state === 'active') {
           if (!toConsume.includes(b.id)) {
             toConsume.push(b.id)
-            consumedPop += bDef.population
+            consumedPop += bDef.capacity
           }
         } else {
           return { ok: false }
@@ -335,7 +335,7 @@ export function checkDereliction(map: GameMap, powerGrid: Uint8Array): { populat
       if (!infraOk) {
         building.state = 'derelict'
         building.derelictMonths = 0
-        populationDelta -= def.population  // subtract lost population
+        populationDelta -= def.capacity  // subtract lost population
       }
     } else if (building.state === 'derelict' && def.density > DensityLevel.Low) {
       const infraRestored = def.density === DensityLevel.Medium
@@ -344,7 +344,7 @@ export function checkDereliction(map: GameMap, powerGrid: Uint8Array): { populat
       if (infraRestored) {
         building.state = 'active'
         building.derelictMonths = undefined
-        populationDelta += def.population  // restore population on recovery
+        populationDelta += def.capacity  // restore population on recovery
       }
     }
   }
@@ -355,7 +355,7 @@ export function tickDerelict(map: GameMap, building: Building): number {
   building.derelictMonths = (building.derelictMonths ?? 0) + 1
   if (building.derelictMonths >= DERELICT_DOWNGRADE_MONTHS) {
     const downgradeTarget = DOWNGRADE_TARGET[building.defId]
-    const currentPop = BUILDING_DEFS[building.defId]?.population ?? 0
+    const currentPop = BUILDING_DEFS[building.defId]?.capacity ?? 0
     if (downgradeTarget) {
       startConstruction(building, downgradeTarget)
       return -currentPop  // subtract current building's population when downgrade starts

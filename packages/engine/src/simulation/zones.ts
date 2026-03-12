@@ -45,7 +45,7 @@ export function updateZones(
           map.buildings.push(building)
           const def = BUILDING_DEFS[defId]
           if (def) {
-            populationDelta += def.population
+            populationDelta += def.capacity
           }
         }
       }

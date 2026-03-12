@@ -16,7 +16,7 @@ export interface BuildingDef {
   category: BuildingCategory
   density: DensityLevel
   size: { w: number; h: number }
-  population: number
+  capacity: number  // max residents this building can hold
   jobs: number
   taxValue: number
   pollutionRadius: number
