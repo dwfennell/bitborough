@@ -145,6 +145,29 @@ export function updateDensity(
     building.residents = Math.max(0, Math.min(def.capacity, building.residents + (target - building.residents) * rate))
 
     populationDelta += building.residents - before
+
+    // Track low occupancy for dereliction
+    if (def.capacity > 0) {
+      const occupancyRatio = building.residents / def.capacity
+      if (occupancyRatio < 0.10) {
+        building.lowOccupancyMonths = (building.lowOccupancyMonths ?? 0) + 1
+        if (building.lowOccupancyMonths >= 3) {
+          // Trigger dereliction
+          const downgradeTarget = DOWNGRADE_TARGET[building.defId]
+          populationDelta -= building.residents  // subtract actual residents
+          building.residents = 0
+          if (downgradeTarget) {
+            startConstruction(building, downgradeTarget)
+          } else {
+            // Already lowest density — reset to active, will fill naturally
+            building.state = 'active'
+            building.lowOccupancyMonths = undefined
+          }
+        }
+      } else {
+        building.lowOccupancyMonths = undefined  // recovered
+      }
+    }
   }
 
   const { cx, cy } = cityCenter(map)
@@ -361,40 +384,6 @@ const DOWNGRADE_TARGET: Record<string, string> = {
   'com.high.b': 'com.med', 'ind.high': 'ind.med', 'ind.high.b': 'ind.med',
 }
 
-/**
- * Check all active non-Low zone buildings for missing infrastructure.
- * Marks them derelict if requirements are no longer met.
- * Recovers derelict buildings if infrastructure is restored.
- * Called by Engine after any bulldoze action.
- */
-export function checkDereliction(map: GameMap, powerGrid: Uint8Array): { populationDelta: number } {
-  let populationDelta = 0
-  for (const building of map.buildings) {
-    const def = BUILDING_DEFS[building.defId]
-    if (!def || def.category === BuildingCategory.Special) continue
-
-    if (building.state === 'active' && def.density > DensityLevel.Low) {
-      const infraOk = def.density === DensityLevel.Medium
-        ? hasNearbyPavedRoad(map, building.x, building.y)
-        : hasNearbyTransitStop(map, building.x, building.y)
-      if (!infraOk) {
-        building.state = 'derelict'
-        building.derelictMonths = 0
-        populationDelta -= def.capacity  // subtract lost population
-      }
-    } else if (building.state === 'derelict' && def.density > DensityLevel.Low) {
-      const infraRestored = def.density === DensityLevel.Medium
-        ? hasNearbyPavedRoad(map, building.x, building.y)
-        : hasNearbyTransitStop(map, building.x, building.y)
-      if (infraRestored) {
-        building.state = 'active'
-        building.derelictMonths = undefined
-        populationDelta += def.capacity  // restore population on recovery
-      }
-    }
-  }
-  return { populationDelta }
-}
 
 export function tickDerelict(map: GameMap, building: Building): number {
   building.derelictMonths = (building.derelictMonths ?? 0) + 1

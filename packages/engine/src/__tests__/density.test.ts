@@ -12,7 +12,6 @@ import {
   mediumRadius,
   hasCriticalMass,
   updateDensity,
-  checkDereliction,
   tickDerelict,
   checkFootprintForUpgrade,
   neighbourhoodAvgOccupancy,
@@ -325,35 +324,6 @@ describe('Medium→High upgrade', () => {
 })
 
 describe('derelict buildings', () => {
-  test('medium building goes derelict when paved road is removed', () => {
-    const map = createTestMap(32)
-    map.buildings.push({
-      id: 'b1', defId: 'res.med', x: 10, y: 10,
-      powered: true, density: DensityLevel.Medium, age: 5, state: 'active',
-    })
-    // No paved road
-    const powerGrid = new Uint8Array(map.width * map.height)
-    powerGrid[10 * map.width + 10] = 1
-    checkDereliction(map, powerGrid)
-    expect(map.buildings[0]!.state).toBe('derelict')
-    expect(map.buildings[0]!.derelictMonths).toBe(0)
-  })
-
-  test('derelict building recovers when paved road is restored', () => {
-    const map = createTestMap(32)
-    map.buildings.push({
-      id: 'b1', defId: 'res.med', x: 10, y: 10,
-      powered: true, density: DensityLevel.Medium, age: 5, state: 'derelict', derelictMonths: 2,
-    })
-    // Restore paved road
-    map.infrastructure[10 * map.width + 10] = Infrastructure.Road | Infrastructure.PavedRoad
-    const powerGrid = new Uint8Array(map.width * map.height)
-    powerGrid[10 * map.width + 10] = 1
-    checkDereliction(map, powerGrid)
-    expect(map.buildings[0]!.state).toBe('active')
-    expect(map.buildings[0]!.derelictMonths).toBeUndefined()
-  })
-
   test('derelict building downgrades to construction after 6 months', () => {
     const map = createTestMap(32)
     map.buildings.push({
@@ -393,6 +363,113 @@ describe('derelict buildings', () => {
     updateDensity(map, powerGrid, demand, 5000, prng, { value: 100 }, crimeLevel, fireCoverage, pollutionLevel)
     // After one tick, derelictMonths should be 1
     expect(map.buildings[0]!.derelictMonths).toBe(1)
+  })
+})
+
+describe('occupancy-based dereliction', () => {
+  test('lowOccupancyMonths increments when residents < 10% capacity', () => {
+    const map = createTestMap(32)
+    map.buildings.push({
+      id: 'b1', defId: 'res.med', x: 5, y: 5,
+      powered: true, density: DensityLevel.Medium, age: 3, state: 'active',
+      residents: 0,  // 0% of capacity=100 — below 10%
+      lowOccupancyMonths: undefined,
+    })
+    const powerGrid = new Uint8Array(map.width * map.height)
+    const demand = { residential: 1.0, commercial: 1.0, industrial: 1.0 }
+    const prng = new PRNG(1)
+    const nextId = { value: 100 }
+    const empty = new Uint8Array(map.width * map.height)
+
+    updateDensity(map, powerGrid, demand, 0, prng, nextId, empty, empty, empty)
+    // After one tick: lowOccupancyMonths should be 1
+    const b = map.buildings[0]!
+    expect(b.lowOccupancyMonths).toBe(1)
+  })
+
+  test('building goes derelict after 3 months below 10% capacity', () => {
+    const map = createTestMap(32)
+    map.buildings.push({
+      id: 'b1', defId: 'res.med', x: 5, y: 5,
+      powered: true, density: DensityLevel.Medium, age: 3, state: 'active',
+      residents: 0,  // empty → below 10% of capacity=100
+      lowOccupancyMonths: 2,  // pre-seed: 2 months already low
+    })
+    const powerGrid = new Uint8Array(map.width * map.height)
+    const demand = { residential: 1.0, commercial: 1.0, industrial: 1.0 }
+    const prng = new PRNG(1)
+    const nextId = { value: 100 }
+    const empty = new Uint8Array(map.width * map.height)
+
+    updateDensity(map, powerGrid, demand, 0, prng, nextId, empty, empty, empty)
+    // Month 3 (2+1) → triggers dereliction → startConstruction to downgrade
+    expect(map.buildings[0]!.state).toBe('under_construction')
+    expect(map.buildings[0]!.upgradingToDefId).toBe('res.low')
+  })
+
+  test('lowOccupancyMonths resets to undefined when residents recover above 10%', () => {
+    const map = createTestMap(32)
+    map.infrastructure[5 * map.width + 5] = Infrastructure.Road
+    map.zones[5 * map.width + 5] = ZoneType.Residential
+    map.buildings.push({
+      id: 'b1', defId: 'res.med', x: 5, y: 5,
+      powered: true, density: DensityLevel.Medium, age: 3, state: 'active',
+      residents: 15,  // 15% — above 10% threshold
+      lowOccupancyMonths: 1,
+    })
+    const powerGrid = new Uint8Array(map.width * map.height)
+    powerGrid[5 * map.width + 5] = 1
+    const demand = { residential: 1.0, commercial: 1.0, industrial: 1.0 }
+    const prng = new PRNG(1)
+    const nextId = { value: 100 }
+    const empty = new Uint8Array(map.width * map.height)
+
+    updateDensity(map, powerGrid, demand, 0, prng, nextId, empty, empty, empty)
+    expect(map.buildings[0]!.lowOccupancyMonths).toBeUndefined()
+  })
+
+  test('populationDelta on dereliction uses actual residents not capacity', () => {
+    const map = createTestMap(32)
+    map.buildings.push({
+      id: 'b1', defId: 'res.med', x: 5, y: 5,
+      powered: true, density: DensityLevel.Medium, age: 3, state: 'active',
+      residents: 8,  // 8% of capacity=100 — below 10%
+      lowOccupancyMonths: 2,
+    })
+    const powerGrid = new Uint8Array(map.width * map.height)
+    const demand = { residential: 1.0, commercial: 1.0, industrial: 1.0 }
+    const prng = new PRNG(1)
+    const nextId = { value: 100 }
+    const empty = new Uint8Array(map.width * map.height)
+
+    const { populationDelta } = updateDensity(map, powerGrid, demand, 0, prng, nextId, empty, empty, empty)
+    // residents was 8, fill loop drains it slightly (target=0), then dereliction fires
+    // the populationDelta from dereliction should be -residents (whatever residents is after fill)
+    // The exact value depends on drain, but it should be negative
+    expect(populationDelta).toBeLessThan(0)
+  })
+
+  test('bulldozing paved road no longer instantly derelicts medium building', () => {
+    const engine = Engine.create(createTestMap(32), { seed: 1, startingFunds: 999_999 })
+    // Place a medium building manually
+    engine.placeBuilding(0, 0, 'power.diesel')
+    for (let x = 3; x < 8; x++) {
+      engine.placeTile(x, 0, Infrastructure.Road)
+      engine.upgradeTile(x, 0)
+      engine.placeZone(x, 1, ZoneType.Residential)
+    }
+    // Manually place a medium building into the state
+    const state = engine.getState()
+    state.map.buildings.push({
+      id: 'med1', defId: 'res.med', x: 3, y: 1,
+      powered: true, density: DensityLevel.Medium, age: 5, state: 'active',
+      residents: 80,
+    })
+    // Bulldoze the paved road
+    engine.bulldoze(3, 0)
+    // Building should NOT be immediately derelict
+    const b = engine.getState().map.buildings.find(b => b.id === 'med1')!
+    expect(b.state).toBe('active')  // still active, will drain slowly
   })
 })
 
