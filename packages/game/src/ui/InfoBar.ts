@@ -49,9 +49,12 @@ export class InfoBar {
   }
 
   update(state: GameState): void {
-    const buildings = state.map.buildings.filter(b => b.state === 'active')
-    const totalCap = buildings.reduce((s, b) => s + (BUILDING_DEFS[b.defId]?.capacity ?? 0), 0)
-    const totalRes = buildings.reduce((s, b) => s + (b.residents ?? 0), 0)
+    let totalCap = 0, totalRes = 0
+    for (const b of state.map.buildings) {
+      if (b.state !== 'active') continue
+      totalCap += BUILDING_DEFS[b.defId]?.capacity ?? 0
+      totalRes += b.residents
+    }
     const occupancyPct = totalCap > 0 ? Math.round(totalRes / totalCap * 100) : 0
     if (state.population !== this.lastPop || occupancyPct !== this.lastOccupancy) {
       this.lastPop = state.population
