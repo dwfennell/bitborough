@@ -197,9 +197,9 @@ export function updateDensity(
       if (!hasNearbyPavedRoad(map, building.x, building.y)) continue
 
       const occupancy = def.capacity > 0 ? building.residents / def.capacity : 0
-      if (occupancy < 0.80) continue
+      if (occupancy < 0.70) continue
       const neighbourAvg = neighbourhoodAvgOccupancy(map, building.x, building.y, 5)
-      if (neighbourAvg < 0.75) continue
+      if (neighbourAvg < 0.70) continue
 
       const dist = Math.hypot(building.x - cx, building.y - cy)
       const demandFactor = getZoneDemand(building.defId, demand)

@@ -38,7 +38,7 @@ export function calculateDemand(
   const taxModifier = 1.0 - ((taxRate - 0.07) * 5.0)
 
   // Residential demand:
-  const rBase = 0.7
+  const rBase = 1.0
   let rDemand = rBase * taxModifier
 
   // Commercial demand uses total residential capacity (not actual residents).

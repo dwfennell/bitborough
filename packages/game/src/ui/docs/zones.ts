@@ -21,8 +21,8 @@ export const zones: DocSection = {
 
     <p><strong>Density progression:</strong> Buildings upgrade from Low → Medium → High density when the neighbourhood is nearly full.</p>
     <ul>
-      <li><strong>Low → Medium:</strong> Requires a <em>paved road</em> within 3 tiles, the building at <em>80%+ occupancy</em>, and the surrounding neighbourhood at <em>75%+ average occupancy</em>.</li>
-      <li><strong>Medium → High:</strong> Requires a <em>transit stop</em> within 10 tiles and the building at <em>80%+ occupancy</em>.</li>
+      <li><strong>Low → Medium:</strong> Requires a <em>paved road</em> within 3 tiles, the building at <em>70%+ occupancy</em>, and the surrounding neighbourhood at <em>70%+ average occupancy</em>.</li>
+      <li><strong>Medium → High:</strong> Requires a <em>transit stop</em> within 10 tiles and the building at <em>85%+ occupancy</em>.</li>
     </ul>
     <p>Upgrades take <em>2 months</em> — you'll see a construction phase before the new building appears.</p>
     <p><strong>Dereliction:</strong> A building that stays below 10% occupancy for 3 consecutive months will downgrade. Removing infrastructure can also trigger dereliction.</p>
