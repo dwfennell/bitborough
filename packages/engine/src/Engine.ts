@@ -402,7 +402,7 @@ export class Engine {
     const activeFires: Array<[number, number]> = Array.from(this.fireState.activeFires.entries())
 
     return {
-      version: 2,
+      version: 3,
       map: {
         version: this.map.version,
         width: this.map.width,
@@ -425,6 +425,8 @@ export class Engine {
         funding: { ...this.funding },
         seed: this.prng.getInternalState(),
         activeFires,
+        loan: this.loan,
+        loanRepaymentAmount: this.loanRepaymentAmount,
       },
       timestamp: new Date().toISOString(),
     }
@@ -494,6 +496,10 @@ export class Engine {
     engine.population = map.buildings
       .filter((b) => b.state === 'active')
       .reduce((sum, b) => sum + (b.residents ?? 0), 0)
+
+    // Restore loan state
+    engine.loan = save.state.loan ?? null
+    engine.loanRepaymentAmount = save.state.loanRepaymentAmount ?? (engine.loan?.monthlyPayment ?? 0)
 
     // Rebuild derived state
     propagatePower(engine.map, engine.powerGrid, engine.bldIdx)

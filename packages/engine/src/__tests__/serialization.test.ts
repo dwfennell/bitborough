@@ -3,6 +3,7 @@ import { Engine } from '../Engine.js'
 import { createTestMap, advanceYear } from '../test-helpers.js'
 import { Infrastructure, ZoneType } from '@bitborough/core'
 import { BUILDING_DEFS } from '../buildings-registry.js'
+import type { SaveFile } from '@bitborough/core'
 
 describe('Serialization', () => {
   test('serialize produces valid JSON', () => {
@@ -82,10 +83,10 @@ describe('Serialization', () => {
     }
   })
 
-  test('v2 save preserves exact residents values', () => {
+  test('v3 save preserves exact residents values', () => {
     const engine = Engine.create(createTestMap(32), { seed: 1, startingFunds: 10_000 })
     const save = engine.serialize()
-    expect(save.version).toBe(2)
+    expect(save.version).toBe(3)
     const restored = Engine.restore(save)
     for (let i = 0; i < engine.getState().map.buildings.length; i++) {
       expect(restored.getState().map.buildings[i]!.residents).toBe(engine.getState().map.buildings[i]!.residents)
@@ -108,6 +109,72 @@ describe('Serialization', () => {
       .map.buildings.filter((b) => b.state === 'active')
       .reduce((sum, b) => sum + b.residents, 0)
     expect(restored.getState().population).toBe(expectedPop)
+  })
+
+  test('loan state persists through save/load', () => {
+    const engine = Engine.create(createTestMap(32), { seed: 42 })
+    // Inject a loan directly into the save file to avoid needing tax income
+    const baseSave = engine.serialize()
+    const loanBefore = {
+      principal: 50_000,
+      remaining: 42_000,
+      monthlyPayment: 510.31,
+      termMonths: 120,
+      monthsLeft: 98,
+      interestRate: 0.08,
+    }
+    const loanRepaymentAmountBefore = 510.31
+    const saveWithLoan: SaveFile = {
+      ...baseSave,
+      state: {
+        ...baseSave.state,
+        loan: loanBefore,
+        loanRepaymentAmount: loanRepaymentAmountBefore,
+      },
+    }
+
+    const restored = Engine.restore(saveWithLoan)
+    const stateAfter = restored.getState()
+
+    expect(stateAfter.loan).not.toBeNull()
+    expect(stateAfter.loan!.principal).toBe(loanBefore.principal)
+    expect(stateAfter.loan!.remaining).toBe(loanBefore.remaining)
+    expect(stateAfter.loan!.monthlyPayment).toBe(loanBefore.monthlyPayment)
+    expect(stateAfter.loan!.termMonths).toBe(loanBefore.termMonths)
+    expect(stateAfter.loan!.monthsLeft).toBe(loanBefore.monthsLeft)
+    expect(stateAfter.loan!.interestRate).toBe(loanBefore.interestRate)
+    expect(stateAfter.loanRepaymentAmount).toBe(loanRepaymentAmountBefore)
+  })
+
+  test('no-loan state persists through save/load', () => {
+    const engine = Engine.create(createTestMap(32), { seed: 42 })
+    const save = engine.serialize()
+    const restored = Engine.restore(save)
+    expect(restored.getState().loan).toBeNull()
+  })
+
+  test('missing loan fields in save file gracefully default to null/0', () => {
+    const engine = Engine.create(createTestMap(32), { seed: 42 })
+    const save = engine.serialize()
+    // Simulate an old save without loan fields
+    const oldSave: SaveFile = {
+      ...save,
+      state: {
+        funds: save.state.funds,
+        population: save.state.population,
+        month: save.state.month,
+        year: save.state.year,
+        tickCount: save.state.tickCount,
+        taxRate: save.state.taxRate,
+        funding: save.state.funding,
+        seed: save.state.seed,
+        activeFires: save.state.activeFires,
+        // intentionally omit loan and loanRepaymentAmount
+      },
+    }
+    const restored = Engine.restore(oldSave)
+    expect(restored.getState().loan).toBeNull()
+    expect(restored.getState().loanRepaymentAmount).toBe(0)
   })
 
   test('restored engine is deterministic with original', () => {
