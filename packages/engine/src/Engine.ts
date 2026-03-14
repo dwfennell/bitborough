@@ -369,12 +369,18 @@ export class Engine {
 
   setTaxRate(rate: number): void {
     this.taxRate = Math.max(0, Math.min(0.2, rate))
-    this.budgetInfo = calculateBudget(this.map, this.population, this.taxRate, this.landValues, this.funding)
+    const repayment = this.loan
+      ? Math.round(Math.min(this.loanRepaymentAmount, this.loan.remaining))
+      : 0
+    this.budgetInfo = calculateBudget(this.map, this.population, this.taxRate, this.landValues, this.funding, repayment)
   }
 
   setFunding(service: 'police' | 'fire' | 'transit', level: number): void {
     this.funding[service] = Math.max(0, Math.min(100, level))
-    this.budgetInfo = calculateBudget(this.map, this.population, this.taxRate, this.landValues, this.funding)
+    const repayment = this.loan
+      ? Math.round(Math.min(this.loanRepaymentAmount, this.loan.remaining))
+      : 0
+    this.budgetInfo = calculateBudget(this.map, this.population, this.taxRate, this.landValues, this.funding, repayment)
   }
 
   takeLoan(amount: number): Result {
@@ -504,12 +510,16 @@ export class Engine {
     // Rebuild derived state
     propagatePower(engine.map, engine.powerGrid, engine.bldIdx)
     engine.demand = calculateDemand(engine.map, engine.taxRate)
+    const restoreRepayment = engine.loan
+      ? Math.round(Math.min(engine.loanRepaymentAmount, engine.loan.remaining))
+      : 0
     engine.budgetInfo = calculateBudget(
       engine.map,
       engine.population,
       engine.taxRate,
       engine.landValues,
       engine.funding,
+      restoreRepayment,
     )
 
     return engine

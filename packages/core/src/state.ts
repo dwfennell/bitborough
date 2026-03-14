@@ -19,7 +19,7 @@ export enum FailReason {
   NotZonable,
   LoanExists,
   AmountOutOfRange,
-  NoActiveLoan = 'NoActiveLoan',
+  NoActiveLoan,
 }
 
 export interface Loan {
