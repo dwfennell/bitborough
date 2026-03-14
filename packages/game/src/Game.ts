@@ -81,6 +81,8 @@ export class Game {
       uiOverlay,
       (rate) => this.engine?.setTaxRate(rate),
       (service, level) => this.engine?.setFunding(service, level),
+      (amount) => this.engine?.takeLoan(amount),
+      (amount) => this.engine?.setLoanRepayment(amount),
     )
     this.queryPanel = new QueryPanel(uiOverlay)
     this.miniMap = new MiniMap(uiOverlay)
