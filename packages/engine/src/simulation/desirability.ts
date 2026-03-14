@@ -1,20 +1,20 @@
 import { type GameMap, ZoneType, Infrastructure } from '@bitborough/core'
 
 // Residential weights (sum to 1.0 at perfect conditions, no pollution)
-const RES_BASELINE = 0.30        // constant when power + road present
-const RES_SAFETY_WEIGHT = 0.30   // (1 - crimeNorm) × this
-const RES_FIRE_BONUS = 0.15      // flat bonus when fire-covered
-const RES_PARK_BONUS = 0.25      // flat bonus when park within PARK_RADIUS tiles
-const RES_POLLUTION_PENALTY = 0.30  // pollutionNorm × this, subtracted
+const RES_BASELINE = 0.3 // constant when power + road present
+const RES_SAFETY_WEIGHT = 0.3 // (1 - crimeNorm) × this
+const RES_FIRE_BONUS = 0.15 // flat bonus when fire-covered
+const RES_PARK_BONUS = 0.25 // flat bonus when park within PARK_RADIUS tiles
+const RES_POLLUTION_PENALTY = 0.3 // pollutionNorm × this, subtracted
 const PARK_RADIUS = 5
 
 // Commercial weights (sum to 1.0)
-const COM_BASELINE = 0.40
+const COM_BASELINE = 0.4
 const COM_TRANSIT_BONUS = 0.35
 const COM_RESIDENTIAL_BONUS = 0.25
 const COM_TRANSIT_RADIUS = 10
 const COM_RESIDENTIAL_RADIUS = 5
-const COM_RESIDENTIAL_MIN_COUNT = 3  // need at least this many to earn the bonus
+const COM_RESIDENTIAL_MIN_COUNT = 3 // need at least this many to earn the bonus
 
 /**
  * Compute per-tile desirability for a zone type.
@@ -39,15 +39,21 @@ export function computeDesirability(
   if (!hasRoadAccess(map, x, y)) return 0
 
   switch (zone) {
-    case ZoneType.Residential:  return residentialDesirability(x, y, idx, map, crimeLevel, fireCoverage, pollutionLevel)
-    case ZoneType.Commercial:   return commercialDesirability(x, y, map)
-    case ZoneType.Industrial:   return 1.0  // road + power already confirmed above
-    default:                    return 0
+    case ZoneType.Residential:
+      return residentialDesirability(x, y, idx, map, crimeLevel, fireCoverage, pollutionLevel)
+    case ZoneType.Commercial:
+      return commercialDesirability(x, y, map)
+    case ZoneType.Industrial:
+      return 1.0 // road + power already confirmed above
+    default:
+      return 0
   }
 }
 
 function residentialDesirability(
-  x: number, y: number, idx: number,
+  x: number,
+  y: number,
+  idx: number,
   map: GameMap,
   crimeLevel: Uint8Array,
   fireCoverage: Uint8Array,

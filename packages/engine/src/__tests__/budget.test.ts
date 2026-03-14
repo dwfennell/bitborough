@@ -64,7 +64,7 @@ describe('Budget system', () => {
   test('setTaxRate clamps to valid range', () => {
     const engine = Engine.create(createTestMap(32), { seed: 42 })
     engine.setTaxRate(0.25) // above max 20%
-    expect(engine.getState().budget.taxRate).toBe(0.20)
+    expect(engine.getState().budget.taxRate).toBe(0.2)
     engine.setTaxRate(-0.05) // below min 0%
     expect(engine.getState().budget.taxRate).toBe(0)
   })

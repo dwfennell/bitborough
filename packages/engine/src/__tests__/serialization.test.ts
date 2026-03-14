@@ -31,9 +31,7 @@ describe('Serialization', () => {
     expect(s2.time.year).toBe(s1.time.year)
     expect(s2.funds).toBe(s1.funds)
     // population is recomputed from Σ b.residents on restore
-    const expectedPop = s2.map.buildings
-      .filter(b => b.state === 'active')
-      .reduce((sum, b) => sum + b.residents, 0)
+    const expectedPop = s2.map.buildings.filter((b) => b.state === 'active').reduce((sum, b) => sum + b.residents, 0)
     expect(s2.population).toBe(expectedPop)
     expect(s2.budget.taxRate).toBe(s1.budget.taxRate)
     expect(Array.from(s2.map.terrain)).toEqual(Array.from(s1.map.terrain))
@@ -90,8 +88,7 @@ describe('Serialization', () => {
     expect(save.version).toBe(2)
     const restored = Engine.restore(save)
     for (let i = 0; i < engine.getState().map.buildings.length; i++) {
-      expect(restored.getState().map.buildings[i]!.residents)
-        .toBe(engine.getState().map.buildings[i]!.residents)
+      expect(restored.getState().map.buildings[i]!.residents).toBe(engine.getState().map.buildings[i]!.residents)
     }
   })
 
@@ -103,11 +100,12 @@ describe('Serialization', () => {
       engine.placeTile(x, 3, Infrastructure.Road)
       engine.placeZone(x, 4, ZoneType.Residential)
     }
-    for (let i = 0; i < 120; i++) engine.tick()  // let buildings fill up a bit
+    for (let i = 0; i < 120; i++) engine.tick() // let buildings fill up a bit
     const save = engine.serialize()
     const restored = Engine.restore(save)
-    const expectedPop = restored.getState().map.buildings
-      .filter(b => b.state === 'active')
+    const expectedPop = restored
+      .getState()
+      .map.buildings.filter((b) => b.state === 'active')
       .reduce((sum, b) => sum + b.residents, 0)
     expect(restored.getState().population).toBe(expectedPop)
   })

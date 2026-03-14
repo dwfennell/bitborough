@@ -52,7 +52,7 @@ describe('Zone development', () => {
       engine.placeZone(x, 3, ZoneType.Residential)
     }
     for (let i = 0; i < 24; i++) advanceMonth(engine)
-    const rBuildings = engine.getState().map.buildings.filter(b => b.defId.startsWith('res.'))
+    const rBuildings = engine.getState().map.buildings.filter((b) => b.defId.startsWith('res.'))
     expect(rBuildings.length).toBe(0)
   })
 
@@ -65,7 +65,7 @@ describe('Zone development', () => {
       engine.placeZone(x, 3, ZoneType.Residential)
     }
     for (let i = 0; i < 24; i++) advanceMonth(engine)
-    const rBuildings = engine.getState().map.buildings.filter(b => b.defId.startsWith('res.'))
+    const rBuildings = engine.getState().map.buildings.filter((b) => b.defId.startsWith('res.'))
     expect(rBuildings.length).toBe(0)
   })
 
@@ -93,13 +93,13 @@ describe('updateZones unit', () => {
     for (let i = 0; i < 100; i++) {
       const result = updateZones(map, powerGrid, { residential: 1.0, commercial: 1.0, industrial: 1.0 }, prng, nextId)
       populationDelta += result.populationDelta
-      if (map.buildings.some(b => b.x === 5 && b.y === 5)) break
+      if (map.buildings.some((b) => b.x === 5 && b.y === 5)) break
     }
 
     // Population delta should be 0 — new buildings start empty
     expect(populationDelta).toBe(0)
     // Building should exist with residents=0
-    const b = map.buildings.find(b => b.x === 5 && b.y === 5)
+    const b = map.buildings.find((b) => b.x === 5 && b.y === 5)
     expect(b).toBeDefined()
     expect(b!.residents).toBe(0)
   })

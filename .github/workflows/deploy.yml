@@ -29,7 +29,11 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      - run: pnpm lint
+
       - run: pnpm -r build
+
+      - run: pnpm -r test
         env:
           BASE_URL: /${{ github.event.repository.name }}/
 

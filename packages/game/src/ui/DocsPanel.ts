@@ -22,7 +22,9 @@ function buildReferenceTable(rows: BuildingRow[]): string {
     <th>Size</th>
     <th>Notes</th>
   </tr>`
-  const dataRows = rows.map(r => `<tr>
+  const dataRows = rows
+    .map(
+      (r) => `<tr>
     <td><strong>${r.name}</strong></td>
     <td>${formatCurrency(r.cost)}</td>
     <td>${formatCurrency(r.maintenanceCost)}</td>
@@ -33,7 +35,9 @@ function buildReferenceTable(rows: BuildingRow[]): string {
     <td>${formatNum(r.pollutionAmount)}</td>
     <td>${r.size.w}×${r.size.h}</td>
     <td>${r.notes}</td>
-  </tr>`).join('')
+  </tr>`,
+    )
+    .join('')
   return `<table class="docs-ref-table">${headerRow}${dataRows}</table>`
 }
 

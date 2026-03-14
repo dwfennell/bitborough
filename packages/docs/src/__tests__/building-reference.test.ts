@@ -6,7 +6,7 @@ import { getBuildingReference } from '../building-reference.js'
 describe('getBuildingReference', () => {
   test('diesel generator row has correct cost from COSTS', () => {
     const rows = getBuildingReference()
-    const diesel = rows.find(r => r.id === 'power.diesel')
+    const diesel = rows.find((r) => r.id === 'power.diesel')
     expect(diesel).toBeDefined()
     expect(diesel!.cost).toBe(COSTS.dieselGenerator)
     expect(diesel!.maintenanceCost).toBe(MAINTENANCE.dieselGenerator)
@@ -15,7 +15,7 @@ describe('getBuildingReference', () => {
 
   test('res.low row has correct capacity', () => {
     const rows = getBuildingReference()
-    const res = rows.find(r => r.id === 'res.low')
+    const res = rows.find((r) => r.id === 'res.low')
     expect(res!.capacity).toBe(BUILDING_DEFS['res.low']!.capacity)
   })
 

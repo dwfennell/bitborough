@@ -8,9 +8,7 @@ export enum SimSpeed {
   Turbo,
 }
 
-export type Result =
-  | { ok: true }
-  | { ok: false; reason: FailReason; detail?: string }
+export type Result = { ok: true } | { ok: false; reason: FailReason; detail?: string }
 
 export enum FailReason {
   InsufficientFunds,
@@ -32,9 +30,7 @@ export interface Loan {
   interestRate: number
 }
 
-export type GameEvent =
-  | { type: 'emergency_loan'; amount: number }
-  | { type: 'negative_funds' }
+export type GameEvent = { type: 'emergency_loan'; amount: number } | { type: 'negative_funds' }
 
 export interface DemandInfo {
   residential: number

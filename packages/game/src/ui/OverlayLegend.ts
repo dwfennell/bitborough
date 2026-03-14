@@ -80,7 +80,10 @@ export class OverlayLegend {
     const legend = LEGENDS[overlay]
     this.titleEl.textContent = legend.title
     this.entriesEl.innerHTML = legend.entries
-      .map(e => `<div class="legend-entry"><span class="legend-swatch" style="background:${e.color}"></span>${e.label}</div>`)
+      .map(
+        (e) =>
+          `<div class="legend-entry"><span class="legend-swatch" style="background:${e.color}"></span>${e.label}</div>`,
+      )
       .join('')
 
     this.el.classList.remove('hidden')

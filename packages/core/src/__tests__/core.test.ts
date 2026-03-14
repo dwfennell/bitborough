@@ -158,9 +158,7 @@ describe('DEFAULTS', () => {
 
   test('startingFunds increase with map size', () => {
     for (let i = 1; i < MAP_SIZES.length; i++) {
-      expect(DEFAULTS.startingFunds[MAP_SIZES[i]!]).toBeGreaterThanOrEqual(
-        DEFAULTS.startingFunds[MAP_SIZES[i - 1]!]!,
-      )
+      expect(DEFAULTS.startingFunds[MAP_SIZES[i]!]).toBeGreaterThanOrEqual(DEFAULTS.startingFunds[MAP_SIZES[i - 1]!]!)
     }
   })
 })

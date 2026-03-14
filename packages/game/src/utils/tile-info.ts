@@ -66,6 +66,6 @@ export function describeTile(tile: TileInfo, x: number, y: number, state: GameSt
     crime: state.crimeLevel[idx]!,
     fireCoverage: state.fireCoverage[idx]!,
     onFire: state.activeFires.includes(idx),
-    traffic: (tile.infrastructure & Infrastructure.Road) ? state.trafficDensity[idx]! : 0,
+    traffic: tile.infrastructure & Infrastructure.Road ? state.trafficDensity[idx]! : 0,
   }
 }

@@ -3,10 +3,7 @@ import { type GameMap, ZoneType, Infrastructure } from '@bitborough/core'
 const MAX_TRIP_DISTANCE = 30
 const TRAFFIC_PER_TRIP = 50
 
-export function calculateTraffic(
-  map: GameMap,
-  trafficDensity: Uint8Array,
-): void {
+export function calculateTraffic(map: GameMap, trafficDensity: Uint8Array): void {
   const { width, height } = map
   const size = width * height
 
@@ -87,7 +84,7 @@ function findAdjacentRoad(map: GameMap, x: number, y: number): number {
     x > 0 ? y * width + (x - 1) : -1,
   ]
   for (const idx of neighbors) {
-    if (idx >= 0 && (map.infrastructure[idx]! & Infrastructure.Road)) {
+    if (idx >= 0 && map.infrastructure[idx]! & Infrastructure.Road) {
       return idx
     }
   }

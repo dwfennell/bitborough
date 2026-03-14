@@ -17,6 +17,17 @@ import { timeSimulation } from './sections/time-simulation.js'
 import type { DocSection } from './types.js'
 
 export const SECTIONS: DocSection[] = [
-  gettingStarted, controls, tools, overlays, power, zones,
-  roadsTraffic, budgetTaxes, demand, crime, fire, landValue, timeSimulation,
+  gettingStarted,
+  controls,
+  tools,
+  overlays,
+  power,
+  zones,
+  roadsTraffic,
+  budgetTaxes,
+  demand,
+  crime,
+  fire,
+  landValue,
+  timeSimulation,
 ]

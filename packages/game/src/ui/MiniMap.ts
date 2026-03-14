@@ -7,7 +7,10 @@ export class MiniMap {
   private ctx: CanvasRenderingContext2D
   private imageData: ImageData | null = null
 
-  constructor(container: HTMLElement, private maxSize: number = 150) {
+  constructor(
+    container: HTMLElement,
+    private maxSize: number = 150,
+  ) {
     this.canvas = document.createElement('canvas')
     this.canvas.id = 'minimap'
     this.ctx = this.canvas.getContext('2d')!

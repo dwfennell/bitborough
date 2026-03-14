@@ -10,7 +10,7 @@ describe('Water placement', () => {
     const noise = createNoise2D(prng)
     const terrain = new Uint8Array(64 * 64)
     placeWater(terrain, 64, 64, noise, 0, 'plains')
-    const waterCount = Array.from(terrain).filter(t => t === TileType.Water).length
+    const waterCount = Array.from(terrain).filter((t) => t === TileType.Water).length
     expect(waterCount).toBe(0)
   })
 
@@ -19,7 +19,7 @@ describe('Water placement', () => {
     const noise = createNoise2D(prng)
     const terrain = new Uint8Array(64 * 64)
     placeWater(terrain, 64, 64, noise, 1.0, 'plains')
-    const waterCount = Array.from(terrain).filter(t => t === TileType.Water).length
+    const waterCount = Array.from(terrain).filter((t) => t === TileType.Water).length
     expect(waterCount).toBe(64 * 64)
   })
 
@@ -41,7 +41,7 @@ describe('Water placement', () => {
     const terrain = new Uint8Array(64 * 64)
     placeWater(terrain, 64, 64, noise, 0.1, 'plains')
     // With low water level, most of the map should be land
-    const grassCount = Array.from(terrain).filter(t => t === TileType.Grass).length
+    const grassCount = Array.from(terrain).filter((t) => t === TileType.Grass).length
     expect(grassCount).toBeGreaterThan(64 * 64 * 0.5)
   })
 })

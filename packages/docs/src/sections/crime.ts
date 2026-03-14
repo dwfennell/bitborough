@@ -4,7 +4,7 @@ export const crime: DocSection = {
   id: 'crime',
   title: 'Crime',
   body: [
-    'Crime appears on zoned tiles and is driven by low land values. Every zoned tile starts with a base crime score of 30, reduced by the tile\'s land value. Police stations actively suppress crime within their radius.',
+    "Crime appears on zoned tiles and is driven by low land values. Every zoned tile starts with a base crime score of 30, reduced by the tile's land value. Police stations actively suppress crime within their radius.",
     '',
     '`Crime = 30 − (Land Value × 0.15) − (Police Influence × 40)` — minimum 0',
     '',

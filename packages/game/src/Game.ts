@@ -86,7 +86,10 @@ export class Game {
     this.miniMap = new MiniMap(uiOverlay)
     this.escapeMenu = new EscapeMenu(uiOverlay, {
       onResume: () => {},
-      onSave: () => { this.autoSave(); this.saveManager.exportToFile() },
+      onSave: () => {
+        this.autoSave()
+        this.saveManager.exportToFile()
+      },
       onLoad: async () => {
         const save = await this.saveManager.importFromFile()
         if (save) {
@@ -113,7 +116,13 @@ export class Game {
       { label: 'Fire (F)', key: 'f', action: () => this.renderer.toggleOverlay('fire') },
       { label: 'Traffic (T)', key: 't', action: () => this.renderer.toggleOverlay('traffic') },
       { label: 'Grid (X)', key: 'x', action: () => this.renderer.toggleGridLines() },
-      { label: 'Export', action: () => { this.autoSave(); this.saveManager.exportToFile() } },
+      {
+        label: 'Export',
+        action: () => {
+          this.autoSave()
+          this.saveManager.exportToFile()
+        },
+      },
     ]
 
     this.createMenuBar(uiOverlay)
@@ -126,9 +135,15 @@ export class Game {
       if (tool.category === 'query') return
       if (result.ok) {
         switch (tool.category) {
-          case 'bulldoze': this.audioManager.playBulldoze(); break
-          case 'zone': this.audioManager.playZone(); break
-          default: this.audioManager.playPlace(); break
+          case 'bulldoze':
+            this.audioManager.playBulldoze()
+            break
+          case 'zone':
+            this.audioManager.playZone()
+            break
+          default:
+            this.audioManager.playPlace()
+            break
         }
       } else {
         this.audioManager.playError()
@@ -158,9 +173,8 @@ export class Game {
   }
 
   private showNewGameScreen(): void {
-    const sizeOptions = MAP_SIZES
-      .filter(s => s >= 64 && s <= 256)
-      .map(s => `<option value="${s}"${s === 128 ? ' selected' : ''}>${s}x${s}</option>`)
+    const sizeOptions = MAP_SIZES.filter((s) => s >= 64 && s <= 256)
+      .map((s) => `<option value="${s}"${s === 128 ? ' selected' : ''}>${s}x${s}</option>`)
       .join('\n')
 
     const screen = document.createElement('div')
@@ -239,7 +253,12 @@ export class Game {
     keyMap.set('Escape', () => {
       if (this.escapeMenu.isVisible) {
         this.escapeMenu.hide()
-      } else if (this.docsPanel.isVisible || this.budgetPanel.isVisible || this.queryPanel.isVisible || this.toolManager.activeTool) {
+      } else if (
+        this.docsPanel.isVisible ||
+        this.budgetPanel.isVisible ||
+        this.queryPanel.isVisible ||
+        this.toolManager.activeTool
+      ) {
         this.toolManager.clear()
         this.queryPanel.hide()
         this.budgetPanel.hide()
@@ -259,7 +278,10 @@ export class Game {
       if (inInput) return
       this.pressedKeys.add(e.key)
       const action = keyMap.get(e.key)
-      if (action) { e.preventDefault(); action() }
+      if (action) {
+        e.preventDefault()
+        action()
+      }
     }
     this.boundKeyUp = (e: KeyboardEvent) => {
       this.pressedKeys.delete(e.key)
@@ -287,7 +309,7 @@ export class Game {
     }
 
     // Keyboard panning (WASD + arrow keys)
-    const panSpeed = 12 / (this.camera.tileSize * this.camera.zoom) * (delta / 16)
+    const panSpeed = (12 / (this.camera.tileSize * this.camera.zoom)) * (delta / 16)
     const k = this.pressedKeys
     if (k.has('a') || k.has('ArrowLeft')) this.camera.pan(-panSpeed, 0)
     if (k.has('d') || k.has('ArrowRight')) this.camera.pan(panSpeed, 0)
@@ -310,9 +332,18 @@ export class Game {
       this.camera.x = worldX - cx / newTs
       this.camera.y = worldY - cy / newTs
     }
-    if (k.has('a') || k.has('d') || k.has('w') || k.has('s') ||
-        k.has('ArrowLeft') || k.has('ArrowRight') || k.has('ArrowUp') || k.has('ArrowDown') ||
-        k.has('q') || k.has('e')) {
+    if (
+      k.has('a') ||
+      k.has('d') ||
+      k.has('w') ||
+      k.has('s') ||
+      k.has('ArrowLeft') ||
+      k.has('ArrowRight') ||
+      k.has('ArrowUp') ||
+      k.has('ArrowDown') ||
+      k.has('q') ||
+      k.has('e')
+    ) {
       this.camera.clamp()
     }
 

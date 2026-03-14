@@ -51,11 +51,7 @@ function findPowerPlants(map: GameMap): PowerPlant[] {
   return plants
 }
 
-function bfsPower(
-  map: GameMap,
-  powerGrid: Uint8Array,
-  plant: PowerPlant,
-): void {
+function bfsPower(map: GameMap, powerGrid: Uint8Array, plant: PowerPlant): void {
   const { width, height } = map
   let remaining = plant.capacity
 

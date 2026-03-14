@@ -16,7 +16,7 @@ export interface BuildingDef {
   category: BuildingCategory
   density: DensityLevel
   size: { w: number; h: number }
-  capacity: number  // max residents this building can hold
+  capacity: number // max residents this building can hold
   jobs: number
   taxValue: number
   pollutionRadius: number
@@ -38,11 +38,11 @@ export interface Building {
   density: DensityLevel
   age: number // months since placed
   state: BuildingState
-  residents: number           // current occupancy, 0–def.capacity; always 0 for special buildings
+  residents: number // current occupancy, 0–def.capacity; always 0 for special buildings
   // under_construction only:
   constructionMonthsRemaining?: number
   upgradingToDefId?: string
   // derelict only:
   derelictMonths?: number
-  lowOccupancyMonths?: number  // months residents < 10% capacity; undefined when healthy
+  lowOccupancyMonths?: number // months residents < 10% capacity; undefined when healthy
 }

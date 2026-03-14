@@ -46,7 +46,7 @@ describe('generateMap', () => {
 
   test('waterLevel 0 produces minimal water', () => {
     const map = generateMap({ size: 64, seed: 42, preset: 'plains', waterLevel: 0 })
-    const waterCount = Array.from(map.terrain).filter(t => t === TileType.Water).length
+    const waterCount = Array.from(map.terrain).filter((t) => t === TileType.Water).length
     expect(waterCount).toBe(0)
   })
 
@@ -86,13 +86,24 @@ describe('generateMap', () => {
 })
 
 function countTerrain(terrain: Uint8Array) {
-  let grass = 0, water = 0, sand = 0, trees = 0
+  let grass = 0,
+    water = 0,
+    sand = 0,
+    trees = 0
   for (let i = 0; i < terrain.length; i++) {
     switch (terrain[i]) {
-      case TileType.Grass: grass++; break
-      case TileType.Water: water++; break
-      case TileType.Sand: sand++; break
-      case TileType.Trees: trees++; break
+      case TileType.Grass:
+        grass++
+        break
+      case TileType.Water:
+        water++
+        break
+      case TileType.Sand:
+        sand++
+        break
+      case TileType.Trees:
+        trees++
+        break
     }
   }
   return { grass, water, sand, trees }

@@ -63,9 +63,12 @@ export class Renderer {
       const def = BUILDING_DEFS[building.defId]
       if (!def) continue
       if (
-        building.x + def.size.w < startX || building.x > endX ||
-        building.y + def.size.h < startY || building.y > endY
-      ) continue
+        building.x + def.size.w < startX ||
+        building.x > endX ||
+        building.y + def.size.h < startY ||
+        building.y > endY
+      )
+        continue
       const sx = Math.floor((building.x - camera.x) * ts)
       const sy = Math.floor((building.y - camera.y) * ts)
       this.tileRenderer.drawBuilding(ctx, building, def, sx, sy, snappedTs)
@@ -73,7 +76,11 @@ export class Renderer {
 
     // Overlays (power grid, land value heatmaps)
     this.overlayRenderer.render(ctx, state, {
-      ts: snappedTs, startX, startY, endX, endY,
+      ts: snappedTs,
+      startX,
+      startY,
+      endX,
+      endY,
       mapWidth: map.width,
       cameraX: camera.x,
       cameraY: camera.y,

@@ -1,17 +1,6 @@
-import {
-  type GameMap,
-  type Result,
-  TileType,
-  FailReason,
-  COSTS,
-} from '@bitborough/core'
+import { type GameMap, type Result, TileType, FailReason, COSTS } from '@bitborough/core'
 
-export function bulldoze(
-  map: GameMap,
-  x: number,
-  y: number,
-  funds: number,
-): { result: Result; cost: number } {
+export function bulldoze(map: GameMap, x: number, y: number, funds: number): { result: Result; cost: number } {
   if (x < 0 || y < 0 || x >= map.width || y >= map.height) {
     return { result: { ok: false, reason: FailReason.InvalidLocation }, cost: 0 }
   }
@@ -38,7 +27,7 @@ export function bulldoze(
   }
 
   // Remove buildings at this tile
-  map.buildings = map.buildings.filter(b => {
+  map.buildings = map.buildings.filter((b) => {
     return !(b.x === x && b.y === y)
   })
 

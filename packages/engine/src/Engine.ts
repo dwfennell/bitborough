@@ -148,8 +148,15 @@ export class Engine {
 
       // Density progression
       const { populationDelta: densityDelta } = updateDensity(
-        this.map, this.powerGrid, this.demand, this.population, this.prng, nextBuildingIdRef,
-        this.crimeLevel, this.fireCoverage, this.pollutionLevel,
+        this.map,
+        this.powerGrid,
+        this.demand,
+        this.population,
+        this.prng,
+        nextBuildingIdRef,
+        this.crimeLevel,
+        this.fireCoverage,
+        this.pollutionLevel,
       )
       this.nextBuildingId = nextBuildingIdRef.value
       this.population = Math.max(0, this.population + densityDelta)
@@ -317,7 +324,7 @@ export class Engine {
   }
 
   setTaxRate(rate: number): void {
-    this.taxRate = Math.max(0, Math.min(0.20, rate))
+    this.taxRate = Math.max(0, Math.min(0.2, rate))
     this.budgetInfo = calculateBudget(this.map, this.population, this.taxRate, this.landValues, this.funding)
   }
 
@@ -373,12 +380,10 @@ export class Engine {
       buildings: save.map.buildings.map((b) => ({
         ...b,
         state: b.state ?? 'active',
-        residents: b.residents ?? (
+        residents:
+          b.residents ??
           // v1 save: default to capacity so old cities aren't empty
-          save.version < 2
-            ? (BUILDING_DEFS[b.defId]?.capacity ?? 0)
-            : 0
-        ),
+          (save.version < 2 ? (BUILDING_DEFS[b.defId]?.capacity ?? 0) : 0),
         lowOccupancyMonths: b.lowOccupancyMonths,
       })),
       meta: { ...save.map.meta },
@@ -423,13 +428,19 @@ export class Engine {
 
     // Recompute population as Σ b.residents — always correct regardless of save version
     engine.population = map.buildings
-      .filter(b => b.state === 'active')
+      .filter((b) => b.state === 'active')
       .reduce((sum, b) => sum + (b.residents ?? 0), 0)
 
     // Rebuild derived state
     propagatePower(engine.map, engine.powerGrid)
     engine.demand = calculateDemand(engine.map, engine.taxRate)
-    engine.budgetInfo = calculateBudget(engine.map, engine.population, engine.taxRate, engine.landValues, engine.funding)
+    engine.budgetInfo = calculateBudget(
+      engine.map,
+      engine.population,
+      engine.taxRate,
+      engine.landValues,
+      engine.funding,
+    )
 
     return engine
   }

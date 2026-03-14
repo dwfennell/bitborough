@@ -66,7 +66,7 @@ describe('Full city lifecycle', () => {
 
   test('high tax rate suppresses growth', () => {
     const engine = Engine.create(createTestMap(64), { seed: 42 })
-    engine.setTaxRate(0.20) // maximum tax
+    engine.setTaxRate(0.2) // maximum tax
 
     engine.placeBuilding(10, 10, 'power.coal')
     for (let x = 14; x < 28; x++) {
@@ -106,9 +106,11 @@ describe('Full city lifecycle', () => {
     // Only 3 months (12 ticks at 4 ticks/month)
     for (let m = 0; m < 3; m++) advanceMonth(engine)
     // No building should be medium density yet (need time to fill)
-    const hasMed = engine.getState().map.buildings.some(b =>
-      b.state !== 'under_construction' && (b.defId.includes('med') || b.defId.includes('high'))
-    )
+    const hasMed = engine
+      .getState()
+      .map.buildings.some(
+        (b) => b.state !== 'under_construction' && (b.defId.includes('med') || b.defId.includes('high')),
+      )
     expect(hasMed).toBe(false)
   })
 
@@ -151,8 +153,9 @@ describe('Full city lifecycle', () => {
     const restored = Engine.restore(parsed)
 
     // population is recomputed from Σ b.residents on restore; funds are preserved
-    const expectedPop = restored.getState().map.buildings
-      .filter(b => b.state === 'active')
+    const expectedPop = restored
+      .getState()
+      .map.buildings.filter((b) => b.state === 'active')
       .reduce((sum, b) => sum + b.residents, 0)
     expect(restored.getState().population).toBe(expectedPop)
     expect(restored.getState().funds).toBe(fundsBefore)

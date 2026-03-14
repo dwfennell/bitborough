@@ -46,7 +46,12 @@ export function calculateLandValues(
 
 function waterAdjacencyBonus(map: GameMap, x: number, y: number): number {
   let bonus = 0
-  const dirs: [number, number][] = [[0, -1], [1, 0], [0, 1], [-1, 0]]
+  const dirs: [number, number][] = [
+    [0, -1],
+    [1, 0],
+    [0, 1],
+    [-1, 0],
+  ]
   for (const [dx, dy] of dirs) {
     const nx = x + dx
     const ny = y + dy

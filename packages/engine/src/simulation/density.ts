@@ -6,11 +6,11 @@ import { computeDesirability } from './desirability.js'
 
 export const TRANSIT_RADIUS = 10
 export const FILL_RATE = 0.12
-export const DRAIN_RATE = 0.20
+export const DRAIN_RATE = 0.2
 
 /** Center of all active buildings (arithmetic mean of positions). Returns map center if no buildings. */
 export function cityCenter(map: GameMap): { cx: number; cy: number } {
-  const active = map.buildings.filter(b => b.state === 'active')
+  const active = map.buildings.filter((b) => b.state === 'active')
   if (active.length === 0) return { cx: map.width / 2, cy: map.height / 2 }
   const cx = active.reduce((sum, b) => sum + b.x, 0) / active.length
   const cy = active.reduce((sum, b) => sum + b.y, 0) / active.length
@@ -67,12 +67,12 @@ export function hasCriticalMass(map: GameMap, x: number, y: number): boolean {
   for (let dy = -range; dy <= range; dy++) {
     for (let dx = -range; dx <= range; dx++) {
       if (dx === 0 && dy === 0) continue
-      if (Math.abs(dx) + Math.abs(dy) > range) continue  // Manhattan distance guard
+      if (Math.abs(dx) + Math.abs(dy) > range) continue // Manhattan distance guard
       const nx = x + dx
       const ny = y + dy
       if (nx < 0 || ny < 0 || nx >= map.width || ny >= map.height) continue
       total++
-      const neighbor = map.buildings.find(b => b.x === nx && b.y === ny && b.state === 'active')
+      const neighbor = map.buildings.find((b) => b.x === nx && b.y === ny && b.state === 'active')
       if (neighbor) {
         const def = BUILDING_DEFS[neighbor.defId]
         if (def && (def.density === DensityLevel.Medium || def.density === DensityLevel.High)) developed++
@@ -86,7 +86,7 @@ export function neighbourhoodAvgOccupancy(map: GameMap, x: number, y: number, ra
   let total = 0
   let count = 0
   for (const b of map.buildings) {
-    if (b.x === x && b.y === y) continue  // exclude self
+    if (b.x === x && b.y === y) continue // exclude self
     if (b.state !== 'active') continue
     const def = BUILDING_DEFS[b.defId]
     if (!def || def.capacity === 0 || def.category === BuildingCategory.Special) continue
@@ -99,18 +99,39 @@ export function neighbourhoodAvgOccupancy(map: GameMap, x: number, y: number, ra
 
 // Weighted variants per zone tier: [defId, weight]
 const MEDIUM_VARIANTS: Record<string, Array<[string, number]>> = {
-  'res.low': [['res.med', 1], ['res.med.b', 1]],
-  'com.low': [['com.med', 1], ['com.med.b', 2]],
-  'ind.low': [['ind.med', 3], ['ind.med.b', 2]],
+  'res.low': [
+    ['res.med', 1],
+    ['res.med.b', 1],
+  ],
+  'com.low': [
+    ['com.med', 1],
+    ['com.med.b', 2],
+  ],
+  'ind.low': [
+    ['ind.med', 3],
+    ['ind.med.b', 2],
+  ],
 }
 
 const HIGH_VARIANTS: Record<string, Array<[string, number]>> = {
-  'res.med':   [['res.high', 1]],
+  'res.med': [['res.high', 1]],
   'res.med.b': [['res.high', 1]],
-  'com.med':   [['com.high', 1], ['com.high.b', 1]],
-  'com.med.b': [['com.high', 1], ['com.high.b', 1]],
-  'ind.med':   [['ind.high', 3], ['ind.high.b', 2]],
-  'ind.med.b': [['ind.high', 3], ['ind.high.b', 2]],
+  'com.med': [
+    ['com.high', 1],
+    ['com.high.b', 1],
+  ],
+  'com.med.b': [
+    ['com.high', 1],
+    ['com.high.b', 1],
+  ],
+  'ind.med': [
+    ['ind.high', 3],
+    ['ind.high.b', 2],
+  ],
+  'ind.med.b': [
+    ['ind.high', 3],
+    ['ind.high.b', 2],
+  ],
 }
 
 export function updateDensity(
@@ -134,8 +155,13 @@ export function updateDensity(
 
     const desirability = computeDesirability(
       categoryToZone(def.category),
-      building.x, building.y,
-      map, powerGrid, crimeLevel, fireCoverage, pollutionLevel,
+      building.x,
+      building.y,
+      map,
+      powerGrid,
+      crimeLevel,
+      fireCoverage,
+      pollutionLevel,
     )
     const zoneDemand = getZoneDemand(building.defId, demand)
     const target = def.capacity * Math.max(0, zoneDemand) * desirability
@@ -149,12 +175,12 @@ export function updateDensity(
     // Track low occupancy for dereliction
     if (def.capacity > 0) {
       const occupancyRatio = building.residents / def.capacity
-      if (occupancyRatio < 0.10) {
+      if (occupancyRatio < 0.1) {
         building.lowOccupancyMonths = (building.lowOccupancyMonths ?? 0) + 1
         if (building.lowOccupancyMonths >= 3) {
           // Trigger dereliction
           const downgradeTarget = DOWNGRADE_TARGET[building.defId]
-          populationDelta -= building.residents  // subtract actual residents
+          populationDelta -= building.residents // subtract actual residents
           building.residents = 0
           if (downgradeTarget) {
             startConstruction(building, downgradeTarget)
@@ -165,7 +191,7 @@ export function updateDensity(
           }
         }
       } else {
-        building.lowOccupancyMonths = undefined  // recovered
+        building.lowOccupancyMonths = undefined // recovered
       }
     }
   }
@@ -197,9 +223,9 @@ export function updateDensity(
       if (!hasNearbyPavedRoad(map, building.x, building.y)) continue
 
       const occupancy = def.capacity > 0 ? building.residents / def.capacity : 0
-      if (occupancy < 0.70) continue
+      if (occupancy < 0.7) continue
       const neighbourAvg = neighbourhoodAvgOccupancy(map, building.x, building.y, 5)
-      if (neighbourAvg < 0.70) continue
+      if (neighbourAvg < 0.7) continue
 
       const dist = Math.hypot(building.x - cx, building.y - cy)
       const demandFactor = getZoneDemand(building.defId, demand)
@@ -267,7 +293,7 @@ function pickVariant(variants: Array<[string, number]>, prng: PRNG): string {
 function startConstruction(building: Building, targetDefId: string): void {
   building.state = 'under_construction'
   building.upgradingToDefId = targetDefId
-  building.constructionMonthsRemaining = 2  // fixed 2 months (deterministic)
+  building.constructionMonthsRemaining = 2 // fixed 2 months (deterministic)
 }
 
 function tickConstruction(map: GameMap, building: Building): number {
@@ -281,7 +307,13 @@ function tickConstruction(map: GameMap, building: Building): number {
 
   const currentSize = BUILDING_DEFS[building.defId]?.size ?? { w: 1, h: 1 }
   const check = checkFootprintForUpgrade(
-    map, building.x, building.y, newDef.size, building.id, currentSize, newDef.category,
+    map,
+    building.x,
+    building.y,
+    newDef.size,
+    building.id,
+    currentSize,
+    newDef.category,
   )
 
   if (!check.ok) {
@@ -291,7 +323,7 @@ function tickConstruction(map: GameMap, building: Building): number {
 
   // Consume same-zone buildings in the expansion area
   for (const id of check.toConsume) {
-    const idx = map.buildings.findIndex(b => b.id === id)
+    const idx = map.buildings.findIndex((b) => b.id === id)
     if (idx !== -1) map.buildings.splice(idx, 1)
   }
 
@@ -380,13 +412,18 @@ function occupiesTile(b: Building, x: number, y: number): boolean {
 const DERELICT_DOWNGRADE_MONTHS = 6
 
 const DOWNGRADE_TARGET: Record<string, string> = {
-  'res.med': 'res.low', 'res.med.b': 'res.low',
-  'com.med': 'com.low', 'com.med.b': 'com.low',
-  'ind.med': 'ind.low', 'ind.med.b': 'ind.low',
-  'res.high': 'res.med', 'com.high': 'com.med',
-  'com.high.b': 'com.med', 'ind.high': 'ind.med', 'ind.high.b': 'ind.med',
+  'res.med': 'res.low',
+  'res.med.b': 'res.low',
+  'com.med': 'com.low',
+  'com.med.b': 'com.low',
+  'ind.med': 'ind.low',
+  'ind.med.b': 'ind.low',
+  'res.high': 'res.med',
+  'com.high': 'com.med',
+  'com.high.b': 'com.med',
+  'ind.high': 'ind.med',
+  'ind.high.b': 'ind.med',
 }
-
 
 export function tickDerelict(map: GameMap, building: Building): number {
   building.derelictMonths = (building.derelictMonths ?? 0) + 1
@@ -395,14 +432,14 @@ export function tickDerelict(map: GameMap, building: Building): number {
     const currentPop = BUILDING_DEFS[building.defId]?.capacity ?? 0
     if (downgradeTarget) {
       startConstruction(building, downgradeTarget)
-      return -currentPop  // subtract current building's population when downgrade starts
+      return -currentPop // subtract current building's population when downgrade starts
     } else {
       // Already lowest density — reset to active so it can redevelop naturally
       building.state = 'active'
       building.derelictMonths = undefined
       building.residents = 0
       building.lowOccupancyMonths = undefined
-      return 0  // fill loop restores occupancy naturally
+      return 0 // fill loop restores occupancy naturally
     }
   }
   return 0

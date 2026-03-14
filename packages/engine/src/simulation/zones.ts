@@ -19,7 +19,7 @@ export function updateZones(
 
       const powered = powerGrid[idx] !== 0
       const hasRoad = hasNearbyRoad(map, x, y)
-      const hasBuilding = map.buildings.some(b => b.x === x && b.y === y)
+      const hasBuilding = map.buildings.some((b) => b.x === x && b.y === y)
 
       // Development: zone is empty, powered, has road, and demand is positive
       if (!hasBuilding && powered && hasRoad) {
@@ -70,18 +70,26 @@ function hasNearbyRoad(map: GameMap, x: number, y: number): boolean {
 
 function getZoneDemand(zone: ZoneType, demand: DemandInfo): number {
   switch (zone) {
-    case ZoneType.Residential: return demand.residential
-    case ZoneType.Commercial: return demand.commercial
-    case ZoneType.Industrial: return demand.industrial
-    default: return 0
+    case ZoneType.Residential:
+      return demand.residential
+    case ZoneType.Commercial:
+      return demand.commercial
+    case ZoneType.Industrial:
+      return demand.industrial
+    default:
+      return 0
   }
 }
 
 function getZoneBuildingDefId(zone: ZoneType): string {
   switch (zone) {
-    case ZoneType.Residential: return 'res.low'
-    case ZoneType.Commercial: return 'com.low'
-    case ZoneType.Industrial: return 'ind.low'
-    default: return 'res.low'
+    case ZoneType.Residential:
+      return 'res.low'
+    case ZoneType.Commercial:
+      return 'com.low'
+    case ZoneType.Industrial:
+      return 'ind.low'
+    default:
+      return 'res.low'
   }
 }

@@ -45,8 +45,8 @@ export function calculateBudget(
     powerPlants: powerPlantMaintenance,
     total: 0,
   }
-  maintenanceCosts.total = maintenanceCosts.roads + maintenanceCosts.rails +
-    maintenanceCosts.powerLines + maintenanceCosts.powerPlants
+  maintenanceCosts.total =
+    maintenanceCosts.roads + maintenanceCosts.rails + maintenanceCosts.powerLines + maintenanceCosts.powerPlants
 
   // Service costs based on funding level
   const serviceCosts = {
@@ -70,7 +70,7 @@ export function calculateBudget(
   }
 
   const avgLandValue = developedTileCount > 0 ? totalLandValue / developedTileCount : 0
-  const taxIncome = population * avgLandValue / 20 * taxRate
+  const taxIncome = ((population * avgLandValue) / 20) * taxRate
 
   const balance = taxIncome - maintenanceCosts.total - serviceCosts.total - loanRepayment
 

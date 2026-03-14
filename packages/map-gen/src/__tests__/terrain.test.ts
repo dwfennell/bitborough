@@ -25,8 +25,8 @@ describe('Sand placement', () => {
     const prng2 = new PRNG(42)
     placeSand(terrain1, 64, 64, createNoise2D(prng1), 0.05, 0.3) // low threshold = more sand
     placeSand(terrain2, 64, 64, createNoise2D(prng2), 0.05, 0.8) // high threshold = less sand
-    const sand1 = Array.from(terrain1).filter(t => t === TileType.Sand).length
-    const sand2 = Array.from(terrain2).filter(t => t === TileType.Sand).length
+    const sand1 = Array.from(terrain1).filter((t) => t === TileType.Sand).length
+    const sand2 = Array.from(terrain2).filter((t) => t === TileType.Sand).length
     expect(sand1).toBeGreaterThan(sand2)
   })
 })
@@ -48,7 +48,7 @@ describe('Vegetation', () => {
     const noise = createNoise2D(prng)
     const terrain = new Uint8Array(32 * 32)
     placeVegetation(terrain, 32, 32, noise, 0)
-    const treeCount = Array.from(terrain).filter(t => t === TileType.Trees).length
+    const treeCount = Array.from(terrain).filter((t) => t === TileType.Trees).length
     expect(treeCount).toBe(0)
   })
 
@@ -57,7 +57,7 @@ describe('Vegetation', () => {
     const noise = createNoise2D(prng)
     const terrain = new Uint8Array(64 * 64)
     placeVegetation(terrain, 64, 64, noise, 1.0)
-    const treeCount = Array.from(terrain).filter(t => t === TileType.Trees).length
+    const treeCount = Array.from(terrain).filter((t) => t === TileType.Trees).length
     expect(treeCount).toBeGreaterThan(64 * 64 * 0.5)
   })
 })

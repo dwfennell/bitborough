@@ -29,8 +29,8 @@ export function createEmptyMap(width: number, height: number, meta: MapMeta): Ga
     version: 1,
     width,
     height,
-    terrain: new Uint8Array(size),       // all Grass (0)
-    zones: new Uint8Array(size),         // all None (0)
+    terrain: new Uint8Array(size), // all Grass (0)
+    zones: new Uint8Array(size), // all None (0)
     infrastructure: new Uint16Array(size),
     connections: new Uint8Array(size),
     elevation: new Uint8Array(size),

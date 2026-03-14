@@ -26,16 +26,12 @@ function totalResCap(map: GameMap): number {
  * - Industrial: base 0.3 with dampened tax sensitivity
  * - Congestion: average road congestion > 0.8 suppresses all demand
  */
-export function calculateDemand(
-  map: GameMap,
-  taxRate: number,
-  trafficDensity?: Uint8Array,
-): DemandInfo {
+export function calculateDemand(map: GameMap, taxRate: number, trafficDensity?: Uint8Array): DemandInfo {
   // Tax rate modifier:
   // At 7% tax, modifier is 1.0 (neutral)
   // Lower tax → modifier > 1 (boost)
   // Higher tax → modifier < 1 (suppress)
-  const taxModifier = 1.0 - ((taxRate - 0.07) * 5.0)
+  const taxModifier = 1.0 - (taxRate - 0.07) * 5.0
 
   // Residential demand:
   const rBase = 1.0

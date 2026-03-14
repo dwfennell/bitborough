@@ -78,7 +78,10 @@ export class SaveManager {
       input.accept = '.json'
       input.addEventListener('change', () => {
         const file = input.files?.[0]
-        if (!file) { resolve(null); return }
+        if (!file) {
+          resolve(null)
+          return
+        }
         const reader = new FileReader()
         reader.onload = () => {
           try {

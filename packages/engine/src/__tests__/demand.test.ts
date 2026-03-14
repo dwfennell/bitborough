@@ -25,7 +25,7 @@ describe('Zone demand', () => {
 
   test('high tax rate suppresses residential demand', () => {
     const map = createTestMap(32)
-    const demand = calculateDemand(map, 0.20)
+    const demand = calculateDemand(map, 0.2)
     expect(demand.residential).toBeLessThan(0.5)
   })
 
@@ -49,14 +49,14 @@ describe('Zone demand', () => {
   test('clamping works with extreme tax rates', () => {
     const map = createTestMap(32)
     // Very high tax rate should not exceed bounds
-    const highTax = calculateDemand(map, 0.50)
+    const highTax = calculateDemand(map, 0.5)
     expect(highTax.residential).toBeGreaterThanOrEqual(-1)
     expect(highTax.residential).toBeLessThanOrEqual(1)
     expect(highTax.industrial).toBeGreaterThanOrEqual(-1)
     expect(highTax.industrial).toBeLessThanOrEqual(1)
 
     // Very low (zero) tax should not exceed bounds
-    const lowTax = calculateDemand(map, 0.00)
+    const lowTax = calculateDemand(map, 0.0)
     expect(lowTax.residential).toBeGreaterThanOrEqual(-1)
     expect(lowTax.residential).toBeLessThanOrEqual(1)
     expect(lowTax.industrial).toBeGreaterThanOrEqual(-1)
@@ -70,8 +70,14 @@ describe('Zone demand', () => {
     // Add residential buildings to raise capacity
     for (let x = 0; x < 10; x++) {
       map.buildings.push({
-        id: `r${x}`, defId: 'res.low', x, y: 0,
-        powered: true, density: DensityLevel.Low, age: 0, state: 'active',
+        id: `r${x}`,
+        defId: 'res.low',
+        x,
+        y: 0,
+        powered: true,
+        density: DensityLevel.Low,
+        age: 0,
+        state: 'active',
         residents: 0,
       })
     }
@@ -85,8 +91,14 @@ describe('Zone demand', () => {
     // To hit 0.6 cap we need capacity >= 300 → 30 buildings × 10 capacity each
     for (let x = 0; x < 30; x++) {
       map.buildings.push({
-        id: `r${x}`, defId: 'res.low', x, y: x < 30 ? x : 0,
-        powered: true, density: DensityLevel.Low, age: 0, state: 'active',
+        id: `r${x}`,
+        defId: 'res.low',
+        x,
+        y: x < 30 ? x : 0,
+        powered: true,
+        density: DensityLevel.Low,
+        age: 0,
+        state: 'active',
         residents: 0,
       })
     }
@@ -102,7 +114,7 @@ describe('Zone demand', () => {
     // At neutral tax
     const neutral = calculateDemand(map, neutralTax)
     // At high tax
-    const high = calculateDemand(map, 0.20)
+    const high = calculateDemand(map, 0.2)
 
     const rDrop = neutral.residential - high.residential
     const iDrop = neutral.industrial - high.industrial
@@ -116,13 +128,19 @@ describe('Zone demand', () => {
     // Add residential buildings with capacity but residents=0 (not yet filled)
     for (let x = 0; x < 5; x++) {
       map.buildings.push({
-        id: `r${x}`, defId: 'res.low', x, y: 0,
-        powered: true, density: DensityLevel.Low, age: 0, state: 'active',
-        residents: 0,  // empty!
+        id: `r${x}`,
+        defId: 'res.low',
+        x,
+        y: 0,
+        powered: true,
+        density: DensityLevel.Low,
+        age: 0,
+        state: 'active',
+        residents: 0, // empty!
       })
     }
     // 5 × res.low capacity=10 = 50 total capacity
     const demand = calculateDemand(map, 0.07)
-    expect(demand.commercial).toBeGreaterThan(0)  // should be non-zero despite 0 actual residents
+    expect(demand.commercial).toBeGreaterThan(0) // should be non-zero despite 0 actual residents
   })
 })

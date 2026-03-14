@@ -68,7 +68,7 @@ export class SpeedControls {
   private setSpeed(speed: SimSpeed, btn: HTMLButtonElement): void {
     this._speed = speed
     localStorage.setItem(SPEED_KEY, String(speed))
-    this.buttons.forEach(b => b.classList.remove('active'))
+    this.buttons.forEach((b) => b.classList.remove('active'))
     btn.classList.add('active')
     this.onChange(speed)
   }

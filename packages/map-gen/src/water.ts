@@ -38,12 +38,7 @@ export function placeWater(
   }
 }
 
-export function smoothShoreline(
-  terrain: Uint8Array,
-  width: number,
-  height: number,
-  iterations: number,
-): void {
+export function smoothShoreline(terrain: Uint8Array, width: number, height: number, iterations: number): void {
   for (let iter = 0; iter < iterations; iter++) {
     const copy = new Uint8Array(terrain)
     for (let y = 1; y < height - 1; y++) {

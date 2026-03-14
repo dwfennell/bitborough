@@ -21,22 +21,58 @@ interface ToolEntry {
 
 const TOOL_ENTRIES: ToolEntry[] = [
   // Infrastructure
-  { label: `Road ${fmtCost(COSTS.road)}`, key: '1', factory: () => new InfrastructureTool('Road', Infrastructure.Road, 'rgba(85,85,85,0.5)') },
+  {
+    label: `Road ${fmtCost(COSTS.road)}`,
+    key: '1',
+    factory: () => new InfrastructureTool('Road', Infrastructure.Road, 'rgba(85,85,85,0.5)'),
+  },
   { label: `Pave $${COSTS.pavedRoadUpgrade}`, key: '`', factory: () => new UpgradeRoadTool() },
-  { label: `Power ${fmtCost(COSTS.powerLine)}`, key: '2', factory: () => new InfrastructureTool('Power Line', Infrastructure.PowerLine, 'rgba(255,193,7,0.5)') },
+  {
+    label: `Power ${fmtCost(COSTS.powerLine)}`,
+    key: '2',
+    factory: () => new InfrastructureTool('Power Line', Infrastructure.PowerLine, 'rgba(255,193,7,0.5)'),
+  },
   // Zones (free)
   { label: 'Zone R', key: '3', factory: () => new ZoneTool(ZoneType.Residential) },
   { label: 'Zone C', key: '4', factory: () => new ZoneTool(ZoneType.Commercial) },
   { label: 'Zone I', key: '5', factory: () => new ZoneTool(ZoneType.Industrial) },
   // Power
-  { label: `Diesel ${fmtCost(BUILDING_DEFS['power.diesel']!.cost)}`, key: '6', factory: () => new BuildingTool('power.diesel') },
-  { label: `Coal ${fmtCost(BUILDING_DEFS['power.coal']!.cost)}`, key: '7', factory: () => new BuildingTool('power.coal') },
-  { label: `Nuclear ${fmtCost(BUILDING_DEFS['power.nuclear']!.cost)}`, key: '8', factory: () => new BuildingTool('power.nuclear') },
+  {
+    label: `Diesel ${fmtCost(BUILDING_DEFS['power.diesel']!.cost)}`,
+    key: '6',
+    factory: () => new BuildingTool('power.diesel'),
+  },
+  {
+    label: `Coal ${fmtCost(BUILDING_DEFS['power.coal']!.cost)}`,
+    key: '7',
+    factory: () => new BuildingTool('power.coal'),
+  },
+  {
+    label: `Nuclear ${fmtCost(BUILDING_DEFS['power.nuclear']!.cost)}`,
+    key: '8',
+    factory: () => new BuildingTool('power.nuclear'),
+  },
   // Services
-  { label: `Transit ${fmtCost(BUILDING_DEFS['transit.stop']!.cost)}`, key: 't', factory: () => new BuildingTool('transit.stop') },
-  { label: `Police ${fmtCost(BUILDING_DEFS['service.police']!.cost)}`, key: '9', factory: () => new BuildingTool('service.police') },
-  { label: `Fire ${fmtCost(BUILDING_DEFS['service.fire']!.cost)}`, key: '0', factory: () => new BuildingTool('service.fire') },
-  { label: `Park ${fmtCost(BUILDING_DEFS['special.park']!.cost)}`, key: 'n', factory: () => new BuildingTool('special.park') },
+  {
+    label: `Transit ${fmtCost(BUILDING_DEFS['transit.stop']!.cost)}`,
+    key: 't',
+    factory: () => new BuildingTool('transit.stop'),
+  },
+  {
+    label: `Police ${fmtCost(BUILDING_DEFS['service.police']!.cost)}`,
+    key: '9',
+    factory: () => new BuildingTool('service.police'),
+  },
+  {
+    label: `Fire ${fmtCost(BUILDING_DEFS['service.fire']!.cost)}`,
+    key: '0',
+    factory: () => new BuildingTool('service.fire'),
+  },
+  {
+    label: `Park ${fmtCost(BUILDING_DEFS['special.park']!.cost)}`,
+    key: 'n',
+    factory: () => new BuildingTool('special.park'),
+  },
   // Utility
   { label: `Bulldoze ${fmtCost(COSTS.bulldoze)}`, key: '-', factory: () => new BulldozeTool() },
   { label: 'Query', key: '=', factory: () => new QueryTool() },
@@ -46,7 +82,10 @@ export class Toolbar {
   private el: HTMLElement
   private buttons: HTMLButtonElement[] = []
 
-  constructor(container: HTMLElement, private toolManager: ToolManager) {
+  constructor(
+    container: HTMLElement,
+    private toolManager: ToolManager,
+  ) {
     this.el = document.createElement('div')
     this.el.id = 'toolbar'
 
@@ -62,16 +101,16 @@ export class Toolbar {
     container.appendChild(this.el)
 
     window.addEventListener('keydown', (e) => {
-      const entry = TOOL_ENTRIES.find(t => t.key === e.key)
+      const entry = TOOL_ENTRIES.find((t) => t.key === e.key)
       if (entry) {
-        const btn = this.buttons.find(b => b.dataset.key === e.key)!
+        const btn = this.buttons.find((b) => b.dataset.key === e.key)!
         this.selectTool(entry, btn)
       }
     })
   }
 
   private selectTool(entry: ToolEntry, btn: HTMLButtonElement): void {
-    this.buttons.forEach(b => b.classList.remove('active'))
+    this.buttons.forEach((b) => b.classList.remove('active'))
     btn.classList.add('active')
     this.toolManager.setTool(entry.factory())
   }

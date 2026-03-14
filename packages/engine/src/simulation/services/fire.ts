@@ -27,12 +27,7 @@ export function calculateFireCoverage(
   }
 }
 
-export function updateFires(
-  map: GameMap,
-  fireState: FireState,
-  fireCoverage: Uint8Array,
-  prng: PRNG,
-): void {
+export function updateFires(map: GameMap, fireState: FireState, fireCoverage: Uint8Array, prng: PRNG): void {
   const { width, height } = map
 
   // Tick existing fires
@@ -46,7 +41,7 @@ export function updateFires(
       // Fire burns out — destroy zone and any building on it
       fireState.activeFires.delete(idx)
       map.zones[idx] = 0
-      const bIdx = map.buildings.findIndex(b => b.x === idx % width && b.y === Math.floor(idx / width))
+      const bIdx = map.buildings.findIndex((b) => b.x === idx % width && b.y === Math.floor(idx / width))
       if (bIdx !== -1) map.buildings.splice(bIdx, 1)
     } else {
       fireState.activeFires.set(idx, newRemaining)
@@ -55,10 +50,10 @@ export function updateFires(
       const x = idx % width
       const y = Math.floor(idx / width)
       const neighbors = [
-        y > 0 ? idx - width : -1,         // N
-        x < width - 1 ? idx + 1 : -1,     // E
+        y > 0 ? idx - width : -1, // N
+        x < width - 1 ? idx + 1 : -1, // E
         y < height - 1 ? idx + width : -1, // S
-        x > 0 ? idx - 1 : -1,             // W
+        x > 0 ? idx - 1 : -1, // W
       ]
 
       for (const nIdx of neighbors) {

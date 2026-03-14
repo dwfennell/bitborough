@@ -6,7 +6,7 @@ export const budgetTaxes: DocSection = {
   body: [
     'Open the budget panel with **B**.',
     '',
-    '**Income** comes from property taxes on developed zones. It\'s based on your population, the average land value across developed tiles, and your tax rate:',
+    "**Income** comes from property taxes on developed zones. It's based on your population, the average land value across developed tiles, and your tax rate:",
     '',
     '`Tax Income = Population × (Avg Land Value ÷ 20) × Tax Rate`',
     '',
@@ -29,6 +29,6 @@ export const budgetTaxes: DocSection = {
     '| Transit Stop | $50 |',
     '| Police/Fire Stations | $50 × (Funding ÷ 100) |',
     '',
-    '**Balance** is calculated monthly but applied to your funds each January. If your funds run out, you can\'t build — but existing buildings continue to function.',
+    "**Balance** is calculated monthly but applied to your funds each January. If your funds run out, you can't build — but existing buildings continue to function.",
   ].join('\n'),
 }

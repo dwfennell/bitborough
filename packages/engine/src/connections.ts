@@ -35,7 +35,7 @@ function updateTileConnections(map: GameMap, x: number, y: number): void {
 
     const neighborInfra = map.infrastructure[ny * map.width + nx]!
     if (myInfra & neighborInfra & CONNECTABLE) {
-      mask |= (1 << dir)
+      mask |= 1 << dir
     }
   }
 

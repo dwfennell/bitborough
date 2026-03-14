@@ -1,8 +1,14 @@
 import { PRNG } from './prng.js'
 
 const GRAD2: [number, number][] = [
-  [1, 0], [-1, 0], [0, 1], [0, -1],
-  [1, 1], [-1, 1], [1, -1], [-1, -1],
+  [1, 0],
+  [-1, 0],
+  [0, 1],
+  [0, -1],
+  [1, 1],
+  [-1, 1],
+  [1, -1],
+  [-1, -1],
 ]
 
 const F2 = 0.5 * (Math.sqrt(3) - 1)
@@ -45,7 +51,9 @@ export function createNoise2D(prng: PRNG): (x: number, y: number) => number {
     const gi1 = hash(i + i1 + hash(j + j1)) % 8
     const gi2 = hash(i + 1 + hash(j + 1)) % 8
 
-    let n0 = 0, n1 = 0, n2 = 0
+    let n0 = 0,
+      n1 = 0,
+      n2 = 0
 
     let t0 = 0.5 - x0 * x0 - y0 * y0
     if (t0 >= 0) {

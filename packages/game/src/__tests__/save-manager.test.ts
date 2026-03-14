@@ -5,8 +5,12 @@ import type { SaveFile } from '@bitborough/core'
 const mockStorage: Record<string, string> = {}
 const mockLocalStorage = {
   getItem: (key: string) => mockStorage[key] ?? null,
-  setItem: (key: string, value: string) => { mockStorage[key] = value },
-  removeItem: (key: string) => { delete mockStorage[key] },
+  setItem: (key: string, value: string) => {
+    mockStorage[key] = value
+  },
+  removeItem: (key: string) => {
+    delete mockStorage[key]
+  },
 } as Storage
 
 const validSave: SaveFile = {
@@ -78,7 +82,9 @@ describe('SaveManager', () => {
   test('save returns false when storage throws', () => {
     const throwingStorage = {
       ...mockLocalStorage,
-      setItem: () => { throw new Error('QuotaExceededError') },
+      setItem: () => {
+        throw new Error('QuotaExceededError')
+      },
     } as Storage
     const mgr = new SaveManager(throwingStorage)
     expect(mgr.save(validSave)).toBe(false)

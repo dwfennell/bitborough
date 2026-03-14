@@ -1,7 +1,7 @@
 export interface DocSection {
   id: string
   title: string
-  body: string  // markdown, no HTML
+  body: string // markdown, no HTML
 }
 
 export interface BuildingRow {

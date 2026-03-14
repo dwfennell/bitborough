@@ -1,21 +1,9 @@
-import {
-  TileType,
-  ZoneType,
-  Infrastructure,
-  type Building,
-  type BuildingDef,
-} from '@bitborough/core'
+import { TileType, ZoneType, Infrastructure, type Building, type BuildingDef } from '@bitborough/core'
 import { TERRAIN_COLORS, ZONE_OVERLAY_COLORS, ZONE_LETTERS } from './colors.js'
 import { SpriteCache } from './SpriteCache.js'
 
 export interface TileRenderer {
-  drawTile(
-    ctx: CanvasRenderingContext2D,
-    tileType: TileType,
-    screenX: number,
-    screenY: number,
-    tileSize: number,
-  ): void
+  drawTile(ctx: CanvasRenderingContext2D, tileType: TileType, screenX: number, screenY: number, tileSize: number): void
   drawInfrastructure(
     ctx: CanvasRenderingContext2D,
     infra: number,
@@ -109,14 +97,12 @@ export class ColorTileRenderer implements TileRenderer {
       const isPaved = !!(infra & Infrastructure.PavedRoad)
 
       // Try SVG sprite (loaded asynchronously; falls back to programmatic on first render)
-      const n = (connections & 1) ? '1' : '0'
-      const e = (connections & 2) ? '1' : '0'
-      const s = (connections & 4) ? '1' : '0'
-      const w = (connections & 8) ? '1' : '0'
+      const n = connections & 1 ? '1' : '0'
+      const e = connections & 2 ? '1' : '0'
+      const s = connections & 4 ? '1' : '0'
+      const w = connections & 8 ? '1' : '0'
       const nesw = `${n}${e}${s}${w}`
-      const spritePath = isPaved
-        ? `/tiles/roads/paved-${nesw}.svg`
-        : `/tiles/roads/road-${nesw}.svg`
+      const spritePath = isPaved ? `/tiles/roads/paved-${nesw}.svg` : `/tiles/roads/road-${nesw}.svg`
       const img = this.sprites.get(spritePath)
       if (img) {
         ctx.drawImage(img, screenX, screenY, tileSize, tileSize)
@@ -128,14 +114,10 @@ export class ColorTileRenderer implements TileRenderer {
         ctx.fillRect(screenX + offset, screenY + offset, roadWidth, roadWidth)
 
         // Draw connections: N=1, E=2, S=4, W=8
-        if (connections & 1)
-          ctx.fillRect(cx - roadWidth / 2, screenY, roadWidth, half)
-        if (connections & 2)
-          ctx.fillRect(cx, cy - roadWidth / 2, half, roadWidth)
-        if (connections & 4)
-          ctx.fillRect(cx - roadWidth / 2, cy, roadWidth, half)
-        if (connections & 8)
-          ctx.fillRect(screenX, cy - roadWidth / 2, half, roadWidth)
+        if (connections & 1) ctx.fillRect(cx - roadWidth / 2, screenY, roadWidth, half)
+        if (connections & 2) ctx.fillRect(cx, cy - roadWidth / 2, half, roadWidth)
+        if (connections & 4) ctx.fillRect(cx - roadWidth / 2, cy, roadWidth, half)
+        if (connections & 8) ctx.fillRect(screenX, cy - roadWidth / 2, half, roadWidth)
 
         // Yellow center stripe on paved roads
         if (isPaved && tileSize >= 8) {
@@ -155,10 +137,22 @@ export class ColorTileRenderer implements TileRenderer {
       ctx.lineWidth = Math.max(1, tileSize * 0.08)
       ctx.beginPath()
 
-      if (connections & 1) { ctx.moveTo(cx, cy); ctx.lineTo(cx, screenY) }
-      if (connections & 2) { ctx.moveTo(cx, cy); ctx.lineTo(screenX + tileSize, cy) }
-      if (connections & 4) { ctx.moveTo(cx, cy); ctx.lineTo(cx, screenY + tileSize) }
-      if (connections & 8) { ctx.moveTo(cx, cy); ctx.lineTo(screenX, cy) }
+      if (connections & 1) {
+        ctx.moveTo(cx, cy)
+        ctx.lineTo(cx, screenY)
+      }
+      if (connections & 2) {
+        ctx.moveTo(cx, cy)
+        ctx.lineTo(screenX + tileSize, cy)
+      }
+      if (connections & 4) {
+        ctx.moveTo(cx, cy)
+        ctx.lineTo(cx, screenY + tileSize)
+      }
+      if (connections & 8) {
+        ctx.moveTo(cx, cy)
+        ctx.lineTo(screenX, cy)
+      }
 
       ctx.stroke()
 
@@ -183,13 +177,14 @@ export class ColorTileRenderer implements TileRenderer {
     // State-based sprites override normal building sprites
     if (building.state === 'under_construction') {
       const maxDim = Math.max(def.size.w, def.size.h)
-      const constructionSprite = maxDim >= 4
-        ? '/tiles/buildings/construction-4x4.svg'
-        : maxDim >= 3
-          ? '/tiles/buildings/construction-3x3.svg'
-          : maxDim >= 2
-            ? '/tiles/buildings/construction-2x2.svg'
-            : '/tiles/buildings/construction.svg'
+      const constructionSprite =
+        maxDim >= 4
+          ? '/tiles/buildings/construction-4x4.svg'
+          : maxDim >= 3
+            ? '/tiles/buildings/construction-3x3.svg'
+            : maxDim >= 2
+              ? '/tiles/buildings/construction-2x2.svg'
+              : '/tiles/buildings/construction.svg'
       const img = this.sprites.get(constructionSprite)
       if (img) {
         ctx.fillStyle = '#d8c498'
@@ -255,11 +250,7 @@ export class ColorTileRenderer implements TileRenderer {
       ctx.font = `${Math.max(8, tileSize * 0.4)}px system-ui`
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
-      ctx.fillText(
-        ZONE_LETTERS[zone] ?? '',
-        screenX + tileSize / 2,
-        screenY + tileSize / 2,
-      )
+      ctx.fillText(ZONE_LETTERS[zone] ?? '', screenX + tileSize / 2, screenY + tileSize / 2)
       ctx.textAlign = 'start'
       ctx.textBaseline = 'alphabetic'
     }

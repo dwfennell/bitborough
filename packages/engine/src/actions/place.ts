@@ -1,12 +1,4 @@
-import {
-  type GameMap,
-  type Result,
-  TileType,
-  Infrastructure,
-  ZoneType,
-  FailReason,
-  COSTS,
-} from '@bitborough/core'
+import { type GameMap, type Result, TileType, Infrastructure, ZoneType, FailReason, COSTS } from '@bitborough/core'
 import { BUILDING_DEFS } from '../buildings-registry.js'
 
 export function placeTile(
@@ -50,12 +42,7 @@ export function placeTile(
   return { result: { ok: true }, cost }
 }
 
-export function placeZone(
-  map: GameMap,
-  x: number,
-  y: number,
-  zone: ZoneType,
-): Result {
+export function placeZone(map: GameMap, x: number, y: number, zone: ZoneType): Result {
   if (!inBounds(map, x, y)) {
     return { ok: false, reason: FailReason.InvalidLocation }
   }
@@ -99,9 +86,13 @@ function hasBuildingAt(map: GameMap, x: number, y: number): boolean {
 
 function infraCost(infra: Infrastructure): number {
   switch (infra) {
-    case Infrastructure.Road: return COSTS.road
-    case Infrastructure.PowerLine: return COSTS.powerLine
-    case Infrastructure.Rail: return COSTS.rail
-    default: return 0
+    case Infrastructure.Road:
+      return COSTS.road
+    case Infrastructure.PowerLine:
+      return COSTS.powerLine
+    case Infrastructure.Rail:
+      return COSTS.rail
+    default:
+      return 0
   }
 }

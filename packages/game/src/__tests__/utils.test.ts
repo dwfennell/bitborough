@@ -25,16 +25,15 @@ describe('describeInfrastructure', () => {
   })
 
   test('returns Road and Power Line for combined mask', () => {
-    expect(describeInfrastructure(Infrastructure.Road | Infrastructure.PowerLine)).toEqual([
-      'Road',
-      'Power Line',
-    ])
+    expect(describeInfrastructure(Infrastructure.Road | Infrastructure.PowerLine)).toEqual(['Road', 'Power Line'])
   })
 
   test('returns all three for road + power + rail', () => {
-    expect(
-      describeInfrastructure(Infrastructure.Road | Infrastructure.PowerLine | Infrastructure.Rail),
-    ).toEqual(['Road', 'Power Line', 'Rail'])
+    expect(describeInfrastructure(Infrastructure.Road | Infrastructure.PowerLine | Infrastructure.Rail)).toEqual([
+      'Road',
+      'Power Line',
+      'Rail',
+    ])
   })
 })
 
@@ -45,7 +44,14 @@ describe('describeTile', () => {
   function makeState(width: number, landValues: number[]): GameState {
     const size = landValues.length
     return {
-      map: { width, height: 1, terrain: new Uint8Array(size), zones: new Uint8Array(size), buildings: [], infrastructure: new Uint8Array(size) },
+      map: {
+        width,
+        height: 1,
+        terrain: new Uint8Array(size),
+        zones: new Uint8Array(size),
+        buildings: [],
+        infrastructure: new Uint8Array(size),
+      },
       landValues,
       crimeLevel: new Uint8Array(size),
       fireCoverage: new Uint8Array(size),
@@ -125,28 +131,16 @@ describe('fillMinimapBuffer', () => {
     fillMinimapBuffer(terrain, zones, 2, 2, buffer)
 
     // pixel 0: Grass terrain (no zone)
-    expect([buffer[0], buffer[1], buffer[2], buffer[3]]).toEqual([
-      ...TERRAIN_RGB[TileType.Grass]!,
-      255,
-    ])
+    expect([buffer[0], buffer[1], buffer[2], buffer[3]]).toEqual([...TERRAIN_RGB[TileType.Grass]!, 255])
 
     // pixel 1: Water terrain (no zone)
-    expect([buffer[4], buffer[5], buffer[6], buffer[7]]).toEqual([
-      ...TERRAIN_RGB[TileType.Water]!,
-      255,
-    ])
+    expect([buffer[4], buffer[5], buffer[6], buffer[7]]).toEqual([...TERRAIN_RGB[TileType.Water]!, 255])
 
     // pixel 2: Residential zone overrides Sand terrain
-    expect([buffer[8], buffer[9], buffer[10], buffer[11]]).toEqual([
-      ...ZONE_RGB[ZoneType.Residential]!,
-      255,
-    ])
+    expect([buffer[8], buffer[9], buffer[10], buffer[11]]).toEqual([...ZONE_RGB[ZoneType.Residential]!, 255])
 
     // pixel 3: Trees terrain (no zone)
-    expect([buffer[12], buffer[13], buffer[14], buffer[15]]).toEqual([
-      ...TERRAIN_RGB[TileType.Trees]!,
-      255,
-    ])
+    expect([buffer[12], buffer[13], buffer[14], buffer[15]]).toEqual([...TERRAIN_RGB[TileType.Trees]!, 255])
   })
 })
 
