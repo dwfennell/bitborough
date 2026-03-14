@@ -110,7 +110,7 @@ See full design: [2026-03-10-density-progression-design.md](../docs/plans/2026-0
 - [x] Maintenance costs (roads, power, services) — per-tile road/powerLine + per-building maintenance
 - [x] Budget panel UI — BudgetPanel with police/fire funding sliders
 - [x] Simple cash flow — `funds += budgetInfo.balance` each month
-- [ ] Bankruptcy / game-over when funds < 0
+- [x] Bankruptcy / game-over when funds < 0
 
 **Deliverable:** Can go bankrupt or profit, time matters
 
