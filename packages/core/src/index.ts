@@ -14,5 +14,6 @@ export {
   type SaveFile,
   type Loan,
   type GameEvent,
+  calcMonthlyPayment,
 } from './state.js'
 export { DEFAULTS, COSTS, MAINTENANCE, POWER } from './constants.js'

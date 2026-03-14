@@ -366,17 +366,15 @@ export class Game {
         }
       }
 
-      if (result.ticks > 0) {
-        for (const event of this.engine.getState().events) {
-          if (event.type === 'emergency_loan') {
-            this.showToast(`Emergency loan of $${event.amount.toLocaleString()} taken`)
-          }
-        }
-      }
     }
 
     if (this.engine) {
       const state = this.engine.getState()
+      for (const event of state.events) {
+        if (event.type === 'emergency_loan') {
+          this.showToast(`Emergency loan of $${event.amount.toLocaleString()} taken`)
+        }
+      }
       this.renderer.render(state)
       this.infoBar.update(state)
       this.budgetPanel.update(state)

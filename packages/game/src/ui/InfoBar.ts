@@ -38,7 +38,7 @@ export class InfoBar {
         <span class="demand-c" title="Commercial">C</span>
         <span class="demand-i" title="Industrial">I</span>
       </span>
-      <span id="infobar-insolvent" class="hidden" style="color:#e57373">&#9888; Insolvent</span>
+      <span id="infobar-insolvent" class="hidden insolvent-warning">&#9888; Insolvent</span>
     `
     container.appendChild(this.el)
 

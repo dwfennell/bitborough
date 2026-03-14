@@ -92,6 +92,12 @@ export interface GameState {
   events: GameEvent[]
 }
 
+/** Compute the fixed monthly payment for an amortized loan. */
+export function calcMonthlyPayment(principal: number, annualRate = 0.08, termMonths = 120): number {
+  const r = annualRate / 12
+  return principal * r / (1 - Math.pow(1 + r, -termMonths))
+}
+
 export interface SaveFile {
   version: number
   map: GameMap

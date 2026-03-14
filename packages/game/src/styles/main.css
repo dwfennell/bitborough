@@ -602,6 +602,8 @@ html, body {
 
 /* Utility */
 .hidden { display: none !important; }
+.loan-preview { font-size: 0.85em; color: #aaa; }
+.insolvent-warning { color: #e57373; }
 
 /* Toast notifications */
 .toast {

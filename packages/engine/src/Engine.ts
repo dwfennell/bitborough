@@ -7,6 +7,7 @@ import {
   type Result,
   type Loan,
   type GameEvent,
+  calcMonthlyPayment,
   TileType,
   ZoneType,
   Infrastructure,
@@ -91,6 +92,11 @@ export class Engine {
   private loan: Loan | null = null
   private loanRepaymentAmount: number = 0
   private events: GameEvent[] = []
+
+  private computeLoanRepayment(): number {
+    if (!this.loan) return 0
+    return Math.round(Math.min(this.loanRepaymentAmount, this.loan.remaining))
+  }
 
   private constructor(map: GameMap, config: EngineConfig) {
     this.map = map
@@ -179,9 +185,7 @@ export class Engine {
       this.population = Math.max(0, this.population + densityDelta)
 
       // 1. Compute budget including loan repayment
-      const loanRepayment = this.loan
-        ? Math.round(Math.min(this.loanRepaymentAmount, this.loan.remaining))
-        : 0
+      const loanRepayment = this.computeLoanRepayment()
       this.budgetInfo = calculateBudget(this.map, this.population, this.taxRate, this.landValues, this.funding, loanRepayment)
 
       // 2. Apply monthly balance (already includes repayment deduction)
@@ -202,10 +206,8 @@ export class Engine {
       if (this.funds < 0 && this.loan === null) {
         const baseExpenses = this.budgetInfo.maintenanceCosts.total + this.budgetInfo.serviceCosts.total
         const emergencyAmount = Math.max(10_000, -this.funds + baseExpenses * 6)
-        const r = 0.08 / 12
-        const n = 120
-        const monthlyPayment = emergencyAmount * r / (1 - Math.pow(1 + r, -n))
-        this.loan = { principal: emergencyAmount, remaining: emergencyAmount, monthlyPayment, termMonths: n, monthsLeft: n, interestRate: 0.08 }
+        const monthlyPayment = calcMonthlyPayment(emergencyAmount)
+        this.loan = { principal: emergencyAmount, remaining: emergencyAmount, monthlyPayment, termMonths: 120, monthsLeft: 120, interestRate: 0.08 }
         this.loanRepaymentAmount = monthlyPayment
         this.funds += emergencyAmount
         this.events.push({ type: 'emergency_loan', amount: emergencyAmount })
@@ -369,28 +371,20 @@ export class Engine {
 
   setTaxRate(rate: number): void {
     this.taxRate = Math.max(0, Math.min(0.2, rate))
-    const repayment = this.loan
-      ? Math.round(Math.min(this.loanRepaymentAmount, this.loan.remaining))
-      : 0
-    this.budgetInfo = calculateBudget(this.map, this.population, this.taxRate, this.landValues, this.funding, repayment)
+    this.budgetInfo = calculateBudget(this.map, this.population, this.taxRate, this.landValues, this.funding, this.computeLoanRepayment())
   }
 
   setFunding(service: 'police' | 'fire' | 'transit', level: number): void {
     this.funding[service] = Math.max(0, Math.min(100, level))
-    const repayment = this.loan
-      ? Math.round(Math.min(this.loanRepaymentAmount, this.loan.remaining))
-      : 0
-    this.budgetInfo = calculateBudget(this.map, this.population, this.taxRate, this.landValues, this.funding, repayment)
+    this.budgetInfo = calculateBudget(this.map, this.population, this.taxRate, this.landValues, this.funding, this.computeLoanRepayment())
   }
 
   takeLoan(amount: number): Result {
     if (this.loan !== null) return { ok: false, reason: FailReason.LoanExists }
     const maxLoanAmount = this.budgetInfo.taxIncome * 48
     if (amount < 10_000 || amount > maxLoanAmount) return { ok: false, reason: FailReason.AmountOutOfRange }
-    const r = 0.08 / 12
-    const n = 120
-    const monthlyPayment = amount * r / (1 - Math.pow(1 + r, -n))
-    this.loan = { principal: amount, remaining: amount, monthlyPayment, termMonths: n, monthsLeft: n, interestRate: 0.08 }
+    const monthlyPayment = calcMonthlyPayment(amount)
+    this.loan = { principal: amount, remaining: amount, monthlyPayment, termMonths: 120, monthsLeft: 120, interestRate: 0.08 }
     this.loanRepaymentAmount = monthlyPayment
     this.funds += amount
     return { ok: true }
@@ -510,16 +504,13 @@ export class Engine {
     // Rebuild derived state
     propagatePower(engine.map, engine.powerGrid, engine.bldIdx)
     engine.demand = calculateDemand(engine.map, engine.taxRate)
-    const restoreRepayment = engine.loan
-      ? Math.round(Math.min(engine.loanRepaymentAmount, engine.loan.remaining))
-      : 0
     engine.budgetInfo = calculateBudget(
       engine.map,
       engine.population,
       engine.taxRate,
       engine.landValues,
       engine.funding,
-      restoreRepayment,
+      engine.computeLoanRepayment(),
     )
 
     return engine

@@ -1,4 +1,4 @@
-import type { GameState } from '@bitborough/core'
+import { type GameState, calcMonthlyPayment } from '@bitborough/core'
 
 export type FundingService = 'police' | 'fire' | 'transit'
 
@@ -56,7 +56,7 @@ export class BudgetPanel {
           <h4>Take Loan</h4>
           <label>Amount: <span id="loan-amount-display">$50,000</span></label>
           <input type="range" id="loan-amount-slider" min="10000" max="500000" value="50000" step="5000">
-          <div id="loan-preview" style="font-size:0.85em;color:#aaa"></div>
+          <div id="loan-preview" class="loan-preview"></div>
           <button id="take-loan-btn">Take Loan</button>
         </div>
         <div class="budget-section hidden" id="loan-status-section">
@@ -103,10 +103,8 @@ export class BudgetPanel {
     const updateLoanPreview = () => {
       const amount = parseInt(loanAmountSlider.value, 10)
       loanAmountDisplay.textContent = `$${amount.toLocaleString()}`
-      const r = 0.08 / 12
-      const n = 120
-      const monthly = Math.round(amount * r / (1 - Math.pow(1 + r, -n)))
-      const total = monthly * n
+      const monthly = Math.round(calcMonthlyPayment(amount))
+      const total = monthly * 120
       loanPreview.textContent = `Monthly payment: $${monthly.toLocaleString()} | Total cost: $${total.toLocaleString()}`
     }
     loanAmountSlider.addEventListener('input', updateLoanPreview)
@@ -132,14 +130,14 @@ export class BudgetPanel {
     payoffBtn.addEventListener('click', () => {
       // Will be handled via update — access loan from last state
       // Store loan in field for payoff button access
-      if (this._lastLoan) {
+      if (this.lastLoan) {
         this.repaymentSlider.dataset.userSet = 'true'
-        this.onSetRepayment(this._lastLoan.remaining)
+        this.onSetRepayment(this.lastLoan.remaining)
       }
     })
   }
 
-  private _lastLoan: import('@bitborough/core').Loan | null = null
+  private lastLoan: import('@bitborough/core').Loan | null = null
 
   private bindFundingSlider(sliderId: string, displayId: string, service: FundingService): void {
     const slider = this.el.querySelector(`#${sliderId}`) as HTMLInputElement
@@ -175,7 +173,7 @@ export class BudgetPanel {
     this.balanceEl.className = b.balance >= 0 ? 'positive' : 'negative'
 
     const loan = state.loan
-    this._lastLoan = loan
+    this.lastLoan = loan
 
     // Show/hide loan repayment line
     this.loanRepaymentLine.classList.toggle('hidden', loan === null)
