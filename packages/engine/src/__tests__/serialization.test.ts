@@ -83,10 +83,10 @@ describe('Serialization', () => {
     }
   })
 
-  test('v3 save preserves exact residents values', () => {
+  test('v4 save preserves exact residents values', () => {
     const engine = Engine.create(createTestMap(32), { seed: 1, startingFunds: 10_000 })
     const save = engine.serialize()
-    expect(save.version).toBe(3)
+    expect(save.version).toBe(4)
     const restored = Engine.restore(save)
     for (let i = 0; i < engine.getState().map.buildings.length; i++) {
       expect(restored.getState().map.buildings[i]!.residents).toBe(engine.getState().map.buildings[i]!.residents)

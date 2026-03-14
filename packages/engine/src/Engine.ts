@@ -7,6 +7,7 @@ import {
   type Result,
   type Loan,
   type GameEvent,
+  type MonthlySnapshot,
   calcMonthlyPayment,
   TileType,
   ZoneType,
@@ -92,6 +93,9 @@ export class Engine {
   private loan: Loan | null = null
   private loanRepaymentAmount: number = 0
   private events: GameEvent[] = []
+
+  // History
+  private history: MonthlySnapshot[] = []
 
   private computeLoanRepayment(): number {
     if (!this.loan) return 0
@@ -217,6 +221,20 @@ export class Engine {
       if (this.funds < 0 && this.loan !== null) {
         this.events.push({ type: 'negative_funds' })
       }
+
+      // 6. Record monthly snapshot
+      this.history.push({
+        month: this.month,
+        year: this.year,
+        population: this.population,
+        funds: this.funds,
+        taxIncome: this.budgetInfo.taxIncome,
+        expenses: this.budgetInfo.projectedExpenses,
+        rDemand: this.demand.residential,
+        cDemand: this.demand.commercial,
+        iDemand: this.demand.industrial,
+      })
+      if (this.history.length > 1200) this.history.shift()
     }
   }
 
@@ -243,6 +261,7 @@ export class Engine {
       loan: this.loan,
       loanRepaymentAmount: this.loanRepaymentAmount,
       events: this.events,
+      history: this.history,
     }
   }
 
@@ -402,7 +421,7 @@ export class Engine {
     const activeFires: Array<[number, number]> = Array.from(this.fireState.activeFires.entries())
 
     return {
-      version: 3,
+      version: 4,
       map: {
         version: this.map.version,
         width: this.map.width,
@@ -427,6 +446,7 @@ export class Engine {
         activeFires,
         loan: this.loan,
         loanRepaymentAmount: this.loanRepaymentAmount,
+        history: this.history,
       },
       timestamp: new Date().toISOString(),
     }
@@ -500,6 +520,7 @@ export class Engine {
     // Restore loan state
     engine.loan = save.state.loan ?? null
     engine.loanRepaymentAmount = save.state.loanRepaymentAmount ?? (engine.loan?.monthlyPayment ?? 0)
+    engine.history = save.state.history ?? []
 
     // Rebuild derived state
     propagatePower(engine.map, engine.powerGrid, engine.bldIdx)
