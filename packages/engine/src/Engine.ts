@@ -183,6 +183,9 @@ export class Engine {
       fireCoverage: this.fireCoverage,
       trafficDensity: this.trafficDensity,
       activeFires: Array.from(this.fireState.activeFires.keys()),
+      loan: null,
+      loanRepaymentAmount: 0,
+      events: [],
     }
   }
 
