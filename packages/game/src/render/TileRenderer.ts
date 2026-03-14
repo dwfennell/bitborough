@@ -107,30 +107,46 @@ export class ColorTileRenderer implements TileRenderer {
 
     if (infra & Infrastructure.Road) {
       const isPaved = !!(infra & Infrastructure.PavedRoad)
-      ctx.fillStyle = isPaved ? '#404040' : '#555'
-      const roadWidth = tileSize * 0.4
-      const offset = (tileSize - roadWidth) / 2
-      ctx.fillRect(screenX + offset, screenY + offset, roadWidth, roadWidth)
 
-      // Draw connections: N=1, E=2, S=4, W=8
-      if (connections & 1)
-        ctx.fillRect(cx - roadWidth / 2, screenY, roadWidth, half)
-      if (connections & 2)
-        ctx.fillRect(cx, cy - roadWidth / 2, half, roadWidth)
-      if (connections & 4)
-        ctx.fillRect(cx - roadWidth / 2, cy, roadWidth, half)
-      if (connections & 8)
-        ctx.fillRect(screenX, cy - roadWidth / 2, half, roadWidth)
+      // Try SVG sprite (loaded asynchronously; falls back to programmatic on first render)
+      const n = (connections & 1) ? '1' : '0'
+      const e = (connections & 2) ? '1' : '0'
+      const s = (connections & 4) ? '1' : '0'
+      const w = (connections & 8) ? '1' : '0'
+      const nesw = `${n}${e}${s}${w}`
+      const spritePath = isPaved
+        ? `/tiles/roads/paved-${nesw}.svg`
+        : `/tiles/roads/road-${nesw}.svg`
+      const img = this.sprites.get(spritePath)
+      if (img) {
+        ctx.drawImage(img, screenX, screenY, tileSize, tileSize)
+      } else {
+        // Programmatic fallback while sprite loads
+        ctx.fillStyle = isPaved ? '#404040' : '#555'
+        const roadWidth = tileSize * 0.4
+        const offset = (tileSize - roadWidth) / 2
+        ctx.fillRect(screenX + offset, screenY + offset, roadWidth, roadWidth)
 
-      // Yellow center stripe on paved roads
-      if (isPaved && tileSize >= 8) {
-        ctx.fillStyle = '#e8d080'
-        ctx.globalAlpha = 0.5
-        if (connections & 1) ctx.fillRect(cx - 0.5, screenY, 1, half)
-        if (connections & 4) ctx.fillRect(cx - 0.5, cy, 1, half)
-        if (connections & 2) ctx.fillRect(cx, cy - 0.5, half, 1)
-        if (connections & 8) ctx.fillRect(screenX, cy - 0.5, half, 1)
-        ctx.globalAlpha = 1.0
+        // Draw connections: N=1, E=2, S=4, W=8
+        if (connections & 1)
+          ctx.fillRect(cx - roadWidth / 2, screenY, roadWidth, half)
+        if (connections & 2)
+          ctx.fillRect(cx, cy - roadWidth / 2, half, roadWidth)
+        if (connections & 4)
+          ctx.fillRect(cx - roadWidth / 2, cy, roadWidth, half)
+        if (connections & 8)
+          ctx.fillRect(screenX, cy - roadWidth / 2, half, roadWidth)
+
+        // Yellow center stripe on paved roads
+        if (isPaved && tileSize >= 8) {
+          ctx.fillStyle = '#e8d080'
+          ctx.globalAlpha = 0.5
+          if (connections & 1) ctx.fillRect(cx - 0.5, screenY, 1, half)
+          if (connections & 4) ctx.fillRect(cx - 0.5, cy, 1, half)
+          if (connections & 2) ctx.fillRect(cx, cy - 0.5, half, 1)
+          if (connections & 8) ctx.fillRect(screenX, cy - 0.5, half, 1)
+          ctx.globalAlpha = 1.0
+        }
       }
     }
 

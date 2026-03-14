@@ -1,0 +1,103 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- High-density industrial complex (3x3 tile footprint) -->
+
+  <!-- === Lot ground (industrial concrete yard) === -->
+  <rect x="8" y="8" width="112" height="112" rx="3" fill="#c0c0b0" opacity="0.3"/>
+
+  <!-- === Building shadow === -->
+  <rect x="10" y="10" width="108" height="78" rx="2" fill="#000000" opacity="0.1" transform="translate(3,3)"/>
+
+  <!-- === Main factory walls === -->
+  <rect x="10" y="10" width="108" height="78" rx="2" fill="#d8d8d0"/>
+
+  <!-- === Main factory roof === -->
+  <rect x="8" y="8" width="112" height="70" rx="2" fill="#989880"/>
+
+  <!-- Roof section dividers (multiple factory bays) -->
+  <g stroke="#8a8878" stroke-width="1.5" opacity="0.4">
+    <line x1="10" y1="43" x2="118" y2="43"/>
+    <line x1="46" y1="8" x2="46" y2="78"/>
+    <line x1="82" y1="8" x2="82" y2="78"/>
+  </g>
+
+  <!-- Roof highlight on each section -->
+  <g fill="#c0c0b0" opacity="0.2">
+    <rect x="10" y="8" width="34" height="35" rx="1"/>
+    <rect x="48" y="8" width="32" height="35" rx="1"/>
+    <rect x="84" y="8" width="32" height="35" rx="1"/>
+  </g>
+
+  <!-- === Smokestacks (4 stacks) === -->
+  <!-- Stack 1 -->
+  <rect x="16" y="-2" width="7" height="18" rx="1" fill="#a8a898"/>
+  <rect x="15" y="-3" width="9" height="3" rx="0.5" fill="#989880"/>
+  <path d="M20 -4 Q22 -9 19 -13 Q17 -17 20 -20" fill="none" stroke="#d0d0d0" stroke-width="1.5" stroke-linecap="round" opacity="0.3"/>
+  <!-- Stack 2 -->
+  <rect x="32" y="0" width="7" height="14" rx="1" fill="#a8a898"/>
+  <rect x="31" y="-1" width="9" height="3" rx="0.5" fill="#989880"/>
+  <path d="M36 -2 Q38 -7 35 -11 Q33 -15 36 -18" fill="none" stroke="#d0d0d0" stroke-width="1.5" stroke-linecap="round" opacity="0.25"/>
+  <!-- Stack 3 -->
+  <rect x="90" y="-2" width="7" height="18" rx="1" fill="#a8a898"/>
+  <rect x="89" y="-3" width="9" height="3" rx="0.5" fill="#989880"/>
+  <path d="M94 -4 Q96 -9 93 -13 Q91 -17 94 -20" fill="none" stroke="#d0d0d0" stroke-width="1.5" stroke-linecap="round" opacity="0.28"/>
+  <!-- Stack 4 -->
+  <rect x="106" y="0" width="7" height="14" rx="1" fill="#a8a898"/>
+  <rect x="105" y="-1" width="9" height="3" rx="0.5" fill="#989880"/>
+  <path d="M110 -2 Q112 -7 109 -11 Q107 -15 110 -18" fill="none" stroke="#d0d0d0" stroke-width="1.5" stroke-linecap="round" opacity="0.22"/>
+
+  <!-- === Storage tanks / silos (2 large, 1 small) === -->
+  <!-- Tank 1 (large) -->
+  <circle cx="64" cy="32" r="12" fill="#a8a898" opacity="0.75"/>
+  <circle cx="64" cy="32" r="9" fill="#989880" opacity="0.55"/>
+  <circle cx="64" cy="32" r="3" fill="#8a8878" opacity="0.5"/>
+  <!-- Tank 2 (medium) -->
+  <circle cx="52" cy="54" r="8" fill="#a8a898" opacity="0.7"/>
+  <circle cx="52" cy="54" r="5.5" fill="#989880" opacity="0.5"/>
+  <circle cx="52" cy="54" r="1.5" fill="#8a8878" opacity="0.45"/>
+  <!-- Tank 3 (medium) -->
+  <circle cx="76" cy="54" r="8" fill="#a8a898" opacity="0.7"/>
+  <circle cx="76" cy="54" r="5.5" fill="#989880" opacity="0.5"/>
+  <circle cx="76" cy="54" r="1.5" fill="#8a8878" opacity="0.45"/>
+
+  <!-- === Pipe network on roof === -->
+  <g stroke="#8a8878" stroke-width="1.5" stroke-linecap="round" opacity="0.55">
+    <line x1="12" y1="28" x2="52" y2="28"/>
+    <line x1="76" y1="28" x2="116" y2="28"/>
+    <line x1="52" y1="28" x2="52" y2="46"/>
+    <line x1="76" y1="28" x2="76" y2="46"/>
+    <line x1="16" y1="16" x2="16" y2="28"/>
+    <line x1="110" y1="16" x2="110" y2="28"/>
+  </g>
+
+  <!-- === Rust accent stripes on roof === -->
+  <rect x="8" y="67" width="112" height="3" rx="0.5" fill="#b09070" opacity="0.28"/>
+
+  <!-- === Loading bay doors (5 bays across south face) === -->
+  <g fill="#585858" opacity="0.52">
+    <rect x="13" y="82" width="14" height="8" rx="0.5"/>
+    <rect x="33" y="82" width="14" height="8" rx="0.5"/>
+    <rect x="53" y="82" width="14" height="8" rx="0.5"/>
+    <rect x="73" y="82" width="14" height="8" rx="0.5"/>
+    <rect x="93" y="82" width="14" height="8" rx="0.5"/>
+  </g>
+  <!-- Bay door dividers -->
+  <g stroke="#989880" stroke-width="0.5" opacity="0.4">
+    <line x1="20" y1="82" x2="20" y2="90"/>
+    <line x1="40" y1="82" x2="40" y2="90"/>
+    <line x1="60" y1="82" x2="60" y2="90"/>
+    <line x1="80" y1="82" x2="80" y2="90"/>
+    <line x1="100" y1="82" x2="100" y2="90"/>
+  </g>
+
+  <!-- === South yard: pallets, vehicles, rust stains === -->
+  <!-- Pallets/crates near loading bays -->
+  <rect x="14" y="93" width="16" height="10" rx="1" fill="#c8b480" opacity="0.38"/>
+  <rect x="56" y="93" width="14" height="8" rx="1" fill="#d8c498" opacity="0.32"/>
+  <rect x="96" y="93" width="12" height="10" rx="1" fill="#c8b480" opacity="0.35"/>
+  <!-- Rust stain -->
+  <ellipse cx="44" cy="106" rx="8" ry="4" fill="#b09070" opacity="0.14"/>
+  <ellipse cx="84" cy="110" rx="10" ry="3" fill="#b09070" opacity="0.12"/>
+  <!-- Forklift / vehicle -->
+  <rect x="76" y="104" width="14" height="8" rx="2" fill="#a8a898" opacity="0.42"/>
+  <rect x="78" y="105" width="5" height="4" rx="0.5" fill="#a8d0e8" opacity="0.3"/>
+</svg>

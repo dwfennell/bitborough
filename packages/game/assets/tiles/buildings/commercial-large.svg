@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- High-density commercial office complex (2x2 tile footprint) -->
+
+  <!-- === Building shadow === -->
+  <rect x="10" y="12" width="108" height="76" rx="2" fill="#000000" opacity="0.1" transform="translate(3,3)"/>
+
+  <!-- === Lot ground (paved commercial) === -->
+  <rect x="8" y="8" width="112" height="112" rx="3" fill="#d8d8d0" opacity="0.28"/>
+
+  <!-- === Parking lot === -->
+  <rect x="10" y="94" width="108" height="26" rx="1" fill="#989890" opacity="0.18"/>
+  <g stroke="#e0e0e0" stroke-width="0.7" opacity="0.32">
+    <line x1="22" y1="94" x2="22" y2="120"/>
+    <line x1="36" y1="94" x2="36" y2="120"/>
+    <line x1="50" y1="94" x2="50" y2="120"/>
+    <line x1="78" y1="94" x2="78" y2="120"/>
+    <line x1="92" y1="94" x2="92" y2="120"/>
+    <line x1="106" y1="94" x2="106" y2="120"/>
+  </g>
+
+  <!-- === Plaza entrance with decorative fountain === -->
+  <rect x="38" y="86" width="52" height="8" rx="2" fill="#c8c8c0" opacity="0.38"/>
+  <circle cx="64" cy="90" r="4" fill="#88c8e8" opacity="0.35"/>
+  <circle cx="64" cy="90" r="2" fill="#a8ddf0" opacity="0.45"/>
+
+  <!-- === Building walls === -->
+  <rect x="10" y="12" width="108" height="76" rx="2" fill="#d8d8d0"/>
+
+  <!-- === Roof (modern flat blue-gray) === -->
+  <rect x="8" y="10" width="112" height="68" rx="2" fill="#90b8d8"/>
+  <!-- Roof highlight strip at top -->
+  <rect x="8" y="10" width="112" height="6" rx="2" fill="#b0d0e8" opacity="0.3"/>
+  <!-- Central ridge -->
+  <line x1="64" y1="12" x2="64" y2="78" stroke="#a0c8e0" stroke-width="2" opacity="0.32"/>
+  <line x1="10" y1="44" x2="118" y2="44" stroke="#a0c8e0" stroke-width="1.5" opacity="0.22"/>
+
+  <!-- === HVAC units on roof (4 units) === -->
+  <rect x="16" y="17" width="12" height="8" rx="1" fill="#a8a898" opacity="0.75"/>
+  <circle cx="22" cy="21" r="3" fill="none" stroke="#8a8878" stroke-width="0.5" opacity="0.6"/>
+  <circle cx="22" cy="21" r="1" fill="#8a8878" opacity="0.5"/>
+
+  <rect x="36" y="17" width="12" height="8" rx="1" fill="#a8a898" opacity="0.7"/>
+  <circle cx="42" cy="21" r="3" fill="none" stroke="#8a8878" stroke-width="0.5" opacity="0.6"/>
+  <circle cx="42" cy="21" r="1" fill="#8a8878" opacity="0.5"/>
+
+  <rect x="80" y="17" width="12" height="8" rx="1" fill="#a8a898" opacity="0.7"/>
+  <circle cx="86" cy="21" r="3" fill="none" stroke="#8a8878" stroke-width="0.5" opacity="0.6"/>
+  <circle cx="86" cy="21" r="1" fill="#8a8878" opacity="0.5"/>
+
+  <rect x="100" y="17" width="12" height="8" rx="1" fill="#a8a898" opacity="0.7"/>
+  <circle cx="106" cy="21" r="3" fill="none" stroke="#8a8878" stroke-width="0.5" opacity="0.6"/>
+  <circle cx="106" cy="21" r="1" fill="#8a8878" opacity="0.5"/>
+
+  <!-- === Signage band on south wall === -->
+  <rect x="24" y="74" width="80" height="4" rx="0.5" fill="#e8d080" opacity="0.42"/>
+
+  <!-- === Windows on visible south wall (wide glass facade, y=78–88) === -->
+  <g fill="#a8d0e8" opacity="0.75">
+    <rect x="11" y="79" width="7" height="6" rx="0.5"/>
+    <rect x="21" y="79" width="7" height="6" rx="0.5"/>
+    <rect x="31" y="79" width="7" height="6" rx="0.5"/>
+    <rect x="41" y="79" width="7" height="6" rx="0.5"/>
+    <!-- gap for double doors -->
+    <rect x="71" y="79" width="7" height="6" rx="0.5"/>
+    <rect x="81" y="79" width="7" height="6" rx="0.5"/>
+    <rect x="91" y="79" width="7" height="6" rx="0.5"/>
+    <rect x="101" y="79" width="7" height="6" rx="0.5"/>
+    <rect x="111" y="79" width="7" height="6" rx="0.5"/>
+  </g>
+  <g fill="none" stroke="#80a8c8" stroke-width="0.6" opacity="0.48">
+    <rect x="11" y="79" width="7" height="6" rx="0.5"/>
+    <rect x="21" y="79" width="7" height="6" rx="0.5"/>
+    <rect x="31" y="79" width="7" height="6" rx="0.5"/>
+    <rect x="41" y="79" width="7" height="6" rx="0.5"/>
+    <rect x="71" y="79" width="7" height="6" rx="0.5"/>
+    <rect x="81" y="79" width="7" height="6" rx="0.5"/>
+    <rect x="91" y="79" width="7" height="6" rx="0.5"/>
+    <rect x="101" y="79" width="7" height="6" rx="0.5"/>
+    <rect x="111" y="79" width="7" height="6" rx="0.5"/>
+  </g>
+
+  <!-- === Double entrance doors === -->
+  <rect x="54" y="78" width="4" height="8" rx="0.5" fill="#8a6848"/>
+  <circle cx="57" cy="82" r="0.6" fill="#c0a080"/>
+  <rect x="60" y="78" width="4" height="8" rx="0.5" fill="#8a6848"/>
+  <circle cx="63" cy="82" r="0.6" fill="#c0a080"/>
+
+  <!-- === Parked cars === -->
+  <rect x="23" y="98" width="8" height="14" rx="2" fill="#90b8d8" opacity="0.45"/>
+  <rect x="37" y="98" width="8" height="14" rx="2" fill="#d8d8d0" opacity="0.4"/>
+  <rect x="79" y="98" width="8" height="14" rx="2" fill="#d08870" opacity="0.4"/>
+  <rect x="93" y="98" width="8" height="14" rx="2" fill="#a8a898" opacity="0.38"/>
+</svg>

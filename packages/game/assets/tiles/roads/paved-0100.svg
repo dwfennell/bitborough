@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="paved" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#606060"/>
+      <stop offset="100%" stop-color="#585858"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Grass base -->
+  <rect width="128" height="128" fill="#8cc870"/>
+  <ellipse cx="18" cy="18" rx="12" ry="9" fill="#95d07a" opacity="0.4"/>
+  <ellipse cx="110" cy="18" rx="11" ry="8" fill="#82c466" opacity="0.35"/>
+  <ellipse cx="18" cy="110" rx="12" ry="9" fill="#95d07a" opacity="0.38"/>
+  <ellipse cx="110" cy="108" rx="11" ry="8" fill="#82c466" opacity="0.4"/>
+  <ellipse cx="64" cy="18" rx="10" ry="7" fill="#a0da88" opacity="0.3"/>
+  <ellipse cx="64" cy="110" rx="10" ry="7" fill="#9ad680" opacity="0.32"/>
+
+  <!-- Grass blade clusters -->
+  <g fill="#6aaa50" opacity="0.45">
+    <path d="M14 28 L15.5 22 L17 28Z"/>
+    <path d="M16 28.5 L18 21 L19.5 28.5Z"/>
+  </g>
+  <g fill="#78b868" opacity="0.4">
+    <path d="M20 100 L21.5 94 L23 100Z"/>
+    <path d="M22 100.5 L24 93 L25.5 100.5Z"/>
+  </g>
+
+  <!-- Sidewalks - horizontal from east edge to dead end -->
+  <rect x="48" y="40" width="80" height="8" fill="#b0b0a8" opacity="0.6"/>
+  <rect x="48" y="80" width="80" height="8" fill="#b0b0a8" opacity="0.6"/>
+  <!-- Rounded dead end sidewalk on west side -->
+  <path d="M56 40 A24 24 0 0 0 56 88 L48 88 L48 40Z" fill="#b0b0a8" opacity="0.6"/>
+
+  <!-- Road pavement - east edge to center with rounded dead end -->
+  <rect x="64" y="48" width="64" height="32" fill="url(#paved)"/>
+  <path d="M64 48 A16 16 0 0 0 64 80Z" fill="url(#paved)"/>
+
+  <!-- Curb lines -->
+  <g stroke="#989898" stroke-width="1.5" opacity="0.5">
+    <line x1="56" y1="40" x2="128" y2="40"/>
+    <line x1="56" y1="88" x2="128" y2="88"/>
+    <!-- Rounded curb at dead end -->
+    <path d="M56 40 A24 24 0 0 0 56 88" fill="none"/>
+  </g>
+
+  <!-- Road surface texture -->
+  <g fill="#606060" opacity="0.12">
+    <circle cx="72" cy="56" r="0.8"/>
+    <circle cx="88" cy="70" r="0.7"/>
+    <circle cx="100" cy="52" r="0.9"/>
+    <circle cx="114" cy="66" r="0.7"/>
+    <circle cx="80" cy="72" r="0.8"/>
+    <circle cx="96" cy="58" r="0.7"/>
+    <circle cx="108" cy="74" r="0.8"/>
+    <circle cx="120" cy="54" r="0.7"/>
+    <circle cx="76" cy="64" r="0.6"/>
+    <circle cx="116" cy="62" r="0.7"/>
+  </g>
+
+  <!-- White edge lines along road surface -->
+  <rect x="64" y="48" width="64" height="1" fill="#e0e0e0" opacity="0.25"/>
+  <rect x="64" y="79" width="64" height="1" fill="#e0e0e0" opacity="0.25"/>
+
+  <!-- Solid white center line - horizontal arm from east to center -->
+  <rect x="64" y="63.25" width="64" height="1.5" fill="#e0e0e0" opacity="0.65"/>
+
+  <!-- Small flowers in grass -->
+  <circle cx="30" cy="64" r="1.5" fill="#e8c8d0" opacity="0.6"/>
+  <circle cx="18" cy="90" r="1.2" fill="#e8d8a0" opacity="0.6"/>
+</svg>

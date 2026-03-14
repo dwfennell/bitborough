@@ -6,6 +6,7 @@ import { ZoneTool } from '../tools/ZoneTool.js'
 import { BulldozeTool } from '../tools/BulldozeTool.js'
 import { BuildingTool } from '../tools/BuildingTool.js'
 import { QueryTool } from '../tools/QueryTool.js'
+import { UpgradeRoadTool } from '../tools/UpgradeRoadTool.js'
 import type { Tool } from '../tools/Tool.js'
 
 function fmtCost(cost: number): string {
@@ -21,6 +22,7 @@ interface ToolEntry {
 const TOOL_ENTRIES: ToolEntry[] = [
   // Infrastructure
   { label: `Road ${fmtCost(COSTS.road)}`, key: '1', factory: () => new InfrastructureTool('Road', Infrastructure.Road, 'rgba(85,85,85,0.5)') },
+  { label: `Pave $${COSTS.pavedRoadUpgrade}`, key: '`', factory: () => new UpgradeRoadTool() },
   { label: `Power ${fmtCost(COSTS.powerLine)}`, key: '2', factory: () => new InfrastructureTool('Power Line', Infrastructure.PowerLine, 'rgba(255,193,7,0.5)') },
   // Zones (free)
   { label: 'Zone R', key: '3', factory: () => new ZoneTool(ZoneType.Residential) },
@@ -31,6 +33,7 @@ const TOOL_ENTRIES: ToolEntry[] = [
   { label: `Coal ${fmtCost(BUILDING_DEFS['power.coal']!.cost)}`, key: '7', factory: () => new BuildingTool('power.coal') },
   { label: `Nuclear ${fmtCost(BUILDING_DEFS['power.nuclear']!.cost)}`, key: '8', factory: () => new BuildingTool('power.nuclear') },
   // Services
+  { label: `Transit ${fmtCost(BUILDING_DEFS['transit.stop']!.cost)}`, key: 't', factory: () => new BuildingTool('transit.stop') },
   { label: `Police ${fmtCost(BUILDING_DEFS['service.police']!.cost)}`, key: '9', factory: () => new BuildingTool('service.police') },
   { label: `Fire ${fmtCost(BUILDING_DEFS['service.fire']!.cost)}`, key: '0', factory: () => new BuildingTool('service.fire') },
   { label: `Park ${fmtCost(BUILDING_DEFS['special.park']!.cost)}`, key: 'n', factory: () => new BuildingTool('special.park') },

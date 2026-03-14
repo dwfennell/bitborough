@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- Transit stop / bus terminal (2x2 tile footprint) -->
+
+  <!-- === Lot ground (paved terminal) === -->
+  <rect x="8" y="8" width="112" height="112" rx="3" fill="#a8a898" opacity="0.25"/>
+
+  <!-- === Concrete apron (main transit area) === -->
+  <rect x="10" y="10" width="108" height="108" rx="2" fill="#989890" opacity="0.2"/>
+
+  <!-- === Terminal building shadow === -->
+  <rect x="24" y="12" width="80" height="34" rx="2" fill="#000000" opacity="0.1" transform="translate(3,3)"/>
+
+  <!-- === Terminal building walls === -->
+  <rect x="24" y="12" width="80" height="34" rx="2" fill="#d8d8d0"/>
+
+  <!-- === Terminal building roof (blue-gray for transit identity) === -->
+  <rect x="22" y="10" width="84" height="32" rx="2" fill="#90b8d8"/>
+  <!-- Roof ridge -->
+  <line x1="64" y1="12" x2="64" y2="42" stroke="#a0c8e0" stroke-width="2" opacity="0.35"/>
+  <!-- Roof shading -->
+  <rect x="22" y="10" width="84" height="5" rx="2" fill="#b0d0e8" opacity="0.28"/>
+
+  <!-- HVAC on terminal roof -->
+  <rect x="30" y="16" width="10" height="6" rx="1" fill="#a8a898" opacity="0.7"/>
+  <circle cx="35" cy="19" r="2.5" fill="none" stroke="#8a8878" stroke-width="0.5" opacity="0.6"/>
+  <circle cx="35" cy="19" r="0.8" fill="#8a8878" opacity="0.5"/>
+  <rect x="88" y="16" width="10" height="6" rx="1" fill="#a8a898" opacity="0.7"/>
+  <circle cx="93" cy="19" r="2.5" fill="none" stroke="#8a8878" stroke-width="0.5" opacity="0.6"/>
+  <circle cx="93" cy="19" r="0.8" fill="#8a8878" opacity="0.5"/>
+
+  <!-- Terminal entrance (south face of building) -->
+  <rect x="56" y="36" width="8" height="8" rx="0.5" fill="#8a6848"/>
+  <circle cx="62" cy="40" r="0.6" fill="#c0a080"/>
+
+  <!-- === Platform shelter structures (3 covered bays) === -->
+  <!-- Platform 1 (left) -->
+  <rect x="12" y="50" width="26" height="36" rx="1" fill="#c0c0b0" opacity="0.22"/>
+  <!-- Shelter canopy roof -->
+  <rect x="10" y="48" width="30" height="6" rx="1" fill="#90b8d8" opacity="0.65"/>
+  <!-- Shelter posts -->
+  <rect x="12" y="54" width="2" height="30" rx="0.5" fill="#989898" opacity="0.5"/>
+  <rect x="36" y="54" width="2" height="30" rx="0.5" fill="#989898" opacity="0.5"/>
+  <!-- Bench inside -->
+  <rect x="15" y="60" width="20" height="3" rx="0.5" fill="#8a8878" opacity="0.45"/>
+
+  <!-- Platform 2 (center) -->
+  <rect x="51" y="50" width="26" height="36" rx="1" fill="#c0c0b0" opacity="0.22"/>
+  <rect x="49" y="48" width="30" height="6" rx="1" fill="#90b8d8" opacity="0.65"/>
+  <rect x="51" y="54" width="2" height="30" rx="0.5" fill="#989898" opacity="0.5"/>
+  <rect x="75" y="54" width="2" height="30" rx="0.5" fill="#989898" opacity="0.5"/>
+  <rect x="54" y="60" width="20" height="3" rx="0.5" fill="#8a8878" opacity="0.45"/>
+
+  <!-- Platform 3 (right) -->
+  <rect x="90" y="50" width="26" height="36" rx="1" fill="#c0c0b0" opacity="0.22"/>
+  <rect x="88" y="48" width="30" height="6" rx="1" fill="#90b8d8" opacity="0.65"/>
+  <rect x="90" y="54" width="2" height="30" rx="0.5" fill="#989898" opacity="0.5"/>
+  <rect x="114" y="54" width="2" height="30" rx="0.5" fill="#989898" opacity="0.5"/>
+  <rect x="93" y="60" width="20" height="3" rx="0.5" fill="#8a8878" opacity="0.45"/>
+
+  <!-- === Bus bay lane markings === -->
+  <!-- Lane dividers (white dashes between platforms) -->
+  <g stroke="#e0e0e0" stroke-width="1" opacity="0.35" stroke-dasharray="4,4">
+    <line x1="42" y1="48" x2="42" y2="88"/>
+    <line x1="86" y1="48" x2="86" y2="88"/>
+  </g>
+
+  <!-- === Bus approach zone (south) === -->
+  <rect x="10" y="90" width="108" height="30" rx="1" fill="#707070" opacity="0.15"/>
+  <!-- Lane markings -->
+  <g stroke="#e8d080" stroke-width="1" opacity="0.4" stroke-dasharray="6,6">
+    <line x1="64" y1="90" x2="64" y2="120"/>
+  </g>
+  <!-- Lane edge lines -->
+  <g stroke="#e0e0e0" stroke-width="0.8" opacity="0.3">
+    <line x1="10" y1="90" x2="118" y2="90"/>
+  </g>
+
+  <!-- === Small paved path strips between platforms === -->
+  <rect x="40" y="54" width="12" height="32" rx="1" fill="#c8b898" opacity="0.2"/>
+  <rect x="78" y="54" width="12" height="32" rx="1" fill="#c8b898" opacity="0.2"/>
+
+  <!-- === Greenery strip at top corners === -->
+  <ellipse cx="14" cy="14" rx="5" ry="4" fill="#78b868" opacity="0.4"/>
+  <ellipse cx="114" cy="14" rx="5" ry="4" fill="#78b868" opacity="0.4"/>
+</svg>
