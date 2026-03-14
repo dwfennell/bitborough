@@ -39,7 +39,7 @@ export interface MonthlySnapshot {
   population: number
   funds: number
   taxIncome: number   // budgetInfo.taxIncome
-  expenses: number    // budgetInfo.projectedExpenses
+  expenses: number    // budgetInfo.projectedExpenses (projected, not actual charged amount)
   rDemand: number     // demand.residential, -1..1
   cDemand: number     // demand.commercial, -1..1
   iDemand: number     // demand.industrial, -1..1

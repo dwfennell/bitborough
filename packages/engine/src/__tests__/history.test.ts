@@ -41,7 +41,7 @@ describe('History collection', () => {
     const engine = Engine.create(createTestMap(32), { seed: 42 })
     // Advance 101 years = 1212 months — history should cap at 1200
     for (let i = 0; i < 101; i++) advanceYear(engine)
-    expect(engine.getState().history.length).toBeLessThanOrEqual(1200)
+    expect(engine.getState().history.length).toBe(1200)
   })
 
   test('history persists through serialize/restore', () => {
