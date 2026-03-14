@@ -180,7 +180,7 @@ export class Engine {
 
       // 1. Compute budget including loan repayment
       const loanRepayment = this.loan
-        ? Math.min(this.loanRepaymentAmount, this.loan.remaining)
+        ? Math.round(Math.min(this.loanRepaymentAmount, this.loan.remaining))
         : 0
       this.budgetInfo = calculateBudget(this.map, this.population, this.taxRate, this.landValues, this.funding, loanRepayment)
 
@@ -391,7 +391,7 @@ export class Engine {
   }
 
   setLoanRepayment(amount: number): Result {
-    if (this.loan === null) return { ok: false, reason: FailReason.LoanExists }
+    if (this.loan === null) return { ok: false, reason: FailReason.NoActiveLoan }
     if (amount < this.loan.monthlyPayment || amount > this.loan.remaining) return { ok: false, reason: FailReason.AmountOutOfRange }
     this.loanRepaymentAmount = amount
     return { ok: true }

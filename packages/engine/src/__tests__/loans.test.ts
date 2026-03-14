@@ -182,7 +182,7 @@ describe('Loan system', () => {
     const result = engine.setLoanRepayment(500)
     expect(result.ok).toBe(false)
     if (!result.ok) {
-      expect(result.reason).toBe(FailReason.LoanExists)
+      expect(result.reason).toBe(FailReason.NoActiveLoan)
     }
   })
 
