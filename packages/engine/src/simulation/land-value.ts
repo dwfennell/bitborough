@@ -1,4 +1,5 @@
 import { type GameMap, TileType, Infrastructure } from '@bitborough/core'
+import type { BuildingIndex } from '../building-index.js'
 
 export function calculateLandValues(
   map: GameMap,
@@ -6,6 +7,7 @@ export function calculateLandValues(
   pollutionLevel: Uint8Array,
   crimeLevel: Uint8Array,
   landValues: Uint8Array,
+  bldIdx: BuildingIndex,
 ): void {
   const { width, height } = map
 
@@ -25,7 +27,7 @@ export function calculateLandValues(
       value += waterAdjacencyBonus(map, x, y) // +15 per adjacent water tile
 
       // Park bonus: nearby parks boost land value
-      value += parkBonus(map, x, y) // +10, decaying with distance
+      value += parkBonus(map, x, y, bldIdx) // +10, decaying with distance
 
       // Road access bonus
       if (hasNearbyRoad(map, x, y, 3)) {
@@ -63,14 +65,17 @@ function waterAdjacencyBonus(map: GameMap, x: number, y: number): number {
   return bonus
 }
 
-function parkBonus(map: GameMap, x: number, y: number): number {
+function parkBonus(_map: GameMap, x: number, y: number, bldIdx: BuildingIndex): number {
   let bonus = 0
   const radius = 4
-  for (const building of map.buildings) {
-    if (building.defId !== 'special.park') continue
-    const dist = Math.abs(building.x - x) + Math.abs(building.y - y) // Manhattan distance
-    if (dist <= radius) {
-      bonus += Math.max(0, 10 - dist * 2) // 10 at distance 0, decaying by 2 per tile
+  for (let dy = -radius; dy <= radius; dy++) {
+    for (let dx = -radius; dx <= radius; dx++) {
+      const dist = Math.abs(dx) + Math.abs(dy)
+      if (dist > radius) continue
+      const b = bldIdx.get(x + dx, y + dy)
+      if (b && b.defId === 'special.park') {
+        bonus += Math.max(0, 10 - dist * 2)
+      }
     }
   }
   return bonus

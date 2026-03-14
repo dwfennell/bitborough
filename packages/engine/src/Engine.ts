@@ -27,6 +27,7 @@ import { calculateFireCoverage, updateFires, createFireState, type FireState } f
 import { calculateTraffic } from './simulation/traffic.js'
 import { updateDensity } from './simulation/density.js'
 import { BUILDING_DEFS } from './buildings-registry.js'
+import { BuildingIndex } from './building-index.js'
 
 export interface TileInfo {
   terrain: TileType
@@ -120,8 +121,11 @@ export class Engine {
   tick(): void {
     this.tickCount++
 
+    // Build spatial index (used by power propagation and monthly systems)
+    const bldIdx = new BuildingIndex(this.map)
+
     // Power propagation runs every tick
-    propagatePower(this.map, this.powerGrid)
+    propagatePower(this.map, this.powerGrid, bldIdx)
 
     // Monthly systems
     if (this.tickCount % this.ticksPerMonth === 0) {
@@ -134,15 +138,15 @@ export class Engine {
       this.demand = calculateDemand(this.map, this.taxRate, this.trafficDensity)
 
       // Land values use previous month's crime; crime uses updated land values
-      calculateLandValues(this.map, this.powerGrid, this.pollutionLevel, this.crimeLevel, this.landValues)
+      calculateLandValues(this.map, this.powerGrid, this.pollutionLevel, this.crimeLevel, this.landValues, bldIdx)
       calculateCrime(this.map, this.landValues, this.crimeLevel, this.funding.police, this.influenceBuffer)
       calculateFireCoverage(this.map, this.fireCoverage, this.funding.fire, this.influenceBuffer)
-      updateFires(this.map, this.fireState, this.fireCoverage, this.prng)
+      updateFires(this.map, this.fireState, this.fireCoverage, this.prng, bldIdx)
       calculateTraffic(this.map, this.trafficDensity)
 
       // Zone development
       const nextBuildingIdRef = { value: this.nextBuildingId }
-      const { populationDelta } = updateZones(this.map, this.powerGrid, this.demand, this.prng, nextBuildingIdRef)
+      const { populationDelta } = updateZones(this.map, this.powerGrid, this.demand, this.prng, nextBuildingIdRef, bldIdx)
       this.nextBuildingId = nextBuildingIdRef.value
       this.population += populationDelta
 
@@ -213,7 +217,7 @@ export class Engine {
   }
 
   placeTile(x: number, y: number, infra: Infrastructure): Result {
-    const { result, cost } = placeTile(this.map, x, y, infra, this.funds)
+    const { result, cost } = placeTile(this.map, x, y, infra, this.funds, new BuildingIndex(this.map))
     this.funds -= cost
     if (result.ok) {
       updateConnections(this.map, x, y)
@@ -222,7 +226,7 @@ export class Engine {
   }
 
   placeZone(x: number, y: number, zone: ZoneType): Result {
-    return placeZone(this.map, x, y, zone)
+    return placeZone(this.map, x, y, zone, new BuildingIndex(this.map))
   }
 
   upgradeTile(x: number, y: number): Result {
@@ -281,18 +285,13 @@ export class Engine {
       }
     }
 
-    // Check overlap with existing buildings
-    for (const existing of this.map.buildings) {
-      const eDef = BUILDING_DEFS[existing.defId]
-      if (!eDef) continue
-      // Check if footprints overlap
-      if (
-        x < existing.x + eDef.size.w &&
-        x + def.size.w > existing.x &&
-        y < existing.y + eDef.size.h &&
-        y + def.size.h > existing.y
-      ) {
-        return { ok: false, reason: FailReason.Occupied }
+    // Check overlap with existing buildings using spatial index
+    const bldIdx = new BuildingIndex(this.map)
+    for (let dy = 0; dy < def.size.h; dy++) {
+      for (let dx = 0; dx < def.size.w; dx++) {
+        if (bldIdx.has(x + dx, y + dy)) {
+          return { ok: false, reason: FailReason.Occupied }
+        }
       }
     }
 
@@ -432,7 +431,7 @@ export class Engine {
       .reduce((sum, b) => sum + (b.residents ?? 0), 0)
 
     // Rebuild derived state
-    propagatePower(engine.map, engine.powerGrid)
+    propagatePower(engine.map, engine.powerGrid, new BuildingIndex(engine.map))
     engine.demand = calculateDemand(engine.map, engine.taxRate)
     engine.budgetInfo = calculateBudget(
       engine.map,

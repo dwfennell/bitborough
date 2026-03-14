@@ -1,5 +1,5 @@
 import { type GameMap, type Result, TileType, Infrastructure, ZoneType, FailReason, COSTS } from '@bitborough/core'
-import { BUILDING_DEFS } from '../buildings-registry.js'
+import type { BuildingIndex } from '../building-index.js'
 
 export function placeTile(
   map: GameMap,
@@ -7,6 +7,7 @@ export function placeTile(
   y: number,
   infra: Infrastructure,
   funds: number,
+  bldIdx: BuildingIndex,
 ): { result: Result; cost: number } {
   if (!inBounds(map, x, y)) {
     return { result: { ok: false, reason: FailReason.InvalidLocation }, cost: 0 }
@@ -23,7 +24,7 @@ export function placeTile(
   }
 
   // Cannot place infrastructure on a building footprint
-  if (hasBuildingAt(map, x, y)) {
+  if (bldIdx.has(x, y)) {
     return { result: { ok: false, reason: FailReason.Occupied }, cost: 0 }
   }
 
@@ -42,7 +43,7 @@ export function placeTile(
   return { result: { ok: true }, cost }
 }
 
-export function placeZone(map: GameMap, x: number, y: number, zone: ZoneType): Result {
+export function placeZone(map: GameMap, x: number, y: number, zone: ZoneType, bldIdx: BuildingIndex): Result {
   if (!inBounds(map, x, y)) {
     return { ok: false, reason: FailReason.InvalidLocation }
   }
@@ -61,7 +62,7 @@ export function placeZone(map: GameMap, x: number, y: number, zone: ZoneType): R
   if (map.infrastructure[idx] !== 0) {
     return { ok: false, reason: FailReason.Occupied }
   }
-  if (hasBuildingAt(map, x, y)) {
+  if (bldIdx.has(x, y)) {
     return { ok: false, reason: FailReason.Occupied }
   }
 
@@ -71,17 +72,6 @@ export function placeZone(map: GameMap, x: number, y: number, zone: ZoneType): R
 
 function inBounds(map: GameMap, x: number, y: number): boolean {
   return x >= 0 && y >= 0 && x < map.width && y < map.height
-}
-
-function hasBuildingAt(map: GameMap, x: number, y: number): boolean {
-  for (const b of map.buildings) {
-    const def = BUILDING_DEFS[b.defId]
-    if (!def) continue
-    if (x >= b.x && x < b.x + def.size.w && y >= b.y && y < b.y + def.size.h) {
-      return true
-    }
-  }
-  return false
 }
 
 function infraCost(infra: Infrastructure): number {

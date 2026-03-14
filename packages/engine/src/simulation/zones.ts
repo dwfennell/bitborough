@@ -1,5 +1,6 @@
 import { type GameMap, type DemandInfo, type Building, ZoneType, Infrastructure, DensityLevel } from '@bitborough/core'
 import { PRNG } from '../prng.js'
+import type { BuildingIndex } from '../building-index.js'
 
 export function updateZones(
   map: GameMap,
@@ -7,6 +8,7 @@ export function updateZones(
   demand: DemandInfo,
   prng: PRNG,
   nextBuildingId: { value: number },
+  bldIdx: BuildingIndex,
 ): { populationDelta: number } {
   const populationDelta = 0
 
@@ -19,7 +21,7 @@ export function updateZones(
 
       const powered = powerGrid[idx] !== 0
       const hasRoad = hasNearbyRoad(map, x, y)
-      const hasBuilding = map.buildings.some((b) => b.x === x && b.y === y)
+      const hasBuilding = bldIdx.has(x, y)
 
       // Development: zone is empty, powered, has road, and demand is positive
       if (!hasBuilding && powered && hasRoad) {

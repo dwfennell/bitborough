@@ -1,4 +1,5 @@
 import { type GameMap, ZoneType, Infrastructure } from '@bitborough/core'
+import type { BuildingIndex } from '../building-index.js'
 
 // Residential weights (sum to 1.0 at perfect conditions, no pollution)
 const RES_BASELINE = 0.3 // constant when power + road present
@@ -30,6 +31,7 @@ export function computeDesirability(
   crimeLevel: Uint8Array,
   fireCoverage: Uint8Array,
   pollutionLevel: Uint8Array,
+  bldIdx?: BuildingIndex,
 ): number {
   const idx = y * map.width + x
 
@@ -40,9 +42,9 @@ export function computeDesirability(
 
   switch (zone) {
     case ZoneType.Residential:
-      return residentialDesirability(x, y, idx, map, crimeLevel, fireCoverage, pollutionLevel)
+      return residentialDesirability(x, y, idx, map, crimeLevel, fireCoverage, pollutionLevel, bldIdx)
     case ZoneType.Commercial:
-      return commercialDesirability(x, y, map)
+      return commercialDesirability(x, y, map, bldIdx)
     case ZoneType.Industrial:
       return 1.0 // road + power already confirmed above
     default:
@@ -58,6 +60,7 @@ function residentialDesirability(
   crimeLevel: Uint8Array,
   fireCoverage: Uint8Array,
   pollutionLevel: Uint8Array,
+  bldIdx?: BuildingIndex,
 ): number {
   const crimeNorm = crimeLevel[idx]! / 255
   const pollNorm = pollutionLevel[idx]! / 255
@@ -65,16 +68,16 @@ function residentialDesirability(
   let score = RES_BASELINE
   score += (1 - crimeNorm) * RES_SAFETY_WEIGHT
   if (fireCoverage[idx]) score += RES_FIRE_BONUS
-  if (hasParkNearby(x, y, map)) score += RES_PARK_BONUS
+  if (hasParkNearby(x, y, map, bldIdx)) score += RES_PARK_BONUS
   score -= pollNorm * RES_POLLUTION_PENALTY
 
   return Math.max(0, Math.min(1, score))
 }
 
-function commercialDesirability(x: number, y: number, map: GameMap): number {
+function commercialDesirability(x: number, y: number, map: GameMap, bldIdx?: BuildingIndex): number {
   let score = COM_BASELINE
-  if (hasTransitNearby(x, y, map)) score += COM_TRANSIT_BONUS
-  if (hasResidentialDensity(x, y, map)) score += COM_RESIDENTIAL_BONUS
+  if (hasTransitNearby(x, y, map, bldIdx)) score += COM_TRANSIT_BONUS
+  if (hasResidentialDensity(x, y, map, bldIdx)) score += COM_RESIDENTIAL_BONUS
   return Math.max(0, Math.min(1, score))
 }
 
@@ -92,7 +95,17 @@ function hasRoadAccess(map: GameMap, x: number, y: number): boolean {
   return false
 }
 
-function hasParkNearby(x: number, y: number, map: GameMap): boolean {
+function hasParkNearby(x: number, y: number, map: GameMap, bldIdx?: BuildingIndex): boolean {
+  if (bldIdx) {
+    for (let dy = -PARK_RADIUS; dy <= PARK_RADIUS; dy++) {
+      for (let dx = -PARK_RADIUS; dx <= PARK_RADIUS; dx++) {
+        if (Math.abs(dx) + Math.abs(dy) > PARK_RADIUS) continue
+        const b = bldIdx.get(x + dx, y + dy)
+        if (b && b.defId === 'special.park' && b.state === 'active') return true
+      }
+    }
+    return false
+  }
   for (const b of map.buildings) {
     if (b.defId !== 'special.park' || b.state !== 'active') continue
     if (Math.abs(b.x - x) + Math.abs(b.y - y) <= PARK_RADIUS) return true
@@ -100,7 +113,17 @@ function hasParkNearby(x: number, y: number, map: GameMap): boolean {
   return false
 }
 
-function hasTransitNearby(x: number, y: number, map: GameMap): boolean {
+function hasTransitNearby(x: number, y: number, map: GameMap, bldIdx?: BuildingIndex): boolean {
+  if (bldIdx) {
+    for (let dy = -COM_TRANSIT_RADIUS; dy <= COM_TRANSIT_RADIUS; dy++) {
+      for (let dx = -COM_TRANSIT_RADIUS; dx <= COM_TRANSIT_RADIUS; dx++) {
+        if (Math.abs(dx) + Math.abs(dy) > COM_TRANSIT_RADIUS) continue
+        const b = bldIdx.get(x + dx, y + dy)
+        if (b && b.defId === 'transit.stop' && b.state === 'active') return true
+      }
+    }
+    return false
+  }
   for (const b of map.buildings) {
     if (b.defId !== 'transit.stop' || b.state !== 'active') continue
     if (Math.abs(b.x - x) + Math.abs(b.y - y) <= COM_TRANSIT_RADIUS) return true
@@ -108,8 +131,19 @@ function hasTransitNearby(x: number, y: number, map: GameMap): boolean {
   return false
 }
 
-function hasResidentialDensity(x: number, y: number, map: GameMap): boolean {
+function hasResidentialDensity(x: number, y: number, map: GameMap, bldIdx?: BuildingIndex): boolean {
   let count = 0
+  if (bldIdx) {
+    for (let dy = -COM_RESIDENTIAL_RADIUS; dy <= COM_RESIDENTIAL_RADIUS; dy++) {
+      for (let dx = -COM_RESIDENTIAL_RADIUS; dx <= COM_RESIDENTIAL_RADIUS; dx++) {
+        if (Math.abs(dx) + Math.abs(dy) > COM_RESIDENTIAL_RADIUS) continue
+        const b = bldIdx.get(x + dx, y + dy)
+        if (b && b.defId.startsWith('res') && b.state === 'active') count++
+        if (count >= COM_RESIDENTIAL_MIN_COUNT) return true
+      }
+    }
+    return false
+  }
   for (const b of map.buildings) {
     if (!b.defId.startsWith('res') || b.state !== 'active') continue
     if (Math.abs(b.x - x) + Math.abs(b.y - y) <= COM_RESIDENTIAL_RADIUS) count++

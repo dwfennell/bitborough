@@ -1,5 +1,6 @@
 import { type GameMap, Infrastructure, ZoneType, POWER } from '@bitborough/core'
 import { BUILDING_DEFS } from '../buildings-registry.js'
+import type { BuildingIndex } from '../building-index.js'
 
 interface PowerPlant {
   x: number
@@ -9,7 +10,7 @@ interface PowerPlant {
   capacity: number
 }
 
-export function propagatePower(map: GameMap, powerGrid: Uint8Array): void {
+export function propagatePower(map: GameMap, powerGrid: Uint8Array, bldIdx: BuildingIndex): void {
   // Clear power grid
   powerGrid.fill(0)
 
@@ -17,7 +18,7 @@ export function propagatePower(map: GameMap, powerGrid: Uint8Array): void {
   const plants = findPowerPlants(map)
 
   for (const plant of plants) {
-    bfsPower(map, powerGrid, plant)
+    bfsPower(map, powerGrid, plant, bldIdx)
   }
 }
 
@@ -51,7 +52,7 @@ function findPowerPlants(map: GameMap): PowerPlant[] {
   return plants
 }
 
-function bfsPower(map: GameMap, powerGrid: Uint8Array, plant: PowerPlant): void {
+function bfsPower(map: GameMap, powerGrid: Uint8Array, plant: PowerPlant, bldIdx: BuildingIndex): void {
   const { width, height } = map
   let remaining = plant.capacity
 
@@ -94,7 +95,7 @@ function bfsPower(map: GameMap, powerGrid: Uint8Array, plant: PowerPlant): void 
       if (remaining <= 0) break
 
       // A tile is a conductor if it has power lines, roads, or a building on it
-      if (isConductor(map, nIdx)) {
+      if (isConductor(map, nIdx, bldIdx)) {
         powerGrid[nIdx] = 1
         remaining--
         queue.push(nIdx)
@@ -103,33 +104,11 @@ function bfsPower(map: GameMap, powerGrid: Uint8Array, plant: PowerPlant): void 
   }
 }
 
-function isConductor(map: GameMap, idx: number): boolean {
+function isConductor(map: GameMap, idx: number, bldIdx: BuildingIndex): boolean {
   const infra = map.infrastructure[idx]!
-  // Power lines conduct
   if (infra & Infrastructure.PowerLine) return true
-  // Roads conduct
   if (infra & Infrastructure.Road) return true
-  // Zoned tiles conduct (so they can receive power from adjacent infrastructure)
   if (map.zones[idx] !== ZoneType.None) return true
-  // Tiles with buildings on them conduct
-  // Check if any building covers this tile
-  if (hasBuildingAt(map, idx)) return true
-  return false
-}
-
-function hasBuildingAt(map: GameMap, idx: number): boolean {
-  const { width } = map
-  const x = idx % width
-  const y = (idx - x) / width
-
-  for (const building of map.buildings) {
-    const def = BUILDING_DEFS[building.defId]
-    if (!def) continue
-    const bx = building.x
-    const by = building.y
-    if (x >= bx && x < bx + def.size.w && y >= by && y < by + def.size.h) {
-      return true
-    }
-  }
+  if (bldIdx.hasIdx(idx)) return true
   return false
 }

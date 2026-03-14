@@ -2,6 +2,7 @@ import { Infrastructure, DensityLevel, BuildingCategory, ZoneType } from '@bitbo
 import type { Building, DemandInfo, GameMap } from '@bitborough/core'
 import { BUILDING_DEFS } from '../buildings-registry.js'
 import type { PRNG } from '../prng.js'
+import { BuildingIndex } from '../building-index.js'
 import { computeDesirability } from './desirability.js'
 
 export const TRANSIT_RADIUS = 10
@@ -35,6 +36,7 @@ export function hasNearbyPavedRoad(map: GameMap, x: number, y: number): boolean 
 
 /** True if any active transit stop building exists within TRANSIT_RADIUS tiles (Manhattan distance). */
 export function hasNearbyTransitStop(map: GameMap, x: number, y: number): boolean {
+  // Transit stops are 2x2, so any tile of the stop counts
   for (const b of map.buildings) {
     if (b.defId !== 'transit.stop' || b.state !== 'active') continue
     const dist = Math.abs(b.x - x) + Math.abs(b.y - y)
@@ -60,20 +62,20 @@ export function mediumRadius(population: number): number {
 }
 
 /** True if more than half of neighbors within 3-tile radius are Medium or High density zone buildings. */
-export function hasCriticalMass(map: GameMap, x: number, y: number): boolean {
+export function hasCriticalMass(map: GameMap, x: number, y: number, bldIdx?: BuildingIndex): boolean {
   let developed = 0
   let total = 0
   const range = 3
   for (let dy = -range; dy <= range; dy++) {
     for (let dx = -range; dx <= range; dx++) {
       if (dx === 0 && dy === 0) continue
-      if (Math.abs(dx) + Math.abs(dy) > range) continue // Manhattan distance guard
+      if (Math.abs(dx) + Math.abs(dy) > range) continue
       const nx = x + dx
       const ny = y + dy
       if (nx < 0 || ny < 0 || nx >= map.width || ny >= map.height) continue
       total++
-      const neighbor = map.buildings.find((b) => b.x === nx && b.y === ny && b.state === 'active')
-      if (neighbor) {
+      const neighbor = bldIdx ? bldIdx.get(nx, ny) : map.buildings.find((b) => b.x === nx && b.y === ny && b.state === 'active')
+      if (neighbor && neighbor.state === 'active') {
         const def = BUILDING_DEFS[neighbor.defId]
         if (def && (def.density === DensityLevel.Medium || def.density === DensityLevel.High)) developed++
       }
@@ -82,17 +84,34 @@ export function hasCriticalMass(map: GameMap, x: number, y: number): boolean {
   return total > 0 && developed / total > 0.5
 }
 
-export function neighbourhoodAvgOccupancy(map: GameMap, x: number, y: number, radius: number): number {
+export function neighbourhoodAvgOccupancy(map: GameMap, x: number, y: number, radius: number, bldIdx?: BuildingIndex): number {
   let total = 0
   let count = 0
-  for (const b of map.buildings) {
-    if (b.x === x && b.y === y) continue // exclude self
-    if (b.state !== 'active') continue
-    const def = BUILDING_DEFS[b.defId]
-    if (!def || def.capacity === 0 || def.category === BuildingCategory.Special) continue
-    if (Math.abs(b.x - x) + Math.abs(b.y - y) > radius) continue
-    total += b.residents / def.capacity
-    count++
+  const seen = bldIdx ? new Set<string>() : undefined
+  if (bldIdx) {
+    for (let dy = -radius; dy <= radius; dy++) {
+      for (let dx = -radius; dx <= radius; dx++) {
+        if (Math.abs(dx) + Math.abs(dy) > radius) continue
+        if (dx === 0 && dy === 0) continue
+        const b = bldIdx.get(x + dx, y + dy)
+        if (!b || b.state !== 'active' || seen!.has(b.id)) continue
+        seen!.add(b.id)
+        const def = BUILDING_DEFS[b.defId]
+        if (!def || def.capacity === 0 || def.category === BuildingCategory.Special) continue
+        total += b.residents / def.capacity
+        count++
+      }
+    }
+  } else {
+    for (const b of map.buildings) {
+      if (b.x === x && b.y === y) continue
+      if (b.state !== 'active') continue
+      const def = BUILDING_DEFS[b.defId]
+      if (!def || def.capacity === 0 || def.category === BuildingCategory.Special) continue
+      if (Math.abs(b.x - x) + Math.abs(b.y - y) > radius) continue
+      total += b.residents / def.capacity
+      count++
+    }
   }
   return count === 0 ? 0 : total / count
 }
@@ -146,6 +165,7 @@ export function updateDensity(
   pollutionLevel: Uint8Array,
 ): { populationDelta: number } {
   let populationDelta = 0
+  const bldIdx = new BuildingIndex(map)
 
   // --- Fill/drain loop ---
   for (const building of map.buildings) {
@@ -162,6 +182,7 @@ export function updateDensity(
       crimeLevel,
       fireCoverage,
       pollutionLevel,
+      bldIdx,
     )
     const zoneDemand = getZoneDemand(building.defId, demand)
     const target = def.capacity * Math.max(0, zoneDemand) * desirability
@@ -201,7 +222,7 @@ export function updateDensity(
 
   for (const building of map.buildings) {
     if (building.state === 'under_construction') {
-      populationDelta += tickConstruction(map, building)
+      populationDelta += tickConstruction(map, building, bldIdx)
       continue
     }
 
@@ -224,7 +245,7 @@ export function updateDensity(
 
       const occupancy = def.capacity > 0 ? building.residents / def.capacity : 0
       if (occupancy < 0.7) continue
-      const neighbourAvg = neighbourhoodAvgOccupancy(map, building.x, building.y, 5)
+      const neighbourAvg = neighbourhoodAvgOccupancy(map, building.x, building.y, 5, bldIdx)
       if (neighbourAvg < 0.7) continue
 
       const dist = Math.hypot(building.x - cx, building.y - cy)
@@ -243,7 +264,7 @@ export function updateDensity(
       const variants = HIGH_VARIANTS[building.defId]
       if (!variants) continue
       if (!hasNearbyTransitStop(map, building.x, building.y)) continue
-      if (!hasCriticalMass(map, building.x, building.y)) continue
+      if (!hasCriticalMass(map, building.x, building.y, bldIdx)) continue
 
       const occupancy = def.capacity > 0 ? building.residents / def.capacity : 0
       if (occupancy < 0.85) continue
@@ -296,7 +317,7 @@ function startConstruction(building: Building, targetDefId: string): void {
   building.constructionMonthsRemaining = 2 // fixed 2 months (deterministic)
 }
 
-function tickConstruction(map: GameMap, building: Building): number {
+function tickConstruction(map: GameMap, building: Building, bldIdx: BuildingIndex): number {
   if (building.constructionMonthsRemaining === undefined) return 0
   building.constructionMonthsRemaining--
   if (building.constructionMonthsRemaining > 0) return 0
@@ -314,6 +335,7 @@ function tickConstruction(map: GameMap, building: Building): number {
     building.id,
     currentSize,
     newDef.category,
+    bldIdx,
   )
 
   if (!check.ok) {
@@ -355,9 +377,11 @@ export function checkFootprintForUpgrade(
   ownId: string,
   currentSize: { w: number; h: number },
   targetCategory: BuildingCategory,
+  bldIdx?: BuildingIndex,
 ): FootprintCheck {
   const toConsume: string[] = []
   let consumedPop = 0
+  const idx = bldIdx ?? new BuildingIndex(map)
 
   for (let dy = 0; dy < newSize.h; dy++) {
     for (let dx = 0; dx < newSize.w; dx++) {
@@ -375,16 +399,14 @@ export function checkFootprintForUpgrade(
       }
 
       // Check for buildings in this expansion tile
-      for (const b of map.buildings) {
-        if (b.id === ownId) continue
-        if (!occupiesTile(b, tx, ty)) continue
-        const bDef = BUILDING_DEFS[b.defId]
+      const bAtTile = idx.get(tx, ty)
+      if (bAtTile && bAtTile.id !== ownId) {
+        const bDef = BUILDING_DEFS[bAtTile.defId]
         if (!bDef) return { ok: false }
-        // Same-category active zone buildings can be consumed (merged into the upgrade)
-        if (bDef.category === targetCategory && bDef.category !== BuildingCategory.Special && b.state === 'active') {
-          if (!toConsume.includes(b.id)) {
-            toConsume.push(b.id)
-            consumedPop += b.residents
+        if (bDef.category === targetCategory && bDef.category !== BuildingCategory.Special && bAtTile.state === 'active') {
+          if (!toConsume.includes(bAtTile.id)) {
+            toConsume.push(bAtTile.id)
+            consumedPop += bAtTile.residents
           }
         } else {
           return { ok: false }
@@ -401,12 +423,6 @@ function categoryToZone(category: BuildingCategory): ZoneType {
   if (category === BuildingCategory.Commercial) return ZoneType.Commercial
   if (category === BuildingCategory.Industrial) return ZoneType.Industrial
   return ZoneType.None
-}
-
-function occupiesTile(b: Building, x: number, y: number): boolean {
-  const def = BUILDING_DEFS[b.defId]
-  if (!def) return false
-  return x >= b.x && x < b.x + def.size.w && y >= b.y && y < b.y + def.size.h
 }
 
 const DERELICT_DOWNGRADE_MONTHS = 6

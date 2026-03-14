@@ -1,6 +1,7 @@
 import type { GameMap } from '@bitborough/core'
 import { TileType, Infrastructure } from '@bitborough/core'
 import type { PRNG } from '../../prng.js'
+import type { BuildingIndex } from '../../building-index.js'
 import { buildInfluenceMap } from './influence.js'
 
 const FIRE_BASE_RADIUS = 15
@@ -27,7 +28,7 @@ export function calculateFireCoverage(
   }
 }
 
-export function updateFires(map: GameMap, fireState: FireState, fireCoverage: Uint8Array, prng: PRNG): void {
+export function updateFires(map: GameMap, fireState: FireState, fireCoverage: Uint8Array, prng: PRNG, bldIdx: BuildingIndex): void {
   const { width, height } = map
 
   // Tick existing fires
@@ -41,8 +42,13 @@ export function updateFires(map: GameMap, fireState: FireState, fireCoverage: Ui
       // Fire burns out — destroy zone and any building on it
       fireState.activeFires.delete(idx)
       map.zones[idx] = 0
-      const bIdx = map.buildings.findIndex((b) => b.x === idx % width && b.y === Math.floor(idx / width))
-      if (bIdx !== -1) map.buildings.splice(bIdx, 1)
+      const fx = idx % width
+      const fy = Math.floor(idx / width)
+      const burned = bldIdx.get(fx, fy)
+      if (burned) {
+        const bIdx = map.buildings.indexOf(burned)
+        if (bIdx !== -1) map.buildings.splice(bIdx, 1)
+      }
     } else {
       fireState.activeFires.set(idx, newRemaining)
 
