@@ -105,11 +105,12 @@ See full design: [2026-03-10-density-progression-design.md](../docs/plans/2026-0
 ## Milestone 5: Budget & Time
 **Goal:** Game becomes a game
 
-- [ ] Game clock (speed controls)
-- [ ] Tax income from developed zones
-- [ ] Maintenance costs (roads, power, services)
-- [ ] Budget panel UI
-- [ ] Simple cash flow
+- [x] Game clock (speed controls) — SpeedControls UI, SimSpeed.Paused/Slow/Normal/Fast
+- [x] Tax income from developed zones — `calculateBudget()` taxIncome = population × avgLandValue / 20 × taxRate
+- [x] Maintenance costs (roads, power, services) — per-tile road/powerLine + per-building maintenance
+- [x] Budget panel UI — BudgetPanel with police/fire funding sliders
+- [x] Simple cash flow — `funds += budgetInfo.balance` each month
+- [ ] Bankruptcy / game-over when funds < 0
 
 **Deliverable:** Can go bankrupt or profit, time matters
 
@@ -118,11 +119,11 @@ See full design: [2026-03-10-density-progression-design.md](../docs/plans/2026-0
 ## Milestone 6: City Services
 **Goal:** Police, fire, quality of life
 
-- [ ] Police station (reduces crime in radius)
-- [ ] Fire station (required for fire events)
-- [ ] Crime calculation affecting land value
-- [ ] Service radius visualization
-- [ ] Funding levels affect effectiveness
+- [x] Police station (reduces crime in radius) — `calculateCrime()` with police funding
+- [x] Fire station (required for fire events) — `calculateFireCoverage()`, `updateFires()`
+- [x] Crime calculation affecting land value — crime array fed into `calculateLandValues()`
+- [x] Service radius visualization — fire/crime overlays in OverlayRenderer
+- [x] Funding levels affect effectiveness — police/fire sliders in BudgetPanel
 
 **Deliverable:** Services affect city development
 
@@ -131,11 +132,11 @@ See full design: [2026-03-10-density-progression-design.md](../docs/plans/2026-0
 ## Milestone 7: Traffic & Commuting
 **Goal:** Roads matter beyond connectivity
 
-- [ ] Basic traffic simulation
-- [ ] Visual traffic density on roads
-- [ ] Traffic affects residential happiness
-- [ ] Traffic affects commercial success
-- [ ] Congestion calculation
+- [x] Basic traffic simulation — `calculateTraffic()` via DFS path routing
+- [x] Visual traffic density on roads — traffic overlay (OverlayType includes 'traffic')
+- [x] Traffic affects residential happiness — congestion > 0.8 suppresses R/C/I demand
+- [x] Traffic affects commercial success — demand suppression hits commercial equally
+- [x] Congestion calculation — `computeAverageCongestion()` across all road tiles
 
 **Deliverable:** Traffic problems emerge in growing cities
 
@@ -144,12 +145,12 @@ See full design: [2026-03-10-density-progression-design.md](../docs/plans/2026-0
 ## Milestone 8: Polish & Save/Load
 **Goal:** Actually usable game
 
-- [ ] Save game to localStorage/file
-- [ ] Load game
-- [ ] Sound effects
-- [ ] Mini-map
-- [ ] Query tool (inspect any tile)
-- [ ] Statistics graphs
+- [x] Save game to localStorage/file — SaveManager with localStorage + JSON export
+- [x] Load game — EscapeMenu save/load UI wired to SaveManager
+- [x] Sound effects — AudioManager (place, bulldoze, zone, error tones)
+- [x] Mini-map — MiniMap.ts canvas overlay
+- [x] Query tool (inspect any tile) — QueryTool + QueryPanel
+- [ ] Statistics graphs — population/funds/demand over time charts
 
 **Deliverable:** Complete SimCity 1 core experience
 

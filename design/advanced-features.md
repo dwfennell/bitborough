@@ -71,6 +71,15 @@ The "Dwarf Fortress" layer. Add these gradually after the SimCity 1 foundation i
 
 ---
 
+## Pollution System (Revisit)
+
+Current pollution is a simple radius+amount per building. Worth redesigning with density progression in mind:
+- Industrial high-density: more production value, fewer jobs, but how does pollution scale?
+- Should pollution be per-tile or per-building? A 4x4 industrial complex vs four 1x1 factories.
+- Wind direction, pollution drift, long-term contamination, cleanup mechanics.
+- Health effects on nearby residential density (dense residential near polluted industrial = bad outcomes).
+- See `research/urban-density-gradients.md` for density mechanics context.
+
 ## Wild Ideas (Maybe Someday)
 - Climate change affecting city over decades
 - Multiplayer region with connected cities
