@@ -1,6 +1,5 @@
 import { type GameMap, type DemandInfo, type Building, ZoneType, Infrastructure, DensityLevel } from '@bitborough/core'
 import { PRNG } from '../prng.js'
-import { BUILDING_DEFS } from '../buildings-registry.js'
 
 export function updateZones(
   map: GameMap,
@@ -9,7 +8,7 @@ export function updateZones(
   prng: PRNG,
   nextBuildingId: { value: number },
 ): { populationDelta: number } {
-  let populationDelta = 0
+  const populationDelta = 0
 
   for (let y = 0; y < map.height; y++) {
     for (let x = 0; x < map.width; x++) {

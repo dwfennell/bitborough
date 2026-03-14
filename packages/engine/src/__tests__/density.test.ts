@@ -1,7 +1,7 @@
 import { describe, test, expect } from 'vitest'
 import { Infrastructure, BuildingCategory, DensityLevel, ZoneType } from '@bitborough/core'
 import { BUILDING_DEFS } from '../buildings-registry.js'
-import { createTestMap, advanceMonth } from '../test-helpers.js'
+import { createTestMap } from '../test-helpers.js'
 import { PRNG } from '../prng.js'
 import { Engine } from '../Engine.js'
 import {

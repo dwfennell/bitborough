@@ -1,4 +1,4 @@
-import { type GameMap, type DemandInfo, ZoneType, Infrastructure } from '@bitborough/core'
+import { type GameMap, type DemandInfo, Infrastructure } from '@bitborough/core'
 import { BUILDING_DEFS } from '../buildings-registry.js'
 
 const TRAFFIC_CAPACITY = 100

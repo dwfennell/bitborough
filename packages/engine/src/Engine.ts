@@ -360,8 +360,6 @@ export class Engine {
   }
 
   static restore(save: SaveFile): Engine {
-    const size = save.map.width * save.map.height
-
     // Rebuild typed arrays from saved number arrays
     const map: GameMap = {
       version: save.map.version,

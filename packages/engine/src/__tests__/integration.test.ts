@@ -143,7 +143,6 @@ describe('Full city lifecycle', () => {
     advanceYear(engine)
     advanceYear(engine)
 
-    const popBefore = engine.getState().population
     const fundsBefore = engine.getState().funds
 
     const save = engine.serialize()
