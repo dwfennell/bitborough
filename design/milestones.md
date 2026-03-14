@@ -150,7 +150,7 @@ See full design: [2026-03-10-density-progression-design.md](../docs/plans/2026-0
 - [x] Sound effects — AudioManager (place, bulldoze, zone, error tones)
 - [x] Mini-map — MiniMap.ts canvas overlay
 - [x] Query tool (inspect any tile) — QueryTool + QueryPanel
-- [ ] Statistics graphs — population/funds/demand over time charts
+- [x] Statistics graphs — population/funds/demand over time charts
 
 **Deliverable:** Complete SimCity 1 core experience
 
