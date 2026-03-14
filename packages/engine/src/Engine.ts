@@ -217,9 +217,9 @@ export class Engine {
         this.events.push({ type: 'emergency_loan', amount: emergencyAmount })
       }
 
-      // 5. Negative funds warning (loan exists but still broke)
+      // 5. Bankruptcy (loan exists but still broke after emergency loan)
       if (this.funds < 0 && this.loan !== null) {
-        this.events.push({ type: 'negative_funds' })
+        this.events.push({ type: 'bankruptcy' })
       }
 
       // 6. Record monthly snapshot

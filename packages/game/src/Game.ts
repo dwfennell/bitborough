@@ -48,6 +48,8 @@ export class Game {
   private overlayLegend: OverlayLegend
   private statsPanel: StatsPanel
 
+  private bankruptcyScreen: HTMLElement
+
   private speed: SimSpeed = SimSpeed.Normal
   private simAccumulator = 0
   private lastFrameTime = 0
@@ -113,6 +115,25 @@ export class Game {
     this.docsPanel = new DocsPanel(uiOverlay)
     this.overlayLegend = new OverlayLegend(uiOverlay)
     this.statsPanel = new StatsPanel(uiOverlay)
+
+    // Bankruptcy screen
+    this.bankruptcyScreen = document.createElement('div')
+    this.bankruptcyScreen.id = 'bankruptcy-screen'
+    this.bankruptcyScreen.className = 'hidden'
+    this.bankruptcyScreen.innerHTML = `
+      <div id="bankruptcy-panel">
+        <h2>Bankruptcy</h2>
+        <p>Your city has gone bankrupt.</p>
+        <button id="bankruptcy-new-game">Start New City</button>
+      </div>
+    `
+    document.body.appendChild(this.bankruptcyScreen)
+    this.bankruptcyScreen.querySelector('#bankruptcy-new-game')!.addEventListener('click', () => {
+      this.bankruptcyScreen.classList.add('hidden')
+      cancelAnimationFrame(this.animationId)
+      this.engine = null
+      this.showNewGameScreen()
+    })
 
     // Shared actions for menu bar and keyboard shortcuts
     this.actions = [
@@ -379,6 +400,8 @@ export class Game {
       for (const event of state.events) {
         if (event.type === 'emergency_loan') {
           this.showToast(`Emergency loan of $${event.amount.toLocaleString()} taken`)
+        } else if (event.type === 'bankruptcy') {
+          this.handleBankruptcy()
         }
       }
       this.renderer.render(state)
@@ -416,6 +439,15 @@ export class Game {
     if (this.boundKeyDown) window.removeEventListener('keydown', this.boundKeyDown)
     if (this.boundKeyUp) window.removeEventListener('keyup', this.boundKeyUp)
     if (this.boundBeforeUnload) window.removeEventListener('beforeunload', this.boundBeforeUnload)
+  }
+
+  private handleBankruptcy(): void {
+    // Pause the simulation
+    this.speed = SimSpeed.Paused
+    this.speedControls.forceSpeed(SimSpeed.Paused)
+
+    // Show the bankruptcy overlay
+    this.bankruptcyScreen.classList.remove('hidden')
   }
 
   private showToast(message: string, duration = 4000): void {

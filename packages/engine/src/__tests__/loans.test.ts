@@ -236,4 +236,26 @@ describe('Loan system', () => {
       expect(state.budget.loanRepayment).toBeGreaterThan(0)
     }
   })
+
+  test('emits bankruptcy event when insolvent with active loan', () => {
+    // Start with tiny funds and lots of roads so expenses exceed any income.
+    // The engine will auto-take an emergency loan when funds first go negative.
+    // Once that loan is active, continued negative balance triggers bankruptcy.
+    const engine = Engine.create(createTestMap(32), { seed: 42, startingFunds: 200 })
+    for (let x = 0; x < 30; x++) {
+      engine.placeTile(x, 5, Infrastructure.Road)
+    }
+    let foundBankruptcy = false
+    // Advance up to 15 years; the emergency loan (~$10k) drains at ~$150/month
+    // (loan payment + road maintenance) with zero income — bankrupts ~month 70+
+    for (let i = 0; i < 180; i++) {
+      advanceMonth(engine)
+      const state = engine.getState()
+      if (state.events.some((e) => e.type === 'bankruptcy')) {
+        foundBankruptcy = true
+        break
+      }
+    }
+    expect(foundBankruptcy).toBe(true)
+  })
 })

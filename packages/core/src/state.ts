@@ -31,7 +31,7 @@ export interface Loan {
   interestRate: number
 }
 
-export type GameEvent = { type: 'emergency_loan'; amount: number } | { type: 'negative_funds' }
+export type GameEvent = { type: 'emergency_loan'; amount: number } | { type: 'negative_funds' } | { type: 'bankruptcy' }
 
 export interface MonthlySnapshot {
   month: number

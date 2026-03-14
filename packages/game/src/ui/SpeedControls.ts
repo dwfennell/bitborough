@@ -73,6 +73,14 @@ export class SpeedControls {
     this.onChange(speed)
   }
 
+  forceSpeed(speed: SimSpeed): void {
+    const speedOrder = [SimSpeed.Paused, SimSpeed.Slow, SimSpeed.Normal, SimSpeed.Fast]
+    const idx = speedOrder.indexOf(speed)
+    if (idx !== -1 && this.buttons[idx]) {
+      this.setSpeed(speed, this.buttons[idx]!)
+    }
+  }
+
   get speed(): SimSpeed {
     return this._speed
   }
