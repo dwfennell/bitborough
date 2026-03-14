@@ -32,10 +32,9 @@ export interface Loan {
   interestRate: number
 }
 
-export interface GameEvent {
-  type: 'emergency_loan' | 'negative_funds'
-  amount?: number
-}
+export type GameEvent =
+  | { type: 'emergency_loan'; amount: number }
+  | { type: 'negative_funds' }
 
 export interface DemandInfo {
   residential: number
@@ -65,11 +64,11 @@ export interface BudgetInfo {
     transit: number
     total: number
   }
+  loanRepayment: number
   balance: number
   projectedIncome: number
   projectedExpenses: number
   projectedBalance: number
-  loanRepayment: number
 }
 
 export interface GameState {
