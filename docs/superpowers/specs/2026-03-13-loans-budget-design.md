@@ -47,21 +47,31 @@ export interface Loan {
   monthsLeft: number      // months remaining at minimum payment pace
   interestRate: number    // annual rate (e.g. 0.08 = 8%)
 }
+
+export interface GameEvent {
+  type: 'emergency_loan' | 'negative_funds'
+  amount?: number
+}
 ```
 
 Extend `BudgetInfo`:
 ```ts
-loanRepayment: number   // monthly amount being repaid this month (≥ monthlyPayment)
+loanRepayment: number   // monthly repayment amount; included in balance and projectedExpenses
 ```
+
+`calculateBudget()` gains a new final parameter `loanRepayment: number` (Engine passes `Math.min(this.loanRepaymentAmount, this.loan?.remaining ?? 0)`, or 0 if no loan). It subtracts `loanRepayment` from `balance` and adds it to `projectedExpenses` so that `balance` reflects true monthly cash flow including debt service.
 
 Extend `GameState`:
 ```ts
 loan: Loan | null
+loanRepaymentAmount: number   // current repayment slider value (0 if no loan)
+events: GameEvent[]           // populated during tick, cleared at the START of the next monthly tick
 ```
 
 Extend `SaveFile.state`:
 ```ts
 loan?: Loan | null
+loanRepaymentAmount?: number   // defaults to loan.monthlyPayment on load if absent
 ```
 
 ### 2b. Loan Terms
@@ -81,61 +91,69 @@ takeLoan(amount: number): Result
 ```
 
 Failure cases:
-- `loan !== null` → new `FailReason.LoanExists` (added to core enum)
-- `amount < 10_000` → `FailReason.InvalidLocation` (reused — amount below minimum)
-- `amount > maxLoanAmount` → `FailReason.InsufficientFunds` (amount exceeds limit)
+- `loan !== null` → `FailReason.LoanExists` (new entry in core enum)
+- `amount < 10_000 || amount > maxLoanAmount` → `FailReason.AmountOutOfRange` (new entry in core enum)
 
-On success: computes `monthlyPayment`, sets `this.loan`, adds `amount` to `this.funds`.
+On success: computes `monthlyPayment` via amortization, sets `this.loan`, sets `this.loanRepaymentAmount = monthlyPayment`, adds `amount` to `this.funds`.
 
 ### 2d. Automatic Emergency Loan
 
-In `Engine.tick()`, after applying the monthly budget:
+Events are cleared at the **start** of each monthly tick (before any simulation runs). This ensures `getState()` always returns the events from the tick that just completed, and they remain visible for one full frame.
+
+In `Engine.tick()`, after applying the monthly budget (which now includes repayment):
 
 ```ts
 if (this.funds < 0 && this.loan === null) {
-  // borrow enough to cover 6 months of projected expenses
-  const emergencyAmount = Math.max(10_000, -this.funds + this.budgetInfo.projectedExpenses * 6)
-  const capped = Math.min(emergencyAmount, maxLoanAmount(this.budgetInfo))
-  this.takeLoan(capped)
-  this.events.push({ type: 'emergency_loan', amount: capped })
+  // borrow enough to cover ~6 months of base expenses (maintenance + services only)
+  const baseExpenses = this.budgetInfo.maintenanceCosts.total + this.budgetInfo.serviceCosts.total
+  const emergencyAmount = Math.max(10_000, -this.funds + baseExpenses * 6)
+  // Emergency loans bypass takeLoan() validation — applied directly to avoid silent failure
+  // on zero-income cities where maxLoanAmount would be 0
+  const r = 0.08 / 12
+  const n = 120
+  const monthlyPayment = emergencyAmount * r / (1 - Math.pow(1 + r, -n))
+  this.loan = { principal: emergencyAmount, remaining: emergencyAmount, monthlyPayment, termMonths: n, monthsLeft: n, interestRate: 0.08 }
+  this.loanRepaymentAmount = monthlyPayment
+  this.funds += emergencyAmount
+  this.events.push({ type: 'emergency_loan', amount: emergencyAmount })
 }
 ```
 
-If a loan is already active and funds go negative: funds go negative, the game continues (no hard bankruptcy — the player must manage their way out by adjusting taxes/services).
+Note: emergency loans bypass `takeLoan()` validation entirely so they always succeed, even for cities with zero tax income. `emergencyAmount` has no upper cap — the city is already insolvent.
+
+**If a loan is already active and funds go negative:** the game continues (no hard bankruptcy). Engine fires `{ type: 'negative_funds' }` event so `Game.ts` can display a persistent warning in the InfoBar or status area until funds recover.
 
 ### 2e. Repayment
 
-Monthly repayment is deducted from funds as part of the budget cycle (before the emergency loan check). The player controls repayment rate via a slider:
+Monthly repayment is applied during the budget cycle (before the emergency loan check). The player controls repayment rate via a slider:
 
-- **Range:** `monthlyPayment` (minimum) to `loan.remaining` (pay off in full)
+- **Range:** `monthlyPayment` (minimum) to `loan.remaining` (pay off in full this month)
 - **Step:** $500
-- **Stored as:** `this.loanRepaymentAmount: number` on Engine (defaults to `monthlyPayment`)
+- **Stored as:** `this.loanRepaymentAmount: number` on Engine (persisted in SaveFile)
 
-Each monthly tick:
+**Tick order within the monthly block:**
+
+1. `calculateBudget(...)` — passes `loanRepayment = Math.min(this.loanRepaymentAmount, this.loan?.remaining ?? 0)` so balance already deducts the payment
+2. `this.funds += this.budgetInfo.balance` — applies the full monthly result including repayment
+3. Update loan book only (funds already adjusted via balance):
 ```ts
-const payment = Math.min(this.loanRepaymentAmount, this.loan.remaining)
-this.loan.remaining -= payment
-this.funds -= payment
-if (this.loan.remaining <= 0) this.loan = null
+if (this.loan) {
+  const payment = this.budgetInfo.loanRepayment  // same value used in calculateBudget
+  this.loan.remaining -= payment
+  if (this.loan.remaining <= 0) { this.loan = null; this.loanRepaymentAmount = 0 }
+}
 ```
+4. Emergency loan check (if `this.funds < 0 && this.loan === null`)
 
-`loanRepayment` is included in `BudgetInfo` so BudgetPanel can display it as a line item.
+`loanRepayment` is always subtracted from `balance` exactly once — through `calculateBudget()`. The loan book update in step 3 only adjusts `loan.remaining`, never `this.funds`.
 
 ### 2f. Events Surface
 
-New field on `GameState`:
-```ts
-events: GameEvent[]   // cleared each tick, consumed by Game.ts
-```
+`Engine` holds `private events: GameEvent[] = []`. At the **start** of each monthly tick, `this.events = []` before any simulation code runs. Events pushed during the tick are available via `getState().events` until the next monthly tick clears them.
 
-```ts
-export interface GameEvent {
-  type: 'emergency_loan'
-  amount: number
-}
-```
-
-`Game.ts` reads events each tick and shows a brief notification (e.g. a toast or status bar message).
+`Game.ts` reads `state.events` after each `tick()` call:
+- `emergency_loan` → flash toast notification ("Emergency loan of $X taken")
+- `negative_funds` → show persistent warning in InfoBar while `state.funds < 0 && state.loan !== null`
 
 ---
 
@@ -164,13 +182,13 @@ export interface GameEvent {
 
 | File | Change |
 |---|---|
-| `packages/core/src/state.ts` | Add `Loan`, `GameEvent`; extend `BudgetInfo`, `GameState`, `SaveFile` |
+| `packages/core/src/state.ts` | Add `Loan`, `GameEvent`; add `LoanExists`, `AmountOutOfRange` to `FailReason`; extend `BudgetInfo` with `loanRepayment`; extend `GameState` with `loan`, `loanRepaymentAmount`, `events`; extend `SaveFile.state` with `loan`, `loanRepaymentAmount` |
 | `packages/core/src/index.ts` | Export new types |
-| `packages/engine/src/Engine.ts` | Monthly budget apply, loan state, `takeLoan()`, repayment tick, events |
-| `packages/engine/src/simulation/budget.ts` | Add `loanRepayment` to output |
-| `packages/game/src/ui/BudgetPanel.ts` | Loan UI section (take/repay/status) |
-| `packages/game/src/Game.ts` | Consume `events`, show notifications |
-| `packages/game/src/storage/SaveManager.ts` | Serialize/deserialize `loan` |
+| `packages/engine/src/Engine.ts` | Monthly budget apply, loan state, `loanRepaymentAmount`, `takeLoan()`, repayment tick, events lifecycle |
+| `packages/engine/src/simulation/budget.ts` | Accept `loanRepayment` param, include in `balance` and `projectedExpenses` |
+| `packages/game/src/ui/BudgetPanel.ts` | Loan UI section (take/repay/status), repayment slider |
+| `packages/game/src/Game.ts` | Consume `events`, show toast/InfoBar notifications |
+| `packages/game/src/storage/SaveManager.ts` | Serialize/deserialize `loan`, `loanRepaymentAmount` |
 
 ---
 
