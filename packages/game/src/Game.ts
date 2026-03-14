@@ -55,6 +55,9 @@ export class Game {
 
   private actions: GameAction[]
   private pressedKeys = new Set<string>()
+  private boundKeyDown: ((e: KeyboardEvent) => void) | null = null
+  private boundKeyUp: ((e: KeyboardEvent) => void) | null = null
+  private boundBeforeUnload: (() => void) | null = null
 
   constructor(
     private canvas: HTMLCanvasElement,
@@ -246,7 +249,7 @@ export class Game {
       }
     })
 
-    window.addEventListener('keydown', (e) => {
+    this.boundKeyDown = (e: KeyboardEvent) => {
       const inInput = e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement
       if (e.key === 'Escape') {
         const action = keyMap.get('Escape')
@@ -257,17 +260,20 @@ export class Game {
       this.pressedKeys.add(e.key)
       const action = keyMap.get(e.key)
       if (action) { e.preventDefault(); action() }
-    })
-    window.addEventListener('keyup', (e) => {
+    }
+    this.boundKeyUp = (e: KeyboardEvent) => {
       this.pressedKeys.delete(e.key)
-    })
+    }
+    window.addEventListener('keydown', this.boundKeyDown)
+    window.addEventListener('keyup', this.boundKeyUp)
   }
 
   private startLoop(): void {
     this.lastFrameTime = performance.now()
     this.loop(this.lastFrameTime)
 
-    window.addEventListener('beforeunload', () => this.autoSave())
+    this.boundBeforeUnload = () => this.autoSave()
+    window.addEventListener('beforeunload', this.boundBeforeUnload)
   }
 
   private loop(now: number): void {
@@ -353,6 +359,14 @@ export class Game {
     const tileSize = this.camera.tileSize * this.camera.zoom
     this.ctx.fillStyle = tool.getPreviewColor()
     this.ctx.fillRect(screen.x, screen.y, tileSize, tileSize)
+  }
+
+  destroy(): void {
+    cancelAnimationFrame(this.animationId)
+    this.inputManager.destroy()
+    if (this.boundKeyDown) window.removeEventListener('keydown', this.boundKeyDown)
+    if (this.boundKeyUp) window.removeEventListener('keyup', this.boundKeyUp)
+    if (this.boundBeforeUnload) window.removeEventListener('beforeunload', this.boundBeforeUnload)
   }
 
   private autoSave(): void {

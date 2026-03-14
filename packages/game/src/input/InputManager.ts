@@ -16,6 +16,12 @@ export class InputManager {
   private mapHeight = 0
   private onToolResult: ToolResultCallback | null = null
 
+  private readonly boundMouseDown = this.onMouseDown.bind(this)
+  private readonly boundMouseMove = this.onMouseMove.bind(this)
+  private readonly boundMouseUp = this.onMouseUp.bind(this)
+  private readonly boundWheel = this.onWheel.bind(this)
+  private readonly boundContextMenu = (e: Event) => e.preventDefault()
+
   constructor(
     private canvas: HTMLCanvasElement,
     private camera: Camera,
@@ -38,12 +44,20 @@ export class InputManager {
     return this.hoverTile
   }
 
+  destroy(): void {
+    this.canvas.removeEventListener('mousedown', this.boundMouseDown)
+    this.canvas.removeEventListener('mousemove', this.boundMouseMove)
+    this.canvas.removeEventListener('mouseup', this.boundMouseUp)
+    this.canvas.removeEventListener('wheel', this.boundWheel)
+    this.canvas.removeEventListener('contextmenu', this.boundContextMenu)
+  }
+
   private bindEvents(): void {
-    this.canvas.addEventListener('mousedown', this.onMouseDown.bind(this))
-    this.canvas.addEventListener('mousemove', this.onMouseMove.bind(this))
-    this.canvas.addEventListener('mouseup', this.onMouseUp.bind(this))
-    this.canvas.addEventListener('wheel', this.onWheel.bind(this), { passive: false })
-    this.canvas.addEventListener('contextmenu', (e) => e.preventDefault())
+    this.canvas.addEventListener('mousedown', this.boundMouseDown)
+    this.canvas.addEventListener('mousemove', this.boundMouseMove)
+    this.canvas.addEventListener('mouseup', this.boundMouseUp)
+    this.canvas.addEventListener('wheel', this.boundWheel, { passive: false })
+    this.canvas.addEventListener('contextmenu', this.boundContextMenu)
   }
 
   private onMouseDown(e: MouseEvent): void {

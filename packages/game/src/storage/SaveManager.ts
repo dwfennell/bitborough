@@ -2,6 +2,30 @@ import type { SaveFile } from '@bitborough/core'
 
 const SAVE_KEY = 'bitborough-save'
 
+function isValidSave(data: unknown): data is SaveFile {
+  if (typeof data !== 'object' || data === null) return false
+  const obj = data as Record<string, unknown>
+  if (typeof obj.version !== 'number') return false
+  if (typeof obj.timestamp !== 'string') return false
+
+  // Validate map
+  const map = obj.map
+  if (typeof map !== 'object' || map === null) return false
+  const m = map as Record<string, unknown>
+  if (typeof m.width !== 'number' || typeof m.height !== 'number') return false
+  if (!Array.isArray(m.buildings)) return false
+
+  // Validate state
+  const state = obj.state
+  if (typeof state !== 'object' || state === null) return false
+  const s = state as Record<string, unknown>
+  if (typeof s.funds !== 'number') return false
+  if (typeof s.month !== 'number') return false
+  if (typeof s.year !== 'number') return false
+
+  return true
+}
+
 export class SaveManager {
   constructor(private storage: Storage = localStorage) {}
 
@@ -9,14 +33,26 @@ export class SaveManager {
     return this.storage.getItem(SAVE_KEY) !== null
   }
 
-  save(data: SaveFile): void {
-    this.storage.setItem(SAVE_KEY, JSON.stringify(data))
+  save(data: SaveFile): boolean {
+    try {
+      this.storage.setItem(SAVE_KEY, JSON.stringify(data))
+      return true
+    } catch {
+      // localStorage quota exceeded or unavailable
+      return false
+    }
   }
 
   load(): SaveFile | null {
     const raw = this.storage.getItem(SAVE_KEY)
     if (!raw) return null
-    return JSON.parse(raw) as SaveFile
+    try {
+      const parsed: unknown = JSON.parse(raw)
+      if (!isValidSave(parsed)) return null
+      return parsed
+    } catch {
+      return null
+    }
   }
 
   deleteSave(): void {
@@ -46,8 +82,8 @@ export class SaveManager {
         const reader = new FileReader()
         reader.onload = () => {
           try {
-            const save = JSON.parse(reader.result as string) as SaveFile
-            resolve(save)
+            const parsed: unknown = JSON.parse(reader.result as string)
+            resolve(isValidSave(parsed) ? parsed : null)
           } catch {
             resolve(null)
           }

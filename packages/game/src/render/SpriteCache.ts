@@ -14,20 +14,26 @@ export class SpriteCache {
     if (!this.loading.has(path)) {
       const promise = this.load(path)
       this.loading.set(path, promise)
-      promise.then((img) => {
-        this.cache.set(path, img)
-        this.loading.delete(path)
-      })
+      promise.then(
+        (img) => {
+          this.cache.set(path, img)
+          this.loading.delete(path)
+        },
+        () => {
+          // Allow retry on next get() call
+          this.loading.delete(path)
+        },
+      )
     }
 
     return null
   }
 
   private load(path: string): Promise<HTMLImageElement> {
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
       const img = new Image()
       img.onload = () => resolve(img)
-      img.onerror = () => resolve(img) // Still cache to avoid retry loops
+      img.onerror = () => reject(new Error(`Failed to load sprite: ${path}`))
       img.src = path
     })
   }
