@@ -24,5 +24,7 @@ export {
   type BudgetInfo,
   type GameState,
   type SaveFile,
+  type Loan,
+  type GameEvent,
 } from './state.js'
 export { DEFAULTS, COSTS, MAINTENANCE, POWER } from './constants.js'

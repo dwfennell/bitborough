@@ -19,6 +19,22 @@ export enum FailReason {
   NoPower,
   NotBulldozable,
   NotZonable,
+  LoanExists,
+  AmountOutOfRange,
+}
+
+export interface Loan {
+  principal: number
+  remaining: number
+  monthlyPayment: number
+  termMonths: number
+  monthsLeft: number
+  interestRate: number
+}
+
+export interface GameEvent {
+  type: 'emergency_loan' | 'negative_funds'
+  amount?: number
 }
 
 export interface DemandInfo {
@@ -53,6 +69,7 @@ export interface BudgetInfo {
   projectedIncome: number
   projectedExpenses: number
   projectedBalance: number
+  loanRepayment: number
 }
 
 export interface GameState {
@@ -74,6 +91,9 @@ export interface GameState {
   fireCoverage: Uint8Array
   trafficDensity: Uint8Array
   activeFires: number[]
+  loan: Loan | null
+  loanRepaymentAmount: number
+  events: GameEvent[]
 }
 
 export interface SaveFile {
@@ -89,6 +109,8 @@ export interface SaveFile {
     funding: Record<string, number>
     seed: number
     activeFires?: Array<[number, number]>
+    loan?: Loan | null
+    loanRepaymentAmount?: number
   }
   timestamp: string
 }
