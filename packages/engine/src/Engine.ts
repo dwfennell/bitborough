@@ -5,6 +5,8 @@ import {
   type BudgetInfo,
   type Building,
   type Result,
+  type Loan,
+  type GameEvent,
   TileType,
   ZoneType,
   Infrastructure,
@@ -85,6 +87,11 @@ export class Engine {
   // Spatial index for O(1) building lookups; rebuilt when buildings change
   private bldIdx: BuildingIndex
 
+  // Loan system
+  private loan: Loan | null = null
+  private loanRepaymentAmount: number = 0
+  private events: GameEvent[] = []
+
   private constructor(map: GameMap, config: EngineConfig) {
     this.map = map
     this.prng = new PRNG(config.seed ?? Date.now())
@@ -130,6 +137,9 @@ export class Engine {
 
     // Monthly systems
     if (this.tickCount % this.ticksPerMonth === 0) {
+      // 0. Clear events at start of monthly tick
+      this.events = []
+
       // Rebuild index — buildings may change during monthly simulation
       this.bldIdx = new BuildingIndex(this.map)
       this.month++
@@ -168,9 +178,43 @@ export class Engine {
       this.nextBuildingId = nextBuildingIdRef.value
       this.population = Math.max(0, this.population + densityDelta)
 
-      // Budget projections (balance applied monthly)
-      this.budgetInfo = calculateBudget(this.map, this.population, this.taxRate, this.landValues, this.funding)
+      // 1. Compute budget including loan repayment
+      const loanRepayment = this.loan
+        ? Math.min(this.loanRepaymentAmount, this.loan.remaining)
+        : 0
+      this.budgetInfo = calculateBudget(this.map, this.population, this.taxRate, this.landValues, this.funding, loanRepayment)
+
+      // 2. Apply monthly balance (already includes repayment deduction)
       this.funds += this.budgetInfo.balance
+
+      // 3. Update loan book (funds already adjusted via balance)
+      if (this.loan) {
+        const payment = this.budgetInfo.loanRepayment
+        this.loan.remaining -= payment
+        this.loan.monthsLeft = Math.max(0, this.loan.monthsLeft - 1)
+        if (this.loan.remaining <= 0) {
+          this.loan = null
+          this.loanRepaymentAmount = 0
+        }
+      }
+
+      // 4. Emergency loan check
+      if (this.funds < 0 && this.loan === null) {
+        const baseExpenses = this.budgetInfo.maintenanceCosts.total + this.budgetInfo.serviceCosts.total
+        const emergencyAmount = Math.max(10_000, -this.funds + baseExpenses * 6)
+        const r = 0.08 / 12
+        const n = 120
+        const monthlyPayment = emergencyAmount * r / (1 - Math.pow(1 + r, -n))
+        this.loan = { principal: emergencyAmount, remaining: emergencyAmount, monthlyPayment, termMonths: n, monthsLeft: n, interestRate: 0.08 }
+        this.loanRepaymentAmount = monthlyPayment
+        this.funds += emergencyAmount
+        this.events.push({ type: 'emergency_loan', amount: emergencyAmount })
+      }
+
+      // 5. Negative funds warning (loan exists but still broke)
+      if (this.funds < 0 && this.loan !== null) {
+        this.events.push({ type: 'negative_funds' })
+      }
     }
   }
 
@@ -194,9 +238,9 @@ export class Engine {
       fireCoverage: this.fireCoverage,
       trafficDensity: this.trafficDensity,
       activeFires: Array.from(this.fireState.activeFires.keys()),
-      loan: null,
-      loanRepaymentAmount: 0,
-      events: [],
+      loan: this.loan,
+      loanRepaymentAmount: this.loanRepaymentAmount,
+      events: this.events,
     }
   }
 
@@ -331,6 +375,26 @@ export class Engine {
   setFunding(service: 'police' | 'fire' | 'transit', level: number): void {
     this.funding[service] = Math.max(0, Math.min(100, level))
     this.budgetInfo = calculateBudget(this.map, this.population, this.taxRate, this.landValues, this.funding)
+  }
+
+  takeLoan(amount: number): Result {
+    if (this.loan !== null) return { ok: false, reason: FailReason.LoanExists }
+    const maxLoanAmount = this.budgetInfo.taxIncome * 48
+    if (amount < 10_000 || amount > maxLoanAmount) return { ok: false, reason: FailReason.AmountOutOfRange }
+    const r = 0.08 / 12
+    const n = 120
+    const monthlyPayment = amount * r / (1 - Math.pow(1 + r, -n))
+    this.loan = { principal: amount, remaining: amount, monthlyPayment, termMonths: n, monthsLeft: n, interestRate: 0.08 }
+    this.loanRepaymentAmount = monthlyPayment
+    this.funds += amount
+    return { ok: true }
+  }
+
+  setLoanRepayment(amount: number): Result {
+    if (this.loan === null) return { ok: false, reason: FailReason.LoanExists }
+    if (amount < this.loan.monthlyPayment || amount > this.loan.remaining) return { ok: false, reason: FailReason.AmountOutOfRange }
+    this.loanRepaymentAmount = amount
+    return { ok: true }
   }
 
   serialize(): SaveFile {
