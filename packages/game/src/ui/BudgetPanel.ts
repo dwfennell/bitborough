@@ -133,6 +133,7 @@ export class BudgetPanel {
       // Will be handled via update — access loan from last state
       // Store loan in field for payoff button access
       if (this._lastLoan) {
+        this.repaymentSlider.dataset.userSet = 'true'
         this.onSetRepayment(this._lastLoan.remaining)
       }
     })

@@ -81,7 +81,10 @@ export class Game {
       uiOverlay,
       (rate) => this.engine?.setTaxRate(rate),
       (service, level) => this.engine?.setFunding(service, level),
-      (amount) => this.engine?.takeLoan(amount),
+      (amount) => {
+        const result = this.engine?.takeLoan(amount)
+        if (result && !result.ok) this.audioManager.playError()
+      },
       (amount) => this.engine?.setLoanRepayment(amount),
     )
     this.queryPanel = new QueryPanel(uiOverlay)
