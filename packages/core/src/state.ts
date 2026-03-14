@@ -33,6 +33,18 @@ export interface Loan {
 
 export type GameEvent = { type: 'emergency_loan'; amount: number } | { type: 'negative_funds' }
 
+export interface MonthlySnapshot {
+  month: number
+  year: number
+  population: number
+  funds: number
+  taxIncome: number   // budgetInfo.taxIncome
+  expenses: number    // budgetInfo.projectedExpenses
+  rDemand: number     // demand.residential, -1..1
+  cDemand: number     // demand.commercial, -1..1
+  iDemand: number     // demand.industrial, -1..1
+}
+
 export interface DemandInfo {
   residential: number
   commercial: number
@@ -90,6 +102,7 @@ export interface GameState {
   loan: Loan | null
   loanRepaymentAmount: number
   events: GameEvent[]
+  history: MonthlySnapshot[]
 }
 
 /** Compute the fixed monthly payment for an amortized loan. */
@@ -113,6 +126,7 @@ export interface SaveFile {
     activeFires?: Array<[number, number]>
     loan?: Loan | null
     loanRepaymentAmount?: number
+    history?: MonthlySnapshot[]   // optional for backwards compatibility; [] if absent
   }
   timestamp: string
 }
