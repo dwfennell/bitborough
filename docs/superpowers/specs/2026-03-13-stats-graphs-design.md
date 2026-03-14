@@ -23,7 +23,7 @@ export interface MonthlySnapshot {
   year: number
   population: number
   funds: number
-  income: number      // budgetInfo.taxIncome for that month
+  taxIncome: number   // budgetInfo.taxIncome for that month (matches BudgetInfo field name)
   expenses: number    // budgetInfo.projectedExpenses (maintenance + services + loanRepayment)
   rDemand: number     // demand.residential, range -1..1
   cDemand: number     // demand.commercial
@@ -56,7 +56,7 @@ const snapshot: MonthlySnapshot = {
   year: this.year,
   population: this.population,
   funds: this.funds,
-  income: this.budgetInfo.taxIncome,
+  taxIncome: this.budgetInfo.taxIncome,
   expenses: this.budgetInfo.projectedExpenses,
   rDemand: this.demand.residential,
   cDemand: this.demand.commercial,
@@ -78,7 +78,18 @@ if (this.history.length > 1200) this.history.shift()  // cap at 100 years
 
 A new `StatsPanel` class in `packages/game/src/ui/StatsPanel.ts`. Toggled by keyboard shortcut `g` (added to `Game.ts` actions). Panel is a floating overlay (same pattern as BudgetPanel) with a close button.
 
-Panel contains a single `<canvas>` element that StatsPanel draws into. The panel is 480×400px. Six charts are laid out in a 2-column × 3-row grid (each chart ~220×110px with 8px padding).
+Panel contains a single `<canvas>` element that StatsPanel draws into. The panel is 480×400px logical size. Six charts are laid out in a 2-column × 3-row grid (each chart ~220×110px with 8px padding).
+
+**HiDPI / devicePixelRatio:** apply the standard pattern so charts are crisp on retina screens:
+```ts
+const dpr = window.devicePixelRatio || 1
+canvas.width = 480 * dpr
+canvas.height = 400 * dpr
+canvas.style.width = '480px'
+canvas.style.height = '400px'
+ctx.scale(dpr, dpr)
+```
+All drawing coordinates remain in logical pixels (0–480, 0–400).
 
 ### 3b. Charts
 
@@ -86,7 +97,7 @@ Panel contains a single `<canvas>` element that StatsPanel draws into. The panel
 |---|---|---|
 | 1 | Population | `population` |
 | 2 | Treasury | `funds` |
-| 3 | Monthly Cash Flow | `income` (green), `expenses` (red) |
+| 3 | Monthly Cash Flow | `taxIncome` (green), `expenses` (red) |
 | 4 | Residential Demand | `rDemand` |
 | 5 | Commercial Demand | `cDemand` |
 | 6 | Industrial Demand | `iDemand` |
@@ -107,7 +118,11 @@ Drawn with Canvas 2D — no third-party library. On each `update(state)` call (o
 
 **X-axis window:** always shows the last N snapshots where N fits in the chart width (1 px per month at 220px = 220 months ≈ 18 years; all history if shorter). No interactive pan/zoom in this iteration.
 
-**Y-axis:** auto-scaled per chart per update. Demand charts always show `-1..1`. Population and funds use `[0, max * 1.1]`. Income/expenses use `[0, max(income, expenses) * 1.1]`.
+**Y-axis:** auto-scaled per chart per update. Demand charts always show `-1..1`. Population and funds use `[0, max * 1.1]`. Income/expenses use `[0, max(taxIncome, expenses) * 1.1]`.
+
+**Funds line color:** determined per-render based on the current (last) value in the series — `#81c784` (green) if `funds >= 0`, `#e57373` (red) if negative. The entire line uses the same color (not per-segment).
+
+**Empty / single-point history:** if `history.length === 0`, render a centered "No data yet" message in each chart area. If `history.length === 1` or all values in a series are equal (zero Y range), use a default Y range of `[0, 1]` (or `[-1, 1]` for demand) to prevent division by zero in coordinate mapping.
 
 ### 3d. Styling
 
@@ -124,11 +139,23 @@ Consistent with existing UI (dark panel background `#1a1a1a`, text `#e0e0e0`, pa
 
 ## 4. Save/Load Integration
 
-`SaveManager` already serializes `SaveFile` as JSON. `MonthlySnapshot[]` is a plain array of plain objects — no special handling needed beyond including it in the save/load path.
+`MonthlySnapshot[]` is a plain array of plain objects — JSON-serializable without special handling. However, `Engine.serialize()` constructs its return value explicitly (not via `JSON.stringify(this)`), so `history` must be added explicitly:
 
-`Engine.restore(saveFile)` (or wherever save data is applied) sets `this.history = saveFile.state.history ?? []`.
+**In `Engine.serialize()`:**
+```ts
+state: {
+  // ... existing fields ...
+  history: this.history,
+}
+```
 
-`SaveFile.version` should be bumped so old saves without `history` are handled gracefully (the `?? []` default handles this regardless of version check, but bumping makes it explicit).
+**In `Engine.restore(save)`:**
+```ts
+engine.history = save.state.history ?? []
+```
+This follows the existing pattern (e.g. `engine.funding = save.state.funding ?? defaults`).
+
+`SaveFile.version` should be bumped (2 → 3) to signal the schema change. Old saves without `history` are handled gracefully by `?? []`.
 
 ---
 
@@ -138,10 +165,10 @@ Consistent with existing UI (dark panel background `#1a1a1a`, text `#e0e0e0`, pa
 |---|---|
 | `packages/core/src/state.ts` | Add `MonthlySnapshot`; extend `GameState` with `history`; extend `SaveFile.state` with `history` |
 | `packages/core/src/index.ts` | Export `MonthlySnapshot` |
-| `packages/engine/src/Engine.ts` | `private history`, append snapshot each month, expose in `getState()`, restore from save |
+| `packages/engine/src/Engine.ts` | `private history`, append snapshot each month, expose in `getState()`, add `history` to `serialize()` return, restore in `static restore()`, bump save version 2→3 |
 | `packages/game/src/ui/StatsPanel.ts` | New file — Canvas 2D chart panel |
 | `packages/game/src/Game.ts` | Instantiate StatsPanel, wire `g` key, call `statsPanel.update(state)` each frame |
-| `packages/game/src/storage/SaveManager.ts` | Include `history` in serialize/deserialize path (likely automatic via JSON) |
+| `packages/game/src/storage/SaveManager.ts` | No change — `history` flows through automatically once added to `SaveFile` type |
 
 ---
 
