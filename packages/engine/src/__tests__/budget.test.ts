@@ -101,6 +101,10 @@ describe('Budget system', () => {
 
     expect(withLoan.loanRepayment).toBe(500)
     expect(withLoan.balance).toBe(withoutLoan.balance - 500)
+    expect(withLoan.projectedBalance).toBe(withoutLoan.projectedBalance - 500)
     expect(withLoan.projectedExpenses).toBe(withoutLoan.projectedExpenses + 500)
+
+    const withLargeLoan = calculateBudget(map, 0, 0.07, landValues, funding, 999_999)
+    expect(withLargeLoan.balance).toBe(withoutLoan.balance - 999_999)
   })
 })
