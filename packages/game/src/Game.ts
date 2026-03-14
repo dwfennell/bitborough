@@ -365,6 +365,14 @@ export class Game {
           this.ticksSinceSave = 0
         }
       }
+
+      if (result.ticks > 0) {
+        for (const event of this.engine.getState().events) {
+          if (event.type === 'emergency_loan') {
+            this.showToast(`Emergency loan of $${event.amount.toLocaleString()} taken`)
+          }
+        }
+      }
     }
 
     if (this.engine) {
@@ -403,6 +411,14 @@ export class Game {
     if (this.boundKeyDown) window.removeEventListener('keydown', this.boundKeyDown)
     if (this.boundKeyUp) window.removeEventListener('keyup', this.boundKeyUp)
     if (this.boundBeforeUnload) window.removeEventListener('beforeunload', this.boundBeforeUnload)
+  }
+
+  private showToast(message: string, duration = 4000): void {
+    const toast = document.createElement('div')
+    toast.className = 'toast'
+    toast.textContent = message
+    document.body.appendChild(toast)
+    setTimeout(() => toast.remove(), duration)
   }
 
   private autoSave(): void {

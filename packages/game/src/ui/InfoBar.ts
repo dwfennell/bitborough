@@ -11,6 +11,7 @@ export class InfoBar {
   private rBar: HTMLElement
   private cBar: HTMLElement
   private iBar: HTMLElement
+  private insolventEl: HTMLElement
 
   // Cached values to avoid redundant DOM writes
   private lastPop = -1
@@ -22,6 +23,7 @@ export class InfoBar {
   private lastDemandR = NaN
   private lastDemandC = NaN
   private lastDemandI = NaN
+  private lastInsolvent = false
 
   constructor(container: HTMLElement) {
     this.el = document.createElement('div')
@@ -36,6 +38,7 @@ export class InfoBar {
         <span class="demand-c" title="Commercial">C</span>
         <span class="demand-i" title="Industrial">I</span>
       </span>
+      <span id="infobar-insolvent" class="hidden" style="color:#e57373">&#9888; Insolvent</span>
     `
     container.appendChild(this.el)
 
@@ -46,6 +49,7 @@ export class InfoBar {
     this.rBar = this.el.querySelector('.demand-r') as HTMLElement
     this.cBar = this.el.querySelector('.demand-c') as HTMLElement
     this.iBar = this.el.querySelector('.demand-i') as HTMLElement
+    this.insolventEl = this.el.querySelector('#infobar-insolvent') as HTMLElement
   }
 
   update(state: GameState): void {
@@ -99,6 +103,12 @@ export class InfoBar {
       const style = computeDemandBarStyle(industrial, maxH)
       this.iBar.style.height = `${style.height}px`
       this.iBar.style.opacity = style.opacity
+    }
+
+    const isInsolvent = state.funds < 0 && state.loan !== null
+    if (isInsolvent !== this.lastInsolvent) {
+      this.lastInsolvent = isInsolvent
+      this.insolventEl.classList.toggle('hidden', !isInsolvent)
     }
   }
 }

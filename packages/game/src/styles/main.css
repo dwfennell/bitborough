@@ -599,3 +599,23 @@ html, body {
   background: rgba(60, 80, 120, 0.95);
   border-color: #5c9ce6;
 }
+
+/* Utility */
+.hidden { display: none !important; }
+
+/* Toast notifications */
+.toast {
+  position: fixed;
+  bottom: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(20, 20, 40, 0.95);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 6px;
+  padding: 10px 18px;
+  font-size: 14px;
+  color: #e0e0e0;
+  z-index: 200;
+  pointer-events: none;
+  white-space: nowrap;
+}
