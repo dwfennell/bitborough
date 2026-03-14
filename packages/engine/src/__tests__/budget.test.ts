@@ -1,32 +1,32 @@
 import { describe, test, expect } from 'vitest'
 import { Engine } from '../Engine.js'
-import { createTestMap, advanceYear } from '../test-helpers.js'
+import { createTestMap, advanceYear, advanceMonth } from '../test-helpers.js'
 import { Infrastructure, ZoneType, createEmptyMap } from '@bitborough/core'
 import { calculateBudget } from '../simulation/budget.js'
 
 describe('Budget system', () => {
-  test('road maintenance deducted annually', () => {
+  test('road maintenance deducted monthly', () => {
     const engine = Engine.create(createTestMap(32), { seed: 42 })
     // Place 10 road tiles (cost: $100 construction)
     for (let x = 5; x < 15; x++) {
       engine.placeTile(x, 10, Infrastructure.Road)
     }
     const afterConstruction = engine.getState().funds
-    advanceYear(engine) // 48 ticks
+    advanceYear(engine) // 48 ticks = 12 months
     const afterYear = engine.getState().funds
-    // Should have deducted $10 maintenance (10 tiles × $1/tile)
+    // $1/tile/month × 10 tiles × 12 months = $120
     // (no tax income since no developed zones)
-    expect(afterYear).toBe(afterConstruction - 10)
+    expect(afterYear).toBe(afterConstruction - 120)
   })
 
-  test('power plant maintenance deducted annually', () => {
+  test('power plant maintenance deducted monthly', () => {
     const engine = Engine.create(createTestMap(32), { seed: 42 })
-    engine.placeBuilding(0, 0, 'power.coal') // costs $3,000
+    engine.placeBuilding(0, 0, 'power.coal') // costs $2,000
     const afterPlacement = engine.getState().funds
     advanceYear(engine)
     const afterYear = engine.getState().funds
-    // Coal plant maintenance: $60/year
-    expect(afterYear).toBe(afterPlacement - 60)
+    // Coal plant maintenance: $60/month × 12 months = $720/year
+    expect(afterYear).toBe(afterPlacement - 720)
   })
 
   test('tax income collected from developed zones', () => {
@@ -89,6 +89,19 @@ describe('Budget system', () => {
     // Now have $5 left — can't afford another road
     const result = engine.placeTile(6, 5, Infrastructure.Road)
     expect(result.ok).toBe(false)
+  })
+
+  test('budget balance applied every monthly tick', () => {
+    const engine = Engine.create(createTestMap(32), { seed: 42 })
+    // Place 10 road tiles so there is a non-zero (negative) balance each month
+    for (let x = 5; x < 15; x++) {
+      engine.placeTile(x, 10, Infrastructure.Road)
+    }
+    const before = engine.getState().funds
+    // Advance exactly one month (4 ticks) — funds should change immediately
+    advanceMonth(engine)
+    const after = engine.getState().funds
+    expect(after).not.toBe(before)
   })
 
   test('loanRepayment is subtracted from balance and added to projectedExpenses', () => {

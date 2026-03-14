@@ -168,12 +168,9 @@ export class Engine {
       this.nextBuildingId = nextBuildingIdRef.value
       this.population = Math.max(0, this.population + densityDelta)
 
-      // Budget projections (balance applied annually)
+      // Budget projections (balance applied monthly)
       this.budgetInfo = calculateBudget(this.map, this.population, this.taxRate, this.landValues, this.funding)
-      if (this.month === 1) {
-        // Year just started — apply last year's balance
-        this.funds += this.budgetInfo.balance
-      }
+      this.funds += this.budgetInfo.balance
     }
   }
 
