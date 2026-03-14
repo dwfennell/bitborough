@@ -15,6 +15,7 @@ import { MiniMap } from './ui/MiniMap.js'
 import { EscapeMenu } from './ui/EscapeMenu.js'
 import { DocsPanel } from './ui/DocsPanel.js'
 import { OverlayLegend } from './ui/OverlayLegend.js'
+import { StatsPanel } from './ui/StatsPanel.js'
 import { AudioManager } from './audio/AudioManager.js'
 import { SaveManager } from './storage/SaveManager.js'
 import { TICK_INTERVALS, advanceTicks } from './utils/tick-accumulator.js'
@@ -45,6 +46,7 @@ export class Game {
   private escapeMenu: EscapeMenu
   private docsPanel: DocsPanel
   private overlayLegend: OverlayLegend
+  private statsPanel: StatsPanel
 
   private speed: SimSpeed = SimSpeed.Normal
   private simAccumulator = 0
@@ -110,11 +112,13 @@ export class Game {
     })
     this.docsPanel = new DocsPanel(uiOverlay)
     this.overlayLegend = new OverlayLegend(uiOverlay)
+    this.statsPanel = new StatsPanel(uiOverlay)
 
     // Shared actions for menu bar and keyboard shortcuts
     this.actions = [
       { label: 'Budget (B)', key: 'b', action: () => this.budgetPanel.toggle() },
       { label: 'Guide (G)', key: 'g', action: () => this.docsPanel.toggle() },
+      { label: 'Stats (H)', key: 'h', action: () => this.statsPanel.toggle() },
       { label: 'Power (P)', key: 'p', action: () => this.renderer.toggleOverlay('power') },
       { label: 'Value (V)', key: 'v', action: () => this.renderer.toggleOverlay('landValue') },
       { label: 'Crime (C)', key: 'c', action: () => this.renderer.toggleOverlay('crime') },
@@ -262,12 +266,14 @@ export class Game {
         this.docsPanel.isVisible ||
         this.budgetPanel.isVisible ||
         this.queryPanel.isVisible ||
+        this.statsPanel.isVisible ||
         this.toolManager.activeTool
       ) {
         this.toolManager.clear()
         this.queryPanel.hide()
         this.budgetPanel.hide()
         this.docsPanel.hide()
+        this.statsPanel.hide()
       } else {
         this.escapeMenu.show()
       }
@@ -378,6 +384,7 @@ export class Game {
       this.renderer.render(state)
       this.infoBar.update(state)
       this.budgetPanel.update(state)
+      this.statsPanel.update(state)
       this.overlayLegend.update(this.renderer.activeOverlay)
       this.drawToolPreview(state)
 
