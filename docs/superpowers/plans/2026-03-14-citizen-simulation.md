@@ -1486,7 +1486,7 @@ pnpm -F @bitborough/engine test
 ```
 Expected: all tests PASS.
 
-- [ ] **Step 9: Commit**
+- [ ] **Step 8: Commit**
 
 ```bash
 git add packages/engine/src/Engine.ts packages/engine/src/simulation/traffic.ts packages/engine/src/__tests__/traffic.test.ts
