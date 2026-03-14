@@ -82,6 +82,9 @@ export class Engine {
   // Reusable buffer for radial influence calculations (avoids per-tick allocation)
   private influenceBuffer: Float32Array
 
+  // Spatial index for O(1) building lookups; rebuilt when buildings change
+  private bldIdx: BuildingIndex
+
   private constructor(map: GameMap, config: EngineConfig) {
     this.map = map
     this.prng = new PRNG(config.seed ?? Date.now())
@@ -103,6 +106,7 @@ export class Engine {
     this.trafficDensity = new Uint8Array(size)
     this.fireState = createFireState()
     this.influenceBuffer = new Float32Array(size)
+    this.bldIdx = new BuildingIndex(map)
 
     // Initialize demand
     this.demand = calculateDemand(this.map, this.taxRate)
@@ -121,14 +125,13 @@ export class Engine {
   tick(): void {
     this.tickCount++
 
-    // Build spatial index (used by power propagation and monthly systems)
-    const bldIdx = new BuildingIndex(this.map)
-
-    // Power propagation runs every tick
-    propagatePower(this.map, this.powerGrid, bldIdx)
+    // Power propagation runs every tick (uses cached building index)
+    propagatePower(this.map, this.powerGrid, this.bldIdx)
 
     // Monthly systems
     if (this.tickCount % this.ticksPerMonth === 0) {
+      // Rebuild index — buildings may change during monthly simulation
+      this.bldIdx = new BuildingIndex(this.map)
       this.month++
       if (this.month > this.monthsPerYear) {
         this.month = 1
@@ -138,15 +141,15 @@ export class Engine {
       this.demand = calculateDemand(this.map, this.taxRate, this.trafficDensity)
 
       // Land values use previous month's crime; crime uses updated land values
-      calculateLandValues(this.map, this.powerGrid, this.pollutionLevel, this.crimeLevel, this.landValues, bldIdx)
+      calculateLandValues(this.map, this.powerGrid, this.pollutionLevel, this.crimeLevel, this.landValues, this.bldIdx)
       calculateCrime(this.map, this.landValues, this.crimeLevel, this.funding.police, this.influenceBuffer)
       calculateFireCoverage(this.map, this.fireCoverage, this.funding.fire, this.influenceBuffer)
-      updateFires(this.map, this.fireState, this.fireCoverage, this.prng, bldIdx)
+      updateFires(this.map, this.fireState, this.fireCoverage, this.prng, this.bldIdx)
       calculateTraffic(this.map, this.trafficDensity)
 
       // Zone development
       const nextBuildingIdRef = { value: this.nextBuildingId }
-      const { populationDelta } = updateZones(this.map, this.powerGrid, this.demand, this.prng, nextBuildingIdRef, bldIdx)
+      const { populationDelta } = updateZones(this.map, this.powerGrid, this.demand, this.prng, nextBuildingIdRef, this.bldIdx)
       this.nextBuildingId = nextBuildingIdRef.value
       this.population += populationDelta
 
@@ -217,7 +220,7 @@ export class Engine {
   }
 
   placeTile(x: number, y: number, infra: Infrastructure): Result {
-    const { result, cost } = placeTile(this.map, x, y, infra, this.funds, new BuildingIndex(this.map))
+    const { result, cost } = placeTile(this.map, x, y, infra, this.funds, this.bldIdx)
     this.funds -= cost
     if (result.ok) {
       updateConnections(this.map, x, y)
@@ -226,7 +229,7 @@ export class Engine {
   }
 
   placeZone(x: number, y: number, zone: ZoneType): Result {
-    return placeZone(this.map, x, y, zone, new BuildingIndex(this.map))
+    return placeZone(this.map, x, y, zone, this.bldIdx)
   }
 
   upgradeTile(x: number, y: number): Result {
@@ -255,6 +258,7 @@ export class Engine {
     this.funds -= cost
     if (result.ok) {
       updateConnections(this.map, x, y)
+      this.bldIdx = new BuildingIndex(this.map)
     }
     return result
   }
@@ -286,10 +290,9 @@ export class Engine {
     }
 
     // Check overlap with existing buildings using spatial index
-    const bldIdx = new BuildingIndex(this.map)
     for (let dy = 0; dy < def.size.h; dy++) {
       for (let dx = 0; dx < def.size.w; dx++) {
-        if (bldIdx.has(x + dx, y + dy)) {
+        if (this.bldIdx.has(x + dx, y + dy)) {
           return { ok: false, reason: FailReason.Occupied }
         }
       }
@@ -309,6 +312,7 @@ export class Engine {
     }
 
     this.map.buildings.push(building)
+    this.bldIdx = new BuildingIndex(this.map)
     this.funds -= def.cost
 
     // Clear zones under the building footprint
@@ -431,7 +435,7 @@ export class Engine {
       .reduce((sum, b) => sum + (b.residents ?? 0), 0)
 
     // Rebuild derived state
-    propagatePower(engine.map, engine.powerGrid, new BuildingIndex(engine.map))
+    propagatePower(engine.map, engine.powerGrid, engine.bldIdx)
     engine.demand = calculateDemand(engine.map, engine.taxRate)
     engine.budgetInfo = calculateBudget(
       engine.map,

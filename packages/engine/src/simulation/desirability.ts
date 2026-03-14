@@ -35,8 +35,6 @@ export function computeDesirability(
 ): number {
   const idx = y * map.width + x
 
-  // Infrastructure gate: no power OR no road access within 3 tiles → 0
-  // Uses same 3-tile Manhattan distance as zone development (hasNearbyRoad in zones.ts)
   if (!powerGrid[idx]) return 0
   if (!hasRoadAccess(map, x, y)) return 0
 
@@ -46,7 +44,7 @@ export function computeDesirability(
     case ZoneType.Commercial:
       return commercialDesirability(x, y, map, bldIdx)
     case ZoneType.Industrial:
-      return 1.0 // road + power already confirmed above
+      return 1.0
     default:
       return 0
   }
