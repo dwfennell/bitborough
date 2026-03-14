@@ -167,13 +167,26 @@ export class StatsPanel {
     } else if (def.secondSeries) {
       // Income/expenses: 0 to max of both series * 1.1
       const secondValues = slice.map(def.secondSeries.getValue)
-      const allVals = [...values, ...secondValues]
-      yMax = Math.max(...allVals) * 1.1
-      if (yMax === 0) yMax = 1
+      let allMin = Infinity
+      let allMax = -Infinity
+      for (const v of values) {
+        if (v < allMin) allMin = v
+        if (v > allMax) allMax = v
+      }
+      for (const v of secondValues) {
+        if (v < allMin) allMin = v
+        if (v > allMax) allMax = v
+      }
+      yMin = Math.min(0, allMin)
+      yMax = allMax > 0 ? allMax * 1.1 : 1
     } else {
       // Population, funds: show full range — funds can go negative
-      const seriesMin = Math.min(...values)
-      const seriesMax = Math.max(...values)
+      let seriesMin = values[0] ?? 0
+      let seriesMax = values[0] ?? 0
+      for (const v of values) {
+        if (v < seriesMin) seriesMin = v
+        if (v > seriesMax) seriesMax = v
+      }
       yMin = Math.min(0, seriesMin)      // always include 0; extend down if negative
       yMax = seriesMax > 0 ? seriesMax * 1.1 : 1
     }
