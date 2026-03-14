@@ -543,6 +543,18 @@ html, body {
   image-rendering: pixelated;
 }
 
+/* Stats Panel */
+#stats-panel {
+  position: fixed;
+  top: 60px;
+  right: 20px;
+  width: 480px;
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 6px;
+  z-index: 100;
+}
+
 /* Escape Menu */
 #escape-menu {
   position: absolute;

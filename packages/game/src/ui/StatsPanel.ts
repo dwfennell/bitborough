@@ -54,20 +54,21 @@ const PANEL_H = 400
 const COLS = 2
 const ROWS = 3
 const PAD = 8
+const HEADER_H = 40  // panel header height
 const CHART_W = Math.floor((PANEL_W - PAD * (COLS + 1)) / COLS)  // ~220
-const CHART_H = Math.floor((PANEL_H - 40 - PAD * (ROWS + 1)) / ROWS)  // ~100 (40px header)
+const CHART_H = Math.floor((PANEL_H - HEADER_H - PAD * (ROWS + 1)) / ROWS)  // ~100 (40px header)
 
 export class StatsPanel {
   private el: HTMLElement
   private canvas: HTMLCanvasElement
   private ctx: CanvasRenderingContext2D
   private visible = false
+  private lastHistoryLength = 0
 
   constructor(container: HTMLElement) {
     this.el = document.createElement('div')
     this.el.id = 'stats-panel'
     this.el.className = 'panel hidden'
-    this.el.style.cssText = 'position:fixed;top:60px;right:20px;width:480px;background:#1a1a1a;border:1px solid #333;border-radius:6px;z-index:100;'
 
     this.el.innerHTML = `
       <div class="panel-header">
@@ -108,6 +109,8 @@ export class StatsPanel {
 
   update(state: GameState): void {
     if (!this.visible) return
+    if (state.history.length === this.lastHistoryLength) return
+    this.lastHistoryLength = state.history.length
     const { ctx } = this
     const history = state.history
 
@@ -122,7 +125,7 @@ export class StatsPanel {
         const col = i % COLS
         const row = Math.floor(i / COLS)
         const x = PAD + col * (CHART_W + PAD)
-        const y = 40 + PAD + row * (CHART_H + PAD)
+        const y = HEADER_H + PAD + row * (CHART_H + PAD)
         ctx.fillStyle = '#222'
         ctx.fillRect(x, y, CHART_W, CHART_H)
         ctx.fillStyle = '#555'
