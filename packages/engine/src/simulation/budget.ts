@@ -7,6 +7,7 @@ export function calculateBudget(
   taxRate: number,
   landValues: Uint8Array,
   funding: { police: number; fire: number; transit: number },
+  loanRepayment = 0,
 ): BudgetInfo {
   // Count infrastructure for maintenance
   let roadCount = 0
@@ -71,7 +72,7 @@ export function calculateBudget(
   const avgLandValue = developedTileCount > 0 ? totalLandValue / developedTileCount : 0
   const taxIncome = population * avgLandValue / 20 * taxRate
 
-  const balance = taxIncome - maintenanceCosts.total - serviceCosts.total
+  const balance = taxIncome - maintenanceCosts.total - serviceCosts.total - loanRepayment
 
   return {
     taxRate,
@@ -91,9 +92,10 @@ export function calculateBudget(
       transit: Math.round(serviceCosts.transit),
       total: Math.round(serviceCosts.total),
     },
+    loanRepayment: Math.round(loanRepayment),
     balance: Math.round(balance),
     projectedIncome: Math.round(taxIncome),
-    projectedExpenses: Math.round(maintenanceCosts.total + serviceCosts.total),
+    projectedExpenses: Math.round(maintenanceCosts.total + serviceCosts.total + loanRepayment),
     projectedBalance: Math.round(balance),
   }
 }

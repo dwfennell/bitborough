@@ -1,7 +1,8 @@
 import { describe, test, expect } from 'vitest'
 import { Engine } from '../Engine.js'
 import { createTestMap, advanceYear } from '../test-helpers.js'
-import { Infrastructure, ZoneType } from '@bitborough/core'
+import { Infrastructure, ZoneType, createEmptyMap } from '@bitborough/core'
+import { calculateBudget } from '../simulation/budget.js'
 
 describe('Budget system', () => {
   test('road maintenance deducted annually', () => {
@@ -88,5 +89,18 @@ describe('Budget system', () => {
     // Now have $5 left — can't afford another road
     const result = engine.placeTile(6, 5, Infrastructure.Road)
     expect(result.ok).toBe(false)
+  })
+
+  test('loanRepayment is subtracted from balance and added to projectedExpenses', () => {
+    const map = createEmptyMap(32, 32, { name: 'test', seed: 0, createdAt: '' })
+    const landValues = new Uint8Array(32 * 32)
+    const funding = { police: 100, fire: 100, transit: 100 }
+
+    const withoutLoan = calculateBudget(map, 0, 0.07, landValues, funding, 0)
+    const withLoan = calculateBudget(map, 0, 0.07, landValues, funding, 500)
+
+    expect(withLoan.loanRepayment).toBe(500)
+    expect(withLoan.balance).toBe(withoutLoan.balance - 500)
+    expect(withLoan.projectedExpenses).toBe(withoutLoan.projectedExpenses + 500)
   })
 })
