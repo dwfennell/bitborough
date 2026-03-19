@@ -1,4 +1,4 @@
-import { type GameMap, type Building, type CitizenSummary, Infrastructure, BuildingCategory } from '@bitborough/core'
+import { type GameMap, type Building, type BuildingDef, type CitizenSummary, Infrastructure, BuildingCategory } from '@bitborough/core'
 import { BUILDING_DEFS } from '../buildings-registry.js'
 import type { RoadGraph } from '../road-graph.js'
 import { astar } from '../road-graph.js'
@@ -75,29 +75,17 @@ export function createRegistry(samplingRatio = DEFAULT_SAMPLING_RATIO): CitizenR
 
 // ── Assign ───────────────────────────────────────────────────────────────────
 
-function findNearestJobBuilding(map: GameMap, graph: RoadGraph, fromRoad: number): { buildingId: string; accessRoad: number; route: number[] } | null {
+function findNearestBuilding(
+  map: GameMap,
+  graph: RoadGraph,
+  fromRoad: number,
+  filter: (def: BuildingDef) => boolean,
+): { buildingId: string; accessRoad: number; route: number[] } | null {
   let best: { buildingId: string; accessRoad: number; route: number[] } | null = null
   for (const building of map.buildings) {
     if (building.state !== 'active') continue
     const def = BUILDING_DEFS[building.defId]
-    if (!def || def.jobs <= 0) continue
-    const access = resolveAccessRoad(map, building)
-    if (access < 0) continue
-    const route = astar(graph, fromRoad, access, map.width)
-    if (!route) continue
-    if (!best || route.length < best.route.length) {
-      best = { buildingId: building.id, accessRoad: access, route }
-    }
-  }
-  return best
-}
-
-function findNearestCommerceBuilding(map: GameMap, graph: RoadGraph, fromRoad: number): { buildingId: string; accessRoad: number; route: number[] } | null {
-  let best: { buildingId: string; accessRoad: number; route: number[] } | null = null
-  for (const building of map.buildings) {
-    if (building.state !== 'active') continue
-    const def = BUILDING_DEFS[building.defId]
-    if (!def || def.category !== BuildingCategory.Commercial) continue
+    if (!def || !filter(def)) continue
     const access = resolveAccessRoad(map, building)
     if (access < 0) continue
     const route = astar(graph, fromRoad, access, map.width)
@@ -118,8 +106,8 @@ let nextAgentId = 1
 
 function createAgent(map: GameMap, graph: RoadGraph, homeBuildingId: string, homeAccessRoad: number): Citizen {
   const id = `c${nextAgentId++}`
-  const jobMatch = findNearestJobBuilding(map, graph, homeAccessRoad)
-  const commerceMatch = findNearestCommerceBuilding(map, graph, homeAccessRoad)
+  const jobMatch = findNearestBuilding(map, graph, homeAccessRoad, d => d.jobs > 0)
+  const commerceMatch = findNearestBuilding(map, graph, homeAccessRoad, d => d.category === BuildingCategory.Commercial)
   const agent: Citizen = {
     id,
     homeBuildingId,
@@ -162,6 +150,18 @@ export function syncAgentsForBuilding(map: GameMap, registry: CitizenRegistry, g
 
 export function removeAgentsForBuilding(registry: CitizenRegistry, buildingId: string): void {
   registry.agents = registry.agents.filter(a => a.homeBuildingId !== buildingId)
+}
+
+export function removeOrphanedAgents(registry: CitizenRegistry, validBuildingIds: Set<string>): void {
+  const orphanedIds = new Set<string>()
+  for (const agent of registry.agents) {
+    if (!validBuildingIds.has(agent.homeBuildingId)) {
+      orphanedIds.add(agent.homeBuildingId)
+    }
+  }
+  for (const id of orphanedIds) {
+    removeAgentsForBuilding(registry, id)
+  }
 }
 
 export function markRoutesStale(registry: CitizenRegistry, tileIndex: number): void {

@@ -32,7 +32,7 @@ import { calculateCrime } from './simulation/services/crime.js'
 import { calculateFireCoverage, updateFires, createFireState, type FireState } from './simulation/services/fire.js'
 import { buildRoadGraph, updateRoadGraph, type RoadGraph } from './road-graph.js'
 import {
-  createRegistry, syncAgentsForBuilding, removeAgentsForBuilding,
+  createRegistry, syncAgentsForBuilding, removeOrphanedAgents,
   citizenMonthlyTick, computeCitizenSummary, markRoutesStale,
   EMPTY_CITIZEN_SUMMARY,
   type CitizenRegistry,
@@ -361,16 +361,7 @@ export class Engine {
       const idx = y * this.map.width + x
       updateRoadGraph(this.map, this.roadGraph, x, y)
       markRoutesStale(this.citizenRegistry, idx)
-      const buildingIds = new Set(this.map.buildings.map(b => b.id))
-      const orphanedIds = new Set<string>()
-      for (const agent of this.citizenRegistry.agents) {
-        if (!buildingIds.has(agent.homeBuildingId)) {
-          orphanedIds.add(agent.homeBuildingId)
-        }
-      }
-      for (const id of orphanedIds) {
-        removeAgentsForBuilding(this.citizenRegistry, id)
-      }
+      removeOrphanedAgents(this.citizenRegistry, new Set(this.map.buildings.map(b => b.id)))
     }
     return result
   }
@@ -607,7 +598,7 @@ export class Engine {
 
     // Rebuild derived state
     propagatePower(engine.map, engine.powerGrid, engine.bldIdx)
-    engine.demand = calculateDemand(engine.map, engine.taxRate)
+    engine.demand = calculateDemand(engine.map, engine.taxRate, undefined, engine.citizenSummary)
     engine.budgetInfo = calculateBudget(
       engine.map,
       engine.population,
