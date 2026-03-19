@@ -2,9 +2,10 @@ import { describe, test, expect } from 'vitest'
 import { createTestMap } from '../test-helpers.js'
 import {
   resolveAccessRoad, createRegistry, syncAgentsForBuilding, removeAgentsForBuilding,
+  markRoutesStale, replanStaleRoutes,
   type CitizenRegistry,
 } from '../simulation/citizens.js'
-import { buildRoadGraph } from '../road-graph.js'
+import { buildRoadGraph, updateRoadGraph } from '../road-graph.js'
 import { Infrastructure, DensityLevel } from '@bitborough/core'
 import type { Building } from '@bitborough/core'
 
@@ -107,5 +108,64 @@ describe('Agent spawning', () => {
     syncAgentsForBuilding(map, registry, graph, building)
     // No agents spawned because no access road
     expect(registry.agents).toHaveLength(0)
+  })
+})
+
+describe('Route invalidation', () => {
+  function buildScenario() {
+    const map = createTestMap(8)
+    // Road: (0,0)..(4,0) as y=0 row
+    for (let x = 0; x < 5; x++) map.infrastructure[x] = Infrastructure.Road
+    const graph = buildRoadGraph(map)
+    const registry = createRegistry()
+    // Residential building at (0,1), its north neighbor (0,0) is road access
+    const home: Building = { id: 'b1', defId: 'res.low', x: 0, y: 1, powered: true, density: DensityLevel.Low, age: 0, state: 'active', residents: 50 }
+    // Commercial building at (4,1), its north neighbor (4,0) is road access
+    const shop: Building = { id: 'b2', defId: 'com.low', x: 4, y: 1, powered: true, density: DensityLevel.Low, age: 0, state: 'active', residents: 0 }
+    map.buildings = [home, shop]
+    syncAgentsForBuilding(map, registry, graph, home)
+    return { map, graph, registry, home, shop }
+  }
+
+  test('markRoutesStale flags agents whose routes include a demolished tile', () => {
+    const { registry } = buildScenario()
+    const agent = registry.agents[0]!
+    // Route goes through index=2 (x=2,y=0)
+    expect(agent.homeCommerceRoute).toContain(2)
+    markRoutesStale(registry, 2)
+    expect(agent.homeCommerceRouteStale).toBe(true)
+  })
+
+  test('markRoutesStale does not affect agents whose routes do not include the tile', () => {
+    const { registry } = buildScenario()
+    const agent = registry.agents[0]!
+    markRoutesStale(registry, 99)  // tile not in any route
+    expect(agent.homeWorkRouteStale).toBe(false)
+    expect(agent.homeCommerceRouteStale).toBe(false)
+  })
+
+  test('replanStaleRoutes replans a stale route', () => {
+    const { map, graph, registry } = buildScenario()
+    const agent = registry.agents[0]!
+    agent.homeCommerceRouteStale = true
+    const originalRoute = [...agent.homeCommerceRoute]
+    replanStaleRoutes(registry, map, graph)
+    // Route should still be valid (same path)
+    expect(agent.homeCommerceRoute).toEqual(originalRoute)
+    expect(agent.homeCommerceRouteStale).toBe(false)
+  })
+
+  test('replanStaleRoutes sets route to [] when path is broken', () => {
+    const { map, graph, registry } = buildScenario()
+    const agent = registry.agents[0]!
+    // Remove road tiles in the middle so path is broken
+    map.infrastructure[2] = 0
+    map.infrastructure[3] = 0
+    updateRoadGraph(map, graph, 2, 0)
+    updateRoadGraph(map, graph, 3, 0)
+    agent.homeCommerceRouteStale = true
+    replanStaleRoutes(registry, map, graph)
+    expect(agent.homeCommerceRoute).toEqual([])
+    expect(agent.homeCommerceRouteStale).toBe(false)
   })
 })

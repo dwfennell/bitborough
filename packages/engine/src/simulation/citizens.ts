@@ -170,3 +170,37 @@ export function removeAgentsForBuilding(registry: CitizenRegistry, buildingId: s
   registry.agents = registry.agents.filter(a => a.homeBuildingId !== buildingId)
 }
 
+export function markRoutesStale(registry: CitizenRegistry, tileIndex: number): void {
+  for (const agent of registry.agents) {
+    if (agent.homeWorkRouteTileSet.has(tileIndex)) agent.homeWorkRouteStale = true
+    if (agent.homeCommerceRouteTileSet.has(tileIndex)) agent.homeCommerceRouteStale = true
+  }
+}
+
+export function replanStaleRoutes(registry: CitizenRegistry, map: GameMap, graph: RoadGraph): void {
+  for (const agent of registry.agents) {
+    if (agent.homeWorkRouteStale) {
+      if (agent.workAccessRoad !== null) {
+        const route = astar(graph, agent.homeAccessRoad, agent.workAccessRoad, map.width)
+        agent.homeWorkRoute = route ?? []
+        if (!route) { agent.workBuildingId = null; agent.workAccessRoad = null }
+      } else {
+        agent.homeWorkRoute = []
+      }
+      agent.homeWorkRouteTileSet = new Set(agent.homeWorkRoute)
+      agent.homeWorkRouteStale = false
+    }
+    if (agent.homeCommerceRouteStale) {
+      if (agent.commerceAccessRoad !== null) {
+        const route = astar(graph, agent.homeAccessRoad, agent.commerceAccessRoad, map.width)
+        agent.homeCommerceRoute = route ?? []
+        if (!route) { agent.commerceBuildingId = null; agent.commerceAccessRoad = null }
+      } else {
+        agent.homeCommerceRoute = []
+      }
+      agent.homeCommerceRouteTileSet = new Set(agent.homeCommerceRoute)
+      agent.homeCommerceRouteStale = false
+    }
+  }
+}
+
