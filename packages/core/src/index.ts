@@ -15,6 +15,7 @@ export {
   type Loan,
   type GameEvent,
   type MonthlySnapshot,
+  type CitizenSummary,
   calcMonthlyPayment,
 } from './state.js'
 export { DEFAULTS, COSTS, MAINTENANCE, POWER } from './constants.js'
