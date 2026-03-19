@@ -204,3 +204,75 @@ export function replanStaleRoutes(registry: CitizenRegistry, map: GameMap, graph
   }
 }
 
+// ── Monthly tick ──────────────────────────────────────────────────────────────
+
+const WORK_TRIP_WEIGHT = 2
+const COMMERCE_TRIP_WEIGHT = 1
+const MAX_SATISFACTION_COMMUTE = 60  // same as MAX_ROUTE_LENGTH
+
+function clamp(v: number, lo: number, hi: number): number {
+  return Math.max(lo, Math.min(hi, v))
+}
+
+function computeSatisfaction(agent: Citizen): number {
+  const commutePenalty = clamp(agent.homeWorkRoute.length / MAX_SATISFACTION_COMMUTE, 0, 1)
+  const jobPenalty = agent.workBuildingId === null ? 0.5 : 0
+  const commercePenalty = agent.commerceBuildingId === null ? 0.3 : 0
+  return clamp(1 - commutePenalty * 0.4 - jobPenalty - commercePenalty, 0, 1)
+}
+
+export function citizenMonthlyTick(
+  registry: CitizenRegistry,
+  map: GameMap,
+  graph: RoadGraph,
+  trafficDensity: Uint8Array,
+): void {
+  // Pass 1: replan stale routes
+  replanStaleRoutes(registry, map, graph)
+
+  // Pass 2: traffic contribution
+  const size = map.width * map.height
+  const rawTraffic = new Float64Array(size)
+
+  for (const agent of registry.agents) {
+    for (const tileIdx of agent.homeWorkRoute) {
+      rawTraffic[tileIdx]! += WORK_TRIP_WEIGHT
+    }
+    for (const tileIdx of agent.homeCommerceRoute) {
+      rawTraffic[tileIdx]! += COMMERCE_TRIP_WEIGHT
+    }
+    agent.satisfaction = computeSatisfaction(agent)
+  }
+
+  // Scale by sampling ratio and write to trafficDensity
+  trafficDensity.fill(0)
+  for (let i = 0; i < size; i++) {
+    trafficDensity[i] = Math.min(255, Math.floor(rawTraffic[i]! * registry.samplingRatio))
+  }
+}
+
+export function computeCitizenSummary(registry: CitizenRegistry): CitizenSummary {
+  const { agents } = registry
+  if (agents.length === 0) return { ...EMPTY_CITIZEN_SUMMARY }
+
+  let satSum = 0
+  let unmatchedJob = 0
+  let unmatchedCommerce = 0
+  let commuteLengthSum = 0
+
+  for (const agent of agents) {
+    satSum += agent.satisfaction
+    if (agent.workBuildingId === null) unmatchedJob++
+    if (agent.commerceBuildingId === null) unmatchedCommerce++
+    commuteLengthSum += agent.homeWorkRoute.length
+  }
+
+  return {
+    agentCount: agents.length,
+    avgSatisfaction: satSum / agents.length,
+    unmatchedJobFraction: unmatchedJob / agents.length,
+    unmatchedCommerceFraction: unmatchedCommerce / agents.length,
+    avgCommuteLengthTiles: commuteLengthSum / agents.length,
+  }
+}
+

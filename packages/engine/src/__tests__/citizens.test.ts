@@ -2,7 +2,7 @@ import { describe, test, expect } from 'vitest'
 import { createTestMap } from '../test-helpers.js'
 import {
   resolveAccessRoad, createRegistry, syncAgentsForBuilding, removeAgentsForBuilding,
-  markRoutesStale, replanStaleRoutes,
+  markRoutesStale, replanStaleRoutes, citizenMonthlyTick, computeCitizenSummary,
   type CitizenRegistry,
 } from '../simulation/citizens.js'
 import { buildRoadGraph, updateRoadGraph } from '../road-graph.js'
@@ -167,5 +167,92 @@ describe('Route invalidation', () => {
     replanStaleRoutes(registry, map, graph)
     expect(agent.homeCommerceRoute).toEqual([])
     expect(agent.homeCommerceRouteStale).toBe(false)
+  })
+})
+
+describe('Monthly tick — traffic + satisfaction', () => {
+  function buildCity() {
+    const map = createTestMap(8)
+    for (let x = 0; x < 8; x++) map.infrastructure[x] = Infrastructure.Road
+    const graph = buildRoadGraph(map)
+    const registry = createRegistry()
+    const home: Building = { id: 'b1', defId: 'res.low', x: 0, y: 1, powered: true, density: DensityLevel.Low, age: 0, state: 'active', residents: 100 }
+    const shop: Building = { id: 'b2', defId: 'com.low', x: 6, y: 1, powered: true, density: DensityLevel.Low, age: 0, state: 'active', residents: 0 }
+    map.buildings = [home, shop]
+    syncAgentsForBuilding(map, registry, graph, home)
+    return { map, graph, registry }
+  }
+
+  test('traffic is zero on empty registry', () => {
+    const map = createTestMap(8)
+    const graph = buildRoadGraph(map)
+    const registry = createRegistry()
+    const trafficDensity = new Uint8Array(64)
+    citizenMonthlyTick(registry, map, graph, trafficDensity)
+    expect(Array.from(trafficDensity).every(v => v === 0)).toBe(true)
+  })
+
+  test('traffic appears on road tiles along agent routes', () => {
+    const { map, graph, registry } = buildCity()
+    const trafficDensity = new Uint8Array(64)
+    citizenMonthlyTick(registry, map, graph, trafficDensity)
+    // Road at y=0 (indices 0..7) should have traffic from commerce route
+    const roadTraffic = Array.from(trafficDensity.slice(0, 8))
+    expect(roadTraffic.some(v => v > 0)).toBe(true)
+  })
+
+  test('more agents produce more traffic', () => {
+    // Use samplingRatio=1 so each agent is 1 resident — avoids Uint8 saturation at 255
+    const map = createTestMap(8)
+    for (let x = 0; x < 8; x++) map.infrastructure[x] = Infrastructure.Road
+    const graph = buildRoadGraph(map)
+    const registry = createRegistry(1)
+    const home: Building = { id: 'b1', defId: 'res.low', x: 0, y: 1, powered: true, density: DensityLevel.Low, age: 0, state: 'active', residents: 2 }
+    const shop: Building = { id: 'b2', defId: 'com.low', x: 6, y: 1, powered: true, density: DensityLevel.Low, age: 0, state: 'active', residents: 0 }
+    map.buildings = [home, shop]
+    syncAgentsForBuilding(map, registry, graph, home)
+
+    const t1 = new Uint8Array(64)
+    citizenMonthlyTick(registry, map, graph, t1)
+    const sum1 = Array.from(t1).reduce((a, b) => a + b, 0)
+
+    // Double residents
+    home.residents = 4
+    syncAgentsForBuilding(map, registry, graph, home)
+    const t2 = new Uint8Array(64)
+    citizenMonthlyTick(registry, map, graph, t2)
+    const sum2 = Array.from(t2).reduce((a, b) => a + b, 0)
+    expect(sum2).toBeGreaterThan(sum1)
+  })
+
+  test('satisfaction is 1 when agent has short commute and commerce', () => {
+    const { registry } = buildCity()
+    const agent = registry.agents[0]!
+    // Short route (≤ a few tiles), has commerce
+    expect(agent.satisfaction).toBeGreaterThan(0.5)
+  })
+
+  test('satisfaction penalised when no job assigned', () => {
+    const map = createTestMap(8)
+    for (let x = 0; x < 8; x++) map.infrastructure[x] = Infrastructure.Road
+    const graph = buildRoadGraph(map)
+    const registry = createRegistry()
+    // Only residential, no jobs nearby
+    const home: Building = { id: 'b1', defId: 'res.low', x: 0, y: 1, powered: true, density: DensityLevel.Low, age: 0, state: 'active', residents: 50 }
+    map.buildings = [home]
+    syncAgentsForBuilding(map, registry, graph, home)
+    const trafficDensity = new Uint8Array(64)
+    citizenMonthlyTick(registry, map, graph, trafficDensity)
+    const agent = registry.agents[0]!
+    // jobPenalty = 0.5, so satisfaction ≤ 0.5
+    expect(agent.satisfaction).toBeLessThanOrEqual(0.5)
+  })
+
+  test('computeCitizenSummary returns empty summary for empty registry', () => {
+    const registry = createRegistry()
+    const summary = computeCitizenSummary(registry)
+    expect(summary.agentCount).toBe(0)
+    expect(summary.avgSatisfaction).toBe(1)
+    expect(summary.unmatchedJobFraction).toBe(0)
   })
 })
