@@ -1,4 +1,4 @@
-import { type GameMap, type Building, Infrastructure } from '@bitborough/core'
+import { type GameMap, type Building, Infrastructure, BuildingCategory } from '@bitborough/core'
 import { BUILDING_DEFS } from '../buildings-registry.js'
 import type { RoadGraph } from '../road-graph.js'
 import { astar } from '../road-graph.js'
@@ -71,5 +71,102 @@ export function resolveAccessRoad(map: GameMap, building: Building): number {
     }
   }
   return -1
+}
+
+// ── Registry ─────────────────────────────────────────────────────────────────
+
+export function createRegistry(samplingRatio = DEFAULT_SAMPLING_RATIO): CitizenRegistry {
+  return { agents: [], samplingRatio }
+}
+
+// ── Assign ───────────────────────────────────────────────────────────────────
+
+function findNearestJobBuilding(map: GameMap, graph: RoadGraph, fromRoad: number): { buildingId: string; accessRoad: number; route: number[] } | null {
+  let best: { buildingId: string; accessRoad: number; route: number[] } | null = null
+  for (const building of map.buildings) {
+    if (building.state !== 'active') continue
+    const def = BUILDING_DEFS[building.defId]
+    if (!def || def.jobs <= 0) continue
+    const access = resolveAccessRoad(map, building)
+    if (access < 0) continue
+    const route = astar(graph, fromRoad, access, map.width)
+    if (!route) continue
+    if (!best || route.length < best.route.length) {
+      best = { buildingId: building.id, accessRoad: access, route }
+    }
+  }
+  return best
+}
+
+function findNearestCommerceBuilding(map: GameMap, graph: RoadGraph, fromRoad: number): { buildingId: string; accessRoad: number; route: number[] } | null {
+  let best: { buildingId: string; accessRoad: number; route: number[] } | null = null
+  for (const building of map.buildings) {
+    if (building.state !== 'active') continue
+    const def = BUILDING_DEFS[building.defId]
+    if (!def || def.category !== BuildingCategory.Commercial) continue
+    const access = resolveAccessRoad(map, building)
+    if (access < 0) continue
+    const route = astar(graph, fromRoad, access, map.width)
+    if (!route) continue
+    if (!best || route.length < best.route.length) {
+      best = { buildingId: building.id, accessRoad: access, route }
+    }
+  }
+  return best
+}
+
+function buildTileSets(agent: Citizen): void {
+  agent.homeWorkRouteTileSet = new Set(agent.homeWorkRoute)
+  agent.homeCommerceRouteTileSet = new Set(agent.homeCommerceRoute)
+}
+
+let nextAgentId = 1
+
+function createAgent(map: GameMap, graph: RoadGraph, homeBuildingId: string, homeAccessRoad: number): Citizen {
+  const id = `c${nextAgentId++}`
+  const jobMatch = findNearestJobBuilding(map, graph, homeAccessRoad)
+  const commerceMatch = findNearestCommerceBuilding(map, graph, homeAccessRoad)
+  const agent: Citizen = {
+    id,
+    homeBuildingId,
+    workBuildingId: jobMatch?.buildingId ?? null,
+    commerceBuildingId: commerceMatch?.buildingId ?? null,
+    homeAccessRoad,
+    workAccessRoad: jobMatch?.accessRoad ?? null,
+    commerceAccessRoad: commerceMatch?.accessRoad ?? null,
+    homeWorkRoute: jobMatch?.route ?? [],
+    homeCommerceRoute: commerceMatch?.route ?? [],
+    homeWorkRouteTileSet: new Set(),
+    homeCommerceRouteTileSet: new Set(),
+    homeWorkRouteStale: false,
+    homeCommerceRouteStale: false,
+    satisfaction: 1,
+  }
+  buildTileSets(agent)
+  return agent
+}
+
+export function syncAgentsForBuilding(map: GameMap, registry: CitizenRegistry, graph: RoadGraph, building: Building): void {
+  const homeAccessRoad = resolveAccessRoad(map, building)
+  if (homeAccessRoad < 0) return  // building has no road access — no agents
+
+  const existing = registry.agents.filter(a => a.homeBuildingId === building.id)
+  const needed = Math.floor(building.residents / registry.samplingRatio)
+  const delta = needed - existing.length
+
+  if (delta > 0) {
+    for (let i = 0; i < delta; i++) {
+      registry.agents.push(createAgent(map, graph, building.id, homeAccessRoad))
+    }
+  } else if (delta < 0) {
+    // Remove from end
+    const toRemove = existing.slice(delta).map(a => a.id)
+    const removeSet = new Set(toRemove)
+    registry.agents = registry.agents.filter(a => !removeSet.has(a.id))
+  }
+}
+
+export function removeAgentsForBuilding(registry: CitizenRegistry, buildingId: string): void {
+  registry.agents = registry.agents.filter(a => a.homeBuildingId !== buildingId)
 }
 

@@ -1,6 +1,10 @@
 import { describe, test, expect } from 'vitest'
 import { createTestMap } from '../test-helpers.js'
-import { resolveAccessRoad } from '../simulation/citizens.js'
+import {
+  resolveAccessRoad, createRegistry, syncAgentsForBuilding, removeAgentsForBuilding,
+  type CitizenRegistry,
+} from '../simulation/citizens.js'
+import { buildRoadGraph } from '../road-graph.js'
 import { Infrastructure, DensityLevel } from '@bitborough/core'
 import type { Building } from '@bitborough/core'
 
@@ -40,5 +44,68 @@ describe('resolveAccessRoad', () => {
     const building = makeBuilding(2, 2, 1, 1)
     // N is checked before E, so north road wins
     expect(resolveAccessRoad(map, building)).toBe(1 * 8 + 2)
+  })
+})
+
+describe('Agent spawning', () => {
+  test('createRegistry returns empty registry with default ratio', () => {
+    const registry = createRegistry()
+    expect(registry.agents).toHaveLength(0)
+    expect(registry.samplingRatio).toBe(50)
+  })
+
+  test('syncAgentsForBuilding spawns agents proportional to residents', () => {
+    const map = createTestMap(8)
+    // Road at y=0 row, residential building at (2,1)
+    for (let x = 0; x < 8; x++) map.infrastructure[x] = Infrastructure.Road
+    const graph = buildRoadGraph(map)
+    const registry = createRegistry()
+    const building = makeBuilding(2, 1, 1, 1)
+    building.residents = 100
+    map.buildings = [building]
+    syncAgentsForBuilding(map, registry, graph, building)
+    // 100 / 50 = 2 agents
+    expect(registry.agents.filter(a => a.homeBuildingId === building.id)).toHaveLength(2)
+  })
+
+  test('syncAgentsForBuilding removes agents when residents shrink', () => {
+    const map = createTestMap(8)
+    for (let x = 0; x < 8; x++) map.infrastructure[x] = Infrastructure.Road
+    const graph = buildRoadGraph(map)
+    const registry = createRegistry()
+    const building = makeBuilding(2, 1, 1, 1)
+    building.residents = 100
+    map.buildings = [building]
+    syncAgentsForBuilding(map, registry, graph, building)
+    expect(registry.agents).toHaveLength(2)
+    building.residents = 50
+    syncAgentsForBuilding(map, registry, graph, building)
+    expect(registry.agents).toHaveLength(1)
+  })
+
+  test('removeAgentsForBuilding clears all agents for that building', () => {
+    const map = createTestMap(8)
+    for (let x = 0; x < 8; x++) map.infrastructure[x] = Infrastructure.Road
+    const graph = buildRoadGraph(map)
+    const registry = createRegistry()
+    const building = makeBuilding(2, 1, 1, 1)
+    building.residents = 100
+    map.buildings = [building]
+    syncAgentsForBuilding(map, registry, graph, building)
+    removeAgentsForBuilding(registry, building.id)
+    expect(registry.agents.filter(a => a.homeBuildingId === building.id)).toHaveLength(0)
+  })
+
+  test('agents without road access have empty routes', () => {
+    const map = createTestMap(8)
+    // No road placed — building has no road access
+    const graph = buildRoadGraph(map)
+    const registry = createRegistry()
+    const building = makeBuilding(2, 1, 1, 1)
+    building.residents = 100
+    map.buildings = [building]
+    syncAgentsForBuilding(map, registry, graph, building)
+    // No agents spawned because no access road
+    expect(registry.agents).toHaveLength(0)
   })
 })
