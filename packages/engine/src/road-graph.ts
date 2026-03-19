@@ -31,6 +31,66 @@ export function buildRoadGraph(map: GameMap): RoadGraph {
   return graph
 }
 
+export const MAX_ROUTE_LENGTH = 60
+
+/** A* on road graph. Returns path (inclusive of start and goal) or null if unreachable. */
+export function astar(
+  graph: RoadGraph,
+  start: number,
+  goal: number,
+  mapWidth: number,
+  maxLength = MAX_ROUTE_LENGTH,
+): number[] | null {
+  if (!graph.has(start)) return null
+  if (start === goal) return [start]
+
+  const gScore = new Map<number, number>([[start, 0]])
+  const fScore = new Map<number, number>([[start, heuristic(start, goal, mapWidth)]])
+  const cameFrom = new Map<number, number>()
+  // Min-heap via sorted insertion would be ideal; for simplicity use a Set + linear min scan
+  // (acceptable: road graph ≤ 5,000 nodes, called infrequently)
+  const open = new Set<number>([start])
+
+  while (open.size > 0) {
+    // Find node in open with lowest fScore
+    let current = -1
+    let bestF = Infinity
+    for (const n of open) {
+      const f = fScore.get(n) ?? Infinity
+      if (f < bestF) { bestF = f; current = n }
+    }
+    if (current === goal) return reconstructPath(cameFrom, current)
+
+    open.delete(current)
+    const g = gScore.get(current) ?? Infinity
+
+    for (const neighbor of (graph.get(current) ?? [])) {
+      const tentativeG = g + 1
+      if (tentativeG > maxLength) continue  // path would exceed limit
+      if (tentativeG < (gScore.get(neighbor) ?? Infinity)) {
+        cameFrom.set(neighbor, current)
+        gScore.set(neighbor, tentativeG)
+        fScore.set(neighbor, tentativeG + heuristic(neighbor, goal, mapWidth))
+        open.add(neighbor)
+      }
+    }
+  }
+  return null
+}
+
+function heuristic(a: number, b: number, width: number): number {
+  return Math.abs((a % width) - (b % width)) + Math.abs(Math.floor(a / width) - Math.floor(b / width))
+}
+
+function reconstructPath(cameFrom: Map<number, number>, current: number): number[] {
+  const path = [current]
+  while (cameFrom.has(current)) {
+    current = cameFrom.get(current)!
+    path.unshift(current)
+  }
+  return path
+}
+
 export function updateRoadGraph(map: GameMap, graph: RoadGraph, x: number, y: number): void {
   const { width, height } = map
   const idx = y * width + x
