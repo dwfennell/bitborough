@@ -8,10 +8,12 @@ import {
   type Loan,
   type GameEvent,
   type MonthlySnapshot,
+  type CitizenSummary,
   calcMonthlyPayment,
   TileType,
   ZoneType,
   Infrastructure,
+  BuildingCategory,
   FailReason,
   SimSpeed,
   DEFAULTS,
@@ -28,7 +30,13 @@ import { updateZones } from './simulation/zones.js'
 import { calculateBudget } from './simulation/budget.js'
 import { calculateCrime } from './simulation/services/crime.js'
 import { calculateFireCoverage, updateFires, createFireState, type FireState } from './simulation/services/fire.js'
-import { calculateTraffic } from './simulation/traffic.js'
+import { buildRoadGraph, updateRoadGraph, type RoadGraph } from './road-graph.js'
+import {
+  createRegistry, syncAgentsForBuilding, removeAgentsForBuilding,
+  citizenMonthlyTick, computeCitizenSummary, markRoutesStale,
+  EMPTY_CITIZEN_SUMMARY,
+  type CitizenRegistry,
+} from './simulation/citizens.js'
 import { updateDensity } from './simulation/density.js'
 import { hasNearbyRoad } from './simulation/road-access.js'
 import { BUILDING_DEFS } from './buildings-registry.js'
@@ -82,6 +90,11 @@ export class Engine {
   private fireCoverage: Uint8Array
   private trafficDensity: Uint8Array
 
+  // Citizens
+  private citizenRegistry: CitizenRegistry
+  private roadGraph: RoadGraph
+  private citizenSummary: CitizenSummary
+
   // Fire system
   private fireState: FireState
 
@@ -126,6 +139,9 @@ export class Engine {
     this.fireState = createFireState()
     this.influenceBuffer = new Float32Array(size)
     this.bldIdx = new BuildingIndex(map)
+    this.citizenRegistry = createRegistry()
+    this.roadGraph = buildRoadGraph(this.map)
+    this.citizenSummary = { ...EMPTY_CITIZEN_SUMMARY }
 
     // Initialize demand
     this.demand = calculateDemand(this.map, this.taxRate)
@@ -160,14 +176,16 @@ export class Engine {
         this.year++
       }
 
-      this.demand = calculateDemand(this.map, this.taxRate, this.trafficDensity)
+      this.demand = calculateDemand(this.map, this.taxRate, this.trafficDensity, this.citizenSummary)
 
       // Land values use previous month's crime; crime uses updated land values
       calculateLandValues(this.map, this.powerGrid, this.pollutionLevel, this.crimeLevel, this.landValues, this.bldIdx)
       calculateCrime(this.map, this.landValues, this.crimeLevel, this.funding.police, this.influenceBuffer)
       calculateFireCoverage(this.map, this.fireCoverage, this.funding.fire, this.influenceBuffer)
       updateFires(this.map, this.fireState, this.fireCoverage, this.prng, this.bldIdx)
-      calculateTraffic(this.map, this.trafficDensity)
+      // Citizen monthly tick: replan stale routes, write trafficDensity from agent routes
+      citizenMonthlyTick(this.citizenRegistry, this.map, this.roadGraph, this.trafficDensity)
+      this.citizenSummary = computeCitizenSummary(this.citizenRegistry)
 
       // Zone development
       const nextBuildingIdRef = { value: this.nextBuildingId }
@@ -189,6 +207,16 @@ export class Engine {
       )
       this.nextBuildingId = nextBuildingIdRef.value
       this.population = Math.max(0, this.population + densityDelta)
+
+      // Sync citizen agents after zone/density changes (population may have changed)
+      for (const b of this.map.buildings) {
+        if (b.state === 'active') {
+          const def = BUILDING_DEFS[b.defId]
+          if (def && def.category === BuildingCategory.Residential) {
+            syncAgentsForBuilding(this.map, this.citizenRegistry, this.roadGraph, b)
+          }
+        }
+      }
 
       // 1. Compute budget including loan repayment
       const loanRepayment = this.computeLoanRepayment()
@@ -264,6 +292,7 @@ export class Engine {
       loanRepaymentAmount: this.loanRepaymentAmount,
       events: this.events,
       history: this.history,
+      citizens: this.citizenSummary,
     }
   }
 
@@ -289,6 +318,11 @@ export class Engine {
     this.funds -= cost
     if (result.ok) {
       updateConnections(this.map, x, y)
+      const placedInfra = this.map.infrastructure[y * this.map.width + x]!
+      if (placedInfra & Infrastructure.Road) {
+        updateRoadGraph(this.map, this.roadGraph, x, y)
+        markRoutesStale(this.citizenRegistry, y * this.map.width + x)
+      }
     }
     return result
   }
@@ -324,6 +358,16 @@ export class Engine {
     if (result.ok) {
       updateConnections(this.map, x, y)
       this.bldIdx = new BuildingIndex(this.map)
+      const idx = y * this.map.width + x
+      updateRoadGraph(this.map, this.roadGraph, x, y)
+      markRoutesStale(this.citizenRegistry, idx)
+      const buildingIds = new Set(this.map.buildings.map(b => b.id))
+      for (const agent of this.citizenRegistry.agents) {
+        if (!buildingIds.has(agent.homeBuildingId)) {
+          removeAgentsForBuilding(this.citizenRegistry, agent.homeBuildingId)
+          break
+        }
+      }
     }
     return result
   }
