@@ -30,6 +30,7 @@ import { calculateCrime } from './simulation/services/crime.js'
 import { calculateFireCoverage, updateFires, createFireState, type FireState } from './simulation/services/fire.js'
 import { calculateTraffic } from './simulation/traffic.js'
 import { updateDensity } from './simulation/density.js'
+import { hasNearbyRoad } from './simulation/road-access.js'
 import { BUILDING_DEFS } from './buildings-registry.js'
 import { BuildingIndex } from './building-index.js'
 
@@ -40,6 +41,7 @@ export interface TileInfo {
   connections: number
   elevation: number
   powered: boolean
+  hasRoadAccess: boolean
 }
 
 export interface EngineConfig {
@@ -278,6 +280,7 @@ export class Engine {
       connections: this.map.connections[idx]!,
       elevation: this.map.elevation[idx]!,
       powered: this.powerGrid[idx] !== 0,
+      hasRoadAccess: hasNearbyRoad(this.map, x, y),
     }
   }
 

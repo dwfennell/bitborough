@@ -6,7 +6,6 @@ import { PRNG } from '../prng.js'
 import { Engine } from '../Engine.js'
 import {
   cityCenter,
-  hasNearbyPavedRoad,
   hasNearbyTransitStop,
   upgradeProb,
   mediumRadius,
@@ -16,6 +15,7 @@ import {
   checkFootprintForUpgrade,
   neighbourhoodAvgOccupancy,
 } from '../simulation/density.js'
+import { hasNearbyPavedRoad } from '../simulation/road-access.js'
 
 describe('PavedRoad infrastructure', () => {
   test('PavedRoad is a distinct bit flag', () => {
