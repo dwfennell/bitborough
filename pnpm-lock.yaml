@@ -24,6 +24,34 @@ importers:
         specifier: ^8.57.0
         version: 8.57.0(eslint@10.0.3)(typescript@5.9.3)
 
+  packages/cli:
+    dependencies:
+      '@bitborough/core':
+        specifier: workspace:*
+        version: link:../core
+      '@bitborough/docs':
+        specifier: workspace:*
+        version: link:../docs
+      '@bitborough/engine':
+        specifier: workspace:*
+        version: link:../engine
+      '@bitborough/map-gen':
+        specifier: workspace:*
+        version: link:../map-gen
+      commander:
+        specifier: ^12.0.0
+        version: 12.1.0
+    devDependencies:
+      tsx:
+        specifier: ^4.0.0
+        version: 4.21.0
+      typescript:
+        specifier: ^5.7.0
+        version: 5.9.3
+      vitest:
+        specifier: ^3.0.0
+        version: 3.2.4(tsx@4.21.0)
+
   packages/core:
     devDependencies:
       typescript:
@@ -665,6 +693,10 @@ packages:
   check-error@2.1.3:
     resolution: {integrity: sha512-PAJdDJusoxnwm1VwW07VWwUN1sl7smmC3OKggvndJFadxxDRyFJBX/ggnu/KE4kQAB7a3Dp8f/YXC1FlUprWmA==}
     engines: {node: '>= 16'}
+
+  commander@12.1.0:
+    resolution: {integrity: sha512-Vw8qHK3bZM9y/P10u3Vib8o/DdkvA2OtPtZvD871QKjy74Wj1WSKFILMPRPSdUSx5RFK1arlJzEtA4PkFgnbuA==}
+    engines: {node: '>=18'}
 
   cross-spawn@7.0.6:
     resolution: {integrity: sha512-uV2QOWP2nWzsy2aMp8aRibhi9dlzF5Hgh5SHaB9OiTGEyDTiJJyx0uy51QXdyWbtAHNua4XJzUKca3OzKUd3vA==}
@@ -1532,6 +1564,8 @@ snapshots:
       pathval: 2.0.1
 
   check-error@2.1.3: {}
+
+  commander@12.1.0: {}
 
   cross-spawn@7.0.6:
     dependencies:

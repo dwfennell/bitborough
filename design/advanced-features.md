@@ -5,9 +5,10 @@ The "Dwarf Fortress" layer. Add these gradually after the SimCity 1 foundation i
 ## Phase 1: Individual Simulation
 **Goal:** Citizens aren't just numbers, they're agents.
 
-- [ ] Individual citizens with home/work locations
+- [ ] Individual citizens with home/work/commerce locations
 - [ ] Actual commute pathfinding (not abstract traffic)
 - [ ] Citizens have needs: housing, jobs, goods, services
+- [ ] Schools and education (coverage + long-term citizen skill effects)
 - [ ] Birth, aging, death
 - [ ] Migration in/out based on city quality
 

@@ -1,4 +1,4 @@
-import { type GameMap, type DemandInfo, Infrastructure } from '@bitborough/core'
+import { type GameMap, type DemandInfo, type CitizenSummary, Infrastructure } from '@bitborough/core'
 import { BUILDING_DEFS } from '../buildings-registry.js'
 
 const TRAFFIC_CAPACITY = 100
@@ -26,7 +26,7 @@ function totalResCap(map: GameMap): number {
  * - Industrial: base 0.3 with dampened tax sensitivity
  * - Congestion: average road congestion > 0.8 suppresses all demand
  */
-export function calculateDemand(map: GameMap, taxRate: number, trafficDensity?: Uint8Array): DemandInfo {
+export function calculateDemand(map: GameMap, taxRate: number, trafficDensity?: Uint8Array, citizens?: CitizenSummary): DemandInfo {
   // Tax rate modifier:
   // At 7% tax, modifier is 1.0 (neutral)
   // Lower tax → modifier > 1 (boost)
@@ -56,6 +56,23 @@ export function calculateDemand(map: GameMap, taxRate: number, trafficDensity?: 
       cDemand *= penalty
       iDemand *= penalty
     }
+  }
+
+  // Citizen signals (only when citizens are present)
+  if (citizens && citizens.agentCount > 0) {
+    // Long commute suppresses residential demand (max -0.3 penalty at 60 tiles)
+    if (citizens.avgCommuteLengthTiles > 30) {
+      const penalty = Math.min(0.3, (citizens.avgCommuteLengthTiles - 30) / 30 * 0.3)
+      rDemand -= penalty
+    }
+
+    // Unmatched job fraction boosts industrial + commercial demand (up to +0.3)
+    const jobBoost = citizens.unmatchedJobFraction * 0.3
+    iDemand += jobBoost
+    cDemand += jobBoost * 0.5
+
+    // Unmatched commerce fraction boosts commercial demand (up to +0.2)
+    cDemand += citizens.unmatchedCommerceFraction * 0.2
   }
 
   // Clamp all values to [-1, 1]

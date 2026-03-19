@@ -45,6 +45,14 @@ export interface MonthlySnapshot {
   iDemand: number     // demand.industrial, -1..1
 }
 
+export interface CitizenSummary {
+  agentCount: number
+  avgSatisfaction: number
+  unmatchedJobFraction: number
+  unmatchedCommerceFraction: number
+  avgCommuteLengthTiles: number
+}
+
 export interface DemandInfo {
   residential: number
   commercial: number
@@ -103,6 +111,7 @@ export interface GameState {
   loanRepaymentAmount: number
   events: GameEvent[]
   history: MonthlySnapshot[]
+  citizens: CitizenSummary
 }
 
 /** Compute the fixed monthly payment for an amortized loan. */
@@ -127,6 +136,21 @@ export interface SaveFile {
     loan?: Loan | null
     loanRepaymentAmount?: number
     history?: MonthlySnapshot[]   // optional for backwards compatibility; [] if absent
+    citizens?: {
+      samplingRatio: number
+      agents: Array<{
+        id: string
+        homeBuildingId: string
+        homeAccessRoad: number
+        workBuildingId: string | null
+        workAccessRoad: number | null
+        commerceBuildingId: string | null
+        commerceAccessRoad: number | null
+        homeWorkRoute: number[]
+        homeCommerceRoute: number[]
+        satisfaction: number
+      }>
+    }
   }
   timestamp: string
 }

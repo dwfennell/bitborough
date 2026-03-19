@@ -1,4 +1,4 @@
-import { type BuildingDef, BuildingCategory, DensityLevel } from '@bitborough/core'
+import { type BuildingDef, BuildingCategory, DensityLevel, COSTS, MAINTENANCE } from '@bitborough/core'
 
 export const BUILDING_DEFS: Record<string, BuildingDef> = {
   // Zone buildings (auto-placed by simulation)
@@ -230,8 +230,8 @@ export const BUILDING_DEFS: Record<string, BuildingDef> = {
     pollutionAmount: 0,
     powerRequired: true,
     roadRequired: true,
-    cost: 500,
-    maintenanceCost: 50,
+    cost: COSTS.transitStop,
+    maintenanceCost: MAINTENANCE.transitStop,
   },
 
   // Player-placed buildings
@@ -247,8 +247,8 @@ export const BUILDING_DEFS: Record<string, BuildingDef> = {
     pollutionAmount: 5,
     powerRequired: false,
     roadRequired: false,
-    cost: 300,
-    maintenanceCost: 15,
+    cost: COSTS.dieselGenerator,
+    maintenanceCost: MAINTENANCE.dieselGenerator,
   },
   'power.coal': {
     id: 'power.coal',
@@ -262,8 +262,8 @@ export const BUILDING_DEFS: Record<string, BuildingDef> = {
     pollutionAmount: 20,
     powerRequired: false,
     roadRequired: false,
-    cost: 2000,
-    maintenanceCost: 60,
+    cost: COSTS.coalPlant,
+    maintenanceCost: MAINTENANCE.coalPlant,
   },
   'power.nuclear': {
     id: 'power.nuclear',
@@ -277,8 +277,8 @@ export const BUILDING_DEFS: Record<string, BuildingDef> = {
     pollutionAmount: 0,
     powerRequired: false,
     roadRequired: false,
-    cost: 5000,
-    maintenanceCost: 100,
+    cost: COSTS.nuclearPlant,
+    maintenanceCost: MAINTENANCE.nuclearPlant,
   },
   'service.police': {
     id: 'service.police',
@@ -292,8 +292,8 @@ export const BUILDING_DEFS: Record<string, BuildingDef> = {
     pollutionAmount: 0,
     powerRequired: true,
     roadRequired: true,
-    cost: 300,
-    maintenanceCost: 50,
+    cost: COSTS.policeStation,
+    maintenanceCost: MAINTENANCE.policeStation,
   },
   'service.fire': {
     id: 'service.fire',
@@ -307,8 +307,8 @@ export const BUILDING_DEFS: Record<string, BuildingDef> = {
     pollutionAmount: 0,
     powerRequired: true,
     roadRequired: true,
-    cost: 300,
-    maintenanceCost: 50,
+    cost: COSTS.fireStation,
+    maintenanceCost: MAINTENANCE.fireStation,
   },
   'special.park': {
     id: 'special.park',
@@ -322,7 +322,7 @@ export const BUILDING_DEFS: Record<string, BuildingDef> = {
     pollutionAmount: 0,
     powerRequired: false,
     roadRequired: false,
-    cost: 10,
+    cost: COSTS.park,
     maintenanceCost: 0,
   },
 }
