@@ -1,4 +1,4 @@
-import { type GameMap, type Building, Infrastructure, BuildingCategory } from '@bitborough/core'
+import { type GameMap, type Building, type CitizenSummary, Infrastructure, BuildingCategory } from '@bitborough/core'
 import { BUILDING_DEFS } from '../buildings-registry.js'
 import type { RoadGraph } from '../road-graph.js'
 import { astar } from '../road-graph.js'
@@ -27,13 +27,7 @@ export interface CitizenRegistry {
   samplingRatio: number
 }
 
-export interface CitizenSummary {
-  agentCount: number
-  avgSatisfaction: number
-  unmatchedJobFraction: number
-  unmatchedCommerceFraction: number
-  avgCommuteLengthTiles: number
-}
+export type { CitizenSummary }
 
 export const EMPTY_CITIZEN_SUMMARY: CitizenSummary = {
   agentCount: 0,

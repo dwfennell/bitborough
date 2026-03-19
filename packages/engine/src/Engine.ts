@@ -362,11 +362,14 @@ export class Engine {
       updateRoadGraph(this.map, this.roadGraph, x, y)
       markRoutesStale(this.citizenRegistry, idx)
       const buildingIds = new Set(this.map.buildings.map(b => b.id))
+      const orphanedIds = new Set<string>()
       for (const agent of this.citizenRegistry.agents) {
         if (!buildingIds.has(agent.homeBuildingId)) {
-          removeAgentsForBuilding(this.citizenRegistry, agent.homeBuildingId)
-          break
+          orphanedIds.add(agent.homeBuildingId)
         }
+      }
+      for (const id of orphanedIds) {
+        removeAgentsForBuilding(this.citizenRegistry, id)
       }
     }
     return result
