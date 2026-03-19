@@ -1,7 +1,7 @@
 import { describe, test, expect } from 'vitest'
 import { createTestMap } from '../test-helpers.js'
 import { calculateDemand } from '../simulation/demand.js'
-import { DensityLevel } from '@bitborough/core'
+import { DensityLevel, type CitizenSummary } from '@bitborough/core'
 
 describe('Zone demand', () => {
   test('initial residential demand is positive', () => {
@@ -142,5 +142,68 @@ describe('Zone demand', () => {
     // 5 × res.low capacity=10 = 50 total capacity
     const demand = calculateDemand(map, 0.07)
     expect(demand.commercial).toBeGreaterThan(0) // should be non-zero despite 0 actual residents
+  })
+})
+
+const baseSummary: CitizenSummary = {
+  agentCount: 100,
+  avgSatisfaction: 1,
+  unmatchedJobFraction: 0,
+  unmatchedCommerceFraction: 0,
+  avgCommuteLengthTiles: 10,
+}
+
+describe('Citizen demand signals', () => {
+  test('long average commute suppresses residential demand', () => {
+    const map = createTestMap(32)
+    const baseline = calculateDemand(map, 0.07)
+    const withLongCommute = calculateDemand(map, 0.07, undefined, {
+      ...baseSummary,
+      avgCommuteLengthTiles: 60,
+    })
+    expect(withLongCommute.residential).toBeLessThan(baseline.residential)
+  })
+
+  test('high unmatched job fraction boosts industrial demand', () => {
+    const map = createTestMap(32)
+    const baseline = calculateDemand(map, 0.07)
+    const withUnmatched = calculateDemand(map, 0.07, undefined, {
+      ...baseSummary,
+      unmatchedJobFraction: 1.0,
+    })
+    expect(withUnmatched.industrial).toBeGreaterThan(baseline.industrial)
+  })
+
+  test('high unmatched commerce fraction boosts commercial demand', () => {
+    const map = createTestMap(32)
+    const baseline = calculateDemand(map, 0.07)
+    const withUnmatched = calculateDemand(map, 0.07, undefined, {
+      ...baseSummary,
+      unmatchedCommerceFraction: 1.0,
+    })
+    expect(withUnmatched.commercial).toBeGreaterThan(baseline.commercial)
+  })
+
+  test('short commute with all matched produces no penalty', () => {
+    const map = createTestMap(32)
+    const baseline = calculateDemand(map, 0.07)
+    const withGoodCitizens = calculateDemand(map, 0.07, undefined, baseSummary)
+    expect(withGoodCitizens.residential).toBeCloseTo(baseline.residential, 2)
+  })
+
+  test('demand values remain clamped to [-1, 1] with citizen signals', () => {
+    const map = createTestMap(32)
+    const demand = calculateDemand(map, 0.07, undefined, {
+      ...baseSummary,
+      unmatchedJobFraction: 1.0,
+      unmatchedCommerceFraction: 1.0,
+      avgCommuteLengthTiles: 60,
+    })
+    expect(demand.residential).toBeGreaterThanOrEqual(-1)
+    expect(demand.residential).toBeLessThanOrEqual(1)
+    expect(demand.commercial).toBeGreaterThanOrEqual(-1)
+    expect(demand.commercial).toBeLessThanOrEqual(1)
+    expect(demand.industrial).toBeGreaterThanOrEqual(-1)
+    expect(demand.industrial).toBeLessThanOrEqual(1)
   })
 })
