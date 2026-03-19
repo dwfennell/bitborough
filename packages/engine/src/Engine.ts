@@ -468,7 +468,7 @@ export class Engine {
     const activeFires: Array<[number, number]> = Array.from(this.fireState.activeFires.entries())
 
     return {
-      version: 4,
+      version: 5,
       map: {
         version: this.map.version,
         width: this.map.width,
@@ -494,6 +494,21 @@ export class Engine {
         loan: this.loan,
         loanRepaymentAmount: this.loanRepaymentAmount,
         history: this.history,
+        citizens: {
+          samplingRatio: this.citizenRegistry.samplingRatio,
+          agents: this.citizenRegistry.agents.map(a => ({
+            id: a.id,
+            homeBuildingId: a.homeBuildingId,
+            homeAccessRoad: a.homeAccessRoad,
+            workBuildingId: a.workBuildingId,
+            workAccessRoad: a.workAccessRoad,
+            commerceBuildingId: a.commerceBuildingId,
+            commerceAccessRoad: a.commerceAccessRoad,
+            homeWorkRoute: a.homeWorkRoute,
+            homeCommerceRoute: a.homeCommerceRoute,
+            satisfaction: a.satisfaction,
+          })),
+        },
       },
       timestamp: new Date().toISOString(),
     }
@@ -568,6 +583,24 @@ export class Engine {
     engine.loan = save.state.loan ?? null
     engine.loanRepaymentAmount = save.state.loanRepaymentAmount ?? (engine.loan?.monthlyPayment ?? 0)
     engine.history = save.state.history ?? []
+
+    // Restore citizen registry
+    if (save.state.citizens) {
+      engine.citizenRegistry = {
+        samplingRatio: save.state.citizens.samplingRatio,
+        agents: save.state.citizens.agents.map(a => ({
+          ...a,
+          homeWorkRouteStale: false,
+          homeCommerceRouteStale: false,
+          homeWorkRouteTileSet: new Set(a.homeWorkRoute),
+          homeCommerceRouteTileSet: new Set(a.homeCommerceRoute),
+        })),
+      }
+    } else {
+      engine.citizenRegistry = createRegistry()
+    }
+    engine.roadGraph = buildRoadGraph(engine.map)
+    engine.citizenSummary = computeCitizenSummary(engine.citizenRegistry)
 
     // Rebuild derived state
     propagatePower(engine.map, engine.powerGrid, engine.bldIdx)

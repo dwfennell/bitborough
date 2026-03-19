@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'vitest'
 import { Engine } from '../Engine.js'
-import { createTestMap, advanceYear } from '../test-helpers.js'
+import { createTestMap, advanceYear, advanceMonth } from '../test-helpers.js'
 import { Infrastructure, ZoneType } from '@bitborough/core'
 import { BUILDING_DEFS } from '../buildings-registry.js'
 import type { SaveFile } from '@bitborough/core'
@@ -83,10 +83,10 @@ describe('Serialization', () => {
     }
   })
 
-  test('v4 save preserves exact residents values', () => {
+  test('v5 save preserves exact residents values', () => {
     const engine = Engine.create(createTestMap(32), { seed: 1, startingFunds: 10_000 })
     const save = engine.serialize()
-    expect(save.version).toBe(4)
+    expect(save.version).toBe(5)
     const restored = Engine.restore(save)
     for (let i = 0; i < engine.getState().map.buildings.length; i++) {
       expect(restored.getState().map.buildings[i]!.residents).toBe(engine.getState().map.buildings[i]!.residents)
@@ -175,6 +175,45 @@ describe('Serialization', () => {
     const restored = Engine.restore(oldSave)
     expect(restored.getState().loan).toBeNull()
     expect(restored.getState().loanRepaymentAmount).toBe(0)
+  })
+
+  test('citizens are serialized and restored', () => {
+    const engine = Engine.create(createTestMap(32), { seed: 42, startingFunds: 100_000 })
+    engine.placeBuilding(0, 0, 'power.coal')
+    for (let x = 4; x < 10; x++) {
+      engine.placeTile(x, 2, Infrastructure.PowerLine)
+      engine.placeTile(x, 4, Infrastructure.Road)
+      engine.placeZone(x, 3, ZoneType.Residential)
+    }
+    for (let x = 15; x < 20; x++) {
+      engine.placeTile(x, 4, Infrastructure.Road)
+      engine.placeZone(x, 3, ZoneType.Commercial)
+    }
+    // Let city develop so citizens spawn
+    for (let i = 0; i < 24; i++) advanceMonth(engine)
+
+    const state1 = engine.getState()
+    const save = engine.serialize()
+
+    expect(save.version).toBe(5)
+    if (state1.citizens.agentCount > 0) {
+      expect(save.state.citizens).toBeDefined()
+      expect(save.state.citizens!.agents.length).toBeGreaterThan(0)
+    }
+
+    const restored = Engine.restore(save)
+    const state2 = restored.getState()
+
+    expect(state2.citizens.agentCount).toBe(state1.citizens.agentCount)
+  })
+
+  test('restore from v4 save (no citizens field) starts with empty registry', () => {
+    const engine = Engine.create(createTestMap(32), { seed: 42 })
+    const save = engine.serialize()
+    // Simulate a v4 save by removing citizens and setting version to 4
+    const v4Save = { ...save, version: 4 as const, state: { ...save.state, citizens: undefined } }
+    const restored = Engine.restore(v4Save as any)
+    expect(restored.getState().citizens.agentCount).toBe(0)
   })
 
   test('restored engine is deterministic with original', () => {
