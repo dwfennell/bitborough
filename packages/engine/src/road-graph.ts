@@ -41,7 +41,7 @@ export function astar(
   mapWidth: number,
   maxLength = MAX_ROUTE_LENGTH,
 ): number[] | null {
-  if (!graph.has(start)) return null
+  if (!graph.has(start) || !graph.has(goal)) return null
   if (start === goal) return [start]
 
   const gScore = new Map<number, number>([[start, 0]])
@@ -86,9 +86,9 @@ function reconstructPath(cameFrom: Map<number, number>, current: number): number
   const path = [current]
   while (cameFrom.has(current)) {
     current = cameFrom.get(current)!
-    path.unshift(current)
+    path.push(current)
   }
-  return path
+  return path.reverse()
 }
 
 export function updateRoadGraph(map: GameMap, graph: RoadGraph, x: number, y: number): void {
