@@ -33,6 +33,15 @@ export function buildRoadGraph(map: GameMap): RoadGraph {
 
 export const MAX_ROUTE_LENGTH = 60
 
+const TRAFFIC_CAPACITY = 100
+
+function edgeCost(tile: number, trafficDensity?: Uint8Array): number {
+  if (!trafficDensity) return 1
+  const v = trafficDensity[tile]!
+  const vc = v / TRAFFIC_CAPACITY
+  return 1 + 0.15 * vc * vc * vc * vc  // BPR: 1 + 0.15 * (v/c)^4
+}
+
 /** A* on road graph. Returns path (inclusive of start and goal) or null if unreachable. */
 export function astar(
   graph: RoadGraph,
@@ -40,6 +49,7 @@ export function astar(
   goal: number,
   mapWidth: number,
   maxLength = MAX_ROUTE_LENGTH,
+  trafficDensity?: Uint8Array,
 ): number[] | null {
   if (!graph.has(start) || !graph.has(goal)) return null
   if (start === goal) return [start]
@@ -65,7 +75,7 @@ export function astar(
     const g = gScore.get(current) ?? Infinity
 
     for (const neighbor of (graph.get(current) ?? [])) {
-      const tentativeG = g + 1
+      const tentativeG = g + edgeCost(neighbor, trafficDensity)
       if (tentativeG > maxLength) continue  // path would exceed limit
       if (tentativeG < (gScore.get(neighbor) ?? Infinity)) {
         cameFrom.set(neighbor, current)

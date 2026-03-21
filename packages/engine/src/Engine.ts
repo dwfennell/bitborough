@@ -217,7 +217,7 @@ export class Engine {
         if (b.state === 'active') {
           const def = BUILDING_DEFS[b.defId]
           if (def && def.category === BuildingCategory.Residential) {
-            syncAgentsForBuilding(this.map, this.citizenRegistry, this.roadGraph, b)
+            syncAgentsForBuilding(this.map, this.citizenRegistry, this.roadGraph, b, this.trafficDensity)
           }
         }
       }
