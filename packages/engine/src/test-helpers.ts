@@ -1,4 +1,4 @@
-import { createEmptyMap, type GameMap } from '@bitborough/core'
+import { createEmptyMap, DEFAULTS, type GameMap } from '@bitborough/core'
 
 export function createTestMap(size: number): GameMap {
   return createEmptyMap(size, size, {
@@ -13,9 +13,9 @@ export function advanceTicks(engine: { tick(): void }, n: number): void {
 }
 
 export function advanceMonth(engine: { tick(): void }): void {
-  advanceTicks(engine, 4)
+  advanceTicks(engine, DEFAULTS.ticksPerMonth)
 }
 
 export function advanceYear(engine: { tick(): void }): void {
-  advanceTicks(engine, 48)
+  advanceTicks(engine, DEFAULTS.ticksPerMonth * DEFAULTS.monthsPerYear)
 }
