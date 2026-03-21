@@ -32,8 +32,8 @@ import { calculateCrime } from './simulation/services/crime.js'
 import { calculateFireCoverage, updateFires, createFireState, type FireState } from './simulation/services/fire.js'
 import { buildRoadGraph, updateRoadGraph, type RoadGraph } from './road-graph.js'
 import {
-  createRegistry, syncAgentsForBuilding, removeOrphanedAgents,
-  citizenMonthlyTick, computeCitizenSummary, markRoutesStale,
+  createRegistry, syncAgentsForBuilding, removeAgentsForBuilding,
+  citizenMonthlyTick, computeCitizenSummary, markRoutesStale, markRoutesStaleBatch,
   setNextAgentId, EMPTY_CITIZEN_SUMMARY,
   type CitizenRegistry,
 } from './simulation/citizens.js'
@@ -363,24 +363,26 @@ export class Engine {
       this.bldIdx = new BuildingIndex(this.map)
 
       if (building && def) {
-        // Update connections, road graph, and stale routes for all footprint tiles
         for (let dy = 0; dy < def.size.h; dy++) {
           for (let dx = 0; dx < def.size.w; dx++) {
-            const tx = building.x + dx
-            const ty = building.y + dy
-            updateConnections(this.map, tx, ty)
-            updateRoadGraph(this.map, this.roadGraph, tx, ty)
-            markRoutesStale(this.citizenRegistry, ty * this.map.width + tx)
+            updateConnections(this.map, building.x + dx, building.y + dy)
+            updateRoadGraph(this.map, this.roadGraph, building.x + dx, building.y + dy)
           }
         }
+        // Batch mark all footprint tiles as stale in a single agent scan
+        const staleTiles = new Set<number>()
+        for (let dy = 0; dy < def.size.h; dy++) {
+          for (let dx = 0; dx < def.size.w; dx++) {
+            staleTiles.add((building.y + dy) * this.map.width + (building.x + dx))
+          }
+        }
+        markRoutesStaleBatch(this.citizenRegistry, staleTiles)
+        removeAgentsForBuilding(this.citizenRegistry, building.id)
       } else {
-        // Single tile bulldoze (no building)
         updateConnections(this.map, x, y)
         updateRoadGraph(this.map, this.roadGraph, x, y)
         markRoutesStale(this.citizenRegistry, y * this.map.width + x)
       }
-
-      removeOrphanedAgents(this.citizenRegistry, new Set(this.map.buildings.map(b => b.id)))
     }
     return result
   }

@@ -180,54 +180,50 @@ export function markRoutesStale(registry: CitizenRegistry, tileIndex: number): v
   }
 }
 
+export function markRoutesStaleBatch(registry: CitizenRegistry, tileIndices: Set<number>): void {
+  for (const agent of registry.agents) {
+    for (const idx of tileIndices) {
+      if (agent.homeWorkRouteTileSet.has(idx)) { agent.homeWorkRouteStale = true; break }
+    }
+    for (const idx of tileIndices) {
+      if (agent.homeCommerceRouteTileSet.has(idx)) { agent.homeCommerceRouteStale = true; break }
+    }
+  }
+}
+
+function replanRoute(
+  agent: Citizen,
+  map: GameMap,
+  graph: RoadGraph,
+  currentAccessRoad: number | null,
+  filter: (def: BuildingDef) => boolean,
+): { buildingId: string | null; accessRoad: number | null; route: number[] } {
+  if (currentAccessRoad !== null) {
+    const route = astar(graph, agent.homeAccessRoad, currentAccessRoad, map.width)
+    if (route) return { buildingId: null, accessRoad: currentAccessRoad, route }
+  }
+  const match = findNearestBuilding(map, graph, agent.homeAccessRoad, filter)
+  if (match) return { buildingId: match.buildingId, accessRoad: match.accessRoad, route: match.route }
+  return { buildingId: null, accessRoad: null, route: [] }
+}
+
 export function replanStaleRoutes(registry: CitizenRegistry, map: GameMap, graph: RoadGraph): void {
   for (const agent of registry.agents) {
     if (agent.homeWorkRouteStale) {
-      let found = false
-      if (agent.workAccessRoad !== null) {
-        const route = astar(graph, agent.homeAccessRoad, agent.workAccessRoad, map.width)
-        if (route) {
-          agent.homeWorkRoute = route
-          found = true
-        }
-      }
-      if (!found) {
-        // Try to find an alternative workplace
-        const match = findNearestBuilding(map, graph, agent.homeAccessRoad, d => d.jobs > 0)
-        if (match) {
-          agent.workBuildingId = match.buildingId
-          agent.workAccessRoad = match.accessRoad
-          agent.homeWorkRoute = match.route
-        } else {
-          agent.workBuildingId = null
-          agent.workAccessRoad = null
-          agent.homeWorkRoute = []
-        }
-      }
+      const result = replanRoute(agent, map, graph, agent.workAccessRoad, d => d.jobs > 0)
+      if (result.buildingId !== null) agent.workBuildingId = result.buildingId
+      agent.workAccessRoad = result.accessRoad
+      agent.homeWorkRoute = result.route
+      if (result.accessRoad === null) agent.workBuildingId = null
       agent.homeWorkRouteTileSet = new Set(agent.homeWorkRoute)
       agent.homeWorkRouteStale = false
     }
     if (agent.homeCommerceRouteStale) {
-      let found = false
-      if (agent.commerceAccessRoad !== null) {
-        const route = astar(graph, agent.homeAccessRoad, agent.commerceAccessRoad, map.width)
-        if (route) {
-          agent.homeCommerceRoute = route
-          found = true
-        }
-      }
-      if (!found) {
-        const match = findNearestBuilding(map, graph, agent.homeAccessRoad, d => d.category === BuildingCategory.Commercial)
-        if (match) {
-          agent.commerceBuildingId = match.buildingId
-          agent.commerceAccessRoad = match.accessRoad
-          agent.homeCommerceRoute = match.route
-        } else {
-          agent.commerceBuildingId = null
-          agent.commerceAccessRoad = null
-          agent.homeCommerceRoute = []
-        }
-      }
+      const result = replanRoute(agent, map, graph, agent.commerceAccessRoad, d => d.category === BuildingCategory.Commercial)
+      if (result.buildingId !== null) agent.commerceBuildingId = result.buildingId
+      agent.commerceAccessRoad = result.accessRoad
+      agent.homeCommerceRoute = result.route
+      if (result.accessRoad === null) agent.commerceBuildingId = null
       agent.homeCommerceRouteTileSet = new Set(agent.homeCommerceRoute)
       agent.homeCommerceRouteStale = false
     }

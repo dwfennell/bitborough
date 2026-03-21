@@ -1,11 +1,10 @@
-export function out(data: unknown): never {
+export function out(data: unknown, exitCode = 0): never {
   console.log(JSON.stringify(data, null, 2))
-  process.exit(0)
+  process.exit(exitCode)
 }
 
 export function outErr(data: unknown): never {
-  console.log(JSON.stringify(data, null, 2))
-  process.exit(1)
+  return out(data, 1)
 }
 
 export function err(error: string, code = 1): never {
