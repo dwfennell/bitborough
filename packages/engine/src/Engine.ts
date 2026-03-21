@@ -353,14 +353,33 @@ export class Engine {
   }
 
   bulldoze(x: number, y: number): Result {
-    const { result, cost } = bulldoze(this.map, x, y, this.funds)
+    // Read the building before bulldoze so we know the footprint for cleanup
+    const building = this.bldIdx.get(x, y)
+    const def = building ? BUILDING_DEFS[building.defId] : undefined
+
+    const { result, cost } = bulldoze(this.map, x, y, this.funds, this.bldIdx)
     this.funds -= cost
     if (result.ok) {
-      updateConnections(this.map, x, y)
       this.bldIdx = new BuildingIndex(this.map)
-      const idx = y * this.map.width + x
-      updateRoadGraph(this.map, this.roadGraph, x, y)
-      markRoutesStale(this.citizenRegistry, idx)
+
+      if (building && def) {
+        // Update connections, road graph, and stale routes for all footprint tiles
+        for (let dy = 0; dy < def.size.h; dy++) {
+          for (let dx = 0; dx < def.size.w; dx++) {
+            const tx = building.x + dx
+            const ty = building.y + dy
+            updateConnections(this.map, tx, ty)
+            updateRoadGraph(this.map, this.roadGraph, tx, ty)
+            markRoutesStale(this.citizenRegistry, ty * this.map.width + tx)
+          }
+        }
+      } else {
+        // Single tile bulldoze (no building)
+        updateConnections(this.map, x, y)
+        updateRoadGraph(this.map, this.roadGraph, x, y)
+        markRoutesStale(this.citizenRegistry, y * this.map.width + x)
+      }
+
       removeOrphanedAgents(this.citizenRegistry, new Set(this.map.buildings.map(b => b.id)))
     }
     return result

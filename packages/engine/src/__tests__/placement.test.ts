@@ -198,4 +198,21 @@ describe('Bulldoze', () => {
     engine.bulldoze(5, 5)
     expect(engine.getState().funds).toBe(fundsBefore - 1)
   })
+
+  test('bulldozes multi-tile building from non-origin tile', () => {
+    const engine = Engine.create(createTestMap(32), { seed: 1 })
+    engine.placeBuilding(5, 5, 'power.diesel')
+    expect(engine.getState().map.buildings.length).toBe(1)
+
+    const result = engine.bulldoze(6, 5) // non-origin tile
+    expect(result.ok).toBe(true)
+    expect(engine.getState().map.buildings.length).toBe(0)
+
+    // All footprint tiles cleared
+    for (const [x, y] of [[5, 5], [6, 5], [5, 6], [6, 6]]) {
+      const tile = engine.getTile(x, y)
+      expect(tile.infrastructure).toBe(0)
+      expect(tile.zone).toBe(0)
+    }
+  })
 })
