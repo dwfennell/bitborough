@@ -47,7 +47,7 @@ export class InputManager {
   destroy(): void {
     this.canvas.removeEventListener('mousedown', this.boundMouseDown)
     this.canvas.removeEventListener('mousemove', this.boundMouseMove)
-    this.canvas.removeEventListener('mouseup', this.boundMouseUp)
+    window.removeEventListener('mouseup', this.boundMouseUp)
     this.canvas.removeEventListener('wheel', this.boundWheel)
     this.canvas.removeEventListener('contextmenu', this.boundContextMenu)
   }
@@ -55,7 +55,7 @@ export class InputManager {
   private bindEvents(): void {
     this.canvas.addEventListener('mousedown', this.boundMouseDown)
     this.canvas.addEventListener('mousemove', this.boundMouseMove)
-    this.canvas.addEventListener('mouseup', this.boundMouseUp)
+    window.addEventListener('mouseup', this.boundMouseUp)
     this.canvas.addEventListener('wheel', this.boundWheel, { passive: false })
     this.canvas.addEventListener('contextmenu', this.boundContextMenu)
   }
