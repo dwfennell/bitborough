@@ -1,7 +1,7 @@
 import { describe, test, expect } from 'vitest'
 import { Engine } from '../Engine.js'
 import { createTestMap, advanceYear, advanceMonth } from '../test-helpers.js'
-import { Infrastructure, ZoneType, createEmptyMap } from '@bitborough/core'
+import { Infrastructure, ZoneType, DensityLevel, createEmptyMap } from '@bitborough/core'
 import { calculateBudget } from '../simulation/budget.js'
 
 describe('Budget system', () => {
@@ -119,5 +119,83 @@ describe('Budget system', () => {
 
     const withLargeLoan = calculateBudget(map, 0, 0.07, landValues, funding, 999_999)
     expect(withLargeLoan.balance).toBe(withoutLoan.balance - 999_999)
+  })
+})
+
+describe('Sprawl penalty', () => {
+  test('low population with many spread-out buildings increases road maintenance', () => {
+    const map = createEmptyMap(32, 32, { name: 'test', seed: 0, createdAt: '' })
+    const landValues = new Uint8Array(32 * 32)
+    const funding = { police: 100, fire: 100, transit: 100 }
+
+    // Add 20 road tiles for baseline maintenance
+    for (let x = 0; x < 20; x++) {
+      map.infrastructure[5 * 32 + x] = Infrastructure.Road
+    }
+    // Add 10 power line tiles
+    for (let x = 0; x < 10; x++) {
+      map.infrastructure[3 * 32 + x] = Infrastructure.PowerLine
+    }
+
+    // Add 10 res.low buildings (each 1x1 = 10 footprint tiles total)
+    for (let x = 0; x < 10; x++) {
+      map.buildings.push({
+        id: `r${x}`,
+        defId: 'res.low',
+        x,
+        y: 4,
+        density: DensityLevel.Low,
+        state: 'active',
+        residents: 0,
+        age: 0,
+        powered: true,
+      })
+    }
+
+    // With population=10 and footprint=10: sprawlRatio = 10/10 = 1.0
+    // sprawlMultiplier = 1 + (1.0 - 0.05) * 4 = 1 + 3.8 = 4.8
+    const sprawlBudget = calculateBudget(map, 10, 0.07, landValues, funding)
+
+    // With population=10000 and footprint=10: sprawlRatio = 10/10000 = 0.001
+    // 0.001 < 0.05 threshold → sprawlMultiplier = 1.0 (no penalty)
+    const denseBudget = calculateBudget(map, 10000, 0.07, landValues, funding)
+
+    // Road maintenance should be higher with sprawl
+    expect(sprawlBudget.maintenanceCosts.roads).toBeGreaterThan(denseBudget.maintenanceCosts.roads)
+    // Power line maintenance should also be higher with sprawl
+    expect(sprawlBudget.maintenanceCosts.powerLines).toBeGreaterThan(denseBudget.maintenanceCosts.powerLines)
+  })
+
+  test('high population with dense buildings gets no sprawl penalty', () => {
+    const map = createEmptyMap(32, 32, { name: 'test', seed: 0, createdAt: '' })
+    const landValues = new Uint8Array(32 * 32)
+    const funding = { police: 100, fire: 100, transit: 100 }
+
+    // Add 10 road tiles
+    for (let x = 0; x < 10; x++) {
+      map.infrastructure[5 * 32 + x] = Infrastructure.Road
+    }
+
+    // Add 5 res.low buildings (footprint = 5)
+    for (let x = 0; x < 5; x++) {
+      map.buildings.push({
+        id: `r${x}`,
+        defId: 'res.low',
+        x,
+        y: 4,
+        density: DensityLevel.Low,
+        state: 'active',
+        residents: 0,
+        age: 0,
+        powered: true,
+      })
+    }
+
+    // population=1000, footprint=5: sprawlRatio = 5/1000 = 0.005
+    // 0.005 < 0.05 threshold → no penalty
+    const budget = calculateBudget(map, 1000, 0.07, landValues, funding)
+
+    // Road maintenance should be exactly roadCount * MAINTENANCE.road = 10 * 1 = 10
+    expect(budget.maintenanceCosts.roads).toBe(10)
   })
 })
