@@ -51,11 +51,17 @@ export function calculateBudget(
   maintenanceCosts.total =
     maintenanceCosts.roads + maintenanceCosts.rails + maintenanceCosts.powerLines + maintenanceCosts.powerPlants
 
-  // Sprawl penalty: high land-per-capita increases road and power line maintenance
-  const SPRAWL_THRESHOLD = 0.05
+  // Sprawl penalty: high land-per-capita increases road and power line maintenance.
+  // Threshold scales with population — small cities get a generous allowance,
+  // converging to 0.05 as population grows past ~1000.
+  const SPRAWL_BASE_THRESHOLD = 0.05
+  const SPRAWL_MIN_POPULATION = 50
+  const effectiveThreshold = population < SPRAWL_MIN_POPULATION
+    ? Infinity // no sprawl penalty for tiny cities
+    : SPRAWL_BASE_THRESHOLD + 50 / population
   const sprawlRatio = population > 0 ? footprintTileCount / population : 0
-  const sprawlMultiplier = sprawlRatio > SPRAWL_THRESHOLD
-    ? 1 + (sprawlRatio - SPRAWL_THRESHOLD) * 4
+  const sprawlMultiplier = sprawlRatio > effectiveThreshold
+    ? 1 + (sprawlRatio - effectiveThreshold) * 4
     : 1.0
 
   if (sprawlMultiplier > 1) {

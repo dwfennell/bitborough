@@ -152,12 +152,31 @@ describe('Sprawl penalty', () => {
       })
     }
 
-    // With population=10 and footprint=10: sprawlRatio = 10/10 = 1.0
-    // sprawlMultiplier = 1 + (1.0 - 0.05) * 4 = 1 + 3.8 = 4.8
-    const sprawlBudget = calculateBudget(map, 10, 0.07, landValues, funding)
+    // Sprawl threshold scales: effectiveThreshold = 0.05 + 50/population
+    // At pop=5000: threshold = 0.06, footprint=10, ratio=0.002 → no penalty
+    // Use high population to get the base threshold low, then compare with dense city:
+    // pop=500, footprint=10: threshold=0.15, ratio=0.02 → no penalty
+    // We need ratio > threshold. Use pop=100 (above SPRAWL_MIN_POPULATION=50):
+    // threshold = 0.05 + 50/100 = 0.55. ratio = 10/100 = 0.10. No penalty (0.10 < 0.55)
+    // The scaling makes it very hard for mid-size cities to trigger.
+    // For a clear test: pop=5000, footprint=10, ratio=0.002, threshold=0.06 → no penalty
+    //                   pop=5000, footprint=500 → ratio=0.1, threshold=0.06 → penalty!
+    // Add many buildings to get high footprint:
+    for (let i = 0; i < 50; i++) {
+      map.buildings.push({
+        id: `extra${i}`, defId: 'res.low', x: i % 30, y: 7 + Math.floor(i / 30),
+        density: DensityLevel.Low, state: 'active', residents: 0, age: 0, powered: true,
+      })
+    }
+    // footprint = 10 (original) + 50 = 60
+    // pop=5000: threshold=0.06, ratio=60/5000=0.012 → no penalty
+    // pop=500:  threshold=0.15, ratio=60/500=0.12 → no penalty (0.12 < 0.15)
+    // pop=200:  threshold=0.30, ratio=60/200=0.30 → borderline
+    // pop=100:  threshold=0.55, ratio=60/100=0.60 → penalty! multiplier=1+(0.60-0.55)*4=1.20
+    // But pop=100 is above SPRAWL_MIN_POPULATION=50 ✓
+    const sprawlBudget = calculateBudget(map, 100, 0.07, landValues, funding)
 
-    // With population=10000 and footprint=10: sprawlRatio = 10/10000 = 0.001
-    // 0.001 < 0.05 threshold → sprawlMultiplier = 1.0 (no penalty)
+    // Dense: same footprint but pop=10000 → ratio=0.006, threshold=0.055 → no penalty
     const denseBudget = calculateBudget(map, 10000, 0.07, landValues, funding)
 
     // Road maintenance should be higher with sprawl

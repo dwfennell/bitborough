@@ -209,43 +209,47 @@ describe('Citizen demand signals', () => {
 })
 
 describe('Vacancy rate feedback', () => {
-  test('high vacancy (100%) dampens residential demand', () => {
+  test('high vacancy dampens residential demand when population exceeds gate', () => {
+    // High vacancy city: 200 capacity, 110 residents (~45% vacancy, above 8% threshold)
+    // Population > 100 so the vacancy gate is passed
     const map = createTestMap(32)
-    // Add residential buildings with high capacity but 0 residents (100% vacancy)
-    for (let x = 0; x < 10; x++) {
-      map.buildings.push({
-        id: `r${x}`,
-        defId: 'res.low',
-        x,
-        y: 0,
-        density: DensityLevel.Low,
-        state: 'active',
-        residents: 0,
-        age: 0,
-        powered: true,
-      })
-    }
+    map.buildings.push({
+      id: 'r1', defId: 'res.med', x: 0, y: 0,
+      density: DensityLevel.Medium, state: 'active', residents: 110, age: 0, powered: true,
+    })
+    map.buildings.push({
+      id: 'r2', defId: 'res.med', x: 2, y: 0,
+      density: DensityLevel.Medium, state: 'active', residents: 0, age: 0, powered: true,
+    })
     const withVacancy = calculateDemand(map, 0.07)
 
-    // Now create a map with full occupancy
+    // Full occupancy city: same capacity, full residents
     const mapFull = createTestMap(32)
-    for (let x = 0; x < 10; x++) {
-      mapFull.buildings.push({
-        id: `r${x}`,
-        defId: 'res.low',
-        x,
-        y: 0,
-        density: DensityLevel.Low,
-        state: 'active',
-        residents: 10, // full capacity
-        age: 0,
-        powered: true,
-      })
-    }
+    mapFull.buildings.push({
+      id: 'r1', defId: 'res.med', x: 0, y: 0,
+      density: DensityLevel.Medium, state: 'active', residents: 100, age: 0, powered: true,
+    })
+    mapFull.buildings.push({
+      id: 'r2', defId: 'res.med', x: 2, y: 0,
+      density: DensityLevel.Medium, state: 'active', residents: 100, age: 0, powered: true,
+    })
     const withFullOccupancy = calculateDemand(mapFull, 0.07)
 
-    // 100% vacancy should produce lower residential demand
     expect(withVacancy.residential).toBeLessThan(withFullOccupancy.residential)
+  })
+
+  test('vacancy has no effect below population gate (100)', () => {
+    // Small city with high vacancy but below population gate
+    const map = createTestMap(32)
+    for (let x = 0; x < 5; x++) {
+      map.buildings.push({
+        id: `r${x}`, defId: 'res.low', x, y: 0,
+        density: DensityLevel.Low, state: 'active', residents: 0, age: 0, powered: true,
+      })
+    }
+    const demand = calculateDemand(map, 0.07)
+    // Should not be penalized — demand stays at base level
+    expect(demand.residential).toBe(1)
   })
 
   test('vacancy below 8% has no effect on demand', () => {

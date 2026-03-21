@@ -3,6 +3,7 @@ import { BUILDING_DEFS } from '../buildings-registry.js'
 import { TRAFFIC_CAPACITY } from '../road-graph.js'
 
 export const COMMERCIAL_DEMAND_CAPACITY_DIVISOR = 500
+const VACANCY_MIN_POPULATION = 100
 
 function sumResidentialCapacity(map: GameMap): number {
   let total = 0
@@ -84,12 +85,15 @@ export function calculateDemand(map: GameMap, taxRate: number, trafficDensity?: 
     cDemand += citizens.unmatchedCommerceFraction * 0.2
   }
 
-  // Vacancy rate feedback: high vacancy dampens residential demand
+  // Vacancy rate feedback: high vacancy dampens residential demand.
+  // Only applies above 100 population — small cities need to fill first buildings freely.
   const totalResidents = sumResidentialResidents(map)
-  const vacancy = resCap > 0 ? 1 - totalResidents / resCap : 0
-  if (vacancy > 0.08) {
-    const vacancyPenalty = Math.min(0.5, (vacancy - 0.08) * 3)
-    rDemand -= vacancyPenalty
+  if (totalResidents >= VACANCY_MIN_POPULATION) {
+    const vacancy = resCap > 0 ? 1 - totalResidents / resCap : 0
+    if (vacancy > 0.08) {
+      const vacancyPenalty = Math.min(0.5, (vacancy - 0.08) * 3)
+      rDemand -= vacancyPenalty
+    }
   }
 
   // Clamp all values to [-1, 1]
