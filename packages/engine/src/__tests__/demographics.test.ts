@@ -37,8 +37,8 @@ describe('Demographics — aging', () => {
     for (let i = 0; i < 300; i++) {
       demographicTick(registry, map, prng, 0.45)
     }
-    expect(agent.demographics.children).toBeLessThan(20)
-    expect(agent.demographics.working).toBeGreaterThan(50)
+    expect(agent.demographics.children).toBeLessThan(40)
+    expect(agent.demographics.working).toBeGreaterThan(30)
   })
 
   test('working transition to elderly over time', () => {

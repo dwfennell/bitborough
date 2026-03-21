@@ -1,4 +1,4 @@
-import type { GameMap } from '@bitborough/core'
+import type { GameMap, Building } from '@bitborough/core'
 import type { CitizenRegistry } from './citizens.js'
 import type { PRNG } from '../prng.js'
 import { BUILDING_DEFS } from '../buildings-registry.js'
@@ -14,6 +14,12 @@ export interface DemographicResult {
   netMigration: number
 }
 
+/** Stochastic rounding: floor(n*p) + probabilistic remainder. O(1) per call. */
+function stochasticCount(n: number, p: number, prng: PRNG): number {
+  const expected = n * p
+  return Math.floor(expected) + (prng.next() < (expected % 1) ? 1 : 0)
+}
+
 export function demographicTick(
   registry: CitizenRegistry,
   map: GameMap,
@@ -24,62 +30,56 @@ export function demographicTick(
   let deaths = 0
   let netMigration = 0
 
-  // Pass 1: Aging transitions
-  for (const agent of registry.agents) {
-    const d = agent.demographics
-    let childTransitions = 0
-    for (let i = 0; i < d.children; i++) {
-      if (prng.next() < P_CHILD_TO_WORKING) childTransitions++
-    }
-    d.children -= childTransitions
-    d.working += childTransitions
-
-    let retirements = 0
-    for (let i = 0; i < d.working; i++) {
-      if (prng.next() < P_WORKING_TO_ELDERLY) retirements++
-    }
-    d.working -= retirements
-    d.elderly += retirements
-  }
-
-  // Pass 2: Deaths
+  // Passes 1-3: Aging, deaths, births (merged into single loop)
   for (let i = registry.agents.length - 1; i >= 0; i--) {
     const agent = registry.agents[i]!
     const d = agent.demographics
-    let elderlyDeaths = 0
-    for (let j = 0; j < d.elderly; j++) {
-      if (prng.next() < P_ELDERLY_DEATH) elderlyDeaths++
-    }
+
+    // Aging: children → working
+    const childTransitions = stochasticCount(d.children, P_CHILD_TO_WORKING, prng)
+    d.children -= childTransitions
+    d.working += childTransitions
+
+    // Aging: working → elderly
+    const retirements = stochasticCount(d.working, P_WORKING_TO_ELDERLY, prng)
+    d.working -= retirements
+    d.elderly += retirements
+
+    // Deaths
+    const elderlyDeaths = stochasticCount(d.elderly, P_ELDERLY_DEATH, prng)
     d.elderly -= elderlyDeaths
     deaths += elderlyDeaths
+
+    // Remove empty agents
     if (d.children + d.working + d.elderly <= 0) {
       registry.agents.splice(i, 1)
+      continue
     }
-  }
 
-  // Pass 3: Births
-  for (const agent of registry.agents) {
-    const d = agent.demographics
-    if (d.working <= 0) continue
-    let newBirths = 0
-    for (let i = 0; i < d.working; i++) {
-      if (prng.next() < P_BIRTH) newBirths++
+    // Births
+    if (d.working > 0) {
+      const newBirths = stochasticCount(d.working, P_BIRTH, prng)
+      d.children += newBirths
+      births += newBirths
     }
-    d.children += newBirths
-    births += newBirths
   }
 
   // Pass 4: Migration
   const totalWorking = registry.agents.reduce((sum, a) => sum + a.demographics.working, 0)
 
   if (avgSatisfaction > 0.5 && totalWorking > 0) {
+    // Immigration
     const rate = ((avgSatisfaction - 0.5) / 0.5) * 0.02 * totalWorking
-    // Stochastic rounding: floor + probabilistic extra
     const immigrantCount = Math.floor(rate) + (prng.next() < (rate % 1) ? 1 : 0)
+
+    // Build lookup for O(1) building access
+    const buildingById = new Map<string, Building>()
+    for (const b of map.buildings) buildingById.set(b.id, b)
+
     let placed = 0
     for (const agent of registry.agents) {
       if (placed >= immigrantCount) break
-      const building = map.buildings.find(b => b.id === agent.homeBuildingId)
+      const building = buildingById.get(agent.homeBuildingId)
       if (!building) continue
       const def = BUILDING_DEFS[building.defId]
       if (!def) continue
@@ -92,8 +92,8 @@ export function demographicTick(
     }
     netMigration += placed
   } else if (avgSatisfaction < 0.4 && totalWorking > 0) {
+    // Emigration — drain proportionally from least-satisfied agents
     const rate = ((0.4 - avgSatisfaction) / 0.4) * 0.03 * totalWorking
-    // Stochastic rounding: floor + probabilistic extra
     let toRemove = Math.floor(rate) + (prng.next() < (rate % 1) ? 1 : 0)
     const sorted = [...registry.agents].sort((a, b) => a.satisfaction - b.satisfaction)
     let actualRemoved = 0
