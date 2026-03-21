@@ -330,7 +330,9 @@ export function computeCitizenSummary(registry: CitizenRegistry): CitizenSummary
   }
 }
 
-/** Sync each residential building's `residents` from the sum of its agents' demographics. */
+/** Sync each residential building's `residents` from the sum of its agents' demographics.
+ *  Only updates buildings that have at least one agent; buildings below the sampling
+ *  threshold keep their fill-system residents value. */
 export function syncBuildingResidents(map: GameMap, registry: CitizenRegistry): void {
   const popByBuilding = new Map<string, number>()
   for (const agent of registry.agents) {
@@ -341,7 +343,9 @@ export function syncBuildingResidents(map: GameMap, registry: CitizenRegistry): 
   for (const b of map.buildings) {
     const def = BUILDING_DEFS[b.defId]
     if (!def || def.category !== BuildingCategory.Residential) continue
-    b.residents = popByBuilding.get(b.id) ?? 0
+    if (popByBuilding.has(b.id)) {
+      b.residents = popByBuilding.get(b.id)!
+    }
   }
 }
 

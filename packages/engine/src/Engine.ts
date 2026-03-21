@@ -35,9 +35,11 @@ import {
   createRegistry, syncAgentsForBuilding, removeAgentsForBuilding,
   citizenMonthlyTick, computeCitizenSummary, markRoutesStale, markRoutesStaleBatch,
   setNextAgentId, EMPTY_CITIZEN_SUMMARY,
+  syncBuildingResidents, computeTotalPopulation,
   type CitizenRegistry,
 } from './simulation/citizens.js'
 import { calculatePollution } from './simulation/pollution.js'
+import { demographicTick } from './simulation/demographics.js'
 import { updateDensity } from './simulation/density.js'
 import { hasNearbyRoad } from './simulation/road-access.js'
 import { BUILDING_DEFS } from './buildings-registry.js'
@@ -95,6 +97,7 @@ export class Engine {
   private citizenRegistry: CitizenRegistry
   private roadGraph: RoadGraph
   private citizenSummary: CitizenSummary
+  private lastDemographicResult = { births: 0, deaths: 0, netMigration: 0 }
 
   // Fire system
   private fireState: FireState
@@ -195,12 +198,11 @@ export class Engine {
 
       // Zone development
       const nextBuildingIdRef = { value: this.nextBuildingId }
-      const { populationDelta } = updateZones(this.map, this.powerGrid, this.demand, this.prng, nextBuildingIdRef, this.bldIdx)
+      const { populationDelta: _zoneDelta } = updateZones(this.map, this.powerGrid, this.demand, this.prng, nextBuildingIdRef, this.bldIdx)
       this.nextBuildingId = nextBuildingIdRef.value
-      this.population += populationDelta
 
       // Density progression
-      const { populationDelta: densityDelta } = updateDensity(
+      const { populationDelta: _densityDelta } = updateDensity(
         this.map,
         this.powerGrid,
         this.demand,
@@ -212,7 +214,6 @@ export class Engine {
         this.pollutionLevel,
       )
       this.nextBuildingId = nextBuildingIdRef.value
-      this.population = Math.max(0, this.population + densityDelta)
 
       // Sync citizen agents after zone/density changes (population may have changed)
       for (const b of this.map.buildings) {
@@ -223,6 +224,29 @@ export class Engine {
           }
         }
       }
+
+      // Demographics — aging, deaths, births, migration
+      this.lastDemographicResult = demographicTick(this.citizenRegistry, this.map, this.prng, this.citizenSummary.avgSatisfaction)
+
+      // Sync building residents from agent demographics
+      syncBuildingResidents(this.map, this.citizenRegistry)
+
+      // Re-sync agent count after demographic changes
+      for (const b of this.map.buildings) {
+        if (b.state === 'active') {
+          const def = BUILDING_DEFS[b.defId]
+          if (def && def.category === BuildingCategory.Residential) {
+            syncAgentsForBuilding(this.map, this.citizenRegistry, this.roadGraph, b)
+          }
+        }
+      }
+
+      // Refresh citizen summary with post-demographics data
+      this.citizenSummary = computeCitizenSummary(this.citizenRegistry)
+      this.citizenSummary.birthsLastTick = this.lastDemographicResult.births
+      this.citizenSummary.deathsLastTick = this.lastDemographicResult.deaths
+      this.citizenSummary.netMigrationLastTick = this.lastDemographicResult.netMigration
+      this.population = computeTotalPopulation(this.map)
 
       // 1. Compute budget including loan repayment
       const loanRepayment = this.computeLoanRepayment()
@@ -269,6 +293,9 @@ export class Engine {
         rDemand: this.demand.residential,
         cDemand: this.demand.commercial,
         iDemand: this.demand.industrial,
+        births: this.lastDemographicResult.births,
+        deaths: this.lastDemographicResult.deaths,
+        netMigration: this.lastDemographicResult.netMigration,
       })
       if (this.history.length > 1200) this.history.shift()
     }
@@ -489,7 +516,7 @@ export class Engine {
     const activeFires: Array<[number, number]> = Array.from(this.fireState.activeFires.entries())
 
     return {
-      version: 5,
+      version: 6,
       map: {
         version: this.map.version,
         width: this.map.width,
@@ -528,6 +555,7 @@ export class Engine {
             homeWorkRoute: a.homeWorkRoute,
             homeCommerceRoute: a.homeCommerceRoute,
             satisfaction: a.satisfaction,
+            demographics: a.demographics,
           })),
         },
       },
@@ -611,6 +639,7 @@ export class Engine {
         samplingRatio: save.state.citizens.samplingRatio,
         agents: save.state.citizens.agents.map(a => ({
           ...a,
+          demographics: (a as any).demographics ?? { children: 0, working: 50, elderly: 0 },
           homeWorkRouteStale: false,
           homeCommerceRouteStale: false,
           homeWorkRouteTileSet: new Set(a.homeWorkRoute),
