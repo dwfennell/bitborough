@@ -13,6 +13,7 @@ import {
   COSTS,
   MAINTENANCE,
   POWER,
+  calcMonthlyPayment,
 } from '../index.js'
 
 describe('TileType enum', () => {
@@ -183,5 +184,17 @@ describe('POWER', () => {
   test('capacities increase: diesel < coal < nuclear', () => {
     expect(POWER.dieselCapacity).toBeLessThan(POWER.coalCapacity)
     expect(POWER.coalCapacity).toBeLessThan(POWER.nuclearCapacity)
+  })
+})
+
+describe('calcMonthlyPayment', () => {
+  test('returns expected payment for standard loan', () => {
+    const payment = calcMonthlyPayment(10000, 0.08, 120)
+    expect(payment).toBeCloseTo(121.33, 0)
+  })
+
+  test('handles zero interest rate', () => {
+    const payment = calcMonthlyPayment(12000, 0, 120)
+    expect(payment).toBe(100)
   })
 })
