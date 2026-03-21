@@ -5,7 +5,7 @@ import { Infrastructure, ZoneType } from '@bitborough/core'
 
 describe('Full city lifecycle', () => {
   test('city grows with proper infrastructure', () => {
-    const engine = Engine.create(createTestMap(64), { seed: 42 })
+    const engine = Engine.create(createTestMap(64), { seed: 42, startingFunds: 50_000 })
 
     // Build power
     engine.placeBuilding(10, 10, 'power.coal')

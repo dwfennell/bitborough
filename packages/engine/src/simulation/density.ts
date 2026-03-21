@@ -6,6 +6,18 @@ import { BuildingIndex } from '../building-index.js'
 import { computeDesirability } from './desirability.js'
 import { hasNearbyPavedRoad } from './road-access.js'
 
+const CONSTRUCTION_MONTHS: Record<number, number> = {
+  [DensityLevel.Low]: 1,
+  [DensityLevel.Medium]: 2,
+  [DensityLevel.High]: 4,
+}
+
+function constructionTime(targetDefId: string): number {
+  const def = BUILDING_DEFS[targetDefId]
+  if (!def) return 2
+  return CONSTRUCTION_MONTHS[def.density] ?? 2
+}
+
 export const TRANSIT_RADIUS = 10
 export const FILL_RATE = 0.12
 export const DRAIN_RATE = 0.2
@@ -173,17 +185,19 @@ export function updateDensity(
     const target = def.capacity * Math.max(0, zoneDemand) * desirability
 
     const before = building.residents
-    const rate = target > building.residents ? FILL_RATE : DRAIN_RATE
+    const occupancyRatio = def.capacity > 0 ? building.residents / def.capacity : 0
+    const effectiveFillRate = FILL_RATE * (1 - occupancyRatio)
+    const rate = target > building.residents ? effectiveFillRate : DRAIN_RATE
     building.residents = Math.max(0, Math.min(def.capacity, building.residents + (target - building.residents) * rate))
 
     populationDelta += building.residents - before
 
-    // Track low occupancy for dereliction
+    // Track low occupancy for dereliction (uses post-fill occupancy)
     if (def.capacity > 0) {
-      const occupancyRatio = building.residents / def.capacity
-      if (occupancyRatio < 0.1) {
+      const postFillOccupancy = building.residents / def.capacity
+      if (postFillOccupancy < 0.1) {
         building.lowOccupancyMonths = (building.lowOccupancyMonths ?? 0) + 1
-        if (building.lowOccupancyMonths >= 3) {
+        if (building.lowOccupancyMonths >= LOW_OCCUPANCY_DERELICT_MONTHS) {
           // Trigger dereliction
           const downgradeTarget = DOWNGRADE_TARGET[building.defId]
           populationDelta -= building.residents // subtract actual residents
@@ -299,7 +313,7 @@ function pickVariant(variants: Array<[string, number]>, prng: PRNG): string {
 function startConstruction(building: Building, targetDefId: string): void {
   building.state = 'under_construction'
   building.upgradingToDefId = targetDefId
-  building.constructionMonthsRemaining = 2 // fixed 2 months (deterministic)
+  building.constructionMonthsRemaining = constructionTime(targetDefId)
 }
 
 function tickConstruction(map: GameMap, building: Building, bldIdx: BuildingIndex): number {
@@ -410,6 +424,7 @@ function categoryToZone(category: BuildingCategory): ZoneType {
   return ZoneType.None
 }
 
+const LOW_OCCUPANCY_DERELICT_MONTHS = 3
 const DERELICT_DOWNGRADE_MONTHS = 6
 
 const DOWNGRADE_TARGET: Record<string, string> = {

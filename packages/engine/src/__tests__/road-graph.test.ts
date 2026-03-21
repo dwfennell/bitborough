@@ -141,4 +141,52 @@ describe('astar', () => {
     // Without limit, can reach
     expect(astar(graph, 0, 13, map.width)).not.toBeNull()
   })
+
+  test('prefers uncongested route over shorter congested route (BPR)', () => {
+    // 8-wide grid. Two parallel routes from tile 0 to tile 3:
+    //
+    //   Row 0 (y=0): 0 - 1 - 2 - 3   (short path: 3 edges, 4 tiles)
+    //   Row 1 (y=1): 8 - 9 -10 -11   (long path via y=1: 6 edges, 7 tiles)
+    //
+    // Connect rows: 0↔8 and 3↔11
+    const map = createTestMap(8)
+    // Short top path
+    for (let x = 0; x < 4; x++) map.infrastructure[x] = Infrastructure.Road
+    // Long bottom path
+    for (let x = 0; x < 4; x++) map.infrastructure[8 + x] = Infrastructure.Road
+    const graph = buildRoadGraph(map)
+
+    // Without traffic, A* picks the short top path (4 tiles)
+    const shortPath = astar(graph, 0, 3, map.width)
+    expect(shortPath).toEqual([0, 1, 2, 3])
+
+    // Now congest the top path heavily (density 200 on tiles 1, 2)
+    const trafficDensity = new Uint8Array(8 * 8)
+    trafficDensity[1] = 200
+    trafficDensity[2] = 200
+
+    // BPR cost per congested tile: 1 + 0.15 * (200/100)^4 = 1 + 0.15 * 16 = 3.4
+    // Short path cost: edgeCost(1) + edgeCost(2) + edgeCost(3) = 3.4 + 3.4 + 1 = 7.8
+    // Long path cost (via bottom): all tiles uncongested, 6 edges * 1 = 6
+    // So A* should prefer the long bottom path
+    const congestedPath = astar(graph, 0, 3, map.width, undefined, trafficDensity)
+    expect(congestedPath).not.toBeNull()
+    // The path should go through row 1 (indices 8-11)
+    expect(congestedPath!.some(t => t >= 8 && t <= 11)).toBe(true)
+    expect(congestedPath![0]).toBe(0)
+    expect(congestedPath![congestedPath!.length - 1]).toBe(3)
+  })
+
+  test('without trafficDensity, uses uniform cost (backward compatible)', () => {
+    // Same grid as above, but without trafficDensity param
+    const map = createTestMap(8)
+    for (let x = 0; x < 4; x++) map.infrastructure[x] = Infrastructure.Road
+    for (let x = 0; x < 4; x++) map.infrastructure[8 + x] = Infrastructure.Road
+    const graph = buildRoadGraph(map)
+
+    // Even though we could pass congestion, calling without it should use uniform cost
+    const path = astar(graph, 0, 3, map.width)
+    // Should pick shortest path (top row)
+    expect(path).toEqual([0, 1, 2, 3])
+  })
 })

@@ -1,5 +1,7 @@
-import { type GameMap, ZoneType, Infrastructure } from '@bitborough/core'
+import { type GameMap, ZoneType, BuildingCategory } from '@bitborough/core'
 import type { BuildingIndex } from '../building-index.js'
+import { BUILDING_DEFS } from '../buildings-registry.js'
+import { hasNearbyRoad } from './road-access.js'
 
 // Residential weights (sum to 1.0 at perfect conditions, no pollution)
 const RES_BASELINE = 0.3 // constant when power + road present
@@ -8,6 +10,39 @@ const RES_FIRE_BONUS = 0.15 // flat bonus when fire-covered
 const RES_PARK_BONUS = 0.25 // flat bonus when park within PARK_RADIUS tiles
 const RES_POLLUTION_PENALTY = 0.3 // pollutionNorm × this, subtracted
 const PARK_RADIUS = 5
+
+// Zone boundary effects
+const ZONE_BOUNDARY_RADIUS = 3
+const COM_ADJACENCY_BONUS = 0.10
+const IND_ADJACENCY_PENALTY = 0.15
+
+function zoneBoundaryEffect(x: number, y: number, map: GameMap, bldIdx?: BuildingIndex): number {
+  if (!bldIdx) return 0
+  let effect = 0
+  let hasCommercial = false
+  let hasIndustrial = false
+
+  for (let dy = -ZONE_BOUNDARY_RADIUS; dy <= ZONE_BOUNDARY_RADIUS; dy++) {
+    for (let dx = -ZONE_BOUNDARY_RADIUS; dx <= ZONE_BOUNDARY_RADIUS; dx++) {
+      if (Math.abs(dx) + Math.abs(dy) > ZONE_BOUNDARY_RADIUS) continue
+      const b = bldIdx.get(x + dx, y + dy)
+      if (!b || b.state !== 'active') continue
+      const def = BUILDING_DEFS[b.defId]
+      if (!def) continue
+      if (def.category === BuildingCategory.Commercial && !hasCommercial) {
+        hasCommercial = true
+        effect += COM_ADJACENCY_BONUS
+      }
+      if (def.category === BuildingCategory.Industrial && !hasIndustrial) {
+        hasIndustrial = true
+        effect -= IND_ADJACENCY_PENALTY
+      }
+      if (hasCommercial && hasIndustrial) break
+    }
+    if (hasCommercial && hasIndustrial) break
+  }
+  return effect
+}
 
 // Commercial weights (sum to 1.0)
 const COM_BASELINE = 0.4
@@ -36,7 +71,7 @@ export function computeDesirability(
   const idx = y * map.width + x
 
   if (!powerGrid[idx]) return 0
-  if (!hasRoadAccess(map, x, y)) return 0
+  if (!hasNearbyRoad(map, x, y)) return 0
 
   switch (zone) {
     case ZoneType.Residential:
@@ -66,8 +101,9 @@ function residentialDesirability(
   let score = RES_BASELINE
   score += (1 - crimeNorm) * RES_SAFETY_WEIGHT
   if (fireCoverage[idx]) score += RES_FIRE_BONUS
-  if (hasParkNearby(x, y, map, bldIdx)) score += RES_PARK_BONUS
+  score += parkDesirabilityBonus(x, y, map, bldIdx)
   score -= pollNorm * RES_POLLUTION_PENALTY
+  score += zoneBoundaryEffect(x, y, map, bldIdx)
 
   return Math.max(0, Math.min(1, score))
 }
@@ -79,36 +115,32 @@ function commercialDesirability(x: number, y: number, map: GameMap, bldIdx?: Bui
   return Math.max(0, Math.min(1, score))
 }
 
-function hasRoadAccess(map: GameMap, x: number, y: number): boolean {
-  const range = 3
-  for (let dy = -range; dy <= range; dy++) {
-    for (let dx = -range; dx <= range; dx++) {
-      if (Math.abs(dx) + Math.abs(dy) > range) continue
-      const nx = x + dx
-      const ny = y + dy
-      if (nx < 0 || ny < 0 || nx >= map.width || ny >= map.height) continue
-      if (map.infrastructure[ny * map.width + nx]! & Infrastructure.Road) return true
-    }
-  }
-  return false
-}
 
-function hasParkNearby(x: number, y: number, map: GameMap, bldIdx?: BuildingIndex): boolean {
+function parkDesirabilityBonus(x: number, y: number, map: GameMap, bldIdx?: BuildingIndex): number {
+  let best = 0
   if (bldIdx) {
     for (let dy = -PARK_RADIUS; dy <= PARK_RADIUS; dy++) {
       for (let dx = -PARK_RADIUS; dx <= PARK_RADIUS; dx++) {
-        if (Math.abs(dx) + Math.abs(dy) > PARK_RADIUS) continue
+        const dist = Math.abs(dx) + Math.abs(dy)
+        if (dist > PARK_RADIUS) continue
         const b = bldIdx.get(x + dx, y + dy)
-        if (b && b.defId === 'special.park' && b.state === 'active') return true
+        if (b && b.defId === 'special.park' && b.state === 'active') {
+          const bonus = RES_PARK_BONUS * (1 - dist / PARK_RADIUS)
+          if (bonus > best) best = bonus
+        }
       }
     }
-    return false
+    return best
   }
   for (const b of map.buildings) {
     if (b.defId !== 'special.park' || b.state !== 'active') continue
-    if (Math.abs(b.x - x) + Math.abs(b.y - y) <= PARK_RADIUS) return true
+    const dist = Math.abs(b.x - x) + Math.abs(b.y - y)
+    if (dist <= PARK_RADIUS) {
+      const bonus = RES_PARK_BONUS * (1 - dist / PARK_RADIUS)
+      if (bonus > best) best = bonus
+    }
   }
-  return false
+  return best
 }
 
 function hasTransitNearby(x: number, y: number, map: GameMap, bldIdx?: BuildingIndex): boolean {

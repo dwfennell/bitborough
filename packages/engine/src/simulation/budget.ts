@@ -28,6 +28,7 @@ export function calculateBudget(
   let policeStationCount = 0
   let fireStationCount = 0
   let transitStopCount = 0
+  let footprintTileCount = 0
 
   for (const building of map.buildings) {
     const def = BUILDING_DEFS[building.defId]
@@ -36,6 +37,8 @@ export function calculateBudget(
     if (building.defId === 'service.police') policeStationCount++
     if (building.defId === 'service.fire') fireStationCount++
     if (building.defId === 'transit.stop') transitStopCount++
+    const footprint = (def.size?.w ?? 1) * (def.size?.h ?? 1)
+    footprintTileCount += footprint
   }
 
   const maintenanceCosts = {
@@ -47,6 +50,25 @@ export function calculateBudget(
   }
   maintenanceCosts.total =
     maintenanceCosts.roads + maintenanceCosts.rails + maintenanceCosts.powerLines + maintenanceCosts.powerPlants
+
+  // Sprawl penalty: high land-per-capita increases road and power line maintenance.
+  // Threshold scales with population — small cities get a generous allowance,
+  // converging to 0.05 as population grows past ~1000.
+  const SPRAWL_BASE_THRESHOLD = 0.05
+  const SPRAWL_MIN_POPULATION = 50
+  const effectiveThreshold = population < SPRAWL_MIN_POPULATION
+    ? Infinity // no sprawl penalty for tiny cities
+    : SPRAWL_BASE_THRESHOLD + 50 / population
+  const sprawlRatio = population > 0 ? footprintTileCount / population : 0
+  const sprawlMultiplier = sprawlRatio > effectiveThreshold
+    ? 1 + (sprawlRatio - effectiveThreshold) * 4
+    : 1.0
+
+  if (sprawlMultiplier > 1) {
+    maintenanceCosts.roads = Math.round(maintenanceCosts.roads * sprawlMultiplier)
+    maintenanceCosts.powerLines = Math.round(maintenanceCosts.powerLines * sprawlMultiplier)
+    maintenanceCosts.total = maintenanceCosts.roads + maintenanceCosts.rails + maintenanceCosts.powerLines + maintenanceCosts.powerPlants
+  }
 
   // Service costs based on funding level
   const serviceCosts = {

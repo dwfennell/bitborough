@@ -1,7 +1,7 @@
 import { describe, test, expect } from 'vitest'
 import { Engine } from '../Engine.js'
 import { createTestMap, advanceYear, advanceMonth } from '../test-helpers.js'
-import { Infrastructure, ZoneType, createEmptyMap } from '@bitborough/core'
+import { Infrastructure, ZoneType, DensityLevel, createEmptyMap } from '@bitborough/core'
 import { calculateBudget } from '../simulation/budget.js'
 
 describe('Budget system', () => {
@@ -119,5 +119,102 @@ describe('Budget system', () => {
 
     const withLargeLoan = calculateBudget(map, 0, 0.07, landValues, funding, 999_999)
     expect(withLargeLoan.balance).toBe(withoutLoan.balance - 999_999)
+  })
+})
+
+describe('Sprawl penalty', () => {
+  test('low population with many spread-out buildings increases road maintenance', () => {
+    const map = createEmptyMap(32, 32, { name: 'test', seed: 0, createdAt: '' })
+    const landValues = new Uint8Array(32 * 32)
+    const funding = { police: 100, fire: 100, transit: 100 }
+
+    // Add 20 road tiles for baseline maintenance
+    for (let x = 0; x < 20; x++) {
+      map.infrastructure[5 * 32 + x] = Infrastructure.Road
+    }
+    // Add 10 power line tiles
+    for (let x = 0; x < 10; x++) {
+      map.infrastructure[3 * 32 + x] = Infrastructure.PowerLine
+    }
+
+    // Add 10 res.low buildings (each 1x1 = 10 footprint tiles total)
+    for (let x = 0; x < 10; x++) {
+      map.buildings.push({
+        id: `r${x}`,
+        defId: 'res.low',
+        x,
+        y: 4,
+        density: DensityLevel.Low,
+        state: 'active',
+        residents: 0,
+        age: 0,
+        powered: true,
+      })
+    }
+
+    // Sprawl threshold scales: effectiveThreshold = 0.05 + 50/population
+    // At pop=5000: threshold = 0.06, footprint=10, ratio=0.002 → no penalty
+    // Use high population to get the base threshold low, then compare with dense city:
+    // pop=500, footprint=10: threshold=0.15, ratio=0.02 → no penalty
+    // We need ratio > threshold. Use pop=100 (above SPRAWL_MIN_POPULATION=50):
+    // threshold = 0.05 + 50/100 = 0.55. ratio = 10/100 = 0.10. No penalty (0.10 < 0.55)
+    // The scaling makes it very hard for mid-size cities to trigger.
+    // For a clear test: pop=5000, footprint=10, ratio=0.002, threshold=0.06 → no penalty
+    //                   pop=5000, footprint=500 → ratio=0.1, threshold=0.06 → penalty!
+    // Add many buildings to get high footprint:
+    for (let i = 0; i < 50; i++) {
+      map.buildings.push({
+        id: `extra${i}`, defId: 'res.low', x: i % 30, y: 7 + Math.floor(i / 30),
+        density: DensityLevel.Low, state: 'active', residents: 0, age: 0, powered: true,
+      })
+    }
+    // footprint = 10 (original) + 50 = 60
+    // pop=5000: threshold=0.06, ratio=60/5000=0.012 → no penalty
+    // pop=500:  threshold=0.15, ratio=60/500=0.12 → no penalty (0.12 < 0.15)
+    // pop=200:  threshold=0.30, ratio=60/200=0.30 → borderline
+    // pop=100:  threshold=0.55, ratio=60/100=0.60 → penalty! multiplier=1+(0.60-0.55)*4=1.20
+    // But pop=100 is above SPRAWL_MIN_POPULATION=50 ✓
+    const sprawlBudget = calculateBudget(map, 100, 0.07, landValues, funding)
+
+    // Dense: same footprint but pop=10000 → ratio=0.006, threshold=0.055 → no penalty
+    const denseBudget = calculateBudget(map, 10000, 0.07, landValues, funding)
+
+    // Road maintenance should be higher with sprawl
+    expect(sprawlBudget.maintenanceCosts.roads).toBeGreaterThan(denseBudget.maintenanceCosts.roads)
+    // Power line maintenance should also be higher with sprawl
+    expect(sprawlBudget.maintenanceCosts.powerLines).toBeGreaterThan(denseBudget.maintenanceCosts.powerLines)
+  })
+
+  test('high population with dense buildings gets no sprawl penalty', () => {
+    const map = createEmptyMap(32, 32, { name: 'test', seed: 0, createdAt: '' })
+    const landValues = new Uint8Array(32 * 32)
+    const funding = { police: 100, fire: 100, transit: 100 }
+
+    // Add 10 road tiles
+    for (let x = 0; x < 10; x++) {
+      map.infrastructure[5 * 32 + x] = Infrastructure.Road
+    }
+
+    // Add 5 res.low buildings (footprint = 5)
+    for (let x = 0; x < 5; x++) {
+      map.buildings.push({
+        id: `r${x}`,
+        defId: 'res.low',
+        x,
+        y: 4,
+        density: DensityLevel.Low,
+        state: 'active',
+        residents: 0,
+        age: 0,
+        powered: true,
+      })
+    }
+
+    // population=1000, footprint=5: sprawlRatio = 5/1000 = 0.005
+    // 0.005 < 0.05 threshold → no penalty
+    const budget = calculateBudget(map, 1000, 0.07, landValues, funding)
+
+    // Road maintenance should be exactly roadCount * MAINTENANCE.road = 10 * 1 = 10
+    expect(budget.maintenanceCosts.roads).toBe(10)
   })
 })

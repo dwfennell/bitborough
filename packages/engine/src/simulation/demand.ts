@@ -1,15 +1,24 @@
 import { type GameMap, type DemandInfo, type CitizenSummary, Infrastructure } from '@bitborough/core'
 import { BUILDING_DEFS } from '../buildings-registry.js'
-
-const TRAFFIC_CAPACITY = 100
+import { TRAFFIC_CAPACITY } from '../road-graph.js'
 
 export const COMMERCIAL_DEMAND_CAPACITY_DIVISOR = 500
+const VACANCY_MIN_POPULATION = 100
 
-function totalResCap(map: GameMap): number {
+function sumResidentialCapacity(map: GameMap): number {
   let total = 0
   for (const b of map.buildings) {
     if (!b.defId.startsWith('res') || b.state !== 'active') continue
     total += BUILDING_DEFS[b.defId]?.capacity ?? 0
+  }
+  return total
+}
+
+function sumResidentialResidents(map: GameMap): number {
+  let total = 0
+  for (const b of map.buildings) {
+    if (!b.defId.startsWith('res') || b.state !== 'active') continue
+    total += b.residents
   }
   return total
 }
@@ -39,7 +48,8 @@ export function calculateDemand(map: GameMap, taxRate: number, trafficDensity?: 
 
   // Commercial demand uses total residential capacity (not actual residents).
   // This avoids a deadlock where 0 residents → 0 commercial demand → no foot traffic.
-  const cBase = Math.min(totalResCap(map) / COMMERCIAL_DEMAND_CAPACITY_DIVISOR, 0.6)
+  const resCap = sumResidentialCapacity(map)
+  const cBase = Math.min(resCap / COMMERCIAL_DEMAND_CAPACITY_DIVISOR, 0.6)
   let cDemand = cBase * taxModifier
 
   // Industrial demand:
@@ -73,6 +83,17 @@ export function calculateDemand(map: GameMap, taxRate: number, trafficDensity?: 
 
     // Unmatched commerce fraction boosts commercial demand (up to +0.2)
     cDemand += citizens.unmatchedCommerceFraction * 0.2
+  }
+
+  // Vacancy rate feedback: high vacancy dampens residential demand.
+  // Only applies above 100 population — small cities need to fill first buildings freely.
+  const totalResidents = sumResidentialResidents(map)
+  if (totalResidents >= VACANCY_MIN_POPULATION) {
+    const vacancy = resCap > 0 ? 1 - totalResidents / resCap : 0
+    if (vacancy > 0.08) {
+      const vacancyPenalty = Math.min(0.5, (vacancy - 0.08) * 3)
+      rDemand -= vacancyPenalty
+    }
   }
 
   // Clamp all values to [-1, 1]

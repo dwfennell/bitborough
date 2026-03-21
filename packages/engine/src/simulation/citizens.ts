@@ -80,6 +80,7 @@ function findNearestBuilding(
   graph: RoadGraph,
   fromRoad: number,
   filter: (def: BuildingDef) => boolean,
+  trafficDensity?: Uint8Array,
 ): { buildingId: string; accessRoad: number; route: number[] } | null {
   let best: { buildingId: string; accessRoad: number; route: number[] } | null = null
   for (const building of map.buildings) {
@@ -88,7 +89,7 @@ function findNearestBuilding(
     if (!def || !filter(def)) continue
     const access = resolveAccessRoad(map, building)
     if (access < 0) continue
-    const route = astar(graph, fromRoad, access, map.width)
+    const route = astar(graph, fromRoad, access, map.width, undefined, trafficDensity)
     if (!route) continue
     if (!best || route.length < best.route.length) {
       best = { buildingId: building.id, accessRoad: access, route }
@@ -113,10 +114,10 @@ export function getNextAgentId(): number {
   return nextAgentId
 }
 
-function createAgent(map: GameMap, graph: RoadGraph, homeBuildingId: string, homeAccessRoad: number): Citizen {
+function createAgent(map: GameMap, graph: RoadGraph, homeBuildingId: string, homeAccessRoad: number, trafficDensity?: Uint8Array): Citizen {
   const id = `c${nextAgentId++}`
-  const jobMatch = findNearestBuilding(map, graph, homeAccessRoad, d => d.jobs > 0)
-  const commerceMatch = findNearestBuilding(map, graph, homeAccessRoad, d => d.category === BuildingCategory.Commercial)
+  const jobMatch = findNearestBuilding(map, graph, homeAccessRoad, d => d.jobs > 0, trafficDensity)
+  const commerceMatch = findNearestBuilding(map, graph, homeAccessRoad, d => d.category === BuildingCategory.Commercial, trafficDensity)
   const agent: Citizen = {
     id,
     homeBuildingId,
@@ -137,7 +138,7 @@ function createAgent(map: GameMap, graph: RoadGraph, homeBuildingId: string, hom
   return agent
 }
 
-export function syncAgentsForBuilding(map: GameMap, registry: CitizenRegistry, graph: RoadGraph, building: Building): void {
+export function syncAgentsForBuilding(map: GameMap, registry: CitizenRegistry, graph: RoadGraph, building: Building, trafficDensity?: Uint8Array): void {
   const homeAccessRoad = resolveAccessRoad(map, building)
   if (homeAccessRoad < 0) return  // building has no road access — no agents
 
@@ -147,7 +148,7 @@ export function syncAgentsForBuilding(map: GameMap, registry: CitizenRegistry, g
 
   if (delta > 0) {
     for (let i = 0; i < delta; i++) {
-      registry.agents.push(createAgent(map, graph, building.id, homeAccessRoad))
+      registry.agents.push(createAgent(map, graph, building.id, homeAccessRoad, trafficDensity))
     }
   } else if (delta < 0) {
     // Remove from end
@@ -197,20 +198,21 @@ function replanRoute(
   graph: RoadGraph,
   currentAccessRoad: number | null,
   filter: (def: BuildingDef) => boolean,
+  trafficDensity?: Uint8Array,
 ): { buildingId: string | null; accessRoad: number | null; route: number[] } {
   if (currentAccessRoad !== null) {
-    const route = astar(graph, agent.homeAccessRoad, currentAccessRoad, map.width)
+    const route = astar(graph, agent.homeAccessRoad, currentAccessRoad, map.width, undefined, trafficDensity)
     if (route) return { buildingId: null, accessRoad: currentAccessRoad, route }
   }
-  const match = findNearestBuilding(map, graph, agent.homeAccessRoad, filter)
+  const match = findNearestBuilding(map, graph, agent.homeAccessRoad, filter, trafficDensity)
   if (match) return { buildingId: match.buildingId, accessRoad: match.accessRoad, route: match.route }
   return { buildingId: null, accessRoad: null, route: [] }
 }
 
-export function replanStaleRoutes(registry: CitizenRegistry, map: GameMap, graph: RoadGraph): void {
+export function replanStaleRoutes(registry: CitizenRegistry, map: GameMap, graph: RoadGraph, trafficDensity?: Uint8Array): void {
   for (const agent of registry.agents) {
     if (agent.homeWorkRouteStale) {
-      const result = replanRoute(agent, map, graph, agent.workAccessRoad, d => d.jobs > 0)
+      const result = replanRoute(agent, map, graph, agent.workAccessRoad, d => d.jobs > 0, trafficDensity)
       if (result.buildingId !== null) agent.workBuildingId = result.buildingId
       agent.workAccessRoad = result.accessRoad
       agent.homeWorkRoute = result.route
@@ -219,7 +221,7 @@ export function replanStaleRoutes(registry: CitizenRegistry, map: GameMap, graph
       agent.homeWorkRouteStale = false
     }
     if (agent.homeCommerceRouteStale) {
-      const result = replanRoute(agent, map, graph, agent.commerceAccessRoad, d => d.category === BuildingCategory.Commercial)
+      const result = replanRoute(agent, map, graph, agent.commerceAccessRoad, d => d.category === BuildingCategory.Commercial, trafficDensity)
       if (result.buildingId !== null) agent.commerceBuildingId = result.buildingId
       agent.commerceAccessRoad = result.accessRoad
       agent.homeCommerceRoute = result.route
@@ -253,8 +255,8 @@ export function citizenMonthlyTick(
   graph: RoadGraph,
   trafficDensity: Uint8Array,
 ): void {
-  // Pass 1: replan stale routes
-  replanStaleRoutes(registry, map, graph)
+  // Pass 1: replan stale routes (traffic-aware)
+  replanStaleRoutes(registry, map, graph, trafficDensity)
 
   // Pass 2: traffic contribution
   const size = map.width * map.height
