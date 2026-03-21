@@ -14,6 +14,24 @@ function totalResCap(map: GameMap): number {
   return total
 }
 
+function sumResidentialCapacity(map: GameMap): number {
+  let total = 0
+  for (const b of map.buildings) {
+    if (!b.defId.startsWith('res') || b.state !== 'active') continue
+    total += BUILDING_DEFS[b.defId]?.capacity ?? 0
+  }
+  return total
+}
+
+function sumResidentialResidents(map: GameMap): number {
+  let total = 0
+  for (const b of map.buildings) {
+    if (!b.defId.startsWith('res') || b.state !== 'active') continue
+    total += b.residents
+  }
+  return total
+}
+
 /**
  * Calculate zone demand based on current map state, tax rate, and traffic.
  *
@@ -73,6 +91,15 @@ export function calculateDemand(map: GameMap, taxRate: number, trafficDensity?: 
 
     // Unmatched commerce fraction boosts commercial demand (up to +0.2)
     cDemand += citizens.unmatchedCommerceFraction * 0.2
+  }
+
+  // Vacancy rate feedback: high vacancy dampens residential demand
+  const totalCapacity = sumResidentialCapacity(map)
+  const totalResidents = sumResidentialResidents(map)
+  const vacancy = totalCapacity > 0 ? 1 - totalResidents / totalCapacity : 0
+  if (vacancy > 0.08) {
+    const vacancyPenalty = Math.min(0.5, (vacancy - 0.08) * 3)
+    rDemand -= vacancyPenalty
   }
 
   // Clamp all values to [-1, 1]
