@@ -46,7 +46,6 @@ describe('Infrastructure bit flags', () => {
       Infrastructure.Road,
       Infrastructure.PowerLine,
       Infrastructure.Rail,
-      Infrastructure.Pipe,
       Infrastructure.PavedRoad,
     ]
     for (let i = 0; i < flags.length; i++) {

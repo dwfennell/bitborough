@@ -3,7 +3,6 @@ export enum Infrastructure {
   Road = 1 << 0,
   PowerLine = 1 << 1,
   Rail = 1 << 2,
-  Pipe = 1 << 3,
   PavedRoad = 1 << 4, // upgrade from Road; tiles have Road | PavedRoad
 }
 
