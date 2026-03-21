@@ -11,8 +11,6 @@ export function updateZones(
   nextBuildingId: { value: number },
   bldIdx: BuildingIndex,
 ): { populationDelta: number } {
-  const populationDelta = 0
-
   for (let y = 0; y < map.height; y++) {
     for (let x = 0; x < map.width; x++) {
       const idx = y * map.width + x
@@ -52,7 +50,7 @@ export function updateZones(
     }
   }
 
-  return { populationDelta }
+  return { populationDelta: 0 }
 }
 
 
