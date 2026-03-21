@@ -987,6 +987,9 @@ As the city becomes more desirable and tourism-oriented, a growing share of hous
 - [Land Use and Zoning](./land-use-and-zoning.md) — zoning constrains density, lot sizes, and building types; the primary supply-side policy lever
 - [Municipal Finance](./municipal-finance.md) — property taxes are the link between housing values and local government revenue; Tiebout sorting connects housing to service provision
 - [Urban Growth Patterns](./urban-growth-patterns.md) — monocentric vs. polycentric models determine where housing demand concentrates; density gradients shape the upgrade probability function
+- [Real Estate Development](./real-estate-development.md) — developer decision pipeline, construction economics, 5-over-1 cost thresholds, market cycles, speculation
+- [Social Dynamics and Segregation](./social-dynamics-and-segregation.md) — Schelling segregation, filtering and income sorting, neighborhood effects, housing as segregation mechanism
+- [Disaster and Resilience](./disaster-and-resilience.md) — housing supply elasticity in reconstruction, building vulnerability by type, differential recovery
 
 ---
 

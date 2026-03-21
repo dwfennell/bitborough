@@ -401,6 +401,8 @@ Render the density gradient as a heat map overlay: bright at density anchors, fa
 - [Transit-Oriented Development](./transit-oriented-development.md) — TOD creates secondary density peaks that modify the baseline gradient
 - [Urban Growth Patterns](./urban-growth-patterns.md) — Monocentric vs. polycentric models of city structure
 - [Land Use and Zoning](./land-use-and-zoning.md) — Zoning regulations constrain and shape natural density gradients
+- [Real Estate Development](./real-estate-development.md) — Developer feasibility analysis, construction cost thresholds that produce density transitions
+- [Urban Design and Walkability](./urban-design-and-walkability.md) — Walkability-density feedback loop, block size effects on density gradients
 
 ## Sources
 

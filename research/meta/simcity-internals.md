@@ -20,6 +20,7 @@
 - [6. Key Algorithms](#6-key-algorithms)
 - [7. What Worked and What Didn't](#7-what-worked-and-what-didnt)
 - [8. Lessons for Bitborough](#8-lessons-for-bitborough)
+- [Cross-References](#cross-references)
 - [Sources](#sources)
 
 ---
@@ -842,6 +843,15 @@ Bitborough's engine architecture already incorporates several lessons from SimCi
 **Don't let agent count scale linearly with population.** The sampling ratio approach is correct. As cities grow, increase the sampling ratio (e.g., 1:50 for small cities, 1:200 for large) to keep agent count within computational budget. The key metric is not agent count but route computation count per tick.
 
 **Preserve the two-tier architecture.** Micropolis's split between global demand signals (RCI valves) and local development decisions (per-zone score checks) is elegant and performant. The global tier ensures macro-economic coherence; the local tier ensures spatial variety. Collapsing everything to either pure global (no spatial variation) or pure local (no macro trends) loses important gameplay dynamics.
+
+---
+
+## Cross-References
+
+- [Open-Source City Simulations](./open-source-city-sims.md) -- Micropolis Java source code analysis, OpenTTD YAPF pathfinder, Citybound actor system, code pattern catalog
+- [Cities: Skylines Internals](./cities-skylines-internals.md) -- Manager pattern architecture, A* traffic, citizen lifecycle, CS2 ECS/DOTS attempt
+- [Simulation Architecture Patterns](./simulation-architecture-patterns.md) -- Statistical vs. agent-based simulation, tick loops, layer buffers, demand models, pathfinding at scale
+- [Mechanics Comparison](./mechanics-comparison.md) -- Side-by-side comparison of zoning, economy, traffic, citizens across major titles
 
 ---
 

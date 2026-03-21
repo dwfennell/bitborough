@@ -2,9 +2,13 @@
 
 Reference material informing Bitborough game design decisions. Each document covers real-world urban systems grounded in academic and empirical sources, with explicit "Application to Bitborough" sections mapping patterns to game mechanics.
 
-**16 documents** | ~15,000 lines | ~80,000 words
+**16 topic documents** | ~15,000 lines | ~80,000 words
 
-See also: **[Meta-Research: City-Builder Games](./meta/index.md)** — genre history, mechanics comparison, design analysis (6 docs)
+See also:
+- **[Meta-Research: City-Builder Games](./meta/index.md)** — genre history, mechanics comparison, design analysis (11 docs)
+- **[Systems Interaction Map](./systems-interaction-map.md)** — feedback loops, causal chains, coupling matrix across all systems
+- **[Mechanics Roadmap](./mechanics-roadmap.md)** — every proposed mechanic prioritized by impact/complexity with build order
+- **[Glossary](./glossary.md)** — 60 key terms from urban planning, economics, game design, and Bitborough internals
 
 ## Table of Contents
 
@@ -28,7 +32,7 @@ See also: **[Meta-Research: City-Builder Games](./meta/index.md)** — genre his
   - Cross-refs: urban-density-gradients, land-use-and-zoning, housing, transportation-and-traffic
 
 - [urban-design-and-walkability.md](./urban-design-and-walkability.md) — Jane Jacobs' four conditions, block size and permeability, street design typology, Walk Score methodology, active frontages (Gehl), public spaces (Whyte), third places (Oldenburg), street trees, cycling infrastructure, walkability-property value premium
-  - Cross-refs: transportation-and-traffic, land-use-and-zoning, housing, urban-growth-patterns
+  - Cross-refs: transportation-and-traffic, land-use-and-zoning, housing, urban-growth-patterns, public-services
 
 ## People & Society
 
@@ -36,7 +40,7 @@ See also: **[Meta-Research: City-Builder Games](./meta/index.md)** — genre his
   - Cross-refs: housing, economy-and-employment, public-services
 
 - [social-dynamics-and-segregation.md](./social-dynamics-and-segregation.md) — Schelling segregation model, Tiebout sorting, income/racial segregation measurement, school-based sorting, neighborhood effects (Chetty), social networks (Granovetter), collective efficacy (Sampson), environmental justice, policy tools for integration
-  - Cross-refs: population-and-demographics, housing, public-services, urban-growth-patterns
+  - Cross-refs: population-and-demographics, housing, public-services, urban-growth-patterns, land-use-and-zoning, environment-and-sustainability, municipal-finance, economy-and-employment
 
 - [housing.md](./housing.md) — Supply elasticity, filtering theory, affordability metrics, density types, rent control (Diamond 2019), public housing, NIMBY/YIMBY, school capitalization, vacancy dynamics and abandonment cascades, construction cost curves by density, 5-over-1 buildings, speculation and bubbles, manufactured housing, dark housing stock
   - Cross-refs: population-and-demographics, land-use-and-zoning, municipal-finance, urban-growth-patterns
@@ -50,7 +54,7 @@ See also: **[Meta-Research: City-Builder Games](./meta/index.md)** — genre his
   - Cross-refs: economy-and-employment, utilities-and-infrastructure, public-services
 
 - [real-estate-development.md](./real-estate-development.md) — Developer decision pipeline, feasibility analysis (pro forma, cap rates, NOI), construction economics, 5-over-1 cost thresholds, construction timelines, 18-year market cycles, speculation and bubbles, land banking, adaptive reuse, LIHTC and developer incentives, commercial vs. residential economics
-  - Cross-refs: housing, municipal-finance, land-use-and-zoning, economy-and-employment
+  - Cross-refs: housing, municipal-finance, land-use-and-zoning, economy-and-employment, urban-growth-patterns
 
 ## Infrastructure & Services
 
@@ -72,4 +76,4 @@ See also: **[Meta-Research: City-Builder Games](./meta/index.md)** — genre his
   - Cross-refs: utilities-and-infrastructure, transportation-and-traffic, urban-growth-patterns
 
 - [disaster-and-resilience.md](./disaster-and-resilience.md) — Disaster typology (earthquake, hurricane, flood, wildfire, tornado, drought), vulnerability assessment, FEMA HAZUS damage models, flooding mechanics, recovery trajectories (Kates-Pijawka), economic impact, resilience strategies, insurance and risk transfer, climate change amplification, case studies (Katrina, SF 1906, Galveston, Paradise, Tokyo)
-  - Cross-refs: environment-and-sustainability, utilities-and-infrastructure, municipal-finance, public-services
+  - Cross-refs: environment-and-sustainability, utilities-and-infrastructure, municipal-finance, public-services, housing

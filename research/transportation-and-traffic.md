@@ -977,6 +977,7 @@ Policy levers that affect equity:
 - [Transit-Oriented Development](./transit-oriented-development.md) — Station catchment areas, density clustering around transit, TOD as last-mile solution
 - [Urban Density Gradients](./urban-density-gradients.md) — Clark's Law density decay drives commute patterns; VMT inversely correlates with density
 - [Environment and Sustainability](./environment-and-sustainability.md) — VMT is the primary driver of transportation emissions; congestion pricing and transit as mitigation
+- [Urban Design and Walkability](./urban-design-and-walkability.md) — block size and permeability, street design typology, cycling infrastructure, mode choice at the street level
 
 ---
 

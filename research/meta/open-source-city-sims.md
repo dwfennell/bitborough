@@ -48,6 +48,7 @@ Where the [mechanics comparison](mechanics-comparison.md) examines *design* deci
    - 9.4 [Agent Spawning and Despawning](#94-agent-spawning-and-despawning)
    - 9.5 [Save/Load Serialization Patterns](#95-saveload-serialization-patterns)
 10. [Lessons for Bitborough](#10-lessons-for-bitborough)
+- [Cross-References](#cross-references)
 
 ---
 
@@ -1432,6 +1433,15 @@ Bitborough's engine independently converged on many of the patterns documented a
 **Unbounded recursive flood-fill.** The original Micropolis power propagation could overflow the call stack. Iterative BFS with an explicit queue (which Bitborough already uses) is the correct approach.
 
 **Save format lock-in (OpenLoco).** OpenLoco's constraint to the original SV5/SC5 save format limits map size and vehicle counts permanently. Design save formats with explicit versioning and migration support from day one.
+
+---
+
+## Cross-References
+
+- [SimCity Internals](./simcity-internals.md) --- System Dynamics origins, Micropolis 16-phase loop, SetValves RCI demand, GlassBox agent architecture
+- [Cities: Skylines Internals](./cities-skylines-internals.md) --- Manager pattern, A* traffic pathfinding, TMPE Dynamic Lane Selection, CS2 ECS/DOTS
+- [Simulation Architecture Patterns](./simulation-architecture-patterns.md) --- Statistical vs. agent-based simulation, tick loops, spatial indexing, demand models
+- [Mechanics Comparison](./mechanics-comparison.md) --- Design-level comparison across commercial titles (complement to this document's code-level analysis)
 
 ---
 
