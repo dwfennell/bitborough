@@ -306,6 +306,68 @@ describe('commercial desirability', () => {
   })
 })
 
+describe('zone boundary effects', () => {
+  function setup() {
+    const map = createTestMap(16)
+    const layers = makeLayers(16 * 16)
+    // Give tile (5,5) power + road
+    layers.powerGrid[5 * 16 + 5] = 1
+    map.infrastructure[5 * 16 + 5] = 0b1 // Road
+    return { map, ...layers }
+  }
+
+  test('nearby commercial building boosts residential desirability', () => {
+    const { map, powerGrid, crimeLevel, fireCoverage, pollutionLevel } = setup()
+    // Place a commercial building near (5,5)
+    map.buildings.push({
+      id: 'com1',
+      defId: 'com.low',
+      x: 7,
+      y: 5,
+      powered: true,
+      density: DensityLevel.Low,
+      age: 0,
+      state: 'active',
+      residents: 0,
+    })
+    const bldIdx = new BuildingIndex(map)
+
+    const withCommercial = computeDesirability(
+      ZoneType.Residential, 5, 5, map, powerGrid, crimeLevel, fireCoverage, pollutionLevel, bldIdx,
+    )
+    // Without bldIdx, zoneBoundaryEffect returns 0
+    const without = computeDesirability(
+      ZoneType.Residential, 5, 5, map, powerGrid, crimeLevel, fireCoverage, pollutionLevel,
+    )
+    expect(withCommercial).toBeGreaterThan(without)
+  })
+
+  test('nearby industrial building penalizes residential desirability', () => {
+    const { map, powerGrid, crimeLevel, fireCoverage, pollutionLevel } = setup()
+    // Place an industrial building near (5,5)
+    map.buildings.push({
+      id: 'ind1',
+      defId: 'ind.low',
+      x: 7,
+      y: 5,
+      powered: true,
+      density: DensityLevel.Low,
+      age: 0,
+      state: 'active',
+      residents: 0,
+    })
+    const bldIdx = new BuildingIndex(map)
+
+    const withIndustrial = computeDesirability(
+      ZoneType.Residential, 5, 5, map, powerGrid, crimeLevel, fireCoverage, pollutionLevel, bldIdx,
+    )
+    const without = computeDesirability(
+      ZoneType.Residential, 5, 5, map, powerGrid, crimeLevel, fireCoverage, pollutionLevel,
+    )
+    expect(withIndustrial).toBeLessThan(without)
+  })
+})
+
 describe('industrial desirability', () => {
   test('road + power → 1.0', () => {
     const map = createTestMap(16)

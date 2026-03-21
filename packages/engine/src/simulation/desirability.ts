@@ -1,5 +1,6 @@
-import { type GameMap, ZoneType, Infrastructure } from '@bitborough/core'
+import { type GameMap, ZoneType, Infrastructure, BuildingCategory } from '@bitborough/core'
 import type { BuildingIndex } from '../building-index.js'
+import { BUILDING_DEFS } from '../buildings-registry.js'
 
 // Residential weights (sum to 1.0 at perfect conditions, no pollution)
 const RES_BASELINE = 0.3 // constant when power + road present
@@ -8,6 +9,39 @@ const RES_FIRE_BONUS = 0.15 // flat bonus when fire-covered
 const RES_PARK_BONUS = 0.25 // flat bonus when park within PARK_RADIUS tiles
 const RES_POLLUTION_PENALTY = 0.3 // pollutionNorm × this, subtracted
 const PARK_RADIUS = 5
+
+// Zone boundary effects
+const ZONE_BOUNDARY_RADIUS = 3
+const COM_ADJACENCY_BONUS = 0.10
+const IND_ADJACENCY_PENALTY = 0.15
+
+function zoneBoundaryEffect(x: number, y: number, map: GameMap, bldIdx?: BuildingIndex): number {
+  if (!bldIdx) return 0
+  let effect = 0
+  let hasCommercial = false
+  let hasIndustrial = false
+
+  for (let dy = -ZONE_BOUNDARY_RADIUS; dy <= ZONE_BOUNDARY_RADIUS; dy++) {
+    for (let dx = -ZONE_BOUNDARY_RADIUS; dx <= ZONE_BOUNDARY_RADIUS; dx++) {
+      if (Math.abs(dx) + Math.abs(dy) > ZONE_BOUNDARY_RADIUS) continue
+      const b = bldIdx.get(x + dx, y + dy)
+      if (!b || b.state !== 'active') continue
+      const def = BUILDING_DEFS[b.defId]
+      if (!def) continue
+      if (def.category === BuildingCategory.Commercial && !hasCommercial) {
+        hasCommercial = true
+        effect += COM_ADJACENCY_BONUS
+      }
+      if (def.category === BuildingCategory.Industrial && !hasIndustrial) {
+        hasIndustrial = true
+        effect -= IND_ADJACENCY_PENALTY
+      }
+      if (hasCommercial && hasIndustrial) break
+    }
+    if (hasCommercial && hasIndustrial) break
+  }
+  return effect
+}
 
 // Commercial weights (sum to 1.0)
 const COM_BASELINE = 0.4
@@ -68,6 +102,7 @@ function residentialDesirability(
   if (fireCoverage[idx]) score += RES_FIRE_BONUS
   score += parkDesirabilityBonus(x, y, map, bldIdx)
   score -= pollNorm * RES_POLLUTION_PENALTY
+  score += zoneBoundaryEffect(x, y, map, bldIdx)
 
   return Math.max(0, Math.min(1, score))
 }
