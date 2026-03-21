@@ -430,7 +430,7 @@ export function tickDerelict(map: GameMap, building: Building): number {
   building.derelictMonths = (building.derelictMonths ?? 0) + 1
   if (building.derelictMonths >= DERELICT_DOWNGRADE_MONTHS) {
     const downgradeTarget = DOWNGRADE_TARGET[building.defId]
-    const currentPop = BUILDING_DEFS[building.defId]?.capacity ?? 0
+    const currentPop = building.residents
     if (downgradeTarget) {
       startConstruction(building, downgradeTarget)
       return -currentPop // subtract current building's population when downgrade starts

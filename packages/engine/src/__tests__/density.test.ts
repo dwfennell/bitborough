@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest'
-import { Infrastructure, BuildingCategory, DensityLevel, ZoneType } from '@bitborough/core'
+import { Infrastructure, BuildingCategory, DensityLevel, ZoneType, Building } from '@bitborough/core'
 import { BUILDING_DEFS } from '../buildings-registry.js'
 import { createTestMap } from '../test-helpers.js'
 import { PRNG } from '../prng.js'
@@ -523,6 +523,18 @@ describe('derelict buildings', () => {
     tickDerelict(map, map.buildings[0]!)
     // Low density has nowhere to downgrade — resets to active
     expect(map.buildings[0]!.state).toBe('active')
+  })
+
+  it('tickDerelict subtracts actual residents, not capacity', () => {
+    const map = createTestMap(32)
+    const building: Building = {
+      id: 'b1', defId: 'res.med', x: 5, y: 5, powered: true,
+      density: DensityLevel.Medium, age: 10, state: 'derelict',
+      residents: 3, derelictMonths: 5,
+    }
+    map.buildings.push(building)
+    const delta = tickDerelict(map, building)
+    expect(delta).toBe(-3) // actual residents, not capacity
   })
 
   test('updateDensity calls tickDerelict for derelict buildings', () => {
