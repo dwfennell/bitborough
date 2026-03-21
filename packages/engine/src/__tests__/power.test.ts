@@ -1,7 +1,8 @@
 import { describe, test, expect } from 'vitest'
 import { Engine } from '../Engine.js'
+import { BuildingIndex } from '../building-index.js'
 import { createTestMap } from '../test-helpers.js'
-import { Infrastructure, FailReason, POWER } from '@bitborough/core'
+import { Infrastructure, FailReason, POWER, ZoneType, DensityLevel } from '@bitborough/core'
 
 describe('Power propagation', () => {
   test('coal power plant powers adjacent tiles through power lines', () => {
@@ -71,46 +72,84 @@ describe('Power propagation', () => {
     expect(engine.getTile(6, 0).powered).toBe(true)
   })
 
-  test('power capacity is limited (coal=700 tiles)', () => {
-    // Use a large enough map to exceed 700 tiles
-    const engine = Engine.create(createTestMap(64), { startingFunds: 500_000 })
+  test('power capacity only counts building tiles, not roads or power lines', () => {
+    // Diesel plant: 2x2 footprint (4 building tiles), capacity 50
+    // Place it on a 32x32 map with roads and zone buildings
+    const engine = Engine.create(createTestMap(32), { startingFunds: 500_000 })
 
-    // Place coal plant at (0,0) — occupies 16 tiles of its 700 capacity
-    engine.placeBuilding(0, 0, 'power.coal')
+    // Place diesel plant at (0,0) — 2x2 footprint
+    engine.placeBuilding(0, 0, 'power.diesel')
 
-    // Fill a long line of power lines — more than 700 tiles total
-    // Plant footprint is 16 tiles. We need 700 - 16 = 684 more power line tiles,
-    // then the next ones should be unpowered.
-    // Place a line of power lines from x=4 along y=0, then snake down.
-    // Easier: place a grid of power lines.
-    // Let's place power lines row by row, connected.
-    let count = 0
-    const target = POWER.coalCapacity // 700
-
-    // Fill rows with power lines, connecting each row to the one above
-    // Start from y=0, x=4 (adjacent to plant footprint)
-    for (let y = 0; y < 64 && count < target + 10; y++) {
-      const startX = y === 0 ? 4 : 0
-      for (let x = startX; x < 64 && count < target + 10; x++) {
-        // Skip plant footprint tiles
-        if (x < 4 && y < 4) continue
-        engine.placeTile(x, y, Infrastructure.PowerLine)
-        count++
-      }
+    // Connect roads east from the plant (x=2..31 along y=0) — 30 road tiles
+    for (let x = 2; x < 32; x++) {
+      engine.placeTile(x, 0, Infrastructure.Road)
     }
+
+    // Place zone tiles with buildings along y=1, adjacent to roads
+    // Each is a 1x1 building tile that should count against capacity
+    // We need more than (50 - 4) = 46 zone buildings to exceed capacity
+    const state = engine.getState()
+    for (let x = 2; x < 32; x++) {
+      // Zone the tile
+      state.map.zones[1 * 32 + x] = ZoneType.Residential
+      // Manually add a 1x1 building on each zone tile
+      state.map.buildings.push({
+        id: `r${x}`,
+        defId: 'res.low',
+        x,
+        y: 1,
+        powered: false,
+        density: DensityLevel.Low,
+        age: 0,
+      })
+    }
+
+    // Also add a second row of roads and buildings (y=2, y=3)
+    for (let x = 2; x < 32; x++) {
+      engine.placeTile(x, 2, Infrastructure.Road)
+      state.map.zones[3 * 32 + x] = ZoneType.Residential
+      state.map.buildings.push({
+        id: `r2${x}`,
+        defId: 'res.low',
+        x,
+        y: 3,
+        powered: false,
+        density: DensityLevel.Low,
+        age: 0,
+      })
+    }
+
+    // Total building tiles: 4 (plant) + 30 (row y=1) + 30 (row y=3) = 64
+    // Capacity is 50, so 50 building tiles should be powered, rest not
+    // Total road tiles: 30 (y=0) + 30 (y=2) = 60 — all should be powered
+
+    // Rebuild the BuildingIndex so power propagation sees the manually-added buildings
+    ;(engine as any).bldIdx = new BuildingIndex(state.map)
 
     engine.tick()
 
-    // Count powered tiles (excluding plant footprint)
-    let poweredCount = 0
-    for (let y = 0; y < 64; y++) {
-      for (let x = 0; x < 64; x++) {
-        if (engine.getTile(x, y).powered) poweredCount++
-      }
+    // All road tiles should be powered (roads don't consume capacity)
+    for (let x = 2; x < 32; x++) {
+      expect(engine.getTile(x, 0).powered).toBe(true)
+      expect(engine.getTile(x, 2).powered).toBe(true)
     }
 
-    // Should be exactly the coal capacity (700)
-    expect(poweredCount).toBe(POWER.coalCapacity)
+    // Count powered building tiles (plant + zone buildings)
+    let poweredBuildingTiles = 0
+    // Plant footprint
+    for (let dy = 0; dy < 2; dy++) {
+      for (let dx = 0; dx < 2; dx++) {
+        if (engine.getTile(dx, dy).powered) poweredBuildingTiles++
+      }
+    }
+    // Zone buildings on y=1 and y=3
+    for (let x = 2; x < 32; x++) {
+      if (engine.getTile(x, 1).powered) poweredBuildingTiles++
+      if (engine.getTile(x, 3).powered) poweredBuildingTiles++
+    }
+
+    // Exactly 50 building tiles should be powered (diesel capacity)
+    expect(poweredBuildingTiles).toBe(POWER.dieselCapacity)
   })
 
   test('bulldozing a power line disconnects downstream tiles', () => {

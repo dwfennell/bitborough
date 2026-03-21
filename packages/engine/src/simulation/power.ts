@@ -80,7 +80,7 @@ function bfsPower(map: GameMap, powerGrid: Uint8Array, plant: PowerPlant, bldIdx
   const DY = [-1, 0, 1, 0]
 
   let head = 0
-  while (head < queue.length && remaining > 0) {
+  while (head < queue.length) {
     const idx = queue[head++]!
     const x = idx % width
     const y = (idx - x) / width
@@ -92,12 +92,13 @@ function bfsPower(map: GameMap, powerGrid: Uint8Array, plant: PowerPlant, bldIdx
 
       const nIdx = ny * width + nx
       if (powerGrid[nIdx] !== 0) continue // already powered
-      if (remaining <= 0) break
 
-      // A tile is a conductor if it has power lines, roads, or a building on it
       if (isConductor(map, nIdx, bldIdx)) {
+        const isBuildingTile = bldIdx.hasIdx(nIdx)
+        // Skip building tiles when capacity is exhausted
+        if (isBuildingTile && remaining <= 0) continue
         powerGrid[nIdx] = 1
-        remaining--
+        if (isBuildingTile) remaining--
         queue.push(nIdx)
       }
     }
