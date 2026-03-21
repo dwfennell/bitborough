@@ -183,23 +183,50 @@ export function markRoutesStale(registry: CitizenRegistry, tileIndex: number): v
 export function replanStaleRoutes(registry: CitizenRegistry, map: GameMap, graph: RoadGraph): void {
   for (const agent of registry.agents) {
     if (agent.homeWorkRouteStale) {
+      let found = false
       if (agent.workAccessRoad !== null) {
         const route = astar(graph, agent.homeAccessRoad, agent.workAccessRoad, map.width)
-        agent.homeWorkRoute = route ?? []
-        if (!route) { agent.workBuildingId = null; agent.workAccessRoad = null }
-      } else {
-        agent.homeWorkRoute = []
+        if (route) {
+          agent.homeWorkRoute = route
+          found = true
+        }
+      }
+      if (!found) {
+        // Try to find an alternative workplace
+        const match = findNearestBuilding(map, graph, agent.homeAccessRoad, d => d.jobs > 0)
+        if (match) {
+          agent.workBuildingId = match.buildingId
+          agent.workAccessRoad = match.accessRoad
+          agent.homeWorkRoute = match.route
+        } else {
+          agent.workBuildingId = null
+          agent.workAccessRoad = null
+          agent.homeWorkRoute = []
+        }
       }
       agent.homeWorkRouteTileSet = new Set(agent.homeWorkRoute)
       agent.homeWorkRouteStale = false
     }
     if (agent.homeCommerceRouteStale) {
+      let found = false
       if (agent.commerceAccessRoad !== null) {
         const route = astar(graph, agent.homeAccessRoad, agent.commerceAccessRoad, map.width)
-        agent.homeCommerceRoute = route ?? []
-        if (!route) { agent.commerceBuildingId = null; agent.commerceAccessRoad = null }
-      } else {
-        agent.homeCommerceRoute = []
+        if (route) {
+          agent.homeCommerceRoute = route
+          found = true
+        }
+      }
+      if (!found) {
+        const match = findNearestBuilding(map, graph, agent.homeAccessRoad, d => d.category === BuildingCategory.Commercial)
+        if (match) {
+          agent.commerceBuildingId = match.buildingId
+          agent.commerceAccessRoad = match.accessRoad
+          agent.homeCommerceRoute = match.route
+        } else {
+          agent.commerceBuildingId = null
+          agent.commerceAccessRoad = null
+          agent.homeCommerceRoute = []
+        }
       }
       agent.homeCommerceRouteTileSet = new Set(agent.homeCommerceRoute)
       agent.homeCommerceRouteStale = false
