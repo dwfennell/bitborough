@@ -43,6 +43,9 @@ export interface MonthlySnapshot {
   rDemand: number     // demand.residential, -1..1
   cDemand: number     // demand.commercial, -1..1
   iDemand: number     // demand.industrial, -1..1
+  births: number       // absolute count this month
+  deaths: number       // absolute count this month
+  netMigration: number // absolute count this month
 }
 
 export interface CitizenSummary {
@@ -51,6 +54,13 @@ export interface CitizenSummary {
   unmatchedJobFraction: number
   unmatchedCommerceFraction: number
   avgCommuteLengthTiles: number
+  // Demographics
+  totalChildren: number
+  totalWorking: number
+  totalElderly: number
+  birthsLastTick: number
+  deathsLastTick: number
+  netMigrationLastTick: number
 }
 
 export interface DemandInfo {
@@ -150,6 +160,11 @@ export interface SaveFile {
         homeWorkRoute: number[]
         homeCommerceRoute: number[]
         satisfaction: number
+        demographics?: {
+          children: number
+          working: number
+          elderly: number
+        }
       }>
     }
   }
