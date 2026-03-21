@@ -20,6 +20,15 @@ function stochasticCount(n: number, p: number, prng: PRNG): number {
   return Math.floor(expected) + (prng.next() < (expected % 1) ? 1 : 0)
 }
 
+function removeEmptyAgents(registry: CitizenRegistry): void {
+  for (let i = registry.agents.length - 1; i >= 0; i--) {
+    const d = registry.agents[i]!.demographics
+    if (d.children + d.working + d.elderly <= 0) {
+      registry.agents.splice(i, 1)
+    }
+  }
+}
+
 export function demographicTick(
   registry: CitizenRegistry,
   map: GameMap,
@@ -108,13 +117,7 @@ export function demographicTick(
     netMigration -= actualRemoved
   }
 
-  // Clean up empty agents from emigration
-  for (let i = registry.agents.length - 1; i >= 0; i--) {
-    const d = registry.agents[i]!.demographics
-    if (d.children + d.working + d.elderly <= 0) {
-      registry.agents.splice(i, 1)
-    }
-  }
+  removeEmptyAgents(registry)
 
   return { births, deaths, netMigration }
 }

@@ -250,7 +250,8 @@ describe('Vacancy rate feedback', () => {
       })
     }
     const demand = calculateDemand(map, 0.07)
-    expect(demand.residential).toBe(1)
+    // rBase is 0.9 at neutral tax — no vacancy penalty since population < 100
+    expect(demand.residential).toBeCloseTo(0.9, 2)
   })
 
   test('vacancy below 8% has no effect on demand', () => {

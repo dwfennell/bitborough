@@ -97,8 +97,6 @@ export class Engine {
   private citizenRegistry: CitizenRegistry
   private roadGraph: RoadGraph
   private citizenSummary: CitizenSummary
-  private lastDemographicResult = { births: 0, deaths: 0, netMigration: 0 }
-
   // Fire system
   private fireState: FireState
 
@@ -215,37 +213,19 @@ export class Engine {
       )
       this.nextBuildingId = nextBuildingIdRef.value
 
-      // Sync citizen agents after zone/density changes (population may have changed)
-      for (const b of this.map.buildings) {
-        if (b.state === 'active') {
-          const def = BUILDING_DEFS[b.defId]
-          if (def && def.category === BuildingCategory.Residential) {
-            syncAgentsForBuilding(this.map, this.citizenRegistry, this.roadGraph, b, this.trafficDensity)
-          }
-        }
-      }
+      // Sync citizen agents after zone/density changes
+      this.syncResidentialAgents()
 
       // Demographics — aging, deaths, births, migration
-      this.lastDemographicResult = demographicTick(this.citizenRegistry, this.map, this.prng, this.citizenSummary.avgSatisfaction)
-
-      // Sync building residents from agent demographics
+      const demoResult = demographicTick(this.citizenRegistry, this.map, this.prng, this.citizenSummary.avgSatisfaction)
       syncBuildingResidents(this.map, this.citizenRegistry)
-
-      // Re-sync agent count after demographic changes
-      for (const b of this.map.buildings) {
-        if (b.state === 'active') {
-          const def = BUILDING_DEFS[b.defId]
-          if (def && def.category === BuildingCategory.Residential) {
-            syncAgentsForBuilding(this.map, this.citizenRegistry, this.roadGraph, b)
-          }
-        }
-      }
+      this.syncResidentialAgents()
 
       // Refresh citizen summary with post-demographics data
       this.citizenSummary = computeCitizenSummary(this.citizenRegistry)
-      this.citizenSummary.birthsLastTick = this.lastDemographicResult.births
-      this.citizenSummary.deathsLastTick = this.lastDemographicResult.deaths
-      this.citizenSummary.netMigrationLastTick = this.lastDemographicResult.netMigration
+      this.citizenSummary.birthsLastTick = demoResult.births
+      this.citizenSummary.deathsLastTick = demoResult.deaths
+      this.citizenSummary.netMigrationLastTick = demoResult.netMigration
       this.population = computeTotalPopulation(this.map)
 
       // 1. Compute budget including loan repayment
@@ -293,9 +273,9 @@ export class Engine {
         rDemand: this.demand.residential,
         cDemand: this.demand.commercial,
         iDemand: this.demand.industrial,
-        births: this.lastDemographicResult.births,
-        deaths: this.lastDemographicResult.deaths,
-        netMigration: this.lastDemographicResult.netMigration,
+        births: this.citizenSummary.birthsLastTick,
+        deaths: this.citizenSummary.deathsLastTick,
+        netMigration: this.citizenSummary.netMigrationLastTick,
       })
       if (this.history.length > 1200) this.history.shift()
     }
@@ -483,6 +463,17 @@ export class Engine {
     return { ok: true }
   }
 
+  private syncResidentialAgents(): void {
+    for (const b of this.map.buildings) {
+      if (b.state === 'active') {
+        const def = BUILDING_DEFS[b.defId]
+        if (def && def.category === BuildingCategory.Residential) {
+          syncAgentsForBuilding(this.map, this.citizenRegistry, this.roadGraph, b, this.trafficDensity)
+        }
+      }
+    }
+  }
+
   setTaxRate(rate: number): void {
     this.taxRate = Math.max(0, Math.min(0.2, rate))
     this.budgetInfo = calculateBudget(this.map, this.population, this.taxRate, this.landValues, this.funding, this.computeLoanRepayment())
@@ -623,10 +614,7 @@ export class Engine {
     }
     engine.nextBuildingId = maxId + 1
 
-    // Recompute population as Σ b.residents — always correct regardless of save version
-    engine.population = map.buildings
-      .filter((b) => b.state === 'active')
-      .reduce((sum, b) => sum + (b.residents ?? 0), 0)
+    engine.population = computeTotalPopulation(map)
 
     // Restore loan state
     engine.loan = save.state.loan ?? null
@@ -639,7 +627,7 @@ export class Engine {
         samplingRatio: save.state.citizens.samplingRatio,
         agents: save.state.citizens.agents.map(a => ({
           ...a,
-          demographics: (a as any).demographics ?? { children: 0, working: 50, elderly: 0 },
+          demographics: a.demographics ?? { children: 0, working: 50, elderly: 0 },
           homeWorkRouteStale: false,
           homeCommerceRouteStale: false,
           homeWorkRouteTileSet: new Set(a.homeWorkRoute),
