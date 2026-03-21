@@ -6,10 +6,41 @@
 
 - [Urban Population Growth Models](#urban-population-growth-models)
 - [Migration](#migration)
+  - [Push-Pull Framework](#push-pull-framework)
+  - [The Harris-Todaro Model (1970)](#the-harris-todaro-model-1970)
+  - [Migration Rate Estimation](#migration-rate-estimation)
+- [Immigration and Integration Dynamics](#immigration-and-integration-dynamics)
+  - [Immigration as the Engine of Urban Growth](#immigration-as-the-engine-of-urban-growth)
+  - [Immigrant Community Formation and Ethnic Enclaves](#immigrant-community-formation-and-ethnic-enclaves)
+  - [Economic Contributions of Immigrants](#economic-contributions-of-immigrants)
+  - [Legal Status Effects](#legal-status-effects)
+  - [Integration Trajectories](#integration-trajectories)
+- [Return and Circular Migration](#return-and-circular-migration)
+  - [Migration is Not One-Way](#migration-is-not-one-way)
+  - [Seasonal and Temporary Migration](#seasonal-and-temporary-migration)
+  - [Remittances](#remittances)
+  - [Return Migration and Skills Transfer](#return-migration-and-skills-transfer)
+- [Brain Drain and Brain Gain](#brain-drain-and-brain-gain)
+  - [Selection Effects of Migration](#selection-effects-of-migration)
+  - [Impact on Origin Cities and Countries](#impact-on-origin-cities-and-countries)
+  - [Impact on Destination Cities](#impact-on-destination-cities)
+  - [Brain Gain Mechanisms](#brain-gain-mechanisms)
 - [Natural Increase](#natural-increase)
 - [Age Structure](#age-structure)
+- [Aging in Place and Shrinking Cities](#aging-in-place-and-shrinking-cities)
+  - [The Shrinking City Phenomenon](#the-shrinking-city-phenomenon)
+  - [Fiscal Death Spiral](#fiscal-death-spiral)
+  - [Healthcare Demand and Workforce Mismatch](#healthcare-demand-and-workforce-mismatch)
+  - [Infrastructure Over-Provisioning](#infrastructure-over-provisioning)
+  - [Case Studies](#case-studies-aging)
 - [Household Formation](#household-formation)
 - [Wealth and Income Stratification](#wealth-and-income-stratification)
+- [Gentrification-Driven Displacement](#gentrification-driven-displacement)
+  - [What Gentrification Is and How It Proceeds](#what-gentrification-is-and-how-it-proceeds)
+  - [Who Gets Displaced](#who-gets-displaced)
+  - [Where Do the Displaced Go](#where-do-the-displaced-go)
+  - [Quantitative Evidence](#quantitative-evidence)
+  - [The Eviction Channel](#the-eviction-channel)
 - [Demographic Transition](#demographic-transition)
 - [Population Density and City Size](#population-density-and-city-size)
 - [Suburbanization and Counter-Urbanization](#suburbanization-and-counter-urbanization)
@@ -132,6 +163,204 @@ Where `α` is a responsiveness coefficient (typically 0.01-0.05 annually). Migra
 
 ---
 
+## Immigration and Integration Dynamics
+
+### Immigration as the Engine of Urban Growth
+
+In mature economies, international migration — not natural increase — is the primary driver of urban population growth. Between 2018 and 2023, immigrants accounted for 42% of population growth across America's 100 largest metro areas (American Immigration Council, 2024). In specific metros, the share was far higher: 92% for Seattle, 82% for New York, and 77% for Poughkeepsie. Across the decade, immigrant arrivals (approximately 1.25 million per year to the US alone) accounted for 50-75% of the growth of the largest metropolitan areas.
+
+This pattern is not unique to the United States. As of 2024, 31.5% of Australia's residents were born overseas (8.6 million people), and migrants constitute 40% of the population in the greater metro areas of Sydney, Melbourne, Perth, and Brisbane. In OECD countries collectively, the foreign-born share rose from 9% to 11% between 2013 and 2023, with over 150 million foreign-born residents total. A record 6.5 million new permanent immigrants moved to OECD countries in 2023 — 28% more than in 2019.
+
+| Country / Region | Foreign-born share (c. 2023) | Key destination cities |
+|------------------|------------------------------|----------------------|
+| Australia | 31.5% | Sydney (40%), Melbourne (40%) |
+| Switzerland | ~30% | Zurich, Geneva |
+| Canada | ~23% | Toronto (47%), Vancouver (41%) |
+| Germany | ~16% | Berlin, Munich, Frankfurt |
+| United States | ~14% | Miami (40%), LA (34%), NYC (37%) |
+| France | ~13% | Paris (25%), Lyon |
+| United Kingdom | ~14% | London (37%), Birmingham |
+
+Without immigration, many cities in developed countries would be shrinking. For cities already below replacement fertility (TFR < 2.1), immigration is the only mechanism that prevents population decline and workforce contraction.
+
+### Immigrant Community Formation and Ethnic Enclaves
+
+Immigrants do not distribute evenly across a city. They cluster in specific neighborhoods through a process driven by:
+
+1. **Chain migration** — Earlier migrants lower the information and psychic costs of migration for family and community members who follow. The resulting network produces spatially concentrated settlement (MacDonald & MacDonald, 1964). A successful co-ethnic community acts as an attractor, providing housing leads, job referrals, and cultural familiarity.
+
+2. **Economic constraint** — New arrivals with limited capital and local knowledge are channeled into affordable housing, which concentrates in specific districts. This initial spatial clustering can persist for generations even as incomes rise.
+
+3. **Institutional completeness** — As ethnic populations reach critical mass, they support ethnic-specific businesses, houses of worship, media, and social services. This institutional infrastructure further strengthens the pull, creating what sociologists call "ethnic enclaves" (Wilson & Portes, 1980).
+
+**Economic effects of enclaves are mixed:**
+
+- **Positive:** Social networks provide job information, shelter from discrimination, and entrepreneurial capital. Refugees assigned to areas with larger co-ethnic networks are more likely to find employment within five years (IZA, 2024). Enclave businesses can serve as stepping stones to broader economic participation.
+- **Negative:** Wages within enclave economies are typically lower than in the broader labor market. Prolonged enclave residence can slow language acquisition and reduce intergenerational mobility if it limits children's exposure to the host-country education system. Enclaves can become "mobility traps" for low-skilled workers.
+
+The spatial pattern that emerges — concentrated immigrant neighborhoods with high commercial vitality but lower average wages — is a key feature of real urban landscapes. Over successive generations, residential patterns typically diffuse outward (the "spatial assimilation" model), though some enclaves persist for decades when reinforced by continued inflows and institutional depth.
+
+### Economic Contributions of Immigrants
+
+Immigrants punch above their demographic weight in economic terms:
+
+| Metric | Value | Source |
+|--------|-------|--------|
+| Share of US labor force (foreign-born) | 18.6% (29.1 million workers) | BLS, 2024 |
+| Labor force participation (foreign-born vs. native-born) | 66.6% vs. 61.8% | BLS, 2024 |
+| Share of business owners in top 100 US metros | 29.8% (immigrants) | AIC, 2024 |
+| Business income generated by immigrant entrepreneurs | $98.2 billion (2023) | AIC, 2024 |
+| Tax contributions (immigrant-led households) | $577.4 billion (2023) | AIC, 2024 |
+| Spending power (immigrant-led households) | $1.5 trillion (2023) | AIC, 2024 |
+| Share of nurses in top 100 US metros | 20.7% (immigrants) | AIC, 2024 |
+
+Comparative studies find that high-immigration cities outperform low-immigration cities on several economic indicators: double the job creation rate, higher per capita incomes, lower poverty rates, and approximately 20% less crime (Hoover Institution).
+
+### Legal Status Effects
+
+Legal status profoundly shapes immigrants' economic integration and spatial behavior:
+
+- **Authorized immigrants** have full labor market access, can invest in location-specific capital (homeownership, professional licensing), and exhibit residential patterns converging toward native-born norms over time.
+- **Unauthorized immigrants** face wage penalties averaging 42% below citizen wages (as of 2019). Despite this, the approximately 8.5 million unauthorized workers in the US fill critical roles: 1 in 7 construction workers, 1 in 8 agricultural workers, and 1 in 14 hospital workers. In 2023, unauthorized immigrant households paid $89.8 billion in federal, state, and local taxes and held $299 billion in spending power.
+- **Legal status transitions** — Legalization of unauthorized workers is estimated to add $1.2 trillion to the US economy over ten years and $184 billion annually in tax revenue, primarily through improved job matching and higher wages.
+
+For cities, unauthorized status creates a population that contributes economically but is undercounted in census data, underserved by public systems, and spatially concentrated in areas with informal housing and employment networks. This "shadow population" affects real demand for housing and services in ways that official data miss.
+
+### Integration Trajectories
+
+The classic assimilation trajectory follows a three-generation arc:
+
+1. **First generation** — Economic insertion, often in co-ethnic economy. Limited host-language proficiency. High labor force participation but low wages. Residential concentration in ethnic enclaves.
+2. **Second generation** — Bilingual, higher educational attainment than parents, occupational mobility. Begin residential dispersal to broader metro area. Often the peak entrepreneurship generation.
+3. **Third generation** — Near-complete linguistic assimilation. Residential patterns approximate native-born. Income convergence (though gaps persist for some origin groups due to structural discrimination).
+
+This trajectory is not universal — it depends on reception context, human capital at arrival, co-ethnic community resources, and the legal framework of the destination country.
+
+---
+
+## Return and Circular Migration
+
+### Migration is Not One-Way
+
+A significant share of migrants eventually return to their origin country or move onward to a third destination. In the Netherlands, between 20% and 50% of immigrants do not stay permanently. Globally, circular migration — repeated movement between origin and destination — is far more common than the permanent one-way migration that dominates popular imagination.
+
+Circular migration takes several forms:
+
+| Type | Duration | Example | Scale |
+|------|----------|---------|-------|
+| Seasonal agricultural | 3-9 months | Mexican farmworkers in US, Eastern European harvest workers in Western Europe | Millions annually |
+| Contract labor | 1-3 years | Gulf state construction workers (India, Philippines, Bangladesh) | ~35 million in GCC states |
+| Professional rotation | 2-5 years | Multinational employees, academics, health workers | Millions globally |
+| Transnational entrepreneurship | Ongoing back-and-forth | Diaspora business owners investing in home and host country | Growing, hard to quantify |
+
+### Seasonal and Temporary Migration
+
+Seasonal migration is the oldest form of circular movement. In the developing world, rural-to-urban seasonal migration remains massive: India's National Commission on Rural Labour estimated 10 million circular migrant workers in the 1990s; current estimates place the figure at 60-100 million. These workers move to cities during agricultural off-seasons, provide labor for construction, manufacturing, and services, and return for planting and harvest.
+
+In developed countries, formalized seasonal worker programs manage agricultural labor flows:
+- The US H-2A visa program admitted over 370,000 temporary agricultural workers in 2023.
+- Canada's Seasonal Agricultural Worker Program (SAWP) has operated since 1966, bringing workers from Mexico and the Caribbean.
+- Germany and other EU nations draw seasonal agricultural workers from Eastern Europe and North Africa.
+
+These temporary populations create real demand for housing, services, and transport — but their seasonal nature means demand fluctuates, creating a pattern of surge and vacancy in affected neighborhoods and towns.
+
+### Remittances
+
+Remittances — money sent by migrants to family in their origin country — represent one of the largest financial flows in the global economy, exceeding both foreign direct investment (FDI) and official development assistance (ODA) to developing countries.
+
+| Metric | Value | Year |
+|--------|-------|------|
+| Global remittance flows (total) | ~$905 billion | 2024 est. |
+| Flows to low- and middle-income countries | $685 billion | 2024 est. |
+| Top recipient: India | >$111 billion | 2022 |
+| Top recipient by GDP share: Tonga | ~44% of GDP | 2023 |
+| Countries where remittances exceed 20% of GDP | El Salvador, Honduras, Nepal, Lebanon, Tajikistan | 2023 |
+| Number of countries where remittances > 3% of GDP | 60+ | 2024 |
+| Growth rate (LMICs) | 5.8% | 2024 est. |
+
+Source: World Bank Migration and Development Brief, 2024.
+
+Remittances have several effects relevant to urban dynamics:
+
+1. **Origin-side investment** — Remittances fund housing construction, small business formation, and education in origin communities. This drives local construction booms and changes settlement patterns (remittance-funded houses are often larger and more durable than local norms).
+2. **Demand reduction at destination** — Migrants who remit heavily have lower local consumption, reducing their effective demand on housing and amenities in the destination city below what their income would suggest.
+3. **Counter-cyclical stability** — Unlike FDI, remittances tend to increase during crises in the origin country and are relatively stable during destination-country recessions, providing a buffer to origin communities.
+
+### Return Migration and Skills Transfer
+
+Returning migrants carry human capital acquired abroad — technical skills, management practices, professional networks, and entrepreneurial experience. This "knowledge remittance" can be more transformative than financial remittances:
+
+- Returnees to India and China have founded a disproportionate share of technology startups, including major companies like Sun Microsystems and Baidu.
+- Return migrants in developing countries earn 10-30% wage premiums over non-migrants with similar education, reflecting skill acquisition abroad (IZA World of Labor).
+- "Diaspora networks" — professional associations of emigrants — facilitate technology transfer and investment flows back to origin countries even when members do not physically return.
+
+For the destination city, return migration creates population churn: experienced workers leave, creating vacancies that attract new migrants. The city's population may appear stable while its composition continuously turns over — a dynamic invisible to simple headcount models.
+
+---
+
+## Brain Drain and Brain Gain
+
+### Selection Effects of Migration
+
+Migration is not random. Migrants are selected on observable and unobservable characteristics — education, risk tolerance, ambition, health, and social connections. This selection produces asymmetric effects:
+
+- **Positive selection** (typical for long-distance and international migration): Migrants tend to be younger, more educated, and more entrepreneurial than the origin population average. This drains human capital from the origin and concentrates it at the destination.
+- **Negative selection** (occurs in some contexts): When migration is driven by desperation (conflict, extreme poverty), the very poorest or least skilled may migrate. This is more common for short-distance and forced migration.
+
+The degree of selection depends on migration costs (higher costs = stronger positive selection), visa policies (skill-based systems amplify positive selection), and network effects (chain migration can reduce selection over time as entire communities follow pioneers).
+
+### Impact on Origin Cities and Countries
+
+Brain drain is severe and measurable for the world's poorest countries:
+
+| Country | Skilled emigration rate | Specific losses |
+|---------|----------------------|-----------------|
+| Haiti | >80% of college-educated | Chronic institutional weakness |
+| Jamaica | ~85% of college-educated | One of the highest rates globally |
+| Nigeria | High | ~30,000 doctors and ~60,000 nurses lost per year |
+| Pakistan | High | ~80% of trained doctors emigrate within 5 years of graduation |
+| Philippines | Moderate-high | ~10,000 nurses per year to US, UK, Middle East |
+| Ethiopia | ~35% of locally trained doctors working abroad | Concentrated in US and Europe |
+| Sub-Saharan Africa (avg.) | ~20% of tertiary-educated | Higher for medical professionals |
+
+Source: IZA World of Labor; UNCTAD; PMC/NCBI studies on health worker migration.
+
+The effects cascade through the urban system:
+1. **Service quality declines** — Hospitals, universities, and government agencies lose their most capable staff. This reduces the quality of life that attracts new residents, weakening the city's pull factor.
+2. **Innovation capacity shrinks** — The creative class that drives urban economic dynamism is precisely the population most likely to emigrate.
+3. **Fiscal base erodes** — High earners who leave take their tax contributions with them while the cost of their publicly funded education remains with the origin city.
+
+### Impact on Destination Cities
+
+For receiving cities, skilled immigration is an economic accelerant:
+
+- Immigrants account for 36% of US patent holders (despite being 14% of the population).
+- Foreign-born workers represent over 40% of STEM PhD holders in the United States.
+- Immigrant entrepreneurs founded or co-founded 55% of US unicorn startups (valued at $1 billion+) as of 2022.
+- High-skilled immigrants increase innovation and productivity spillovers to native-born workers in the same industry and metro area.
+
+The concentration of global talent in a small number of "superstar cities" (New York, San Francisco, London, Singapore, Sydney) creates a self-reinforcing dynamic: talent attracts capital, capital attracts more talent, and the gap between these cities and the rest widens.
+
+### Brain Gain Mechanisms
+
+Recent research (Chand & Clemens, *Science*, 2023) challenges the simple brain-drain narrative by identifying "brain gain" mechanisms:
+
+1. **Incentive effect** — The prospect of emigration to a high-wage country motivates investment in education. Many who invest ultimately do not emigrate, increasing the domestic stock of human capital. When the US expanded nursing visa access for Filipinos, enrollment in nursing schools surged — nine new nurses were trained domestically for every one who migrated.
+
+2. **Return migration** — Emigrants who return bring enhanced skills. The net effect depends on the return rate and the skill premium acquired abroad.
+
+3. **Diaspora channels** — Emigrants facilitate trade, FDI, and technology transfer between origin and destination countries. Indian diaspora networks were instrumental in the growth of Bangalore's IT sector.
+
+4. **Institutional development** — Emigrants who acquire experience with stronger institutions (rule of law, democratic governance, regulatory frameworks) can influence reform in their origin countries through both return and remote engagement.
+
+Whether brain drain or brain gain dominates depends on:
+- The **origin country's training capacity** — Can education systems scale up to replace emigrants?
+- The **return rate** — Higher return rates favor brain gain.
+- The **emigration rate** — Beyond a threshold (~15-20% of skilled workers), drain overwhelms gain.
+- The **selectivity of destination immigration policy** — Skill-based selection amplifies drain; lottery or family-based systems produce more mixed selection.
+
+---
+
 ## Natural Increase
 
 Natural increase is the difference between births and deaths:
@@ -211,6 +440,86 @@ Cities that fail to attract young adults progressively age. The feedback loop is
 5. Housing demand falls, property values decline, further discouraging investment.
 
 This pattern describes the "shrinking city" phenomenon (Detroit, many former East German cities, rural Japanese municipalities). Reversing it requires breaking the feedback loop, usually through targeted investment, immigration policy, or an external economic shock (new industry, university expansion).
+
+---
+
+## Aging in Place and Shrinking Cities
+
+### The Shrinking City Phenomenon
+
+As of 2024, 63 countries have declining national populations, including major economies like Japan, Germany, and China. Within countries that are still growing nationally, hundreds of individual cities are shrinking. The phenomenon is concentrated in three contexts:
+
+1. **Post-industrial cities** — Cities whose economic base collapsed (manufacturing decline, resource exhaustion). Detroit, Cleveland, St. Louis, Pittsburgh, and numerous Rust Belt cities in the US; Liverpool, Sunderland in the UK; much of the Ruhr Valley in Germany.
+2. **Post-socialist cities** — Cities that lost population after the collapse of centrally planned economies. Leipzig, Halle, Chemnitz, and many former East German cities; cities across the former Soviet Union, Poland, Romania, and Bulgaria.
+3. **Rural-drain cities** — Small and mid-sized cities in countries experiencing extreme metropolitan concentration. Japan's "Unipolar Concentration" toward Tokyo has hollowed out provincial cities; South Korea concentrates in Seoul; France in Paris.
+
+The scale is substantial. UN projections estimate Japan's population will contract 16% between 2020 and 2050. The Japanese government projects continued aging and shrinking for the next century. Detroit lost over 60% of its peak population (from 1.86 million in 1950 to ~640,000 today).
+
+### Fiscal Death Spiral
+
+Aging populations combined with shrinking tax bases create a self-reinforcing fiscal crisis:
+
+```
+Revenue decline:
+  - Fewer working-age residents → lower income tax receipts
+  - Property values fall → lower property tax receipts
+  - Businesses close or relocate → lower sales and business tax
+
+Expenditure pressure:
+  - Aging residents require more healthcare, social services
+  - Infrastructure maintenance costs remain fixed even as users decline
+  - Pension obligations to retired city workers persist and grow
+  - Debt service on bonds issued during growth era continues
+
+Result: Per-capita fiscal burden rises → services degrade → more residents leave → spiral deepens
+```
+
+**Detroit's fiscal collapse illustrates the endgame:**
+- Only 6% of the taxable value of real estate in the tri-county Detroit metro area is within the city itself; 94% is in the suburbs.
+- From FY2008 to FY2015, taxable values declined 27.2%, state revenue sharing payments declined 21.8%, while expenditures dropped only 8.4% — creating a structural deficit.
+- Detroit filed for Chapter 9 bankruptcy in 2013, the largest municipal bankruptcy in US history ($18.5 billion in debt).
+
+**Japan's municipal stress:**
+- Small Japanese communities face slower or negative economic growth, a reduced labor force, diminished tax revenues, school closures, vacant land and buildings, and difficulty maintaining infrastructure.
+- Urban shrinkage significantly deteriorates local fiscal revenues, particularly affecting building (property) taxes — the primary local revenue source for Japanese municipalities.
+
+### Healthcare Demand and Workforce Mismatch
+
+Aging populations create a simultaneous surge in healthcare demand and a shortage of healthcare workers:
+
+- **Medicare spending** in the US is projected to grow at 9.7% per year through 2030, eclipsing 5% of GDP within two decades (CMS estimates).
+- The US faces a projected deficit of **1.2 million registered nurses** and **121,900 physicians** by 2030.
+- In shrinking cities, the mismatch is more acute: healthcare facilities lose staff to migration even as the remaining population ages and requires more care.
+- Most existing housing stock is not adapted for aging residents — accessibility modifications, single-floor living, proximity to medical facilities — yet 80%+ of this housing will still be in use by 2050.
+
+The healthcare workforce challenge creates a secondary migration dynamic: healthcare workers concentrate in cities that can pay competitive wages, further depleting the healthcare capacity of shrinking cities.
+
+### Infrastructure Over-Provisioning
+
+Cities built for larger populations carry infrastructure sized for their peak — water systems, sewers, roads, transit networks, school buildings — that must be maintained even as usage plummets.
+
+**Leipzig's water system** is a striking example: Water demand dropped from 700,000 m³/day at peak to just 165,000 m³/day — the level of the mid-1940s — while the supply network built for the larger population remains in place. The city faces higher per-unit operation, maintenance, and restructuring costs for water infrastructure that serves a fraction of its designed capacity.
+
+The same dynamic applies across all infrastructure categories:
+
+| Infrastructure | Problem with decline | Fiscal impact |
+|---------------|---------------------|---------------|
+| Water/sewer | Oversized pipes, low flow reduces water quality | Higher per-unit costs, capital for rightsizing |
+| Roads | Maintenance cost per user rises, underuse leads to decay | Deferred maintenance creates safety hazards |
+| Schools | Enrollment drops below viable levels | Closures reduce neighborhood desirability |
+| Transit | Ridership cannot support service frequency | Service cuts → car dependency → further ridership loss |
+| Fire/police | Response area per station increases | Longer response times, safety concerns |
+
+### Case Studies {#case-studies-aging}
+
+**Japan — National-scale aging and shrinkage:**
+Japan's total fertility rate of ~1.2 (2024) is far below replacement. The median age is 49, the highest of any major economy. Approximately 30% of the population is over 65. The "akiya" (vacant house) problem reflects the physical manifestation of shrinkage — an estimated 9 million vacant houses nationwide (2023), concentrated in rural and provincial cities. Despite government incentives for decentralization, Tokyo continues to grow while the rest of the country empties.
+
+**Germany — East German shrinkage and partial recovery:**
+After reunification (1990), East German cities lost 10-30% of their populations within a decade as residents migrated west. Leipzig dropped from 530,000 (1989) to 437,000 (1998). The city has since partially recovered (620,000 by 2024) through a combination of low housing costs attracting young residents, university expansion, and targeted economic development. Leipzig's experience shows that the shrinking-city spiral can be reversed, but recovery took 25+ years and required specific conditions (proximity to Western Germany, cultural amenities, university anchor).
+
+**Detroit — Post-industrial paradigm case:**
+Detroit lost 1.2 million residents over seven decades. The city now has approximately 80,000 vacant structures and 24 square miles of vacant land. Property tax reform is essential but politically difficult: assessments based on peak-era values create crushing burdens on remaining residents. The 2013 bankruptcy forced restructuring of pension obligations, reduced debt, and enabled limited reinvestment — but the population continues to decline slowly, and large areas of the city remain functionally abandoned.
 
 ---
 
@@ -295,6 +604,79 @@ A practical discretization for simulation: divide the population into five wealt
 | Q3 | $55,000-$90,000 | ~15% | Medium-density, suburban |
 | Q4 | $90,000-$150,000 | ~23% | Single-family suburban, newer stock |
 | Q5 (highest) | >$150,000 | ~51% | Premium locations, low-density or luxury high-rise |
+
+---
+
+## Gentrification-Driven Displacement
+
+### What Gentrification Is and How It Proceeds
+
+Gentrification is the process by which higher-income, often college-educated residents move into lower-income neighborhoods, driving up property values, rents, and the cost of goods and services. The number of gentrifying US urban neighborhoods increased from 246 during the 1970s to 1,807 in the 2010s, and approximately 15% of urban neighborhoods now show indications of gentrification (NCRC, 2023).
+
+The process typically follows a sequence:
+
+1. **Pioneer phase** — Artists, students, and young professionals discover affordable space in a disinvested neighborhood. Initial investment is small-scale (cafe, gallery, studio conversion).
+2. **Transition phase** — Media attention and word-of-mouth attract higher-income residents. Property investors begin acquiring buildings. Rents rise. Existing small businesses face higher lease costs.
+3. **Consolidation phase** — Large-scale development replaces or renovates existing housing stock. National chain retailers enter. The neighborhood's demographic and commercial character has fundamentally shifted.
+4. **Stabilization** — The neighborhood has fully transitioned to a higher-income profile. Original residents and businesses have been largely replaced.
+
+### Who Gets Displaced
+
+Displacement is not uniform. The populations most vulnerable to displacement are:
+
+- **Low-income renters** — Renters have no equity buffer and face direct exposure to rent increases. In gentrifying neighborhoods, rents can increase 40-50% in a decade (e.g., median rents in gentrifying D.C. neighborhoods rose 40% from 2010-2020). Low-income New Yorkers typically pay more than 30% of income on rent; between 2000 and 2014, median household income rose 25% while rents increased 53%.
+- **Black and Latino residents** — Gentrification has disproportionately affected communities of color. Between 1980 and 2020, gentrification impacted 523 majority-Black neighborhoods, with 155 (nearly a third) undergoing full racial turnover. There are 261,000 fewer Black people living in neighborhoods that were majority-Black before gentrification began (NCRC, 2023).
+- **Elderly long-term residents** — Even homeowners can be displaced through rising property taxes and the loss of neighborhood social networks and culturally specific services.
+- **Small business owners** — Commercial lease increases and shifting customer demographics force out businesses that served the original population.
+
+Oakland's experience quantifies the rent burden: low-income residents in gentrified areas face rent burdens of up to 50% of income, well above the 30% affordability threshold.
+
+### Where Do the Displaced Go
+
+Research on displacement destinations reveals a troubling pattern (Freeman, Hwang, Haupert & Zhang, 2024):
+
+- Displaced residents disproportionately move to **lower-income neighborhoods** — not to neighborhoods of comparable or higher quality.
+- Moves to worse-off neighborhoods **intensify poverty conditions** and inhibit economic mobility. Research from Philadelphia shows that families displaced to worse neighborhoods experience declining credit scores and long-term financial strain.
+- Displaced residents lose access to the **location-specific advantages** of center-city neighborhoods: public transportation, social services, employment centers, and social networks.
+- Children displaced to higher-poverty neighborhoods show **lower test scores** and **reduced adult earnings** compared to peers who remained (Chetty et al.).
+- The net effect is a **spatial reshuffling of poverty** — gentrification does not eliminate poverty, it relocates and concentrates it in already-disadvantaged areas.
+
+### Quantitative Evidence
+
+The quantitative literature on gentrification and displacement is notably contentious:
+
+**The "null finding" camp:** Several influential studies using large-sample outmigration data found that low-income residents in gentrifying neighborhoods do not move at higher rates than similar residents in non-gentrifying neighborhoods (Freeman, 2005; Vigdor, 2002; McKinnish et al., 2010). This suggests displacement is less widespread than commonly assumed.
+
+**The "composition change" interpretation:** Most neighborhood-level demographic change in gentrifying areas occurs through *differential in-migration* — higher-income, often white residents move in at elevated rates — rather than elevated outmigration of incumbents. The neighborhood changes not because residents are pushed out, but because incoming residents are different from those who would have moved in absent gentrification.
+
+**The eviction and hardship evidence:** More recent research using administrative data (eviction records, credit reports) paints a more complex picture:
+
+| Finding | Source |
+|---------|--------|
+| Gentrifying neighborhoods = 13.2% of all neighborhoods, account for 11.7% of evictions | Eviction Lab |
+| Non-gentrifying low-SES neighborhoods = 45.7% of all neighborhoods, account for 60%+ of evictions | Eviction Lab |
+| Portland gentrifying neighborhoods: 30% rise in eviction rates | Eviction Lab |
+| Displaced movers in Philadelphia show declining credit scores | Federal Reserve Bank of Philadelphia |
+
+The nuanced conclusion: **Gentrifying neighborhoods are not where the most evictions happen** — that distinction belongs to persistently poor neighborhoods. But gentrification does increase displacement pressure at the margins, and the *consequences* of displacement from gentrifying neighborhoods are particularly damaging because they move people from improving areas to deteriorating ones.
+
+### The Eviction Channel
+
+Eviction is the most acute mechanism of displacement. While overall eviction rates may not spike dramatically in gentrifying neighborhoods, the character of evictions shifts:
+
+- **No-fault evictions** increase as landlords seek to renovate units for higher-paying tenants (Ellis Act evictions in San Francisco, "renovictions" in Vancouver and Berlin).
+- **Informal displacement** — Landlords allow buildings to deteriorate or harass tenants to induce voluntary departure, avoiding formal eviction proceedings. This displacement is invisible in eviction data.
+- **Rent-increase displacement** — When leases expire, landlords raise rents beyond existing tenants' ability to pay. In markets without rent stabilization, this is the dominant displacement channel.
+
+Policy responses that cities have attempted:
+
+| Policy | Mechanism | Effectiveness |
+|--------|-----------|---------------|
+| Rent control / stabilization | Caps annual rent increases | Protects existing tenants; reduces mobility; may discourage new supply |
+| Just-cause eviction ordinances | Limits reasons for eviction | Reduces no-fault evictions; does not address rent increases |
+| Community land trusts | Removes land from speculative market | Preserves long-term affordability; slow to scale |
+| Inclusionary zoning | Requires affordable units in new development | Adds some affordable supply; can slow overall development |
+| Right of first refusal | Gives tenants/nonprofits priority to purchase buildings | Preserves existing affordable stock; requires capital |
 
 ---
 
@@ -629,15 +1011,127 @@ If age cohorts are eventually tracked per building or district:
 
 The agent sampling ratio (1:50) keeps this tractable: 10,000 population = 200 agents. Adding an `age` field to each agent and advancing it each tick-year is computationally cheap.
 
+#### 7. Immigration and Enclave Formation
+
+Model international migration as a distinct inflow channel with clustering behavior:
+
+```typescript
+interface ImmigrantWave {
+  originGroup: string          // identifier for cultural/ethnic group
+  skillLevel: 'low' | 'mid' | 'high'
+  arrivalRate: number          // agents per tick-year
+  clusteringAffinity: number   // 0-1, how strongly they prefer co-ethnic neighbors
+}
+
+function immigrantSettlement(
+  wave: ImmigrantWave,
+  buildings: Building[],
+  existingAgents: CitizenAgent[]
+): Building | null {
+  // Score buildings by: (1 - clusteringAffinity) * desirability + clusteringAffinity * coEthnicDensity
+  // Immigrants with high clustering affinity concentrate in enclaves
+  // Immigrants with low clustering affinity distribute like native-born residents
+  const scored = buildings
+    .filter(b => hasCapacity(b))
+    .map(b => ({
+      building: b,
+      score: (1 - wave.clusteringAffinity) * desirability(b)
+             + wave.clusteringAffinity * coEthnicShare(b, wave.originGroup, existingAgents)
+    }))
+    .sort((a, b) => b.score - a.score)
+  return scored[0]?.building ?? null
+}
+```
+
+Over time, this produces emergent ethnic enclaves — concentrated immigrant neighborhoods with distinct commercial character. The enclave formation mechanic would interact with the existing desirability system: enclaves initially have low desirability scores (affordable areas) but could develop cultural amenity bonuses as institutional completeness grows.
+
+Immigrant agents could carry an `integrationProgress` field (0 to 1) that advances each tick, gradually shifting their settlement preferences from enclave-seeking to desirability-maximizing — modeling the spatial assimilation trajectory.
+
+#### 8. Circular Migration and Remittances
+
+Model temporary workers who occupy housing and jobs but remit a portion of income, reducing their local economic multiplier:
+
+```typescript
+interface MigrantAgent extends CitizenAgent {
+  migrantType: 'permanent' | 'temporary' | 'seasonal'
+  remittanceRate: number       // fraction of income sent out of city (0-0.5)
+  returnProbability: number    // per tick-year probability of departure
+}
+
+// Seasonal migrants: present only during certain tick-ranges
+// Temporary migrants: present for N ticks, then leave (creating churn)
+// The city's apparent population stability may mask high turnover
+```
+
+Remittance outflow reduces the local commercial demand multiplier: a seasonal worker earning $X but remitting 40% generates only 0.6X in local spending. This means neighborhoods with high temporary-migrant shares show lower commercial demand per capita — a pattern the player would need to account for when zoning commercial space.
+
+#### 9. Brain Drain / Brain Gain Events
+
+Model skilled worker departure as a risk when city attractiveness falls below external opportunities:
+
+```typescript
+function brainDrainRisk(agent: CitizenAgent, cityAttractiveness: number): number {
+  if (agent.wealthTier < 3) return 0  // only high-skill agents are at risk
+  const externalPull = 0.6            // baseline attractiveness of "elsewhere"
+  const gap = externalPull - cityAttractiveness
+  if (gap <= 0) return 0
+  return gap * 0.05                    // 5% departure probability per unit of gap
+}
+```
+
+When high-income agents leave, the city loses tax revenue and innovation capacity (modeled as reduced commercial desirability). This creates the brain-drain feedback loop: declining attractiveness causes departures, which further reduce attractiveness. The player must invest in amenities and services to retain talent — or accept the transition to a different city archetype.
+
+#### 10. Aging City Mechanics
+
+If age tracking is implemented, model the shrinking-city fiscal spiral:
+
+```typescript
+function agingPenalty(ageDistribution: AgeDistribution): FiscalModifier {
+  const elderlyShare = ageDistribution.over65 / ageDistribution.total
+  const workingShare = ageDistribution.age15to64 / ageDistribution.total
+
+  return {
+    taxRevenueMultiplier: workingShare / 0.65,    // normalized: 1.0 when 65% working-age
+    healthcareDemand: elderlyShare / 0.15,         // normalized: 1.0 when 15% elderly
+    infrastructureCostPerCapita: 1 + (1 - ageDistribution.total / peakPopulation) * 0.5
+    // Infrastructure costs rise 50% per capita when population is far below peak
+  }
+}
+```
+
+A city where the elderly share exceeds 25% would face simultaneously rising healthcare costs, declining tax revenue, and increasing per-capita infrastructure burden — the fiscal death spiral. The player's options mirror reality: attract young immigrants, invest in economic development to retain working-age residents, or manage decline gracefully by rightsizing infrastructure.
+
+#### 11. Gentrification and Displacement
+
+Gentrification emerges naturally from the wealth-tier + desirability system if implemented correctly: high-income agents moving into low-rent, high-potential-amenity neighborhoods will bid up desirability and displace low-income agents. To model displacement consequences:
+
+```typescript
+function displacementDestination(
+  displaced: CitizenAgent,
+  buildings: Building[]
+): Building | null {
+  // Displaced agents are forced to move quickly, so they accept suboptimal locations
+  // They tend to end up in lower-desirability neighborhoods
+  const affordable = buildings
+    .filter(b => hasCapacity(b) && rentLevel(b) <= displaced.affordability)
+    .sort((a, b) => rentLevel(a) - rentLevel(b))  // cheapest first, not best
+  return affordable[0] ?? null
+}
+```
+
+The key mechanic: displaced agents do not optimize for desirability — they optimize for cost, which systematically routes them to the least desirable available locations. Over time, this produces poverty concentration in specific districts, replicating the empirical finding that gentrification reshuffles poverty rather than eliminating it.
+
+A "neighborhood character" or "cultural heritage" score could track how much turnover a district has experienced. Rapid turnover reduces this score, which in turn reduces the amenity bonus that attracted gentrifiers in the first place — a self-limiting dynamic observed in real cities where "authenticity" erodes as gentrification proceeds.
+
 ---
 
 ## Cross-References
 
-- [urban-density-gradients.md](./urban-density-gradients.md) — Clark's Law density decay; directly used in density upgrade probability. Population growth models here determine *when* density transitions trigger.
-- [transit-oriented-development.md](./transit-oriented-development.md) — Transit accessibility affects carrying capacity (K_infrastructure) and drives spatial sorting of wealth tiers toward transit corridors.
-- housing.md (planned) — Household formation trends determine housing unit demand independent of population growth. Wealth tiers map to housing type preferences.
-- economy-and-employment.md (planned) — Employment base sets the jobs component of carrying capacity. Harris-Todaro migration model depends on job availability signals from the economy system.
-- public-services.md (planned) — Service capacity (schools, hospitals, fire coverage) acts as an amenity-based carrying capacity ceiling. Age structure determines service demand profiles.
+- [urban-density-gradients.md](./urban-density-gradients.md) — Clark's Law density decay; directly used in density upgrade probability. Population growth models here determine *when* density transitions trigger. Gentrification dynamics affect where density transitions occur (incumbent neighborhoods vs. new development).
+- [transit-oriented-development.md](./transit-oriented-development.md) — Transit accessibility affects carrying capacity (K_infrastructure) and drives spatial sorting of wealth tiers toward transit corridors. Immigrant enclaves often form near transit nodes; gentrification frequently follows transit investment.
+- housing.md (planned) — Household formation trends determine housing unit demand independent of population growth. Wealth tiers map to housing type preferences. Gentrification displacement mechanics depend on rent dynamics and housing stock age/quality. Immigrant housing demand patterns differ from native-born (higher occupancy, more multi-family).
+- economy-and-employment.md (planned) — Employment base sets the jobs component of carrying capacity. Harris-Todaro migration model depends on job availability signals from the economy system. Brain drain/gain dynamics affect the city's innovation and entrepreneurship capacity. Immigrant entrepreneurship creates distinct commercial corridors. Remittance outflows reduce local economic multipliers.
+- public-services.md (planned) — Service capacity (schools, hospitals, fire coverage) acts as an amenity-based carrying capacity ceiling. Age structure determines service demand profiles. Aging-in-place dynamics create healthcare demand surges. Shrinking cities face infrastructure over-provisioning costs. Immigrant integration requires language services, credential recognition.
 
 ---
 
@@ -652,6 +1146,15 @@ The agent sampling ratio (1:50) keeps this tractable: 10,000 population = 200 ag
 - Angel, S. et al. (2016). *Atlas of Urban Expansion*. Lincoln Institute of Land Policy.
 - Notestein, F. (1945). "Population — The Long View." In *Food for the World*, ed. T. Schultz. University of Chicago Press.
 - Berry, B.J.L. (1976). "The Counterurbanization Process: Urban America Since 1970." *Urbanization and Counterurbanization*, 17-30.
+- MacDonald, J.S. & MacDonald, L.D. (1964). "Chain Migration, Ethnic Neighborhood Formation, and Social Networks." *Milbank Memorial Fund Quarterly*, 42(1), 82-97.
+- Wilson, K.L. & Portes, A. (1980). "Immigrant Enclaves: An Analysis of the Labor Market Experiences of Cubans in Miami." *American Journal of Sociology*, 86(2), 295-319.
+- Freeman, L. (2005). "Displacement or Succession? Residential Mobility in Gentrifying Neighborhoods." *Urban Affairs Review*, 40(4), 463-491.
+- Freeman, L., Hwang, J., Haupert, T. & Zhang, I. (2024). "Where Do They Go? The Destinations of Residents Moving from Gentrifying Neighborhoods." *Urban Affairs Review*, 60(2).
+- Vigdor, J.L. (2002). "Does Gentrification Harm the Poor?" *Brookings-Wharton Papers on Urban Affairs*, 133-182.
+- McKinnish, T., Walsh, R. & White, T.K. (2010). "Who Gentrifies Low-Income Neighborhoods?" *Journal of Urban Economics*, 67(2), 180-193.
+- Chand, S. & Clemens, M. (2023). "Brain drain or brain gain? Effects of high-skilled international emigration on origin countries." *Science*, 382(6670).
+- Card, D. (2007). "How Immigration Affects U.S. Cities." CReAM Discussion Paper No. 11/07. University of California, Berkeley.
+- Van den Berg, L., Drewett, R., Klaassen, L.H., Rossi, A. & Vijverberg, C.H.T. (1982). *Urban Europe: A Study of Growth and Decline*. Pergamon Press.
 
 ### Data Sources
 
@@ -662,6 +1165,52 @@ The agent sampling ratio (1:50) keeps this tractable: 10,000 population = 200 ag
 - [US Census Bureau — One-Person Households](https://www.census.gov/library/visualizations/2019/comm/one-person-households.html)
 - [OECD — Income Levels and Inequality in Metropolitan Areas](https://www.oecd.org/content/dam/oecd/en/publications/reports/2016/07/income-levels-and-inequality-in-metropolitan-areas_g17a282e/5jlwj02zz4mr-en.pdf)
 - [Population Pyramids of the World](https://www.populationpyramid.net/world/2024/)
+- [World Bank — Migration and Remittances Overview](https://www.worldbank.org/en/topic/migration/overview)
+- [World Bank — Remittance Flows to LMICs, 2024](https://blogs.worldbank.org/en/peoplemove/in-2024--remittance-flows-to-low--and-middle-income-countries-ar)
+- [Migration Data Portal — Urbanization and Migration](https://www.migrationdataportal.org/themes/urbanisierung-und-migration)
+- [Migration Data Portal — Remittances Overview](https://www.migrationdataportal.org/themes/remittances-overview)
+- [BLS — Foreign-Born Workers: Labor Force Characteristics 2024](https://www.bls.gov/news.release/pdf/forbrn.pdf)
+- [OECD — International Migration Outlook 2024](https://www.oecd.org/en/publications/2024/11/international-migration-outlook-2024_c6f3e803.html)
+- [UN DESA — International Migrant Stock 2024](https://www.un.org/development/desa/pd/sites/www.un.org.development.desa.pd/files/undesa_pd_2025_intlmigstock_2024_key_facts_and_figures_advance-unedited.pdf)
+
+### Immigration, Enclaves, and Integration
+
+- [American Immigration Council — Immigrants and the Growth of America's Largest Cities](https://www.americanimmigrationcouncil.org/report/immigrants-and-the-growth-of-americas-largest-cities/)
+- [American Immigration Council — How Immigration is Shaping US Cities](https://www.americanimmigrationcouncil.org/blog/how-is-immigration-shaping-us-cities/)
+- [Hoover Institution — Immigration and the Rise and Decline of American Cities](https://www.hoover.org/research/immigration-and-rise-and-decline-american-cities)
+- [Brookings — New Census Data Hints at an Urban Population Revival, Assisted by Immigration](https://www.brookings.edu/articles/new-census-data-hints-at-an-urban-population-revival-assisted-by-immigration/)
+- [IZA World of Labor — Ethnic Enclaves and Immigrant Economic Integration](https://wol.iza.org/articles/ethnic-enclaves-and-immigrant-economic-integration/long)
+- [IZA World of Labor — Circular Migration](https://wol.iza.org/articles/circular-migration/long)
+
+### Brain Drain and Skilled Migration
+
+- [Chand & Clemens (2023) — Brain Drain or Brain Gain? (Science)](https://www.science.org/doi/10.1126/science.adr8861)
+- [University of Michigan — Brain Drain or Brain Gain? New Evidence](https://news.umich.edu/brain-drain-or-brain-gain-new-evidence-points-to-benefits-of-skilled-migration/)
+- [VoxDev — Why Brain Drain Is an Incomplete Story](https://voxdev.org/topic/migration-urbanisation/why-brain-drain-incomplete-story-migration)
+- [IZA World of Labor — The Brain Drain from Developing Countries](https://wol.iza.org/articles/brain-drain-from-developing-countries/long)
+- [UNCTAD — Brain Drain Undermines Progress in Least Developed Countries](https://unctad.org/press-material/brain-drain-undermines-progress-least-developed-countries-unctad-warns)
+- [PMC — Brain Drain and Health Care Delivery in Developing Countries](https://pmc.ncbi.nlm.nih.gov/articles/PMC5345397/)
+
+### Aging, Shrinking Cities, and Fiscal Stress
+
+- [Nature — Ageing and Population Shrinking: Implications for Sustainability](https://www.nature.com/articles/s42949-021-00023-z)
+- [Peter G. Peterson Foundation — How Does Aging Affect Fiscal Health?](https://www.pgpf.org/article/how-does-the-aging-of-the-population-affect-our-fiscal-health/)
+- [Nature — Healthcare on the Brink: Navigating an Aging Society in the US](https://www.nature.com/articles/s41514-024-00148-2)
+- [World Economic Forum — Shrinking Cities Are a Forgotten Problem](https://weforum.org/agenda/2018/03/managing-shrinking-cities-in-an-expanding-world)
+- [Citizens Research Council of Michigan — Detroit's Population Decline and Property Tax](https://crcmich.org/detroits-population-decline-should-prompt-property-tax-reforms)
+- [Wikipedia — Shrinking City](https://en.wikipedia.org/wiki/Shrinking_city)
+- [ICMA — A Brave New Demographic World: Depopulation and Japan](https://icma.org/articles/pm-magazine/brave-new-demographic-world-depopulation-and-examples-japan)
+
+### Gentrification and Displacement
+
+- [Freeman, Hwang, Haupert & Zhang (2024) — Where Do They Go?](https://journals.sagepub.com/doi/10.1177/10780874231169921)
+- [PMC — Beyond Gentrification: Housing Loss, Poverty, and the Geography of Displacement](https://pmc.ncbi.nlm.nih.gov/articles/PMC10789166/)
+- [NCRC — Displaced By Design: Fifty Years of Gentrification](https://ncrc.org/displaced-by-design/)
+- [Eviction Lab — Gentrification's Role in the Eviction Crisis](https://evictionlab.org/gentrifications-role-in-the-eviction-crisis/)
+- [Urban Displacement Project — What Are Gentrification and Displacement](https://www.urbandisplacement.org/about/what-are-gentrification-and-displacement/)
+- [HUD — The Consequences of Gentrification: A Focus on Residents](https://www.huduser.gov/portal/periodicals/cityscpe/vol18num3/ch2.pdf)
+- [Federal Reserve Bank of Philadelphia — Gentrification and Residential Mobility](https://www.philadelphiafed.org/community-development/housing-and-neighborhoods/gentrification-research-and-practitioner-perspectives)
+- [CSS NY — Gentrification, Rising Rents and the City's Changing Housing Landscape](https://www.cssny.org/news/entry/gentrification-rising-rents-and-the-citys-changing-housing-landscape)
 
 ### Textbooks and Surveys
 
@@ -672,3 +1221,4 @@ The agent sampling ratio (1:50) keeps this tractable: 10,000 population = 200 ag
 - [Freddie Mac — Growth of Sole-Person Households](https://www.freddiemac.com/research/insight/20210826-sole-person-households)
 - [Global Household Trends — Springer Nature](https://link.springer.com/article/10.1186/s41118-024-00211-6)
 - [Zipf's Law and City Size Distribution — Survey](https://www.sciencedirect.com/science/article/abs/pii/S0378437117310130)
+- [IOM — World Migration Report 2024: International Remittances](https://worldmigrationreport.iom.int/what-we-do/world-migration-report-2024-chapter-2/international-remittances)

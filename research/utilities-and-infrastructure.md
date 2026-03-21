@@ -6,13 +6,18 @@
 
 - [Power Generation](#power-generation)
 - [Power Distribution](#power-distribution)
+- [Distributed Generation and Microgrids](#distributed-generation-and-microgrids)
 - [Water Supply](#water-supply)
 - [Wastewater and Sewer](#wastewater-and-sewer)
+- [Decentralized Wastewater](#decentralized-wastewater)
 - [Stormwater Management](#stormwater-management)
 - [Solid Waste Management](#solid-waste-management)
 - [Telecom and Broadband](#telecom-and-broadband)
+- [Infrastructure Interdependencies](#infrastructure-interdependencies)
 - [Infrastructure Lifecycle](#infrastructure-lifecycle)
 - [Infrastructure Costs](#infrastructure-costs)
+- [Infrastructure Financing](#infrastructure-financing)
+- [Climate Adaptation Costs](#climate-adaptation-costs)
 - [Capacity Planning](#capacity-planning)
 - [Infrastructure and Development](#infrastructure-and-development)
 - [Application to Bitborough](#application-to-bitborough)
@@ -92,6 +97,77 @@ Grid operators must continuously balance generation with demand. The key constra
 
 ---
 
+## Distributed Generation and Microgrids
+
+The traditional model of large centralized power plants feeding one-way power through transmission and distribution networks is being disrupted by distributed energy resources (DERs) — small-scale generation and storage located at or near the point of consumption. This shift changes grid economics, resilience characteristics, and the relationship between utilities and customers.
+
+### Rooftop solar
+
+Residential and commercial rooftop solar PV is the most widespread form of distributed generation. As of 2025, installed cost for residential rooftop solar averages approximately **$2.58 per watt** before incentives, or roughly $13,000-$18,000 for a typical 5-7 kW residential system. The 30% federal Investment Tax Credit (ITC) reduces this significantly.
+
+Key characteristics:
+- **Capacity factor**: 15-25% depending on location, orientation, and shading — lower than utility-scale solar (20-30%) due to suboptimal tilt angles and partial shading
+- **System size**: Residential 3-10 kW; commercial 50-500 kW; community solar 1-5 MW
+- **Lifespan**: 25-30 years with ~0.5% annual degradation in output
+- **Grid interaction**: Most systems are grid-tied, exporting surplus daytime production and importing power at night
+
+### Community solar
+
+Community solar (also called solar gardens or shared solar) allows multiple customers to subscribe to a shared solar installation and receive bill credits proportional to their share. This model serves renters, shaded properties, and customers who cannot host rooftop panels. Subscribers typically save 5-20% on electricity costs. Community solar capacity has grown rapidly, exceeding 7 GW nationally by 2025.
+
+### Battery storage
+
+Battery energy storage is the enabling technology for making intermittent renewables dispatchable. Costs have fallen dramatically:
+
+| Metric | 2015 | 2020 | 2025 |
+|---|---|---|---|
+| Lithium-ion pack cost ($/kWh) | ~$350 | ~$140 | ~$108 |
+| Residential installed cost ($/kWh usable) | $1,500+ | $1,100 | $700-1,000 |
+| Utility-scale installed cost ($/kWh) | $500+ | $300 | ~$200 |
+
+A typical residential battery system (e.g., Tesla Powerwall 3 at 13.5 kWh) costs $15,000-$16,500 installed before incentives. Battery pack costs are projected to continue declining at 8-12% per year.
+
+Storage serves multiple functions:
+- **Peak shaving**: Charging during low-price periods, discharging during high-price peaks
+- **Solar self-consumption**: Storing midday solar surplus for evening use
+- **Backup power**: Providing hours of power during grid outages
+- **Grid services**: Providing frequency regulation and demand response to utilities
+
+### Microgrids
+
+A microgrid is a localized energy system that can operate connected to the main grid or independently ("islanded") during outages. Microgrids combine local generation (solar, diesel backup, fuel cells), battery storage, and intelligent controls.
+
+**Costs by market segment** (per MW of DERs installed):
+- Community microgrids: ~$2.1 million/MW (lowest due to economies of scale)
+- Utility microgrids: ~$2.6 million/MW
+- Campus microgrids: ~$3.3 million/MW
+- Commercial microgrids: ~$4.0 million/MW
+
+Typical community microgrids range from 2-10 MW and can serve a neighborhood or critical facility cluster. The DOE announced $2.2 billion for microgrid projects in 2024, with the Infrastructure Act earmarking $10 billion total for grid resilience through distributed systems.
+
+**Cost breakdown** for a typical microgrid installation:
+- Energy resources (solar, generators): 30-45%
+- Switchgear, protection, transformers: ~20%
+- Communications and controls: 10-20%
+- Site engineering and construction: ~30%
+- Operations and markets integration: 5-15%
+
+### The duck curve and grid economics
+
+As solar penetration increases, the net load curve (total demand minus solar generation) develops a distinctive shape known as the **duck curve** — low midday demand (belly of the duck) followed by a steep evening ramp (neck of the duck) as solar output drops while demand rises. California's duck curve has deepened dramatically since the term was coined by CAISO in 2012.
+
+The duck curve creates two problems:
+1. **Operational**: The steep evening ramp (up to 13 GW in 3 hours in California) requires fast-ramping conventional generation or storage
+2. **Economic**: Midday wholesale prices drop to zero or negative, undermining the revenue of both solar generators and baseload plants
+
+### The utility death spiral
+
+The **utility death spiral** is a theoretical positive feedback loop: as customers adopt rooftop solar and reduce grid purchases, utilities must raise rates on remaining customers to cover fixed infrastructure costs, which drives more customers to adopt solar, further reducing the rate base. While the full spiral has not materialized anywhere, it has influenced rate design — utilities increasingly use fixed monthly charges, demand charges, and time-of-use rates rather than purely volumetric (per-kWh) pricing to recover fixed costs regardless of net consumption.
+
+Net metering policies — where rooftop solar exports are credited at the full retail rate — are a focal point of this tension. Many states are transitioning to "net billing" or "value of solar" tariffs that compensate exports at a lower wholesale-adjacent rate.
+
+---
+
 ## Water Supply
 
 Municipal water systems have three stages: source, treatment, and distribution.
@@ -165,6 +241,61 @@ Most US plants provide secondary treatment as a minimum (Clean Water Act require
 ### Capacity planning
 
 Wastewater treatment plants are designed for a 20-year planning horizon. Key design parameter: gallons per capita per day of wastewater generated, which typically runs at 60-80% of water consumption (the rest is consumed — irrigation, evaporation, product incorporation). A city of 100,000 at 70 gpcd wastewater flow needs a plant rated for ~7 MGD average daily flow, with peak capacity of 14-21 MGD to handle wet-weather surges.
+
+---
+
+## Decentralized Wastewater
+
+Not all wastewater flows to a centralized treatment plant. Approximately 20% of US households — over 26 million homes — rely on onsite wastewater treatment systems (septic systems), primarily in rural and suburban areas where extending municipal sewer service is impractical or uneconomical.
+
+### Septic system basics
+
+A conventional septic system consists of a septic tank (where solids settle and partially decompose) and a drain field (where effluent percolates through soil for final treatment). The soil itself is the treatment medium — bacteria in the soil break down remaining contaminants before they reach groundwater.
+
+**Minimum lot size requirements** vary by jurisdiction but follow general patterns:
+- With public water supply: minimum **1/2 acre** for most system types
+- With private well: minimum **3/4 to 1 acre** to maintain safe separation between well and drain field
+- Poor soils (clay, high water table, shallow bedrock): **1-3+ acres** may be required
+- High-performance engineered systems (aerobic treatment units, mound systems): can sometimes serve smaller lots
+
+**Installation costs**: A conventional septic system costs $3,100-$9,600 to install. Advanced systems (aerobic treatment units, sand filter systems) cost $10,000-$25,000.
+
+### When septic works and when it fails
+
+Septic systems are appropriate and cost-effective when:
+- Development density is low (lots of 1/2 acre or larger)
+- Soils have adequate percolation rates (sandy loam to loamy sand ideal)
+- Water tables are sufficiently deep (4+ feet below drain field)
+- Properties have enough area for a replacement drain field when the primary field reaches end of life
+
+Septic systems become problematic when:
+- **Density increases**: As lot sizes shrink below 1/2 acre, the cumulative nitrogen loading from multiple septic systems can contaminate groundwater and surface water. Studies have documented groundwater contamination from nitrates at densities as low as 1 unit per acre in vulnerable hydrogeologic settings.
+- **Systems age**: Nearly 70% of onsite wastewater systems are 25 years or older, presenting elevated environmental risk. The EPA reports that failure rates range from 1-5% per year overall, but some communities with aging systems report failure rates as high as 70%.
+- **Soils are marginal**: Clay soils, high water tables, and shallow bedrock cause premature drain field failure. State agencies report failing septic systems as the third most common source of groundwater contamination.
+- **Maintenance is neglected**: Tanks that are not pumped every 3-5 years accumulate solids that eventually clog drain fields irreversibly.
+
+### Septic-to-sewer conversion
+
+When an area with septic systems develops enough density or experiences enough system failures, the community faces a decision point: convert to municipal sewer or continue with individual systems.
+
+**Conversion triggers** (conditions that typically initiate conversion):
+- Documented groundwater contamination from onsite systems
+- Failure rates exceeding 10-20% of systems in an area
+- Development pressure pushing densities above 1-2 units per acre
+- State environmental agency mandate due to water quality violations
+- Proximity to sensitive water bodies (coastal bays, drinking water reservoirs)
+
+**Conversion costs** are substantial:
+- **Household connection**: $5,000-$15,000 per home (national average $7,000-$10,000), including sewer connection fee ($1,000-$5,000), lateral installation ($2,000-$7,000), septic tank decommissioning ($500-$2,000), and permits
+- **Street-level sewer mains**: $50-$250 per linear foot depending on depth and soil conditions
+- **Trunk infrastructure**: $7,000-$67,500+ per property depending on proximity to existing sewer
+- **Treatment plant capacity expansion**: Additional cost borne by the utility to accommodate new flows
+
+The EPA's Clean Water State Revolving Fund provides low-interest financing for septic-to-sewer conversion projects. States including Florida, California, and Nevada offer additional financial assistance programs, recognizing the water quality benefits of conversion.
+
+### Cluster systems — the middle ground
+
+Between individual septic and full municipal sewer lies a middle option: **cluster (community) decentralized systems**. These serve 10-100+ homes through a shared collection network and a small community treatment unit. They cost less than extending municipal sewer to low-density areas while providing better treatment than individual septic systems. Cluster systems are increasingly favored for new developments in the 0.5-2 units per acre density range where neither individual septic nor municipal sewer is clearly optimal.
 
 ---
 
@@ -253,6 +384,79 @@ While telecom is less critical for a city-builder simulation, it follows infrast
 ### Coverage patterns
 
 Telecom infrastructure follows development — it is almost never built ahead of demand. Coverage radiates outward from population centers along major corridors. Dense urban areas get fiber and 5G first; rural areas rely on wireless, satellite, or remain underserved. This "follow demand" pattern contrasts with power and water, which must be provisioned before buildings are occupied.
+
+---
+
+## Infrastructure Interdependencies
+
+Modern infrastructure systems are not independent — they form a tightly coupled network where failures in one system cascade into others. Understanding these interdependencies is critical for both real-world resilience planning and realistic simulation.
+
+### The power-water nexus
+
+Power and water systems have a deep bilateral dependency that creates dangerous feedback loops during disasters:
+
+**Water needs power**:
+- Pumping accounts for approximately 85% of electricity consumption in water supply systems
+- The average US water supply system consumes ~2,000 kWh per million gallons of treated water
+- Wastewater treatment plants consume 1,000-3,000 kWh per million gallons, primarily for aeration and pumping
+- Regional variation is extreme: Southern California requires ~9,800 kWh/MG due to long-distance water transport, while surface water systems elsewhere may need only 1,500 kWh/MG
+- Without power, water treatment stops, pumps fail, and pressure drops — leading to boil-water advisories, service loss, and potential backflow contamination
+
+**Power needs water**:
+- Thermoelectric power plants (coal, gas, nuclear) require cooling water. US power generation has a water-withdrawal intensity of ~11,600 gallons per MWh (2021 data, down from ~14,900 gal/MWh in 2015)
+- Water intensity varies dramatically by fuel and cooling type: coal plants withdraw ~19,200 gal/MWh vs. natural gas combined cycle at ~2,800 gal/MWh
+- Consumptive water use (evaporated, not returned) averages ~0.47 gallons per kWh at point of end use
+- During droughts, power plants may be forced to curtail output due to insufficient cooling water or thermal discharge limits — creating a double crisis of water scarcity and power shortage
+- Wind and solar generation consume essentially zero water during operation, providing a resilience advantage
+
+### Dependency graph
+
+Infrastructure dependencies can be mapped as a directed graph. The major first-order dependencies:
+
+```
+Power → Water treatment (pumping, disinfection)
+Power → Wastewater treatment (pumping, aeration)
+Power → Telecom (towers, switches, data centers)
+Power → Natural gas (compressor stations)
+Natural gas → Power generation (fuel supply)
+Water → Power generation (cooling)
+Water → Firefighting (hydrant pressure)
+Telecom → All systems (SCADA control, monitoring)
+Roads → All systems (maintenance access, fuel delivery)
+```
+
+Second-order dependencies amplify failure chains: if power fails, water treatment stops, which threatens cooling water supply to the very power plants that need to restart — a deadlock condition.
+
+### Cascading failure analysis
+
+Research on interdependent infrastructure failures reveals important patterns:
+
+**Frequency vs. severity**: Studies modeling coupled power-water systems find that approximately 89% of initial transmission line failures do not propagate to water systems, and power failures do not lead to water outages in 96% of simulations. However, approximately 3.7% of simulations produce large cascading failures across both systems — low probability but catastrophic consequence.
+
+**Perfect storms**: When cascading failures do occur, they tend to be far worse than the sum of individual system failures. A Phoenix study modeling 120,000 failure scenarios found the most severe cascading event left 25% of water system nodes with insufficient pressure — triggered not by a water system failure but by power outages at pumping stations.
+
+**Propagation speed**: Power failures propagate in seconds to minutes (electrical). Water pressure loss propagates in minutes to hours (hydraulic). Sewer backup propagates in hours to days. This temporal layering means that a power outage that is restored in 2 hours may cause a water crisis that lasts 2 days.
+
+### Case study: Texas Winter Storm Uri (2021)
+
+Winter Storm Uri is the definitive modern example of cascading infrastructure failure in the United States:
+
+1. **Trigger**: Record cold temperatures (Feb 14-17, 2021) caused natural gas production to drop as wellheads and pipelines froze
+2. **Power cascade**: Gas shortages combined with frozen wind turbines and coal pile freeze-ups caused generation to collapse. ERCOT lost 48.6 GW of capacity — roughly half the grid
+3. **Water cascade**: Power outages knocked out water treatment plants and pumping stations across the state. Over **14.9 million people** lost water service. Boil-water notices were issued across 190 counties
+4. **Pipe failures**: Buildings that lost heat experienced pipe freezes and bursts, creating massive water demand when service was restored — further overwhelming depleted systems
+5. **Death toll and cost**: 246 deaths; over **$20 billion** in damages — making it the costliest winter storm on US record
+
+The critical lesson: the power system and water system each had vulnerabilities that were manageable in isolation, but their interdependence transformed a severe weather event into a civilizational disruption. Sub-freezing temperatures caused simultaneous failure in natural gas production, power generation, water treatment, and building plumbing — a "perfect storm" of coupled infrastructure failure.
+
+### Interdependency types
+
+Infrastructure interdependencies fall into four categories (Rinaldi et al. classification):
+
+1. **Physical**: One system's output is a direct input to another (water for power plant cooling; power for water pumps)
+2. **Cyber**: Information systems link infrastructure operations (SCADA systems controlling water valves depend on telecom networks powered by the electrical grid)
+3. **Geographic**: Co-located systems share exposure to the same hazard (a flood damages both the substation and the water treatment plant in a river valley)
+4. **Logical**: Regulatory, policy, or market mechanisms create coupling (electricity market price spikes during a heat wave cause water utilities to curtail pumping to reduce costs, lowering pressure)
 
 ---
 
@@ -348,6 +552,157 @@ Development pattern is as important as population size. Research consistently fi
 | Exurban/rural (< 1 unit/acre) | $50,000-100,000+ |
 
 A Halifax regional study found exurban patterns imposed up to 10x the lifecycle infrastructure cost of compact patterns. At the national level, one estimate places the total cost of suburban sprawl in the United States at $1 trillion per year.
+
+---
+
+## Infrastructure Financing
+
+Infrastructure must be paid for, and the financing mechanism shapes what gets built, when, and who bears the cost. Municipal infrastructure financing is a distinct domain with its own instruments, institutions, and political dynamics.
+
+### The revenue requirement
+
+For regulated utilities (both public and investor-owned), the fundamental equation governing rates is the **revenue requirement**:
+
+```
+Revenue Requirement = (Rate of Return × Rate Base) + O&M + Depreciation + Taxes
+```
+
+- **Rate base**: The undepreciated value of the utility's capital assets (pipes, plants, lines). This is what the utility has invested and on which it earns a return.
+- **Rate of return**: The authorized return on invested capital, set by regulators. For investor-owned utilities, this reflects a weighted average cost of capital (WACC) combining cost of debt (~4-5%) and authorized return on equity (~9-11%). A typical utility capital structure is approximately 50% debt, 50% equity.
+- **O&M**: Operating costs — labor, chemicals, energy, materials
+- **Depreciation**: Annual accounting charge that recovers the original capital investment over the asset's useful life
+
+This formula means that **utilities earn more money by building more capital assets**. A utility that builds a $100 million treatment plant earns 9-11% equity return on its share of that investment every year for the asset's depreciable life. This creates a well-documented capital bias — utilities prefer capital-intensive solutions over operational solutions, even when the latter may be more cost-effective.
+
+### Municipal bonds
+
+Municipal bonds are the primary financing instrument for public infrastructure in the United States. The outstanding municipal bond market exceeds **$4.1 trillion**, with approximately 85% consisting of tax-exempt bonds. Municipal bond issuance reached approximately $500 billion in 2024 and $585 billion in 2025 — back-to-back records driven by infrastructure demand and rising construction costs.
+
+**General obligation (GO) bonds**:
+- Backed by the full faith, credit, and taxing power of the issuing municipality
+- Repaid from general tax revenues (property tax, sales tax)
+- Considered lower risk; typically carry lower interest rates
+- Require voter approval in most jurisdictions
+- Used for general public infrastructure: roads, schools, parks, public buildings
+
+**Revenue bonds**:
+- Backed solely by the revenue stream of the specific project or utility they finance
+- Repaid from user fees, tolls, or utility rates
+- Higher interest rates than GO bonds (reflecting narrower revenue base), though the spread has narrowed in recent years
+- Do not always require voter approval
+- Used for self-supporting infrastructure: water systems, sewer systems, electric utilities, airports, toll roads
+
+Water and sewer revenue bonds are considered particularly reliable because these are **essential services** — customers will pay water and sewer bills before most other obligations. Debt service coverage ratios for water/sewer utilities are generally strong, and defaults are rare.
+
+### Rate setting — who pays and how
+
+Utility rates must recover the full revenue requirement while maintaining affordability and fairness. Rate structures fall into several categories:
+
+**Flat rate**: Every customer pays the same amount per unit regardless of consumption. Simple but provides no conservation incentive.
+
+**Increasing block rate**: Price per unit rises as consumption increases (e.g., first 5,000 gallons at $3/1,000 gal, next 5,000 at $5/1,000 gal). Encourages conservation and charges heavy users more. Most common for water utilities.
+
+**Decreasing block rate**: Price per unit falls with higher consumption. Historically used by electric utilities to encourage consumption; now declining.
+
+**Fixed + volumetric**: A fixed monthly charge covers infrastructure costs regardless of consumption, plus a per-unit charge for actual use. Increasingly favored because it ensures cost recovery even as conservation reduces per-unit sales.
+
+**Demand charges**: Charges based on peak instantaneous demand (kW) rather than total consumption (kWh). Common for commercial and industrial electric customers. Recovers the cost of maintaining capacity to serve peak loads.
+
+**Affordability threshold**: The EPA uses 2.5% of median household income as a benchmark for combined water and sewer bill affordability. Bills exceeding this threshold indicate potential financial hardship for low-income customers. Many utilities offer lifeline rates or low-income assistance programs.
+
+### Impact fees and developer contributions
+
+New development imposes costs on existing infrastructure. Municipalities recover these costs through:
+
+- **Impact fees**: One-time charges on new development to fund capacity expansion. Typically $2,000-$15,000 per residential unit, varying by jurisdiction and utility type. Must be proportional to the actual infrastructure burden of the development.
+- **Developer-funded infrastructure**: Developers build local infrastructure (streets, water/sewer laterals, stormwater facilities) as a condition of subdivision approval, then deed the assets to the municipality for ongoing maintenance.
+- **Special assessment districts**: Property owners in a defined area are assessed for infrastructure that specifically benefits that area (e.g., a new sewer main serving a particular subdivision).
+- **Tax increment financing (TIF)**: Future property tax increases generated by new development in a designated district are pledged to repay infrastructure bonds. Controversial because it diverts tax revenue from general services.
+
+### Public-private partnerships (P3s)
+
+Public-private partnerships involve private firms in the financing, construction, and/or operation of public infrastructure. P3 structures range from simple design-build contracts to full concessions where the private partner finances, builds, operates, and maintains the asset for 30-75 years.
+
+**Advantages**: Access to private capital; risk transfer (construction cost overruns are contractually borne by the private partner); operational efficiency; performance guarantees over the asset lifecycle.
+
+**Disadvantages**: Higher cost of capital (private borrowing costs exceed municipal bond rates); reduced public control; complexity; long-term contractual lock-in; profit extraction from essential services.
+
+P3s are more common for large, revenue-generating assets (toll roads, airports, water/wastewater systems) and less common for non-revenue infrastructure (local roads, stormwater). The US P3 market is smaller than in the UK, Canada, and Australia, partly because the municipal bond market provides efficient low-cost public financing.
+
+### The state revolving fund model
+
+The EPA administers two major revolving loan funds:
+- **Clean Water State Revolving Fund (CWSRF)**: Provides below-market-rate loans for wastewater infrastructure, stormwater management, and nonpoint source pollution control
+- **Drinking Water State Revolving Fund (DWSRF)**: Provides below-market-rate loans for water treatment and distribution infrastructure
+
+These programs offer interest rates typically 1-3 percentage points below market, with some states offering principal forgiveness for disadvantaged communities. The Bipartisan Infrastructure Law (2021) provided an additional $43 billion to these programs through 2026.
+
+---
+
+## Climate Adaptation Costs
+
+Climate change is imposing new costs on infrastructure systems — both through damage from extreme events and through the need to upgrade systems designed for a climate that no longer exists. These costs are large, growing, and unevenly distributed.
+
+### Heat impacts on infrastructure
+
+Rising temperatures and more frequent extreme heat events damage infrastructure in multiple ways:
+
+**Power systems**:
+- Transmission line capacity decreases as ambient temperature rises (conductors sag, increasing the risk of contact with vegetation or ground)
+- Transformer capacity is derated in extreme heat — a transformer rated for 100 MVA at 25 degC may only safely carry 85-90 MVA at 40 degC
+- Peak demand surges from air conditioning can exceed system capacity, causing rolling blackouts. Heat waves have triggered rolling blackouts in California (2020), Texas (2023), and across the Southeast
+- Thermal power plants lose efficiency at higher ambient temperatures and may be forced to curtail output when cooling water temperatures exceed discharge limits
+
+**Roads and pavement**:
+- Asphalt softens and deforms at sustained temperatures above 90 degF, causing rutting, cracking, and buckling. Approximately **5.8 million miles** of US roads face increasing risk as high-temperature days become more frequent
+- Concrete pavement expands, and if expansion joints are inadequate, slabs buckle
+- Climate-related road damage alone could incur **$20 billion** in repair costs by end of century
+- Adaptation strategies include heat-resistant asphalt mixes, smaller concrete slabs, and reflective surface coatings
+
+**Rail and bridges**:
+- Steel rail tracks expand and can buckle at temperatures above 95 degF (rail neutral temperature design thresholds)
+- Bridge expansion joints reach their limits; thermal movement can shift entire structures
+- Speed restrictions are imposed during heat events, reducing system throughput
+
+**Water systems**:
+- Higher temperatures increase water demand (landscape irrigation, cooling) while reducing supply (increased evaporation from reservoirs, reduced snowpack)
+- Warmer water temperatures accelerate disinfection byproduct formation and algal blooms in source water
+- Pipe thermal expansion/contraction stress increases joint failure rates
+
+### Flooding and sea level rise
+
+Flooding is the costliest natural hazard for infrastructure, and the costs are rising:
+
+**Sea level rise projections**: Global mean sea level is projected to rise 1-4 feet by 2100 depending on emissions trajectory, with local variations due to land subsidence, ocean currents, and glacial rebound. Conservative estimates project **$2-5 trillion** in global coastal infrastructure damages by 2100, with higher estimates reaching tens of trillions under accelerated warming.
+
+**US coastal adaptation costs**:
+- Houston/Harris County: **$30 billion** needed for 100-year flood protection
+- Boston: **$2.4 billion** for flood protection over coming decades
+- Norfolk, Virginia: **$1.4 billion** for seawalls and shoreline infrastructure (Army Corps of Engineers estimate)
+- US nationwide: **$300 billion** in shoreline armoring costs projected by 2100
+
+**Inland flooding**: More intense precipitation events (driven by a warmer atmosphere holding more moisture) overwhelm stormwater systems designed for historical rainfall patterns. Many cities are finding their "100-year storm" design standard is now closer to a 25-50 year event.
+
+### Adaptation cost estimates by infrastructure type
+
+| Infrastructure Type | Climate Threat | Adaptation Measure | Estimated Cost Premium |
+|---|---|---|---|
+| Power transmission | Heat, storms | Undergrounding, stronger poles, wider ROW | 5-15% of replacement cost |
+| Power generation | Heat, water scarcity | Dry cooling, efficiency upgrades | 10-20% capex increase |
+| Water treatment | Flooding, source quality | Elevated facilities, advanced treatment | 10-30% capex increase |
+| Water distribution | Heat/freeze cycles | Deeper burial, flexible joints | 5-10% per mile |
+| Sewer systems | Intense rainfall | Upsizing pipes, green infrastructure | 20-50% of gray infrastructure cost |
+| Roads | Heat, flooding | Heat-resistant materials, elevation | 3-10% of construction cost |
+| Bridges | Heat, flooding | Higher clearances, scour protection | 10-25% of construction cost |
+| Coastal infrastructure | Sea level rise | Seawalls, elevation, managed retreat | Highly variable; $10M-$1B+ per mile |
+
+The general finding across studies is that making infrastructure **climate-resilient adds approximately 3% to upfront costs** but yields a benefit-cost ratio of approximately **4:1** — every dollar spent on adaptation avoids roughly four dollars in future damage and disruption.
+
+### The adaptation finance gap
+
+The United Nations Environment Programme estimates the global adaptation finance gap at **$187-359 billion per year**. Developed nations pledged to provide $40 billion annually in climate adaptation finance under the Glasgow Climate Pact, but even if fully delivered, this would close only about 5% of the gap. The shortfall is particularly acute for infrastructure in developing countries, where systems are being built for the first time and must be designed for a changed climate from the start.
+
+In the United States, the adaptation challenge is complicated by the fact that most infrastructure is owned and maintained by state and local governments, which have limited fiscal capacity. The federal government provides grants and loans (FEMA hazard mitigation, EPA revolving funds, USDA rural development), but the bulk of adaptation investment must come from local rate increases, bond issuance, and land use decisions.
 
 ---
 
@@ -525,6 +880,58 @@ Reserve margin creates a natural tension:
 - Water/sewer follow the same pattern with their own capacity/demand ratios
 - This forces the player to invest ahead of growth, mirroring real utility planning
 
+### Distributed generation and microgrids
+
+Rooftop solar and battery storage could add a mid-to-late-game energy layer:
+
+- **Solar panels**: A building upgrade (not a standalone structure) that reduces a building's power demand from the grid. A solar panel upgrade on a residential building could reduce its grid power consumption by 30-50% during daylight ticks, with zero reduction at night.
+- **Battery storage**: A building upgrade that stores surplus solar production for use during non-solar ticks. Without batteries, solar only helps during daytime; with batteries, the building can be partially self-sufficient around the clock.
+- **Community solar farm**: A standalone 3x3 or 4x4 building that acts like a small power plant (capacity ~200 tiles) but with intermittent output — full capacity during day ticks, zero at night. Cheaper than a diesel generator per tile served but unreliable without storage.
+- **Microgrid resilience**: Areas with sufficient local solar + battery capacity could maintain partial power during grid failures (when a power plant goes offline due to aging or disaster). This creates a tangible resilience benefit for investing in distributed generation.
+
+**Duck curve gameplay**: If time-of-day simulation is implemented, solar-heavy cities would experience midday power surplus and evening power deficit — mirroring the real duck curve. Players would need to balance solar with storage or dispatchable generation.
+
+### Infrastructure interdependency mechanics
+
+Cascading failures could add dramatic emergent gameplay:
+
+- **Power-water coupling**: If power supply to a water treatment plant or water tower tile is lost (the tile is no longer reached by power BFS), the water facility stops functioning — all tiles it served lose water service. This means a single power plant failure can cascade into a water crisis.
+- **Failure chain events**: When a power plant ages and fails (condition = 0), the immediate effect is power loss. But if that power loss disconnects a water facility, buildings lose both power and water simultaneously. The player must prioritize which systems to repair first.
+- **Suggested implementation**: Each water/sewer facility tile checks whether it is powered. If not, it contributes zero capacity. This is a simple check layered on top of the existing BFS systems — no new propagation algorithm needed.
+
+```typescript
+function getEffectiveWaterCapacity(facility: WaterFacility): number {
+  if (!isTilePowered(facility.tile)) return 0
+  return facility.baseCapacity * getConditionMultiplier(facility.condition)
+}
+```
+
+### Decentralized wastewater in early game
+
+Low-density development could function without municipal sewer via implicit septic systems:
+
+- Residential buildings at low density (1 unit per tile or less) function without sewer connection, but at reduced desirability
+- When local density exceeds a threshold (e.g., more than 2 residential buildings within a 3-tile radius), a "septic overload" warning appears, and desirability drops sharply
+- The player must then extend sewer service to the area — a retrofit that costs more than building sewer before development (reflecting real septic-to-sewer conversion costs)
+- This creates a natural early-game-to-mid-game transition: initial growth uses septic (free but density-limited), then sewer investment unlocks higher density
+
+### Infrastructure financing gameplay
+
+The funding mechanics for infrastructure could reflect real financing constraints:
+
+- **Upfront vs. bonded**: The player can pay full cost immediately or issue bonds (pay 20% upfront, then monthly debt service for 20 years at ~1.3x total cost). This mirrors real municipal bond financing and creates cash flow management decisions.
+- **Rate revenue**: Water and sewer facilities generate monthly revenue from connected buildings (a per-building fee), partially offsetting maintenance costs. This models the real revenue bond structure where utility fees repay infrastructure debt.
+- **Impact fees**: New development in areas with existing infrastructure could pay a reduced connection cost, while development that requires infrastructure extension pays full cost. This creates an incentive for infill development over sprawl.
+- **The infrastructure trap**: If the player builds extensive infrastructure to serve sparse suburban development, the ongoing maintenance costs may exceed the tax/fee revenue from those areas — forcing difficult choices about service cuts or tax increases. This is the Strong Towns dynamic made playable.
+
+### Climate events and adaptation
+
+Climate-related events could create periodic challenges:
+
+- **Heat waves**: Power demand spikes (all buildings consume 1.5x power for cooling). Power plants with low condition have elevated failure chance. Roads degrade faster during heat events.
+- **Flooding**: Heavy rain events based on imperviousness (from stormwater model). Flooded tiles temporarily lose all services. More frequent/severe as the game progresses (modeling climate change).
+- **Adaptation upgrades**: Higher-cost versions of standard infrastructure that resist climate events. For example, a "hardened power line" that costs 2x but resists storm damage, or "flood-resistant roads" that cost 1.5x but do not degrade during floods. The 3% cost premium / 4:1 benefit ratio from real-world studies could inform the pricing.
+
 ---
 
 ## Cross-References
@@ -582,3 +989,72 @@ Reserve margin creates a natural tension:
 - [EIA — Reserve Electric Generating Capacity](https://www.eia.gov/todayinenergy/detail.php?id=6510)
 - [SPP — 2024 Resource Adequacy Report](https://www.spp.org/documents/71804/2024%20spp%20june%20resource%20adequacy%20report.pdf)
 - [FERC — Resource Adequacy Requirements: Reliability and Economic Implications](https://www.ferc.gov/sites/default/files/2020-05/02-07-14-consultant-report.pdf)
+
+### Distributed generation and microgrids
+- [DOE — Solar Integration: Distributed Energy Resources and Microgrids](https://www.energy.gov/eere/solar/solar-integration-distributed-energy-resources-and-microgrids)
+- [NREL — Resilience and Economics of Microgrids with PV, Battery Storage](https://docs.nrel.gov/docs/fy21osti/78837.pdf)
+- [NREL — Cost Projections for Utility-Scale Battery Storage (2025)](https://docs.nrel.gov/docs/fy25osti/93281.pdf)
+- [NREL — Ten Years of Analyzing the Duck Chart](https://www.nrel.gov/news/program/2018/10-years-duck-curve.html)
+- [DOE — Confronting the Duck Curve: How to Address Over-Generation of Solar Energy](https://www.energy.gov/cmei/articles/confronting-duck-curve-how-address-over-generation-solar-energy)
+- [EIA — As Solar Capacity Grows, Duck Curves Are Getting Deeper in California](https://www.eia.gov/todayinenergy/detail.php?id=56880)
+- [EnergySage — Solar Panel Cost in 2025](https://www.energysage.com/local-data/solar-panel-cost/)
+- [Microgrid Knowledge — What Does a Microgrid Cost?](https://microgridknowledge.com/microgrid-cost/)
+- [NREL — Phase I Microgrid Cost Study: Data Collection and Analysis](https://docs.nrel.gov/docs/fy19osti/67821.pdf)
+- [Duck Curve — Wikipedia](https://en.wikipedia.org/wiki/Duck_curve)
+- [ScienceDirect — On the Utility Death Spiral and the Impact of Utility Rate Structures](https://www.sciencedirect.com/science/article/abs/pii/S0306261916315732)
+
+### Infrastructure interdependencies
+- [MDPI — Resilience of Interdependent Water and Power Systems: A Literature Review](https://www.mdpi.com/2073-4441/13/20/2846)
+- [ASCE — Cascading Failure Propagation and Perfect Storms in Interdependent Infrastructures](https://ascelibrary.org/doi/10.1061/AOMJAH.AOENG-0045)
+- [ORNL — Cascading Failure Propagation and Perfect Storms in Interdependent Infrastructures](https://www.ornl.gov/publication/cascading-failure-propagation-and-perfect-storms-interdependent-infrastructures)
+- [ResearchGate — Cascading Failure Analysis of Interdependent Water-Power Networks](https://www.researchgate.net/publication/389190853_Cascading_Failure_Analysis_of_Interdependent_Water-Power_Networks_Based_on_Functional_Coupling)
+- [UNDRR — The Texas Coldwave Disaster: How Cascading Risks Took Out an Entire Power Grid](https://www.undrr.org/news/texas-coldwave-disaster-how-cascading-risks-took-out-entire-power-grid)
+- [ScienceDirect — Tracking the Post-Disaster Evolution of Water Infrastructure Resilience: Texas Winter Storm](https://www.sciencedirect.com/science/article/abs/pii/S2210670723000288)
+- [MDPI — Exploring the Impact of Winter Storm Uri on Power, Air Quality, and Water Systems in Texas](https://www.mdpi.com/2071-1050/15/5/4173)
+- [Wikipedia — 2021 Texas Power Crisis](https://en.wikipedia.org/wiki/2021_Texas_power_crisis)
+
+### Power-water nexus
+- [USGS — Thermoelectric Power Water Use](https://www.usgs.gov/mission-areas/water-resources/science/thermoelectric-power-water-use)
+- [EIA — US Electric Power Sector Continues Water Efficiency Gains](https://www.eia.gov/todayinenergy/detail.php?id=56820)
+- [EIA — US Electric Power Sector's Use of Water Continued Downward Trend in 2020](https://www.eia.gov/todayinenergy/detail.php?id=50698)
+- [NREL — Consumptive Water Use for US Power Production](https://docs.nrel.gov/docs/fy04osti/33905.pdf)
+- [Hansen Allen & Luce — Quantifying Energy Use in the US Public Water Sector](https://www.hansenallenluce.com/wp-content/uploads/2015/11/Energy-Use-Water-Sector.pdf)
+- [ACEEE — Driving Energy Efficiency in the US Water & Wastewater Industry](https://www.aceee.org/files/proceedings/2009/data/papers/6_83.pdf)
+- [DOE — Energy Data Management Manual for the Wastewater Treatment Sector](https://www.energy.gov/sites/prod/files/2018/01/f46/WastewaterTreatmentDataGuide_Final_0118.pdf)
+
+### Decentralized wastewater
+- [EPA — Decentralized Wastewater Systems Technology Fact Sheets](https://www.epa.gov/septic/decentralized-wastewater-systems-technology-fact-sheets)
+- [EPA — Septic Systems Overview](https://19january2021snapshot.epa.gov/septic/septic-systems-overview_.html)
+- [EPA — Septic Tanks and Natural Hazards Resource Guide (2024)](https://www.epa.gov/system/files/documents/2024-12/septic-tanks-and-natural-hazards-resource-guide.pdf)
+- [National Academies — Small and Decentralized Systems for Wastewater](https://www.nationalacademies.org/read/11241/chapter/5)
+- [AUC Group — Centralized Versus Decentralized Treatment](https://aucgroup.net/centralized-versus-decentralized-treatment/)
+- [WWEMA — Eliminating Failing Septic Tanks in the United States](https://wwema.org/wp-content/uploads/2020/09/PositionPaperFailingSepticSystems050320.pdf)
+- [Building Advisor — Minimum Lot Size for Septic System](https://buildingadvisor.com/what-is-minimum-lot-size-for-septic-system/)
+- [Washington DOH — Lot Size (Minimum Land Area) for Onsite Sewage Systems](https://doh.wa.gov/sites/default/files/legacy/Documents/Pubs/337-101.pdf)
+
+### Infrastructure financing
+- [MSRB — Municipal Securities: Financing the Nation's Infrastructure](https://www.msrb.org/sites/default/files/MSRB-Infrastructure-Primer.pdf)
+- [MSRB — US Infrastructure Is Backed by Municipal Bonds: Three Things to Know](https://www.msrb.org/sites/default/files/MSRB-Infrastructure-Explainer.pdf)
+- [Baird Asset Management — Municipal Bonds and the Making of American Infrastructure](https://www.bairdassetmanagement.com/insights/2026/03/municipal-bonds-and-the-making-of-american-infrastructure/)
+- [Roosevelt Institute — Financing State and Local Investment: Uses and Limitations of the Municipal Bond Market](https://rooseveltinstitute.org/publications/financing-state-and-local-investment/)
+- [American Public Power Association — Municipal Bonds and Public Power](https://www.publicpower.org/policy/municipal-bonds-and-public-power)
+- [NARUC — Ratemaking Fundamentals and Principles](https://www.naruc.org/commissioners-desk-reference-manual/3-ratemaking-fundamentals-and-principles/)
+- [NARUC — What is "Cost of Service" Regulation?](https://pubs.naruc.org/pub.cfm?id=538E730E-2354-D714-51A6-5B621A9534CB)
+- [Enerdynamics — The Revenue Requirement is the Key to How Utilities Make Money](https://www.enerdynamics.com/Energy-Currents_Blog/The-Revenue-Requirement-is-the-Key-to-How-Utilities-Make-Money.aspx)
+- [Enerdynamics — How Regulators Determine a Utility's Return on Equity](https://www.enerdynamics.com/Energy-Currents_Blog/How-Regulators-Determine-a-Utilitys-Return-on-Equity-ROE.aspx)
+- [RMI — Rebalancing Return on Equity to Accelerate an Affordable Clean Energy Future](https://rmi.org/rebalancing-return-on-equity-to-accelerate-an-affordable-clean-energy-future/)
+- [FHWA — Sources of Public Sector Financing](https://www.fhwa.dot.gov/ipd/p3/toolkit/publications/primers/financial_structuring_and_assessment/ch_4.aspx)
+- [Bond Buyer — Private Sector Funding Flooding into Infrastructure](https://www.bondbuyer.com/news/private-sector-funding-flooding-into-infrastructure)
+
+### Climate adaptation
+- [National Climate Assessment — Infrastructure](https://nca2014.globalchange.gov/highlights/report-findings/infrastructure)
+- [US Climate Resilience Toolkit — Infrastructure and the Built Environment](https://toolkit.climate.gov/infrastructure-and-built-environment)
+- [McKinsey — Will Climate Change Cause Infrastructure to Bend or Break?](https://www.mckinsey.com/capabilities/sustainability/our-insights/will-infrastructure-bend-or-break-under-climate-stress)
+- [BSR — Infrastructure Breaks Under Extreme Heat](https://www.bsr.org/en/emerging-issues/infrastructure-breaks-under-extreme-heat)
+- [Pew — Climate Change Poses Risks to Neglected Public Transportation and Water Systems](https://www.pew.org/en/research-and-analysis/issue-briefs/2024/09/climate-change-poses-risks-to-neglected-public-transportation-and-water-systems)
+- [Columbia Climate School — The Case for Climate-Resilient Infrastructure](https://news.climate.columbia.edu/2024/07/22/the-case-for-climate-resilient-infrastructure/)
+- [Springer — Global Costs of Protecting Against Sea-Level Rise at 1.5 to 4.0 degC](https://link.springer.com/article/10.1007/s10584-021-03130-z)
+- [Nature — Coastal Adaptation and Damage Costs at Different Global Warming Thresholds](https://www.nature.com/articles/s44304-025-00089-0)
+- [Yale E360 — Who Will Pay for the Huge Costs of Holding Back Rising Seas?](https://e360.yale.edu/features/who-will-pay-for-the-huge-costs-of-holding-back-rising-seas)
+- [CFR Education — How to Address the Economic Costs of Climate Change](https://education.cfr.org/learn/reading/infrastructure-economic-damage-climate-change)
+- [PreventionWeb — Climate Change and Transportation](https://www.preventionweb.net/news/explainer-climate-change-and-transportation)

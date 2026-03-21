@@ -11,8 +11,12 @@
 - [Multiple Nuclei Model](#multiple-nuclei-model)
 - [Sprawl](#sprawl)
 - [Infill Development](#infill-development)
+- [Redlining and Long-Term Effects](#redlining-and-long-term-effects)
+- [Urban Renewal Failures](#urban-renewal-failures)
+- [Public Housing Concentration Effects](#public-housing-concentration-effects)
 - [Gentrification](#gentrification)
 - [Neighborhood Lifecycle](#neighborhood-lifecycle)
+- [Declining City Revitalization](#declining-city-revitalization)
 - [Urban Growth Boundaries](#urban-growth-boundaries)
 - [Annexation and Metropolitan Fragmentation](#annexation-and-metropolitan-fragmentation)
 - [Smart Growth Principles](#smart-growth-principles)
@@ -255,6 +259,211 @@ The EPA's Smart Growth program identifies brownfield infill as especially benefi
 
 ---
 
+## Redlining and Long-Term Effects
+
+### HOLC Grading System (1935-1940)
+
+The Home Owners' Loan Corporation (HOLC), a New Deal agency, created "Residential Security Maps" for 239 cities between 1935 and 1940. These maps graded neighborhoods on a four-tier scale:
+
+| Grade | Color | Label | Criteria |
+|-------|-------|-------|----------|
+| A | Green | "Best" | New, homogeneous, in-demand; exclusively white, native-born residents |
+| B | Blue | "Still Desirable" | Fully developed, stable; "American business and professional men" |
+| C | Yellow | "Definitely Declining" | Aging housing, infiltration of "lower grade" population; often immigrant or mixed-race |
+| D | Red | "Hazardous" | Oldest housing, "detrimental influences"; African-American or heavily minority |
+
+The maps were used by the Federal Housing Administration (FHA) and private lenders to guide mortgage underwriting. Neighborhoods graded "D" were effectively cut off from conventional mortgage credit — a practice that became known as **redlining**. The FHA Underwriting Manual explicitly stated that "incompatible racial groups" should not share neighborhoods and recommended restrictive covenants as a tool to maintain racial homogeneity.
+
+### Mechanism of Disinvestment
+
+Redlining created a self-reinforcing cycle of decline:
+
+1. **Credit denial** — Banks refused conventional mortgages in D-graded areas. Residents could only access predatory contract sales or exploitative land installment contracts.
+2. **Maintenance collapse** — Without access to home improvement loans, property owners could not maintain or upgrade housing stock.
+3. **Capital flight** — Insurance companies, retailers, and employers followed the credit maps, withdrawing services from redlined areas.
+4. **Tax base erosion** — Declining property values reduced municipal revenue, leading to reduced public services (schools, parks, sanitation).
+5. **Speculative exploitation** — Speculators bought properties cheaply in redlined areas and extracted rents without maintenance investment, accelerating physical deterioration.
+
+### Persistence: 74% Still Disadvantaged
+
+The National Coalition for Reinvestment in Communities (NCRC) analyzed 114 metropolitan areas in 2018, comparing 1930s HOLC maps to contemporary census data. The findings demonstrate extraordinary persistence:
+
+- **74% of neighborhoods graded "Hazardous" (D) in the 1930s remain low-to-moderate income today**
+- **64% of D-graded areas are majority-minority neighborhoods today**
+- Cities with more minority-occupied D-graded areas show significantly greater overall economic inequality and are associated with "hypersegregation"
+
+Appel and Nickerson (2016), published in the *American Economic Journal: Economic Policy*, found the HOLC maps could account for **15-30% of the gap** in African-American population share and homeownership between D-graded and C-graded neighborhoods, and **40% of the gap in house values**, measured over the 1950-1980 period. The effects persisted well after the Fair Housing Act of 1968 formally outlawed discriminatory lending.
+
+### Multi-Generational Wealth Gap
+
+The homeownership channel is central to understanding the wealth gap. For most American families, home equity represents the primary store of wealth. By denying mortgage access to Black families during the 1940s-1960s — precisely the decades when suburban homeownership generated enormous returns — redlining prevented an entire generation from building equity. Aaronson, Hartley, and Mazumder (2021) found that growing up on the lower-graded side of a HOLC boundary had economically large effects on life chances for cohorts born *decades after* the maps were drawn, with magnitudes typically 4-12% of an outcome's sample mean.
+
+The racial wealth gap quantifies the cumulative damage: the median white family holds roughly 6-8 times the wealth of the median Black family, a ratio that has remained stubbornly persistent since reliable measurement began.
+
+### Health and Environmental Consequences
+
+The effects of redlining extend well beyond economics. A scoping review in the *Journal of the National Medical Association* (Nardone et al., 2022) synthesized findings across dozens of studies:
+
+| Health Metric | Finding |
+|--------------|---------|
+| Life expectancy | 3.6-4.8 years lower in D-graded vs. A-graded tracts |
+| Asthma prevalence | 8.6% (A-graded) vs. 10.7% (D-graded) |
+| COPD prevalence | 5.0% (A-graded) vs. 7.4% (D-graded) |
+| Hypertension | 29.3% (A-graded) vs. 34.1% (D-graded) |
+| Diabetes mortality | Significantly higher in lower-graded areas |
+| COVID-19 risk factors | Higher prevalence in historically redlined neighborhoods |
+
+D-graded areas have consistently higher exposure to PM2.5 particulate matter and NO2 pollution. Historically redlined neighborhoods are disproportionately located near Superfund sites, industrial facilities, and highway corridors — a pattern that reflects how environmental disamenities were deliberately sited in communities with reduced political power.
+
+### The Redlining-to-Gentrification Pipeline
+
+Redlining created the conditions for later gentrification by suppressing land values for decades. As Smith's rent gap theory predicts, the prolonged disinvestment in centrally located D-graded neighborhoods created enormous gaps between capitalized and potential ground rent. When demographic and cultural shifts made urban living desirable again (starting in the 1990s), these neighborhoods became prime targets for reinvestment — often displacing the very communities that had endured decades of imposed deprivation.
+
+**Simulation relevance:** Redlining demonstrates how external credit constraints can lock neighborhoods into decline independent of their physical characteristics. In Bitborough, a "disinvestment zone" mechanic could model this: tiles marked by a negative modifier (from policy, pollution, or adjacency to industrial disamenities) receive reduced upgrade probability and accelerated dereliction — and the modifier persists even after the original cause is removed, requiring active player intervention to break the cycle. This would teach players that neglect compounds and that recovery requires deliberate reinvestment, not just the removal of the original harm.
+
+---
+
+## Urban Renewal Failures
+
+### The Federal Urban Renewal Program (1949-1974)
+
+Title I of the Housing Act of 1949 established the federal urban renewal program with an aspirational goal: "a decent home and a suitable living environment for every American family." The mechanism was straightforward — the federal government would provide two-thirds of the cost for local authorities to acquire "blighted" areas through eminent domain, demolish existing structures, and sell the cleared land to private developers at a write-down.
+
+In practice, the program became one of the most destructive episodes in American urban history.
+
+### Scale of Destruction
+
+Between 1949 and 1974, when the program was formally ended by the Housing and Community Development Act:
+
+| Metric | Figure |
+|--------|--------|
+| Total projects funded | Over 2,000 |
+| Acres cleared | 37,200+ (1949-1967 alone) |
+| Housing units demolished | 404,000+ (by 1967) |
+| People displaced | Over 1,000,000 |
+| Total federal expenditure | Exceeding $50 billion (inflation-adjusted) |
+| Peak annual displacement | 50,000-66,000 families per year in mid-1960s |
+
+### "Negro Removal"
+
+The novelist James Baldwin gave the program its most enduring epithet in 1963: "Urban renewal means Negro removal. That is what it means." The data confirmed his assessment:
+
+- **Two-thirds or more** of displaced residents in cities like Philadelphia, Detroit, and Atlanta were people of color
+- In Newark, **77% of those displaced** by urban renewal were Black — in a city that was only 34.1% Black in 1960
+- A 1961 study of renewal projects in 41 cities found that **60% of displaced tenants were merely relocated to other slums**; in large cities the proportion exceeded 70%
+- The Federal-Aid Highway Act of 1956 compounded the damage — highway construction displaced over **one million** additional low-income people of color by routing interstates through the hearts of Black neighborhoods (e.g., the Cross Bronx Expressway, I-81 through Syracuse, I-95 through Overtown in Miami)
+
+### The Demolition-Reconstruction Gap
+
+A central failure was that destruction far outpaced rebuilding. Of the 37,200 acres cleared between 1949 and 1967, only 17,400 acres had been or were being redeveloped. Cities were left with vast empty lots — "urban prairies" — where neighborhoods had once stood. When interest rates rose and federal funding contracted in the mid-1970s, many cleared sites remained vacant for decades.
+
+Specific examples illustrate the pattern:
+
+- **Boston's West End** — A thriving immigrant neighborhood of 7,000 residents demolished in 1958-1960; replaced by luxury high-rises that housed none of the original residents. Herbert Gans documented the community's destruction in *The Urban Villagers* (1962).
+- **St. Louis's Mill Creek Valley** — 800 acres cleared in the late 1950s, displacing 20,000 residents (95% Black). Much of the land sat vacant for over a decade.
+- **San Francisco's Western Addition** — Nearly 5,000 families (over 20,000 people, majority people of color) displaced over two decades of phased demolition.
+- **Newark's Central Ward** — Massive clearance for a medical school and highway contributed directly to the 1967 Newark riots.
+
+### Why Some Cleared Areas Revitalized and Others Did Not
+
+The outcomes diverged sharply. Factors that predicted recovery vs. persistent vacancy:
+
+| Factor | Favored Revitalization | Led to Persistent Vacancy |
+|--------|----------------------|--------------------------|
+| Location | Adjacent to expanding CBD or university | Isolated from employment centers |
+| Institutional anchor | Hospital, university, or government complex nearby | No anchor to attract investment |
+| Market timing | Cleared during economic expansion | Cleared during or before recession |
+| Replacement housing | Mixed-income development with some original residents retained | Pure luxury or institutional development |
+| Community resistance | Strong organized opposition forced compromise and community benefits | Weak resistance allowed total displacement |
+| Infrastructure investment | Transit, parks, and public facilities accompanied redevelopment | Cleared land left as parking lots or vacant |
+
+Cities like Philadelphia (Society Hill) and Washington DC (Southwest) eventually saw cleared areas gentrify into wealthy neighborhoods — but only after decades of vacancy and at the cost of permanent displacement of the original communities. Cities like East St. Louis and Camden saw cleared areas remain vacant or underutilized for generations.
+
+### Legacy and Lessons
+
+The urban renewal era demonstrated several principles relevant to simulation:
+
+1. **Demolition is fast; rebuilding is slow and uncertain** — political will and funding for demolition exceeded the capacity for reconstruction
+2. **Displacement destroys social capital** — the loss of churches, schools, social clubs, and neighbor networks could not be replaced even when physical housing was eventually rebuilt
+3. **"Blight" is a political designation** — areas labeled "blighted" were often functioning communities whose residents lacked political power to resist clearance
+4. **Top-down planning without community input produces the worst outcomes** — the most destructive projects had the least resident participation
+
+**Simulation relevance:** Urban renewal maps to a "mass bulldoze" mechanic. If a player demolishes a large area at once, the game could model the reconstruction gap — cleared tiles do not automatically attract new development; they sit vacant unless the player actively invests in infrastructure and creates demand pull. A "community disruption" penalty could reduce desirability in the surrounding area when too many adjacent tiles are demolished simultaneously, reflecting the social-capital destruction documented in the historical record. The lesson for gameplay: surgical, incremental redevelopment produces better outcomes than wholesale clearance.
+
+---
+
+## Public Housing Concentration Effects
+
+### The High-Rise Era (1950s-1970s)
+
+American public housing policy underwent a fateful shift in the 1950s. The Housing Act of 1949 funded massive construction, but local opposition (especially from white neighborhoods refusing to accept public housing) and cost pressures pushed construction toward high-density, high-rise towers concentrated in already-poor, already-segregated neighborhoods. The results became some of the most notorious failures in American urban policy.
+
+### Landmark Failures
+
+| Project | City | Units | Built | Demolished | Key Facts |
+|---------|------|-------|-------|------------|-----------|
+| Pruitt-Igoe | St. Louis | 2,870 | 1954 | 1972-1976 | 33 towers designed by Minoru Yamasaki (later architect of the World Trade Center); over two-thirds vacant by 1970; televised implosion in 1972 became an icon of modernist failure |
+| Robert Taylor Homes | Chicago | 4,321 | 1962 | 1998-2007 | Largest public housing project in the US; 28 sixteen-story buildings stretching 2 miles along the Dan Ryan Expressway; subject to decades of gang violence, disinvestment, and infrastructure neglect |
+| Cabrini-Green | Chicago | ~3,600 | 1942-1962 | 1995-2011 | Mix of rowhouses and 23 high-rises; located near Chicago's affluent Gold Coast; became a symbol of concentrated poverty adjacent to extreme wealth |
+
+### Why Concentration Failed
+
+The concentration of public housing in high-rise towers within already-distressed neighborhoods produced compounding negative effects:
+
+1. **Poverty concentration** — When nearly all residents are very low income, there are no employed role models, no informal job networks, and no mixed-income commercial activity to sustain local businesses.
+2. **Social isolation** — High-rise design eliminated the "eyes on the street" natural surveillance that Jane Jacobs identified as essential to neighborhood safety. Long corridors, stairwells, and elevators became unmonitored spaces.
+3. **Maintenance collapse** — Operating budgets were perpetually underfunded. The federal government funded construction but provided inadequate ongoing maintenance support. By the 1970s, many projects had broken elevators, non-functioning plumbing, and pest infestations.
+4. **Political abandonment** — Residents of concentrated public housing had minimal political power. Municipal governments had little incentive to invest in maintenance when the residents could not exert electoral pressure.
+5. **Stigma effects** — The address itself became a barrier to employment, credit, and social mobility.
+
+### Scattered-Site vs. Clustered Housing
+
+Research comparing scattered-site public housing (small buildings dispersed throughout a metropolitan area) to large concentrated projects consistently favors the scattered approach:
+
+- Residents in scattered-site housing perceive neighbors as healthier and more socially active (24.7% of network members exercised regularly vs. 14.0% in clustered housing)
+- Low-income women in scattered-site housing showed greater employment gains and networking benefits compared to women in poverty-concentrated environments
+- Scattered-site housing avoids the stigma and social isolation of identifiable "projects"
+- Neighborhood opposition ("NIMBYism") remains the primary barrier to scattered-site construction
+
+### The HOPE VI Program (1992-2010)
+
+HOPE VI (Housing Opportunities for People Everywhere) represented a fundamental policy reversal: instead of concentrating poverty, demolish the worst public housing projects and replace them with mixed-income communities. The program funded demolition of 96,200 public housing units and construction of 107,800 new mixed-income units.
+
+Recent research from Opportunity Insights (Chetty et al., 2025) provides the most rigorous evidence yet on HOPE VI's effectiveness:
+
+| Finding | Magnitude |
+|---------|-----------|
+| Income gain per year of childhood exposure | 2.77% increase in household income at age 30 |
+| Impact of 5 years exposure (childhood) | 14% higher household income at age 30 |
+| Adolescent exposure vs. early childhood | Impacts approximately 2x larger during adolescence |
+| High-income surrounding neighborhood | ~$5,000/year earnings increase |
+| Middle-income surrounding neighborhood | ~$1,700/year earnings increase |
+| Low-income surrounding neighborhood | Near-zero effect |
+
+The critical finding: **location matters enormously**. HOPE VI sites surrounded by high-income neighborhoods produced large gains because children gained access to better schools, safer streets, and employed adult role models. Sites surrounded by disadvantaged communities showed virtually no benefit — simply replacing the physical structures without changing the neighborhood context was insufficient.
+
+### Moving to Opportunity (MTO) Experiment
+
+The MTO experiment (1994-1998), conducted by HUD in five cities, randomly assigned public housing residents to receive vouchers for low-poverty neighborhoods, unrestricted vouchers, or no vouchers (control). The long-term results (Chetty, Hendren, and Katz, 2016) revealed:
+
+- Children who moved to low-poverty neighborhoods **before age 13** earned **31% more** in their mid-twenties than the control group
+- The lifetime earnings gain was approximately **$302,000 per child** (present value ~$99,000 at age 8)
+- Moving as an **adolescent** produced slightly *negative* effects, possibly due to disruption of existing social networks
+- **Adults** showed no economic gains from moving, but reported reduced violent crime exposure and greater subjective well-being
+
+### Implications for Housing Policy
+
+The convergent evidence from HOPE VI and MTO establishes that:
+
+1. Where people live profoundly affects life outcomes, especially for children
+2. Physical replacement of buildings is necessary but not sufficient — the surrounding neighborhood context determines outcomes
+3. Poverty deconcentration works best when it provides access to genuinely high-opportunity neighborhoods, not merely different low-opportunity ones
+4. Timing matters — children benefit most from early and sustained exposure to better environments
+
+**Simulation relevance:** Public housing concentration maps to a mechanic where placing too many low-income residential buildings in a single cluster triggers a "concentration penalty" — reduced desirability, increased service costs, and accelerated decline. A scattered-site approach (distributing affordable housing across the city) would avoid this penalty. The HOPE VI findings suggest that redevelopment of failed housing should produce outcomes proportional to the quality of the surrounding neighborhood — replacing a derelict building in a thriving district yields better results than replacing one surrounded by other derelict buildings. This could be modeled as a "neighborhood quality multiplier" on redevelopment success.
+
+---
+
 ## Gentrification
 
 ### Origins
@@ -297,7 +506,68 @@ Gentrification tends to occur in neighborhoods with:
 - Adjacent to already-gentrified areas (the "frontier" advances incrementally)
 - Large rent gap (long-depressed values in a rising metro market)
 
-**Simulation relevance:** Gentrification maps to a scenario where derelict low-density buildings near the city center are replaced by medium/high-density construction as demand recovers. The rent-gap formula could drive a "reinvestment pressure" score on neglected central tiles, creating waves of renewal that push low-income residents outward.
+### Waves of Gentrification
+
+Hackworth and Smith (2001) introduced an influential wave framework, later extended by Lees, Slater, and Wyly (2008) and Aalbers (2019):
+
+| Wave | Period | Key Actors | Characteristics |
+|------|--------|-----------|----------------|
+| First | 1950s-1970s | Individual pioneer gentrifiers | Sporadic, small-scale renovation; artists and bohemians in select neighborhoods; largely ignored by government |
+| Second | 1970s-1980s | Small developers, early institutional capital | Gentrification becomes visible; linked to back-to-the-city movement; government begins subsidizing through tax incentives |
+| Third | 1990s-2000s | Corporate developers, state policy | Large-scale, state-sponsored gentrification; public-private partnerships; entire neighborhoods transformed by plan |
+| Fourth | 2000s-2010s | Global capital, financial instruments | Financialization of housing; securitization of rental income; gentrification as explicit policy goal |
+| Fifth | 2010s-present | Platform capitalism, corporate landlords | Post-financial-crisis emergence of institutional landlords (buying foreclosed homes at scale); Airbnb-driven displacement; gentrification as "the urban materialisation of financialised capitalism" (Aalbers, 2019) |
+
+Lees further developed the concept of **super-gentrification**: the re-gentrification of already-gentrified neighborhoods by ultra-wealthy in-movers (e.g., Brooklyn Heights in the 2000s, where finance-industry professionals displaced the artists and professionals who had gentrified the area in the 1970s-1980s).
+
+### Quantitative Displacement Evidence
+
+The empirical literature on gentrification-driven displacement is surprisingly contested. Studies vary widely depending on methodology, definition of gentrification, time period, and geographic scope.
+
+**Studies finding limited displacement:**
+
+- Freeman and Braconi (2004) analyzed seven gentrifying New York neighborhoods (Chelsea, Harlem, Lower East Side, Fort Greene, Park Slope, Williamsburg, Morningside Heights) from 1991-1999. They found that poor households in gentrifying neighborhoods were actually *less* likely to move than poor households in non-gentrifying neighborhoods. Poor families faced average rent increases of **25.1% over 8 years**, but many chose to stay in improving neighborhoods.
+- Freeman (2005) expanded the analysis nationally using the Panel Study of Income Dynamics and found "no evidence" that gentrification increased displacement probability for renters or homeowners.
+- Vigdor, Massey, and Rivlin (2002) found that low-income residents of Boston's gentrifying neighborhoods had longer tenure than those in non-gentrifying areas.
+
+**Studies finding significant displacement:**
+
+- Newman and Wyly (2006) criticized the above findings, arguing that survey-based methods systematically *undercount* displacement because displaced people leave the sample — you cannot interview someone who has already been pushed out. They found that 8-10% of recent movers in gentrifying New York neighborhoods reported being directly displaced.
+- The NCRC's "Displaced by Design" report (2023) found that across US cities, neighborhoods that gentrified between 2000 and 2013 saw significant declines in Black population share, with an estimated 135,000 Black residents displaced from gentrifying census tracts in the 50 largest metro areas.
+- Dragan, Ellen, and Glied (2019) used Medicaid records to track individual moves in New York and found that children in gentrifying neighborhoods were more likely to move to lower-performing school districts.
+
+**The measurement problem:**
+
+The disconnect between quantitative and qualitative evidence reflects fundamental measurement challenges:
+
+| Method | What It Captures | What It Misses |
+|--------|-----------------|----------------|
+| Panel surveys (PSID, AHS) | Whether current residents moved | People who already left the sample; indirect displacement (not moving in because priced out) |
+| Census tract comparison | Aggregate demographic change | Whether change reflects displacement vs. in-situ income growth vs. selective in-migration |
+| Administrative data (Medicaid, tax records) | Individual-level moves for those in the system | People not in administrative databases; reasons for moving |
+| Qualitative interviews | Lived experience, mechanisms, community effects | Small sample sizes, selection bias |
+
+### Income Changes in Gentrifying Neighborhoods
+
+Gentrifying neighborhoods show characteristic income trajectories:
+
+- **Median household income** in gentrifying tracts typically rises **40-80%** faster than the metro average over a 10-20 year period (varies by city and wave)
+- Income growth is driven primarily by **compositional change** (higher-income in-movers replacing lower-income out-movers) rather than incumbent income growth
+- One study tracking incumbent workers in gentrifying neighborhoods found **no adverse effects** on their individual income trajectories — those who stayed did not earn less. The damage is to those who leave and to the community fabric, not to remaining individuals' wages.
+- Rent-to-income ratios for remaining low-income renters increase sharply, creating "cost-burdened" households spending more than 30% (often more than 50%) of income on housing
+
+### Timeline of a Gentrifying Neighborhood
+
+Synthesizing Clay's stages with contemporary evidence, a typical gentrification timeline looks approximately like:
+
+| Years | Phase | Visible Signs | Rent Trajectory |
+|-------|-------|--------------|----------------|
+| 0-3 | Pioneer entry | Coffee shops, art galleries in former industrial spaces; scattered renovation | Flat to modest increase (5-10% above trend) |
+| 3-7 | Expansion | Visible renovation wave; real estate media attention; "up and coming" designation; new restaurants | Accelerating (15-30% above baseline) |
+| 7-15 | Transformation | Chain retail replaces local businesses; condo conversions; zoning variances for density; original commercial tenants priced out | Rapid increase (50-100%+ from pre-gentrification baseline) |
+| 15-25 | Maturation | Neighborhood fully transformed; luxury development; even early gentrifiers may be priced out by super-gentrification | Plateau at new high level; neighborhood becomes "established" |
+
+**Simulation relevance:** Gentrification maps to a scenario where derelict low-density buildings near the city center are replaced by medium/high-density construction as demand recovers. The rent-gap formula could drive a "reinvestment pressure" score on neglected central tiles, creating waves of renewal that push low-income residents outward. The quantitative evidence suggests modeling displacement as a gradual population-composition shift rather than sudden mass eviction — the population count may remain stable or even increase, but the *character* of the population changes. For gameplay, a "displacement counter" could track the number of low-income residents pushed out over time, serving as both a realism metric and a scoring dimension (players must balance growth with equity).
 
 ---
 
@@ -324,6 +594,102 @@ The lifecycle model is linked to *filtering* — the process by which housing "f
 The lifecycle model was criticized for contributing to urban disinvestment. Metzger (2000) argued that treating decline as "natural" justified redlining, disinvestment, and planned abandonment — if a neighborhood's decline is inevitable, why invest in maintaining it? This critique is important for simulation design: the lifecycle should not be deterministic but responsive to player investment decisions.
 
 **Simulation relevance:** This maps closely to Bitborough's existing building age/dereliction system. Buildings age, occupancy drops, dereliction sets in, and downgrade follows. The model suggests a complete cycle should be possible: Development (zone + build) -> Growth (density upgrade) -> Stability (high occupancy plateau) -> Decline (aging, dereliction) -> Renewal (player reinvestment or organic gentrification). The key design insight is that renewal should not be automatic — it should require active intervention (infrastructure investment, demolition and rezoning, or transit placement).
+
+---
+
+## Declining City Revitalization
+
+### The Shrinking Cities Problem
+
+Between 1950 and 2010, many major American cities lost more than half their peak populations:
+
+| City | Peak Population | Peak Year | 2010 Population | % Loss |
+|------|----------------|-----------|-----------------|--------|
+| Detroit | 1,849,568 | 1950 | 713,777 | -61.4% |
+| St. Louis | 856,796 | 1950 | 319,294 | -62.7% |
+| Cleveland | 914,808 | 1950 | 396,815 | -56.6% |
+| Pittsburgh | 676,806 | 1950 | 305,704 | -54.8% |
+| Buffalo | 580,132 | 1950 | 261,310 | -55.0% |
+| Baltimore | 949,708 | 1950 | 620,961 | -34.6% |
+| Gary, IN | 178,320 | 1960 | 80,294 | -55.0% |
+| Youngstown, OH | 166,689 | 1930 | 66,982 | -59.8% |
+
+The causes follow a common pattern: deindustrialization (loss of manufacturing base), suburbanization accelerated by highway construction and white flight, metropolitan fragmentation that locked cities out of suburban tax revenue, and in many cases the compounding effects of redlining and urban renewal.
+
+### What Doesn't Work
+
+Decades of revitalization attempts have identified strategies that consistently underperform:
+
+- **Convention centers and sports stadiums** — The "build it and they'll come" approach has been extensively studied. Research consistently shows stadiums and convention centers do not generate net new economic activity for the metro area; they redistribute spending from other entertainment and shift public money to private team owners. Cities that bet on mega-projects (e.g., Gary, Indiana's Genesis Convention Center) saw no measurable recovery.
+- **Tax incentive bidding wars** — Competing with other jurisdictions by offering tax abatements to attract large employers produces a race to the bottom. Even when a firm relocates, the lost tax revenue often offsets the employment gains. Amazon's HQ2 search (2017-2018) demonstrated the extremes of this dynamic.
+- **Demolition without a plan** — Clearing blighted areas without a reconstruction strategy (the urban renewal lesson) leaves vacant lots that further depress surrounding property values.
+- **Population growth targets** — Setting goals to return to peak population is almost always unrealistic and leads to over-building infrastructure for a population that never arrives.
+
+### What Works: Evidence-Based Strategies
+
+#### Anchor Institution Strategy ("Eds and Meds")
+
+Universities and hospitals are "anchored" — they cannot relocate to the suburbs. This makes them uniquely valuable partners for urban revitalization. The most studied example is the **University of Pennsylvania's West Philadelphia Initiatives** (launched 1996):
+
+- Penn shifted nearly **$100 million annually** in procurement to West Philadelphia businesses
+- In FY2015, Penn spent **$122 million with local businesses** (13% of total purchasing)
+- Penn and its Health System hired **1,572 local residents** (47.5% of all new hires)
+- University City District trained over **600 local residents** for jobs at Penn and other anchors, with **90% connected to employment**
+- Surrounding neighborhoods saw significant increases in property values, commercial activity, and population
+
+Other anchor-driven recoveries include the Cleveland Clinic's role in Cleveland's Health-Tech Corridor and Johns Hopkins' partnerships in East Baltimore. The strategy works because it leverages existing institutional spending (procurement, hiring, real estate) toward local economic development without requiring new public subsidy.
+
+However, anchor strategies carry risks: they can drive gentrification in surrounding neighborhoods, and the institution's interests may not align with community needs (the University of Chicago's fraught relationship with Woodlawn is a cautionary example).
+
+#### Creative Economy and Cultural Districts
+
+Arts and cultural strategies work through multiple channels:
+
+1. **Pioneer stage activation** — Artists occupy cheap space in declining neighborhoods, providing the "pioneer gentrifier" function identified in Clay's model but with community-building benefits
+2. **Placemaking** — Public art, performance spaces, and cultural events create distinctive neighborhood identity that attracts visitors and investment
+3. **Small business incubation** — Creative enterprises (studios, galleries, maker spaces) fill vacant commercial spaces with low-capital-requirement businesses
+4. **Tourism and external spending** — Cultural districts attract spending from outside the neighborhood
+
+Examples with measured impact:
+- **Pittsburgh's Lawrenceville** — Former industrial neighborhood transformed through artist studios and maker spaces; population stabilized after decades of decline; median home values increased significantly
+- **Detroit's Heidelberg Project** — Vacant lot art installations in a severely blighted neighborhood attracted international attention and tourism
+- **Cleveland's Tremont** — Victorian neighborhood revitalized through a mix of arts galleries, restaurants, and walkable streets; population has stabilized
+
+The limitation: cultural strategies alone cannot overcome fundamental economic decline. They work best as complements to anchor institution and infrastructure strategies, not as standalone solutions.
+
+#### Smart Decline and Right-Sizing
+
+A paradigm shift emerged in the 2000s: rather than trying to grow back to peak population, some cities adopted "smart decline" — strategies to improve quality of life for the current, smaller population.
+
+Key approaches:
+
+- **Right-sizing infrastructure** — Consolidating city services (schools, fire stations, utilities) to match actual population rather than maintaining infrastructure built for 2-3x the current residents
+- **Land banking** — Public acquisition of vacant and abandoned properties to control disposition, prevent speculation, and assemble parcels for strategic reuse. Cleveland and Detroit have both established land banks that manage thousands of properties.
+- **Green infrastructure** — Converting vacant lots to community gardens, parks, urban farms, and stormwater management green space. Youngstown, Ohio was an early adopter of this approach in its Youngstown 2010 plan (notable for being the first US comprehensive plan to explicitly plan for a smaller population).
+- **Neighborhood consolidation** — Encouraging residents in the most sparsely populated areas to relocate to denser, better-serviced neighborhoods. Detroit's "Detroit Work Project" plan identified nine neighborhoods for concentration of investment and services. This is politically contentious because it can feel like managed abandonment of some areas.
+
+#### Population Attraction Strategies
+
+Cities that have partially recovered often leveraged specific population-attraction mechanisms:
+
+- **Lower cost of living** — Pittsburgh's relative affordability compared to coastal cities attracted remote workers and young professionals, especially post-2020
+- **Quality-of-life investments** — Pittsburgh converted polluted riverfronts into recreational areas and abandoned steel mills into heritage parks, fundamentally changing the city's image
+- **Immigration** — Many shrinking cities have been partially stabilized by immigrant communities. Refugee resettlement has revitalized neighborhoods in Buffalo, Cleveland, and Utica, NY
+- **University retention** — Strategies to keep graduates of local universities (Carnegie Mellon, Case Western Reserve, University of Pittsburgh) in the region through startup incubators and quality-of-life investments
+
+### Comparative Outcomes
+
+Among the major shrinking cities, Pittsburgh is the most frequently cited success story, though the recovery is partial and uneven:
+
+| City | Recovery Trajectory | Key Factor |
+|------|-------------------|------------|
+| Pittsburgh | Population stabilizing; tech/medical economy growing; gentrification in select neighborhoods | Strong anchor institutions (CMU, Pitt, UPMC); quality-of-life investments; tech industry |
+| Cleveland | Population decline slowed to near-zero; some neighborhood revival | Cleveland Clinic anchor; lakefront investment; immigrant communities |
+| Detroit | Severe decline continued through 2013 bankruptcy; selective recovery in core neighborhoods | Auto industry restructuring; land banking; extreme right-sizing challenges |
+| St. Louis | Continued decline; city-county division prevents metropolitan coordination | Extreme fragmentation; no dominant anchor; loss of corporate headquarters |
+| Buffalo | Modest stabilization; medical campus expansion | Refugee resettlement; waterfront development; lower cost of living |
+
+**Simulation relevance:** Declining city mechanics could model population loss and the player's choices about how to respond. Key mechanics: (1) **Right-sizing** — the player can choose to contract services to a smaller area, reducing maintenance costs but abandoning peripheral neighborhoods; (2) **Anchor investment** — placing a university or hospital building creates a strong localized demand pull that resists decline; (3) **Land banking** — a mechanic to acquire derelict properties cheaply and hold them for future strategic development rather than letting them drag down surrounding values; (4) **Smart decline scoring** — rather than penalizing population loss per se, the game could score on quality-of-life metrics for the *existing* population, rewarding efficient right-sizing over futile growth chasing.
 
 ---
 
@@ -448,6 +814,11 @@ Cities implementing smart growth policies show:
 | Neighborhood lifecycle | Building age + dereliction system | `lowOccupancyMonths` triggers dereliction; `tickDerelict()` downgrades after 6 months |
 | Infill / densification | Density upgrade (Low -> Med -> High) | Buildings upgrade in place, consuming adjacent tiles for larger footprints |
 | Filtering | Downgrade chain in `DOWNGRADE_TARGET` | High -> Medium -> Low density when occupancy collapses |
+| Redlining / disinvestment | (Not yet modeled) | Persistent negative modifiers on neglected tiles that compound over time |
+| Urban renewal | Bulldoze mechanic | Mass demolition clears tiles but does not guarantee reconstruction |
+| Housing concentration | (Not yet modeled) | Clustering low-income buildings could trigger concentration penalties |
+| Gentrification displacement | (Not yet modeled) | Population composition shift during density upgrades in formerly declined areas |
+| Declining city dynamics | Dereliction cascade | Cascading building decline when population drops; recovery requires active investment |
 
 ### Suggested New Mechanics
 
@@ -514,15 +885,84 @@ sprawl_score = total_developed_area / (total_population × density_target)
 
 When `sprawl_score > 1.0`, infrastructure maintenance costs increase proportionally. This creates economic pressure to build compactly — mirroring the real fiscal costs of sprawl documented by Ewing and Hamidi.
 
+#### 6. Disinvestment Persistence (Redlining Model)
+
+Track a per-tile "disinvestment score" that accumulates when tiles are adjacent to pollution, lack infrastructure, or have prolonged low occupancy:
+
+```
+disinvestment(tile, t) = disinvestment(tile, t-1) × decay_rate + new_negative_factors(tile, t)
+```
+
+Key properties:
+- The score accumulates faster than it decays (asymmetric dynamics) — reflecting how disinvestment compounds
+- High disinvestment reduces upgrade probability and increases dereliction rate
+- Removal of the original cause (e.g., closing a polluting factory) does not instantly reset the score — it decays slowly
+- Active investment (new infrastructure, transit placement, building renovation) accelerates decay
+- Teaches the core redlining lesson: neglect has long-lasting consequences that require deliberate intervention to reverse
+
+#### 7. Mass Demolition Penalty (Urban Renewal Model)
+
+When the player demolishes more than N adjacent tiles in a single action or within a short time window:
+
+```
+disruption_radius = sqrt(tiles_demolished) × disruption_factor
+disruption_penalty(nearby_tile) = base_penalty × e^(-dist / disruption_radius)
+```
+
+- Surrounding tiles receive a temporary desirability penalty (reflecting community disruption)
+- Cleared tiles do not automatically attract new development — they require infrastructure investment or adjacency to existing demand
+- The penalty scales with the *concentration* of demolition — demolishing 10 scattered tiles has less impact than demolishing 10 contiguous tiles
+- Encourages incremental, surgical redevelopment over wholesale clearance
+
+#### 8. Housing Concentration Penalty
+
+When low-income residential buildings cluster beyond a threshold:
+
+```
+concentration_score(area) = low_income_units(area) / total_units(area)
+```
+
+When `concentration_score > threshold`:
+- Desirability decreases for the area (reflecting poverty concentration effects)
+- Service costs increase (more policing, maintenance per unit)
+- Upgrade probability drops (no market demand for densification in deeply disadvantaged clusters)
+
+Scattered placement of affordable housing across the city avoids this penalty and produces better outcomes — directly modeling the HOPE VI and MTO findings.
+
+#### 9. Anchor Institution Demand Pull
+
+University and hospital buildings (if added) create a localized demand pull that:
+- Resists dereliction in surrounding tiles (institutional employment provides stable demand)
+- Boosts commercial zone viability (workers need services)
+- Partially buffers against population decline (anchor employment is recession-resistant)
+- Creates a "procurement radius" within which commercial buildings get a revenue bonus
+
+```
+anchor_pull(tile) = Σ (anchor_strength(a) × e^(-dist(tile, a) / anchor_radius))
+```
+
+#### 10. Right-Sizing / Smart Decline Mode
+
+When total city population drops below a threshold (e.g., 60% of peak):
+- The game offers a "right-sizing" action: consolidate services to a smaller area
+- Tiles outside the consolidated area have reduced service costs but also reduced desirability
+- Scoring shifts from population growth to quality-of-life metrics for existing residents
+- Land banking becomes available: acquire derelict tiles cheaply to hold for future strategic use
+
 ### Implementation Priority
 
 | Mechanic | Complexity | Dependency | Priority |
 |----------|-----------|------------|----------|
 | Sprawl penalty | Low | Existing density system | High — simple ratio, immediate gameplay impact |
 | Sector development via road weighting | Low | Road system already exists | High — modifies existing `upgradeProb()` input |
+| Mass demolition penalty | Low | Bulldoze mechanic exists | High — simple adjacency check, discourages unrealistic play |
+| Disinvestment persistence | Medium | Building age tracking exists | Medium — enriches dereliction with historical memory |
 | Neighborhood lifecycle score | Medium | Building age tracking exists | Medium — enriches existing dereliction system |
 | Growth boundary | Medium | Map edge mechanics | Medium — significant gameplay change, needs playtesting |
+| Housing concentration penalty | Medium | Residential building tracking | Medium — straightforward ratio calculation |
+| Anchor institution demand pull | Medium | Requires university/hospital buildings | Medium — depends on new building types |
 | Gentrification pressure | High | Lifecycle score, desirability system | Low — interesting but complex; depends on lifecycle being in place |
+| Right-sizing / smart decline | High | Population tracking, scoring system | Low — requires significant new UI and scoring mechanics |
 
 ---
 
@@ -563,8 +1003,53 @@ When `sprawl_score > 1.0`, infrastructure maintenance costs increase proportiona
 - Glass, R. (1964). *London: Aspects of Change*. MacGibbon & Kee.
 - Smith, N. (1979). ["Gentrification and the Rent Gap."](https://www.academia.edu/8988092/Gentrification_and_the_Rent_Gap) *Annals of the Association of American Geographers*.
 - Clay, P. (1979). *Neighborhood Renewal*. Lexington Books.
+- Hackworth, J. and Smith, N. (2001). "The changing state of gentrification." *Tijdschrift voor Economische en Sociale Geografie*.
+- Lees, L., Slater, T., and Wyly, E. (2008). *Gentrification*. Routledge.
+- Aalbers, M. (2019). ["Introduction to the Forum: From Third to Fifth-Wave Gentrification."](https://onlinelibrary.wiley.com/doi/abs/10.1111/tesg.12332) *Tijdschrift voor Economische en Sociale Geografie*.
+- Freeman, L. and Braconi, F. (2004). ["Gentrification and Displacement: New York City in the 1990s."](https://www.tandfonline.com/doi/abs/10.1080/01944360408976337) *Journal of the American Planning Association*.
+- Freeman, L. (2005). ["Displacement or Succession? Residential Mobility in Gentrifying Neighborhoods."](https://ds4ps.org/cpp-528-spr-2020/articles/gentrification/displacement-or-succession.pdf) *Urban Affairs Review*.
+- Newman, K. and Wyly, E. (2006). "The Right to Stay Put, Revisited: Gentrification and Resistance to Displacement in New York City." *Urban Studies*.
+- NCRC. (2023). ["Displaced by Design: Fifty Years of Gentrification and Black Cultural Displacement in US Cities."](https://ncrc.org/displaced-by-design/)
+- [Displacement of Lower-Income Families in Urban Areas Report](https://www.huduser.gov/portal/sites/default/files/pdf/displacementreport.pdf) — HUD USER.
 - Hoover, E. and Vernon, R. (1959). *Anatomy of a Metropolis*. Harvard University Press.
 - Metzger, J. (2000). ["Planned abandonment: The neighborhood life-cycle theory and national urban policy."](https://www.researchgate.net/publication/237470090_Planned_Abandonment_The_Neighborhood_Life-Cycle_Theory_and_National_Urban_Policy) *Housing Policy Debate*.
+
+### Redlining and Discriminatory Housing Policy
+
+- Aaronson, D., Hartley, D., and Mazumder, B. (2021). ["The Effects of the 1930s HOLC 'Redlining' Maps."](https://www.aeaweb.org/articles?id=10.1257/pol.20190414) *American Economic Journal: Economic Policy*.
+- NCRC. (2018). ["HOLC 'Redlining' Maps: The Persistent Structure of Segregation and Economic Inequality."](https://ncrc.org/holc/)
+- Aaronson, D. et al. (2022). ["The Long-run Effects of the 1930s Redlining Maps on Children."](https://www2.census.gov/ces/wp/2022/CES-WP-22-56.pdf) US Census Bureau Working Paper.
+- Nardone, A. et al. (2022). ["The Relationship of Historical Redlining with Present-Day Neighborhood Environmental and Health Outcomes: A Scoping Review."](https://pmc.ncbi.nlm.nih.gov/articles/PMC9342590/) *Journal of the National Medical Association*.
+- Lane, H.M. et al. (2022). ["Historical Neighborhood Redlining and Contemporary Environmental Racism."](https://pmc.ncbi.nlm.nih.gov/articles/PMC10427113/)
+- [HOLC Redlining and Neighborhood Health](https://ncrc.org/holc-health/) — NCRC.
+
+### Urban Renewal
+
+- Gans, H. (1962). *The Urban Villagers*. Free Press.
+- Anderson, M. (1964). *The Federal Bulldozer*. MIT Press.
+- [The Failure of Urban Renewal](https://www.commentary.org/articles/herbert-gans/the-failure-of-urban-renewal/) — Herbert Gans, *Commentary Magazine* (1965).
+- [Urban Renewal](https://en.wikipedia.org/wiki/Urban_renewal) — Wikipedia.
+- [Maps Show How Tearing Down City Slums Displaced Thousands](https://www.nationalgeographic.com/history/article/urban-renewal-projects-maps-united-states) — National Geographic.
+- [Tearing Down Black America](https://www.bostonreview.net/articles/brent-cebul-tearing-down-black-america/) — Brent Cebul, *Boston Review*.
+- [The Creation of the US Federal Urban Renewal Program](https://thewestendmuseum.org/history/era/new-boston/the-creation-of-the-us-federal-urban-renewal-program/) — West End Museum.
+
+### Public Housing and Poverty Deconcentration
+
+- Chetty, R. et al. (2025). ["Creating High-Opportunity Neighborhoods: Evidence from the HOPE VI Program."](https://opportunityinsights.org/wp-content/uploads/2025/09/HopeVI_Paper.pdf) NBER Working Paper.
+- Chetty, R., Hendren, N., and Katz, L. (2016). ["The Effects of Exposure to Better Neighborhoods on Children: New Evidence from the Moving to Opportunity Experiment."](https://scholar.harvard.edu/files/lkatz/files/chk_aer_mto_0416.pdf) *American Economic Review*.
+- [Why Did Pruitt-Igoe Fail?](https://www.huduser.gov/portal/pdredge/pdr_edge_featd_article_110314.html) — HUD USER.
+- [Public Housing's Most Notorious Failure](https://www.city-journal.org/article/public-housings-most-notorious-failure) — *City Journal*.
+- [NPR: Raj Chetty's latest research on the HOPE VI public housing experiment](https://www.npr.org/2026/01/28/nx-s1-5691692/hope-vi-public-housing-opportunity-insights-raj-chetty) — NPR (2026).
+
+### Declining Cities and Revitalization
+
+- Hollingsworth, T. and Goebel, A. ["Revitalizing America's Smaller Legacy Cities."](https://www.lincolninst.edu/app/uploads/legacy-files/pubfiles/revitalizing-americas-smaller-legacy-cities-full.pdf) Lincoln Institute of Land Policy.
+- Mallach, A. and Brachman, L. (2013). *Regenerating America's Legacy Cities*. Lincoln Institute of Land Policy.
+- Ehlenz, M. (2016). ["Neighborhood Revitalization and the Anchor Institution."](https://journals.sagepub.com/doi/abs/10.1177/1078087415601220) *Urban Affairs Review*.
+- [The Power of Eds and Meds](https://penniur.upenn.edu/uploads/media/Anchor-Institutions-PRAI-2014.pdf) — Penn IUR.
+- [Anchor Institutions Toolkit](https://www.nettercenter.upenn.edu/sites/default/files/Anchor_Toolkit6_09.pdf) — Netter Center, University of Pennsylvania.
+- ["Shrinking Cities" Revisited](https://realestate.wharton.upenn.edu/working-papers/shrinking-cities-revisited/) — Wharton Real Estate Center.
+- [Facing the Urban Challenge](https://www.urban.org/sites/default/files/publication/28101/1001392-Facing-the-Urban-Challenge-The-Federal-Government-and-America-s-Older-Distressed-Cities.PDF) — Urban Institute.
 
 ### Growth Boundaries and Smart Growth
 

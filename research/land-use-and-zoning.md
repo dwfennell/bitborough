@@ -13,6 +13,11 @@
 - [Setbacks, Lot Coverage, and Height Limits](#setbacks-lot-coverage-and-height-limits)
 - [Zoning and Land Value](#zoning-and-land-value)
 - [Non-Conforming Uses and Variances](#non-conforming-uses-and-variances)
+- [Inclusionary Zoning](#inclusionary-zoning)
+- [Historic Preservation Overlays](#historic-preservation-overlays)
+- [Parking Minimums and Zoning](#parking-minimums-and-zoning)
+- [Fiscal Zoning](#fiscal-zoning)
+- [Variance Approval Dynamics](#variance-approval-dynamics)
 - [Zoning's Feedback Loops](#zonings-feedback-loops)
 - [Application to Bitborough](#application-to-bitborough)
 - [Cross-References](#cross-references)
@@ -316,6 +321,270 @@ A middle ground between by-right development and variances. Conditional use perm
 
 ---
 
+## Inclusionary Zoning
+
+Inclusionary zoning (IZ) requires or incentivizes developers to include a percentage of below-market-rate ("affordable") units in new residential projects. It is one of the most widely adopted tools for producing affordable housing through the private market, and one of the most debated.
+
+### Scale and Prevalence
+
+As of 2019, over 1,000 inclusionary housing programs existed across 31 states and the District of Columbia. Geographic concentration is extreme: New Jersey accounts for 45% of all programs, Massachusetts 27%, and California 17%. A subset of 675 jurisdictions reported creating over 173,000 inclusionary units total, including approximately 70,000 affordable rental units and 31,000 for-sale units. Programs have also collected at least $1.76 billion in in-lieu fees from developers who opted to pay rather than build affordable units on-site.
+
+### Mandatory vs. Voluntary Programs
+
+IZ programs fall on a spectrum:
+
+| Program Type | Mechanism | Typical Set-Aside | Effectiveness |
+|---|---|---|---|
+| Mandatory, jurisdiction-wide | All projects above a unit threshold must include affordable units | 10-20% of units | Highest production but highest market impact |
+| Mandatory, area-specific | Applies only in designated zones (e.g., transit corridors, upzoned areas) | 15-30% of units | Moderate production, targeted to high-value areas |
+| Voluntary with incentives | Developers receive density bonuses, fee waivers, or expedited review | 5-15% of units | Lower production, lower market distortion |
+| Voluntary, no incentives | Purely optional | 0-5% of units | Near-zero production in practice |
+
+NYC's Mandatory Inclusionary Housing (MIH) program, adopted in 2016, requires affordable set-asides of 20-30% in areas receiving upzoning. Portland's program, adopted in 2017, requires 10-20% affordable units in buildings of 20+ units and offers an FAR bonus of up to 25%.
+
+### Density Bonus Mechanics
+
+The density bonus is the most common developer incentive used to offset the cost of affordable unit requirements. California's Density Bonus Law (Government Code Section 65915) is the most detailed framework:
+
+| Affordable Tier | Minimum Set-Aside | Base Density Bonus | Maximum Bonus | Incentives/Concessions |
+|---|---|---|---|---|
+| Very low income (<=50% AMI) | 5% of units | 20% | 50% | 1-3 depending on % |
+| Low income (<=80% AMI) | 10% of units | 20% | 50% | 1-3 depending on % |
+| Moderate income (<=120% AMI, for-sale only) | 10% of units | 5% | 35% | 1-3 depending on % |
+| 100% affordable projects | 100% of units | 80% | Unlimited near transit | 4 |
+
+For each additional 1% of low-income units above the 10% threshold, the developer receives a 1.5% increase in the density bonus. Projects within half a mile of a major transit stop can receive an unlimited density bonus if 100% affordable. Since 2020, the maximum bonus for most projects has been 50%, up from the previous 35%.
+
+### In-Lieu Fees
+
+Developers can often pay a per-unit fee instead of building affordable units on-site. Fee levels vary dramatically by market:
+
+- **Boston**: $200,000-$380,000 per required affordable unit (graduated by neighborhood cost zone)
+- **San Francisco**: $150,000-$250,000 per unit
+- **Moderate-cost cities**: $50,000-$100,000 per unit
+
+State law in California requires that in-lieu fees must be set high enough to produce at least as many affordable units as on-site construction would have yielded. In practice, fee revenue is often pooled into a housing trust fund and used to subsidize deeper affordability (lower AMI targets, special needs housing, homeless services) than the inclusionary program itself would produce.
+
+### Effectiveness Data
+
+Empirical evidence on IZ is mixed:
+
+**Production.** IZ programs have collectively produced over 170,000 affordable units nationally. But this represents a small fraction of total housing need. NYC's MIH program, one of the largest, produced approximately 3,500 affordable units in its first five years.
+
+**Market effects.** A 2025 study of U.S. jurisdictions found that IZ implementation resulted in an average 2.1% increase in home prices, with mandatory jurisdiction-wide programs producing the largest price effects. More stringent requirements (higher set-aside percentages, lower AMI targets) correlate with 5-12% decreases in overall new unit construction, as some projects become financially infeasible.
+
+**Integration outcomes.** Research indicates that developments with 20-30% affordable units achieve optimal social integration when supported by robust institutional frameworks and thoughtful physical design. Below 20%, affordable tenants are too few to form community; above 30%, market-rate buyers begin to avoid the project.
+
+**The cost-pass-through problem.** In strong markets, the cost of affordable units is passed through to market-rate buyers as higher prices. In weak markets, the requirement can kill projects entirely. The sweet spot exists in moderate-demand markets where developers can absorb some cost while remaining profitable.
+
+---
+
+## Historic Preservation Overlays
+
+Historic preservation overlay districts are a form of supplementary zoning regulation that sits on top of ("overlays") the base zoning district. They regulate the physical appearance, alteration, and demolition of structures within areas deemed historically significant. While their stated purpose is cultural preservation, they have profound effects on development capacity, housing supply, and neighborhood economics.
+
+### How Overlay Regulations Work
+
+A historic overlay typically imposes the following additional requirements beyond the base zone:
+
+- **Design review**: all exterior modifications, new construction, and demolitions within the district must be reviewed by a historic preservation commission or architectural review board
+- **Demolition restrictions**: demolition of contributing structures is either prohibited outright or requires a "certificate of appropriateness" with a high evidentiary burden
+- **Height and massing controls**: new construction must be compatible in height, scale, and massing with existing contributing structures, often capping buildings at 2-4 stories regardless of what the underlying zoning would permit
+- **Material and style requirements**: facade materials, window proportions, roof forms, and architectural details are regulated to maintain visual consistency
+- **Setback and lot coverage freezes**: new construction may be required to match the setback and lot coverage of surrounding historic structures
+
+The net effect is that the overlay often reduces the effective development capacity of a parcel well below what the base zoning would allow. A parcel zoned R-4 (mid-rise multifamily, FAR 3.0) inside a historic overlay may be limited in practice to a 3-story building matching adjacent 1920s rowhouses, yielding an effective FAR of 1.0-1.5.
+
+### Density Restriction Effects
+
+Historic overlays function as a de facto downzoning mechanism in some of the most desirable, centrally-located neighborhoods in American cities. Research from Los Angeles found that historic districts can be used as protection against state and city regulations intended to encourage development, including density bonus law and small-lot subdivisions. A 2024 study characterized these restrictions as having an "exclusionary nature," reinforcing existing neighborhood demographics by restricting the supply of new housing.
+
+Key data points:
+
+- **New York City**: as of 2020, approximately 3.5% of the city's lots were in historic districts, but these lots accounted for a disproportionate share of Manhattan's developable land. Studies found that designation raises property values in lower-valued boroughs (Brooklyn, Queens) but can depress land values in Manhattan where foregone development potential is highest.
+- **San Francisco**: 32% of the city's land area falls within some form of historic overlay or architectural conservation district, contributing to severe housing supply constraints.
+- **Washington, D.C.**: approximately 27% of the District's land area is within historic districts, covering much of the most transit-accessible, centrally located land.
+
+### Property Value Effects
+
+Historic district designation has consistently been shown to increase property values for existing structures, creating a tension with housing affordability:
+
+| Study Location | Value Premium | Notes |
+|---|---|---|
+| Denver | 12-23% | Local historic district designation |
+| National Register (multiple cities) | 9-12% | National listing only |
+| Philadelphia | Up to 131% | National Register districts (outlier) |
+| Spillover to adjacent properties | 10-20% | Within 1-2 blocks of district boundary |
+
+The premium derives from three sources: regulatory certainty (neighbors cannot demolish and build incompatible structures), aesthetic amenity (maintained streetscape quality), and scarcity (restricted supply of units in a desirable area). The third source is the one that creates the affordability tension: the premium is partly a monopoly rent extracted from constrained supply.
+
+### Economic Tradeoffs
+
+The core tradeoff is preservation of existing character vs. foregone development capacity:
+
+**Benefits**: cultural value, tourism revenue, neighborhood stability, streetscape quality, property value increases for existing owners, environmental benefits of building reuse (embodied energy preservation).
+
+**Costs**: reduced housing supply in high-demand areas, increased housing prices, displacement of lower-income residents through gentrification, foregone density near transit, higher renovation costs due to compliance requirements, and opportunity cost of development potential.
+
+Some municipalities have attempted to resolve this tension by offering density transfers (transferable development rights, or TDRs) from historic parcels to receiving sites, or by exempting historic structures from unit-count caps when they are adaptively reused for housing.
+
+---
+
+## Parking Minimums and Zoning
+
+Parking minimums are zoning requirements that mandate a minimum number of off-street parking spaces for new development, typically specified per dwelling unit, per 1,000 sq ft of commercial space, or per seat/bed/room for institutional uses. Since their widespread adoption beginning in the 1950s, they have been one of the most consequential and least-examined elements of American zoning codes. A reform movement to eliminate them has gained major momentum since 2020.
+
+### How Parking Minimums Shape Land Use
+
+Parking requirements interact with land use in several fundamental ways:
+
+**Land consumption.** A surface parking space requires approximately 300-350 sq ft including the access lane. In the median American city with population over 500,000, approximately 26% of downtown land is devoted exclusively to parking. Individual cities range from 4% to 42%. This land cannot be used for housing, commerce, or public space.
+
+**Development cost.** Parking construction costs are substantial:
+
+| Parking Type | Cost Per Space | Annual Operating Cost |
+|---|---|---|
+| Surface lot | $5,000-$15,000 | $600-$1,200 |
+| Above-ground structure | $25,000-$40,000 | $1,500-$3,000 |
+| Below-ground structure | $35,000-$75,000 | $2,500-$5,000 |
+
+With most jurisdictions requiring 1-3 spaces per dwelling unit, parking can add $25,000-$225,000 to the cost of each housing unit. Donald Shoup's research found that when considered as an impact fee, minimum parking requirements increase development costs by more than 10 times the impact fees for all other public purposes combined.
+
+**Density suppression.** On a constrained urban lot, the parking requirement often becomes the binding constraint on unit count rather than FAR or height limits. A developer with a 10,000 sq ft lot in a zone that permits 40 units but requires 1.5 parking spaces per unit needs 60 spaces. At 350 sq ft per space, this requires 21,000 sq ft of parking area, exceeding the lot size. The project either shrinks to fewer units, adds expensive structured parking, or does not get built.
+
+**Use pattern reinforcement.** Free parking (which describes 99% of all automobile trips in the United States, per Shoup) subsidizes driving and suppresses transit ridership, walking, and cycling. Parking minimums thus reinforce the car-dependent land use pattern that Euclidean zoning created, forming a feedback loop: separated uses require driving, driving requires parking, parking requirements prevent the density needed for transit, and lack of transit ensures continued car dependency.
+
+### The Reform Movement
+
+The movement to eliminate parking minimums has accelerated rapidly:
+
+- **2017**: Buffalo, NY becomes the first major U.S. city to eliminate all parking minimums citywide. In the years following, 68% of all new homes used parking ratios that would not have been allowed under the prior code.
+- **2021**: California bans parking mandates near transit statewide (AB 2097).
+- **2024**: Washington State passes the strongest statewide rollback, capping most residential projects at 0.5 spaces per unit and exempting many projects entirely.
+- **2025**: Chicago eliminates parking minimums for most new residential and commercial developments in transit-served locations (effective September 2025). NYC's "City of Yes" reforms eliminate parking mandates for residential projects in transit-rich areas.
+- **As of 2025**: Over 3,700 cities in 22 countries have enacted reforms to eliminate or reduce parking requirements, with over 100 cities removing all minimums entirely.
+
+### What Happens When Minimums Are Eliminated
+
+Empirical evidence from early-adopter cities shows:
+
+**Developers still build parking, but less.** In Buffalo, developers provided an average of 0.5 spaces per unit voluntarily, down from the 1.0-2.0 mandated previously. The market, not the code, determines parking supply.
+
+**Housing costs moderate.** Minneapolis eliminated parking minimums as part of broader zoning reform in 2020. While national rents increased 22% from 2019 to 2024, Minneapolis rents declined 4% over the same period. Parking reform was one of several contributing factors (the city also legalized triplexes citywide and streamlined permitting).
+
+**More housing gets built.** A 2025 U.S. Department of Transportation study found that removing parking minimums in Colorado would lead to 71% more homes in transit-oriented areas and 41% more homes overall in studied urban areas.
+
+**Historic building reuse becomes feasible.** Many pre-automobile buildings (pre-1940) cannot meet modern parking requirements without demolishing adjacent structures or building expensive underground garages. Eliminating minimums makes adaptive reuse of these buildings economically viable.
+
+**Ground floors activate.** Developers convert ground-floor space from parking garages to retail, offices, or additional housing units, creating more active street frontages and generating more tax revenue per acre.
+
+---
+
+## Fiscal Zoning
+
+Fiscal zoning is the practice of using land-use regulation to maximize a municipality's property and sales tax revenue while minimizing the public expenditure obligations associated with new development. It is one of the most powerful but least publicly discussed motivations behind zoning decisions.
+
+### The Fiscal Calculus of Land Use
+
+Different land uses generate vastly different net fiscal impacts (tax revenue minus service costs):
+
+| Land Use | Revenue Profile | Service Cost Profile | Typical Net Fiscal Impact |
+|---|---|---|---|
+| Single-family residential (large lot) | Moderate property tax | High (schools, roads, utilities per unit) | Negative to break-even |
+| Single-family residential (small lot) | Higher property tax per acre | Moderate (shared infrastructure) | Break-even to slightly positive |
+| Multifamily residential | High property tax per acre | Moderate (shared infrastructure, fewer school-age children per unit) | Positive |
+| Neighborhood commercial | High property + sales tax | Low (no school demand, limited utility demand) | Strongly positive |
+| Big-box retail | Very high sales tax | Low to moderate (road infrastructure) | Strongly positive for sales-tax cities |
+| Office/professional | High property tax | Very low (no school demand, minimal residential services) | Strongly positive |
+| Light industrial | Moderate property tax | Low | Positive |
+| Heavy industrial | Moderate property tax | Moderate (infrastructure, environmental) | Variable |
+
+The key insight: residential development, particularly single-family homes on large lots, is often a net fiscal drain on municipalities because the cost of providing schools, roads, water, sewer, police, and fire service exceeds the property tax revenue generated. Commercial and industrial uses generate revenue with far lower service demands.
+
+### How Fiscal Zoning Manifests
+
+**Commercial corridor protection.** Municipalities zone generous areas for commercial use along arterials, even when market demand does not support it, to attract sales-tax-generating retail. If sales taxes are the primary source of local revenue, shopping centers have a disproportionate chance of being approved, even if they reduce nearby residential property values.
+
+**Industrial preservation.** Industrial zoning functions as a subsidy: municipalities forgo higher tax revenue from converting industrial land to residential or commercial use in order to maintain employment-generating uses that demand few public services. Industrial zoning also protects industries from competition with residential and commercial users who could outbid them for land.
+
+**Large-lot residential zoning.** Paradoxically, fiscal zoning drives some municipalities toward large-lot single-family zoning despite its fiscal inefficiency. The logic: large-lot homes attract high-income residents whose property tax payments exceed service costs, while smaller homes and apartments attract families with more school-age children per dollar of assessed value. This creates exclusionary outcomes -- lower-income households are priced out by minimum lot size requirements.
+
+**Revenue-per-acre analysis.** Strong Towns and other fiscal urbanist organizations have documented dramatic differences in revenue productivity by development pattern:
+
+| Development Type | Property Tax Per Acre | Notes |
+|---|---|---|
+| Mixed-use downtown building | ~$67,000/acre | Highest revenue productivity |
+| Small-lot residential (<0.2 acres) | ~$5,600/acre | Dense single-family |
+| Large-lot residential (>1 acre) | ~$538/acre | 10x less than small-lot |
+| Walmart (typical) | Varies | A downtown building in Asheville generates 100x more property tax per acre |
+
+The implication is stark: low-density suburban development patterns, despite appearing "safe" from a fiscal perspective, often produce the weakest revenue per acre while demanding the most infrastructure per capita.
+
+### Fiscal Zoning and Housing Affordability
+
+The prioritization of fiscally positive development often comes at the expense of affordable housing. Local governments favor high-end residential or commercial projects that promise greater tax revenues, leading to:
+
+- Displacement of lower-income residents as neighborhoods are rezoned for higher-value uses
+- Exclusion of affordable multifamily housing through large-lot zoning and parking requirements
+- Competition between neighboring municipalities for commercial tax base ("fiscal competition"), where each city zones aggressively for retail at the expense of regional housing needs
+- Resistance to group homes, supportive housing, and subsidized developments that are perceived as fiscally negative regardless of social value
+
+---
+
+## Variance Approval Dynamics
+
+While variances are discussed structurally in [Non-Conforming Uses and Variances](#non-conforming-uses-and-variances) above, the political economy of how variance decisions are actually made deserves separate treatment. The gap between the legal standard for variances and actual board behavior is one of the most studied -- and most troubling -- aspects of zoning administration.
+
+### Approval Rates
+
+Research spanning decades has consistently found variance approval rates far higher than the strict legal standards would predict:
+
+| Study Period | Setting | Approval Rate | Source |
+|---|---|---|---|
+| 1960-1990 (multiple studies) | Urban, suburban, and rural jurisdictions | 70-80% | Pepperdine Law Review synthesis |
+| Indiana (specific board study) | Single jurisdiction | 86% | Academic case study |
+| Boston (special permits + variances) | Urban | 81% of requests approved | 52% of all dwelling units involved a variance |
+
+These rates are remarkably consistent across time periods and geographic settings. The 70-80% baseline has held since the 1960s.
+
+### The Legal Standard vs. Practice
+
+The legal standard for granting a variance is high. Under most state statutes (derived from the Standard State Zoning Enabling Act), an applicant must demonstrate:
+
+1. **Unnecessary hardship**: the property cannot yield a reasonable return under strict application of the zoning code
+2. **Unique circumstances**: the hardship is due to characteristics of the specific property (topography, irregular lot shape, etc.), not conditions general to the neighborhood
+3. **No self-created hardship**: the owner did not create the condition necessitating the variance
+4. **No substantial detriment**: the variance will not alter the essential character of the neighborhood
+5. **Minimum variance**: the relief granted is the minimum necessary
+
+In practice, research consistently finds that boards routinely ignore these standards. A comprehensive academic analysis concluded that local decision-making bodies base decisions on "inappropriate and substantially irrelevant factors," and there are "no common evidentiary or procedural standards" applied. Many hearings fail to provide fundamental fairness and due process, and the legal prerequisites for obtaining a variance are "frequently ignored."
+
+### The Political Economy of Variance Decisions
+
+Several forces drive the high approval rates:
+
+**Asymmetric participation.** The applicant (who stands to gain a concentrated benefit) always appears. Neighbors who would bear diffuse costs often do not. Board members face a motivated supplicant with no organized opposition.
+
+**Repeat-player dynamics.** In many jurisdictions, the same attorneys, developers, and architects appear before the board repeatedly. Board members develop relationships with these repeat players. One-time applicants (homeowners seeking a shed setback variance) and repeat professional applicants (developers seeking use variances) receive very different levels of scrutiny in practice, even if the legal standard is identical.
+
+**Political pressure.** Board members in many jurisdictions are political appointees. Elected officials who appoint them may have preferences about specific projects. Even where boards are nominally independent, the appointment process creates implicit accountability to political actors.
+
+**The "nice person" problem.** Variance hearings are quasi-judicial proceedings, but they feel like community meetings. Applicants present sympathetic personal narratives. Board members, who are typically laypeople rather than judges, find it difficult to deny a request from someone who appears reasonable and whose project seems harmless.
+
+**Precedent accumulation.** Each granted variance makes the next one harder to deny. If the board approved a similar request last month, denying this one feels arbitrary. Over time, the effective zoning standard drifts far from the written code.
+
+### Consequences of Liberal Variance Granting
+
+**Code erosion.** When 70-80% of variance requests are approved, the written zoning code ceases to reflect the actual regulatory environment. Developers learn to design projects that require variances, knowing they will likely be granted, rather than conforming to the code.
+
+**Uncertainty premium.** Despite high approval rates, the variance process introduces uncertainty, delay (typically 2-6 months), and cost (application fees, attorney fees, architect fees for redesign). This acts as a tax on development that falls disproportionately on smaller projects and less-experienced developers.
+
+**Inequitable access.** Sophisticated developers with legal representation navigate the variance process far more effectively than individual homeowners or small builders. The system favors repeat players with resources.
+
+**Corruption risk.** The discretionary nature of variance decisions, combined with the large dollar values at stake (a use variance can add millions in land value), creates corruption risk. Multiple jurisdictions have experienced zoning board scandals involving bribery or quid pro quo arrangements.
+
+---
+
 ## Zoning's Feedback Loops
 
 Zoning does not merely regulate — it actively creates self-reinforcing spatial patterns. Once established, these patterns are difficult to reverse.
@@ -497,6 +766,114 @@ The current building definitions can be cross-referenced against real density da
 
 The industrial job density *decreasing* at higher tiers already matches the real-world pattern documented in the TOD research: heavy industrial facilities are capital-intensive and automated, producing more economic output with fewer workers. This is a strong design choice worth preserving.
 
+### Mechanics Suggested by New Sections
+
+**7. Inclusionary Zoning / Affordable Housing Mandate**
+
+Add a policy toggle (or slider) where the player can impose an affordable housing requirement on new residential construction. This creates a tradeoff between social equity and development throughput:
+
+```
+// When inclusionary policy is active:
+if (policy.inclusionaryZoning.enabled) {
+  const setAside = policy.inclusionaryZoning.percentage  // 0.10 - 0.30
+  const densityBonus = setAside * 1.5  // e.g., 15% set-aside -> 22.5% bonus capacity
+  building.affordableUnits = Math.floor(building.capacity * setAside)
+  building.capacity = Math.floor(building.capacity * (1 + densityBonus))
+  // Affordable units generate residents but less tax revenue
+  // Higher set-asides reduce P(develop) as marginal projects become infeasible
+  tile.developmentProbabilityModifier *= (1 - setAside * 0.4)  // 10% set-aside -> 4% reduction
+}
+```
+
+This models the real finding that IZ programs produce affordable units at the cost of slightly reduced overall development (5-12% in high-requirement jurisdictions). The density bonus partially compensates.
+
+**8. Historic Preservation Overlay**
+
+Allow the player to designate tiles or districts as "historic," which raises property value for existing buildings but suppresses new development and density upgrades:
+
+```
+if (tile.historicOverlay) {
+  tile.landValue *= 1.15  // 12-23% premium from research
+  tile.maxDensity = Math.min(tile.maxDensity, DensityLevel.Medium)  // cap density
+  tile.developmentProbabilityModifier *= 0.3  // demolition/rebuild nearly impossible
+  tile.desirability += 0.08  // aesthetic/stability bonus
+  // Adjacent tiles get spillover: +5% desirability within radius 2
+}
+```
+
+This creates an interesting player dilemma: designating historic districts preserves desirable neighborhoods and boosts values, but freezes density in areas that might benefit from growth. It maps to the real tension between preservation and housing supply.
+
+**9. Parking Requirements Toggle**
+
+Add a city-wide or per-district parking policy that affects development capacity:
+
+```
+enum ParkingPolicy { Standard, Reduced, None }
+
+function adjustForParking(tile: Tile, baseCapacity: number): number {
+  switch (tile.parkingPolicy) {
+    case ParkingPolicy.Standard:
+      return baseCapacity * 0.70  // 30% capacity lost to parking
+    case ParkingPolicy.Reduced:
+      return baseCapacity * 0.85  // 15% capacity lost
+    case ParkingPolicy.None:
+      return baseCapacity * 1.00  // full capacity, but...
+      // ...reduced desirability if no transit: residents need cars
+  }
+}
+
+// No-parking penalty without transit:
+if (tile.parkingPolicy === ParkingPolicy.None && !hasTransitStop(tile, radius=6)) {
+  tile.residentialDesirability -= 0.12  // car-dependent residents penalized
+}
+```
+
+This models the real dynamic where parking minimums suppress density (26% of downtown land is parking in the median U.S. city) but eliminating them only works well near transit. It teaches players that parking reform and transit investment are complementary policies.
+
+**10. Fiscal Impact Awareness**
+
+Surface the fiscal impact of zoning decisions to the player through a per-tile or per-district revenue/cost display:
+
+```
+function fiscalImpactPerTile(tile: Tile): number {
+  const revenue = tile.taxRevenue  // based on land value + building value
+  const serviceCost = getServiceCost(tile)  // schools, roads, utilities, police, fire
+  return revenue - serviceCost
+}
+
+// Revenue per acre varies dramatically by development pattern:
+// Mixed-use downtown: ~$67,000/acre
+// Small-lot residential: ~$5,600/acre
+// Large-lot residential: ~$538/acre
+// Commercial corridors and dense mixed-use subsidize suburban residential
+```
+
+This would make the fiscal zoning dynamic visible: players would see that sprawling low-density residential zones drain the budget while compact mixed-use development generates surplus. It naturally teaches the Strong Towns lesson without being didactic.
+
+**11. Variance System**
+
+When a building wants to develop but the strict zoning doesn't quite fit (e.g., commercial demand on a residential-edge tile), model variance requests as probabilistic events:
+
+```
+function requestVariance(tile: Tile, requestedUse: ZoneType): boolean {
+  const approvalRate = 0.75  // matches real 70-80% baseline
+  const demandPressure = getDemand(requestedUse) / getMaxDemand()
+  const neighborOpposition = countResidentialNeighbors(tile, radius=2) * 0.05
+  const P_approve = approvalRate + (demandPressure * 0.15) - neighborOpposition
+
+  if (Math.random() < P_approve) {
+    tile.varianceGranted = true
+    tile.allowedUse = requestedUse
+    // Variance adds delay: development delayed by 2-4 ticks
+    tile.developmentDelay += 3
+    return true
+  }
+  return false
+}
+```
+
+This models the real dynamic where variance approval is likely but not certain, adds delay, and is influenced by demand pressure and neighbor opposition. It could fire automatically at zone boundaries where demand spills over.
+
 ---
 
 ## Cross-References
@@ -548,6 +925,58 @@ The industrial job density *decreasing* at higher tiers already matches the real
 - [Density — JHP Architecture](https://jhparch.com/density)
 - [Zoning Classifications — Anne Arundel County](https://www.aacounty.org/planning-and-zoning/zoning-administration/zoning-classifications-guide)
 - [LA Residential Zoning — Benson Construction Group](https://www.bensonconstructiongroup.com/los-angeles-zoning-residential)
+
+### Inclusionary Zoning
+- [Inclusionary Housing in the United States — Lincoln Institute of Land Policy](https://www.lincolninst.edu/publications/working-papers/inclusionary-housing-in-united-states/)
+- [Inclusionary Housing in the United States: Prevalence, Practices, and Production — Grounded Solutions Network](https://groundedsolutions.org/resources/inclusionary-housing-united-states/)
+- [Study Identifies Over 1,000 Inclusionary Housing Programs Nationwide — NLIHC](https://nlihc.org/resource/study-identifies-over-1000-inclusionary-housing-programs-nationwide)
+- [Do Inclusionary Zoning Policies Affect Local Housing Markets? — ScienceDirect](https://www.sciencedirect.com/science/article/abs/pii/S0264275125000368)
+- [Study Highlights Housing Tradeoffs in Inclusionary Zoning Policies — NAHB](https://www.nahb.org/blog/2024/04/inclusionary-zoning-study-ucla)
+- [Inclusionary Zoning Helps Some, but Can Jeopardize Broad-Based Affordability — Pioneer Institute](https://pioneerinstitute.org/study-inclusionary-zoning-helps-some-but-can-jeopardize-broad-based-affordability/)
+- [Mandatory Inclusionary Housing — NYC Council Land Use](https://council.nyc.gov/land-use/plans/mih-zqa/mih/)
+- [Inclusionary Housing — Portland.gov](https://www.portland.gov/phb/inclusionary-housing)
+- [Setting the In-Lieu Fee — InclusionaryHousing.org](https://inclusionaryhousing.org/designing-a-policy/off-site-development/in-lieu-fees/setting-the-in-lieu-fee/)
+- [Determining In-Lieu Fees in Inclusionary Zoning Policies — Urban Institute](https://www.urban.org/research/publication/determining-lieu-fees-inclusionary-zoning-policies)
+- [California Density Bonus Law FAQ — City of Morgan Hill](https://www.morganhill.ca.gov/2160/Density-Bonus-Law)
+- [Density Bonus Law: Incentives, Concessions, and Waivers — SCAG](https://scag.ca.gov/sites/default/files/2024-05/density_bonus_law_-_what_are_incentives_concessions_and_waivers.pdf)
+
+### Historic Preservation Overlays
+- [Where Preservation Meets Land Use Regulation: Historic Districts in Los Angeles — Journal of the American Planning Association](https://www.tandfonline.com/doi/full/10.1080/01944363.2024.2417053)
+- [Preserving History or Restricting Development? Historic Districts in NYC — ScienceDirect](https://www.sciencedirect.com/science/article/abs/pii/S0094119015000820)
+- [When Historic Preservation Clashes with Housing Affordability — Sightline Institute](https://www.sightline.org/2017/12/19/when-historic-preservation-clashes-with-housing-affordability/)
+- [Character Contradiction: The Exclusionary Nature of Preservationist Planning Restrictions — Urban Studies (2024)](https://journals.sagepub.com/doi/10.1177/00420980231195218)
+- [The Value of Historic District Status — ScienceDirect (2025)](https://www.sciencedirect.com/science/article/abs/pii/S0166046225000742)
+- [The Political Economy of Historic Districts — ScienceDirect](https://www.sciencedirect.com/science/article/abs/pii/S0166046220302684)
+- [Historic Districting Does Not Have a Negative Effect on Property Values — Nashville Metro](https://www.nashville.gov/sites/default/files/2025-11/Historic-Districting-and-Property-Values.pdf)
+- [How Historical Designations Affect Property Values — Urban Land Magazine](https://urbanland.uli.org/economy-markets-trends/historical-designations-affect-property-values)
+
+### Parking Minimums and Reform
+- Shoup, D. (2005/2011). *The High Cost of Free Parking*. Planners Press / Routledge.
+- [From Austin to Anchorage, U.S. Cities Opt to Ditch Parking Minimums — NPR](https://www.npr.org/2024/01/02/1221366173/u-s-cities-drop-parking-space-minimums-development)
+- [Eliminating Parking Mandates to Tackle the Housing Crisis — NAIOP](https://www.naiop.org/research-and-publications/magazine/2025/fall-2025/development-ownership/eliminating-parking-mandates-to-tackle-the-housing-crisis/)
+- [In These US Cities, Parking Reform Is Gaining Momentum — ITDP](https://itdp.org/2024/02/01/in-these-us-cities-parking-reform-is-gaining-momentum/)
+- [Parking Reforms — U.S. Department of Transportation (2025)](https://www.transportation.gov/sites/dot.gov/files/2025-01/Parking%20Reforms.pdf)
+- [Parking Reform Map — Parking Reform Network](https://parkingreform.org/resources/mandates-map/)
+- [Eliminating Parking Minimums Works: Minneapolis and Buffalo — NextSTL](https://nextstl.com/2024/01/eliminating-parking-minimums-works-ask-minneapolis-and-buffalo/)
+- [Zoning Reform 2025: Parking Minimums Axed and FAR Caps Raised — Innowave Studio](https://www.innowave-studio.com/post/zoning-reform-2025-parking-minimums-axed-and-far-caps-raised-in-major-u-s-cities)
+- [Parking Requirement Impacts on Housing Affordability — VTPI](https://www.vtpi.org/park-hou.pdf)
+- [Maps: How Much of Your City Is Parking? — Planetizen](https://www.planetizen.com/news/2023/03/122397-maps-how-much-your-city-parking)
+
+### Fiscal Zoning
+- Fischel, W. (2014). "Fiscal Zoning and Economists' Views of the Property Tax." Lincoln Institute of Land Policy Working Paper.
+- [Understanding the Fiscal Impact of Zoning — Smart Growth America](https://smartgrowthamerica.org/understanding-the-fiscal-impact-of-zoning-and-how-smart-growth-solutions-can-foster-fiscal-responsibility/)
+- [Value Per Acre Analysis: A How-To for Beginners — Strong Towns](https://www.strongtowns.org/journal/2018-10-19-value-per-acre-analysis-a-how-to-for-beginners)
+- [What's in Your City's Wallet? — Strong Towns](https://archive.strongtowns.org/journal/2019/3/25/whats-in-your-citys-wallet)
+- [Industrial Rezoning in U.S. Cities — Manhattan Institute](https://manhattan.institute/article/industrial-rezoning-in-u-s-cities)
+- [Fiscal Zoning — Housing Affordability Institute](https://www.housingaffordabilityinstitute.org/fiscal-zoning-2/)
+- [Building Better Budgets — Smart Growth America (PDF)](https://smartgrowthamerica.org/wp-content/uploads/2016/08/building-better-budgets.pdf)
+
+### Variance Approval Dynamics
+- [Variances: A Canary in the Coal Mine for Zoning Reform? — Pepperdine Law Review](https://digitalcommons.pepperdine.edu/cgi/viewcontent.cgi?article=2635&context=plr)
+- [Variance Standards: What Is Hardship? — UNC School of Government](https://canons.sog.unc.edu/2014/05/variance-standards-what-is-hardship-and-when-is-it-unnecessary/)
+- [New York State Zoning Board of Appeals: A Guidebook for Local Officials — Syracuse EFC](https://efc.syr.edu/wp-content/uploads/2017/06/NYS-Zoning-Board-Appeals.pdf)
+- [Zoning Board of Appeals Overview — NYS Department of State](https://dos.ny.gov/zoning-board-appeals-overview)
+- [A Primer on Area Variances in New York — WMPF](https://www.wmpf.org/wp-content/uploads/2017/05/WMPF-LUTI-2017-A-Primer-on-Area-Variances-in-New-York.pdf)
 
 ### Feedback Loops and Urban Economics
 - [Zoning, Land Use, and the Reproduction of Urban Inequality — PMC](https://pmc.ncbi.nlm.nih.gov/articles/PMC10691857/)

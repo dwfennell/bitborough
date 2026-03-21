@@ -10,6 +10,11 @@
 - [Healthcare](#healthcare)
 - [Parks and Recreation](#parks-and-recreation)
 - [Library and Cultural Services](#library-and-cultural-services)
+- [Service Quality Outcomes](#service-quality-outcomes)
+- [Mental Health and Homelessness Services](#mental-health-and-homelessness-services)
+- [Service Equity Measurement](#service-equity-measurement)
+- [Contracted vs. Government-Provided Services](#contracted-vs-government-provided-services)
+- [Emergency Response Coordination](#emergency-response-coordination)
 - [Service Delivery Models](#service-delivery-models)
 - [Service Costs](#service-costs)
 - [Service Demand](#service-demand)
@@ -66,6 +71,24 @@ Staffing should be driven by workload analysis — call volume, call duration, p
 ### Hot Spot Policing
 
 A well-established empirical finding: crime clusters in small geographic areas. Roughly 50% of all criminal events concentrate in "hot spots" that represent a tiny fraction of total city area. A meta-analysis found that 62 of 78 studies reported noteworthy crime reductions from hot-spot policing interventions (Campbell Systematic Reviews, 2019). The key insight: targeted deployment outperforms uniform coverage.
+
+### Crime Clearance Rates
+
+Clearance rate — the share of reported crimes "cleared" by arrest or exceptional means — is the primary measure of police investigative effectiveness. FBI UCR data for 2024:
+
+| Crime Type | Clearance Rate (2024) | Trend vs. 1990 |
+|---|---|---|
+| Murder / non-negligent manslaughter | 61.4% | Down from ~65% |
+| Aggravated assault | 49.1% | Down from ~59% |
+| Robbery | 30.4% | Down from ~25% (slight improvement) |
+| All violent crimes | 43.8% | Down from ~46% |
+| Property crimes (aggregate) | ~15% | Down from ~18% |
+
+Overall clearance rates dropped from 22.3% in 1990 to 13.7% in 2023 — a 41% decline — despite unprecedented funding levels. Analysis of California's 51 major cities found that increased police spending and officer counts were *negatively* associated with clearance rates (CJCJ, 2023). The relationship is counterintuitive: departments now have 2.3x more sworn officers, 2.4x more total personnel, and 3.6x more funding per reported crime than in 1990, yet solve a smaller share of crimes.
+
+Factors that *do* improve clearance rates include strong victim/witness cooperation, dedicated detective units with manageable caseloads, DNA/forensic technology, and clearance of backlogged cases. Factors that depress clearance rates include chronic staffing shortages in investigations (patrol gets priority over detectives), rising caseloads, strained community-police relationships that reduce witness cooperation, and officer attrition.
+
+The key takeaway for simulation: staffing levels have a weak and possibly negative relationship with crime *solving*, but a stronger relationship with crime *deterrence* through visible patrol. These are distinct mechanisms that a model could separate.
 
 ### Crime and Land Value
 
@@ -128,6 +151,29 @@ The Insurance Services Office (ISO) Public Protection Classification (PPC) rates
 
 Critical threshold: any property more than 5 road miles from a fire station receives an automatic Class 10 rating. This 5-mile radius is the fundamental coverage unit for fire protection planning.
 
+### Fire Containment and Response Outcomes
+
+The relationship between response time and fire outcomes is governed by flashover — the point at which radiant heat ignites all combustible material in a room simultaneously.
+
+**Flashover timeline (modern construction):**
+
+| Time from Ignition | Stage | Survivability |
+|---|---|---|
+| 0-1 minute | Incipient — small flame, often unnoticed | High |
+| 1-2 minutes | Growth — fire doubles in size every 30 seconds | Moderate |
+| 3-5 minutes | Flashover — entire room ignites at once | Near zero in room of origin |
+| 5-8 minutes | Fully developed — structural damage begins | Building at risk |
+| 8+ minutes | Decay or spread to adjacent rooms/structures | Adjacent structures at risk |
+
+Modern fires reach flashover far faster than historic fires. UL/NIST research found that living room flashover times dropped from approximately 30 minutes (legacy furnishings, natural materials) to under 5 minutes (modern synthetic materials, open floor plans). Some test scenarios show flashover as fast as 1.5 minutes from open flame.
+
+**Compliance reality:** The IAFF surveyed the 50 most populous US cities and found that 34% do not meet the NFPA 1710 standard of 240-second travel time for first-due engine companies. Average response times are 4.6 minutes in staffed departments and 6.6 minutes in unstaffed (volunteer) departments — not including dispatch processing or turnout time. This places first-arriving firefighters on scene at roughly the same time flashover is expected, dramatically narrowing the window for rescue and interior attack.
+
+**Staffing and containment:**
+- NFPA 1710 requires a minimum of 4 firefighters per engine company. A 2010 NIST study found that 4-person crews completed key firefighting tasks 25% faster than 3-person crews and 67% faster than 2-person crews.
+- Departments that maintain 4+ firefighters per company and meet 4-minute travel times consistently contain fires to the room of origin at higher rates.
+- When response exceeds 8 minutes, fires are far more likely to extend beyond the structure of origin, triggering mutual aid and dramatically increasing total suppression cost.
+
 ### Fire Spread Models
 
 Fire spreads between structures through three mechanisms:
@@ -182,6 +228,22 @@ Common measures used in planning and by homebuyers:
 - Graduation rates
 - Advanced course offerings
 
+### Spending vs. Student Outcomes
+
+The relationship between per-pupil spending and student outcomes is one of the most studied and most debated questions in education policy.
+
+**What the causal research shows:**
+- A meta-analysis of US evaluations found that a $1,000 per-pupil spending increase sustained for four years improves test scores by 0.03 standard deviations and increases college-going by 2.8 percentage points (American Economic Journal, 2022).
+- Long-term outcomes show stronger effects than test scores: higher graduation rates, higher adult wages, and lower likelihood of adult poverty, with low-income students benefiting the most.
+- The effect depends critically on *how* money is spent. Spending on smaller class sizes and teacher quality shows clear returns; spending on administration and facilities shows weaker returns.
+
+**What the cross-sectional data shows:**
+- Per-pupil spending has more than doubled in real terms since 1970, yet national reading scores have remained essentially flat.
+- State-level comparisons are noisy: New York (top spender) ranks in the middle on test scores, while Idaho (low spender) outperforms it on multiple NAEP measures.
+- These cross-sectional comparisons are confounded by poverty concentration, cost of living, and student demographics — they do not measure the marginal effect of additional spending.
+
+**Reconciliation:** The consensus among education economists is that money matters, but *conditionally*. Adequate funding is necessary but not sufficient. The marginal dollar produces diminishing returns, and spending that does not reach classrooms (administrative overhead, facilities beyond minimum standards) has limited effect on outcomes. For simulation purposes, the relationship is positive but logarithmic — initial spending has large effects, additional spending has declining returns.
+
 ---
 
 ## Healthcare
@@ -213,6 +275,25 @@ Within the US, distribution is uneven:
 | Rural | 2.4 | 1.7 |
 
 Urban areas have fewer beds per capita but more intensive staffing and capital per bed — a specialization effect.
+
+### Patient Outcomes and Staffing
+
+Hospital staffing ratios are among the strongest predictors of patient outcomes. The research is extensive and consistent:
+
+**Nurse-to-patient ratios:**
+
+| Ratio (patients per nurse) | Effect on Mortality | Source |
+|---|---|---|
+| 4:1 | Baseline (California mandated minimum for med-surg) | CA Title 22 |
+| 6:1 | ~14% higher odds of death | Aiken et al., JAMA 2002 |
+| 8:1 | ~31% higher odds of death | Aiken et al., JAMA 2002 |
+| Each additional patient per nurse | 7-10% increase in 30-day mortality | Multiple studies |
+
+A shift-level longitudinal study found that shifts with high registered nurse staffing had 8.7% lower odds of patient mortality, while low-staffed shifts had 10% higher odds (International Journal of Nursing Studies, 2021). Patient-to-nurse ratios across US hospitals range from 3:1 to 11:1 in adult medical-surgical units.
+
+**Economic impact:** An analysis of New York hospitals estimated that if medical-surgical units staffed at 4:1 instead of the average 6.3:1, thousands of deaths could have been avoided and hundreds of millions of dollars saved through shorter stays and avoided readmissions (NINR, 2021). Safe staffing legislation is estimated to save $2,100 per patient admission through reduced complications (PMC, 2021).
+
+**Broader outcomes affected by staffing:** Failure-to-rescue rates, hospital-acquired infections (MRSA, C. diff, UTI), patient satisfaction scores, length of stay, 30-day readmission rates, and medication errors all correlate with nurse staffing levels. The effect is dose-dependent — each additional patient per nurse incrementally worsens all measured outcomes.
 
 ### Healthcare Access and Urban Form
 
@@ -288,6 +369,305 @@ Libraries, community centers, and cultural facilities serve as "third places" (n
 - Meeting spaces support civic engagement
 - Internet/computer access serves as infrastructure for underserved populations
 - Presence signals neighborhood investment and stability
+
+---
+
+## Service Quality Outcomes
+
+Service quality is not merely a function of spending or staffing. Empirical research reveals nuanced, often non-linear relationships between inputs and outcomes across every major public service.
+
+### Police: Deterrence vs. Investigation
+
+Police services produce two distinct outcomes that respond to different inputs:
+
+**Deterrence (crime prevention):** Visible patrol, rapid response, and community presence reduce crime. Hot-spot policing — concentrating patrol in high-crime micro-areas — has strong empirical support (62 of 78 studies showed significant reductions; Campbell Systematic Reviews, 2019). Deterrence is primarily a function of *deployment strategy*, not raw headcount.
+
+**Investigation (crime solving):** Clearance rates depend on detective caseloads, forensic capacity, and community cooperation. The national clearance rate fell from 22.3% (1990) to 13.7% (2023) despite massive funding increases. Higher spending per crime has been associated with *lower* clearance rates in cross-sectional analyses — likely because marginal spending goes to patrol, equipment, and administration rather than investigative capacity.
+
+| Input | Effect on Deterrence | Effect on Clearance |
+|---|---|---|
+| More patrol officers | Moderate positive | Minimal |
+| Hot-spot deployment | Strong positive | Minimal |
+| More detectives | Minimal | Strong positive |
+| Community trust | Moderate positive | Strong positive |
+| Technology (cameras, forensics) | Moderate positive | Moderate positive |
+
+### Fire: Response Time and Structure Loss
+
+Fire outcome quality is more directly tied to response time than any other service due to the physics of flashover:
+
+| Response Time (total reflex) | Typical Outcome |
+|---|---|
+| < 5 minutes | Room-of-origin containment likely; rescue possible |
+| 5-8 minutes | Floor-of-origin containment; rescue window closing |
+| 8-12 minutes | Full structure involvement likely; exposure protection mode |
+| > 12 minutes | Structure loss probable; focus on preventing spread |
+
+NIST testing showed that 4-person engine crews operating within 4-minute travel achieve room-of-origin containment at significantly higher rates than understaffed or delayed responses. Each minute of delay beyond flashover (~3-5 minutes from ignition) approximately doubles the expected property loss.
+
+### Education: Spending and Achievement
+
+| Per-Pupil Spending Increase | Test Score Effect | Long-Term Income Effect |
+|---|---|---|
+| +$1,000/yr for 4 years | +0.03 SD | +$1,800 annual adult earnings |
+| +10% overall spending | +0.05-0.09 SD | +7% adult earnings |
+| +$1 in state aid per pupil | — | +$20 aggregate housing value (NBER) |
+
+Effects are strongest for low-income students and concentrated in instructional spending (teacher quality, class size reduction). Administrative and capital spending show weaker returns. The relationship is positive but logarithmic — returns diminish at higher spending levels.
+
+### Healthcare: Staffing and Mortality
+
+The dose-response relationship between nurse staffing and patient mortality is one of the most robust findings in health services research:
+
+| Staffing Change | Mortality Effect |
+|---|---|
+| Each additional patient per nurse | +7-10% odds of 30-day mortality |
+| Going from 6:1 to 4:1 ratio | ~14% reduction in inpatient mortality |
+| High-staffed shifts vs. low-staffed | 19% difference in mortality odds |
+| Mandated 4:1 ratio (California) | Measurable mortality reduction + $2,100 savings per admission |
+
+Beyond mortality, staffing predicts failure-to-rescue, hospital-acquired infections, readmissions, and patient satisfaction. The effect is consistent across countries, hospital types, and study designs.
+
+---
+
+## Mental Health and Homelessness Services
+
+### The Growing Burden on Traditional First Responders
+
+Mental health crises, substance use emergencies, and homelessness-related calls increasingly dominate police and EMS workloads:
+
+**Call volume data:**
+- A 2020 Center for American Progress analysis of 911 calls in eight cities found that 21-38% involved homelessness, behavioral health crises, substance use, quality-of-life concerns, or community conflicts.
+- The 988 Suicide and Crisis Lifeline received over 10.8 million contacts in its first two years (launched July 2022). Monthly volume exceeded 500,000 by May 2024 — up 80% since launch — indicating rapidly growing demand for mental health crisis response.
+
+**Homelessness and EMS:** In Los Angeles, homeless patients accounted for 10.2% of all 911 incidents (36,122 calls) at a rate of 1,155 per 1,000 homeless residents — 14 times the rate for housed residents. Transport rates were 19 times higher. Homeless individuals cycle repeatedly through emergency departments, often for conditions that could be managed with stable housing and primary care.
+
+**Homelessness and fire:** Encampments create structural fire risk in areas not designed for habitation — under bridges, in abandoned buildings, in wooded areas adjacent to structures. Fire departments report increasing call volume related to encampment fires, often in locations with poor apparatus access.
+
+**Encampment response costs:** A 2019 HUD-funded study found annual city costs for responding to homeless encampments ranged from $3.4 million (Houston) to $8.6 million (San Jose), and these figures excluded fire and EMS costs due to data limitations.
+
+### Specialized Crisis Response Teams
+
+Cities are experimenting with alternative response models that divert mental health and low-acuity calls away from armed police response:
+
+**CAHOOTS (Eugene, OR):** The best-known model. Operated by White Bird Clinic, CAHOOTS dispatched teams of a medic and a crisis worker to behavioral health calls.
+- Handled 16,800+ calls in 2024 (~46 per day)
+- Saved the city an estimated $2.2 million/year in police wages
+- Annual program cost: ~$820,000 (contract covered only ~40% of true operating cost)
+- Program ended in Eugene in April 2025 due to chronic underfunding — illustrating the fragility of alternative response models that lack dedicated funding streams
+
+**STAR (Denver, CO):** The Support Team Assisted Response program diverted low-risk calls to health workers. Within six months, it helped avoid nearly 1,380 criminal offense responses. The study estimated that police response to the same calls would have cost four times as much.
+
+**Co-responder models:** Pair a mental health clinician with a police officer. A review found these programs consistently decreased arrests and reduced officer time on mental health calls. Evidence for effects on clinical outcomes (hospitalization rates, repeat crises) is more limited.
+
+**Cost-effectiveness:** A Minnesota Management and Budget analysis found mobile crisis response returns $3.90 in benefits for every $1 invested. However, sustainable funding remains the primary challenge — most programs rely on grants, Medicaid billing, and fragile municipal contracts rather than stable dedicated revenue.
+
+### Impact on Service Demand Models
+
+Mental health and homelessness create a mismatch between service *need* and service *design*:
+- Police are trained and equipped for law enforcement, not de-escalation of psychotic episodes
+- EMS transports to emergency departments that are not designed for psychiatric stabilization
+- Fire departments respond to encampment fires that are symptoms of housing policy failures
+- The result is high cost, poor outcomes, and provider burnout across all three emergency services
+
+For simulation: these calls consume capacity without producing the outcomes the service is designed for. A fire engine responding to an encampment fire cannot simultaneously respond to a structure fire. A police unit on a welfare check cannot simultaneously deter property crime.
+
+---
+
+## Service Equity Measurement
+
+### Defining Service Equity
+
+Service equity has three dimensions (Cepiku, 2021):
+
+1. **Equal access** — all residents can reach services within comparable time/distance
+2. **Equal quality** — services delivered in different neighborhoods are of comparable quality
+3. **Need-adjusted allocation** — areas with greater need receive proportionally greater resources
+
+These dimensions can conflict. Equal geographic coverage (dimension 1) may be inequitable if high-need areas require *more* service to achieve comparable outcomes (dimension 3). Pure demand-based allocation (dimension 3) may leave low-density areas with unacceptable access gaps (dimension 1).
+
+### Measurement Approaches
+
+**Spatial access analysis (GIS-based):**
+- Map service facilities (stations, schools, parks, hospitals) and calculate travel time or distance to each residential area
+- Identify "service deserts" — areas beyond acceptable thresholds (analogous to food desert methodology)
+- Overlay demographic data (income, race, age) to test whether underserved areas correlate with disadvantaged populations
+- Trust for Public Land's ParkServe and 10-Minute Walk analyses are prominent examples: they map every US park and identify which residents lack a park within a 10-minute walk, disaggregated by race and income
+
+**Response time equity:**
+- Compare actual response times (not just station locations) across neighborhoods
+- Test whether high-poverty or majority-minority areas experience systematically longer response times
+- Account for call volume — high-demand areas may have adequate station coverage but still experience delays due to unit unavailability
+
+**Outcome equity:**
+- Compare outcomes (crime rates, fire losses, test scores, health indicators) across neighborhoods after controlling for demand characteristics
+- Disparities that persist after controlling for socioeconomic factors indicate service delivery inequity
+- This is the most rigorous but most data-intensive approach
+
+**Equity audits:**
+Systematic multi-year assessments used by school districts, health systems, and increasingly by municipal governments. A typical equity audit follows a sequential design (Hanover Research, 2020):
+1. Year 1: Collect baseline data on service access, quality, and outcomes disaggregated by geography, race, and income
+2. Year 2: Conduct root cause analysis — identify policies and practices driving observed disparities
+3. Year 3: Implement targeted interventions and measure change
+
+### The "Service Desert" Framework
+
+Borrowing from food desert analysis, service deserts can be mapped for any public service:
+
+| Service | Desert Threshold (typical) | Demographic Correlates |
+|---|---|---|
+| Parks | No park within 10-minute walk | Low-income, high-minority neighborhoods |
+| Grocery / fresh food | No full-service grocery within 1 mile (urban) or 10 miles (rural) | Low-income, low-vehicle-ownership |
+| Fire protection | Beyond 5 road miles from station (ISO Class 10) | Rural, unincorporated areas |
+| Schools | Beyond reasonable walking distance (1 mile elementary, 1.5 miles middle) | Low-density suburban fringe |
+| Hospitals | Beyond 30-minute drive time | Rural areas — rural hospital closures accelerating this |
+
+Research from Salt Lake City found that the poorer the neighborhood, the harder it is to reach a park — park access was significantly worse in low-income and racially diverse areas even within the same city (MDPI Sustainability, 2025).
+
+### Equity in Practice
+
+Cities use several mechanisms to operationalize equity:
+- **Weighted funding formulas** — allocate more per capita to higher-need areas (common in school funding)
+- **Minimum service standards** — guarantee baseline coverage everywhere regardless of demand or tax yield
+- **Targeted capital investment** — prioritize new facilities in underserved areas
+- **Community input requirements** — require equity impact assessments for service changes
+- **Data dashboards** — publish service metrics disaggregated by neighborhood to create accountability
+
+---
+
+## Contracted vs. Government-Provided Services
+
+### Overview
+
+Most public services in the US are government-provided, but private delivery is common in specific sectors. The choice involves tradeoffs across cost, quality, accountability, and coverage equity.
+
+### Private Security
+
+Private security guards outnumber sworn police officers in the US: approximately 1.1 million guards vs. 666,000 police officers.
+
+| Dimension | Public Police | Private Security |
+|---|---|---|
+| Cost per hour | $58/hr (off-duty officer, San Francisco) | $25-75/hr depending on market |
+| Accountability | Government oversight, civil rights obligations, public records | Client-only accountability, minimal public oversight |
+| Authority | Arrest powers, use of force authority, qualified immunity | Limited to citizen's arrest, property rights enforcement |
+| Coverage mandate | Serve entire jurisdiction | Serve paying clients only |
+| Response to non-clients | Required | Not required |
+
+A notable case: Reminderville, Ohio contracted Corporate Security for $90,000/year with twice as many patrol cars and 6-minute response time, compared to the Summit County Sheriff's $180,000/year offer with 45-minute response time. Cost savings were dramatic but accountability shifted entirely to the municipality to monitor contract performance.
+
+**Key risk:** Private security creates a two-tier system. Wealthier neighborhoods and commercial districts can supplement public policing with private patrols; lower-income areas cannot. This amplifies the Tiebout sorting dynamic described in the feedback loops section.
+
+### Private Fire Protection
+
+Private fire services exist primarily as subscription-based models in unincorporated rural areas:
+
+**Rural Metro Fire** (largest US private fire company):
+- Subscription-based: $150-200/year for residential coverage
+- Serves unincorporated areas outside municipal fire districts
+- Responds to non-subscriber fires but bills after the fact at full cost-recovery rates
+
+**Subscription model failures:** In South Fulton, Tennessee, homeowner Gene Cranick's house was allowed to burn to the ground because he had not paid the $75 annual subscription fee. He offered to pay on the spot; the fire department refused. This case illustrates the moral hazard of fee-for-service fire protection — the service has characteristics of a public good (fire spreads to neighbors regardless of payment status) that make exclusion both ethically problematic and practically dangerous.
+
+**Assessment:** Private fire protection can reduce costs in low-density areas where municipal service is infeasible, but it creates severe equity problems. The subscription model fails when: (a) non-subscribers' fires threaten subscribers' property, (b) low-income residents cannot afford subscriptions, or (c) free-rider incentives undermine the funding base.
+
+### Private Ambulance / EMS
+
+EMS in the US is delivered through diverse models:
+
+| Model | Characteristics |
+|---|---|
+| Fire-based (third service) | Dual-role firefighter-paramedics, 24/48 shifts, ALS in quarters |
+| Municipal third-service | Separate EMS department, dedicated ambulances |
+| Private contracted | For-profit company under municipal contract |
+| Private non-contracted | Independent service, billing patients directly |
+| Hospital-based | Run by the local hospital system |
+
+**Quality comparison:** Fire-based systems tend to produce the fastest urban response times because apparatus is pre-positioned in quarters. Private fleets often use dynamic deployment (surge units to peak demand, redeploy in off-peak), which can stretch response times during low-demand periods. A study of ambulance ownership structures found fire department-based services provided the highest quality measured by time to hospital, though the difference was smaller in urban areas.
+
+**Cost comparison:** Private EMS companies are profit-driven, which creates pressure to cut costs on staffing, training, and coverage area. However, dynamic deployment can be more cost-efficient than staffing fixed stations 24/7. Municipalities that contract with private providers must maintain robust contract oversight — response time guarantees, clinical quality metrics, and coverage area requirements — or risk service degradation in pursuit of profit margins.
+
+**Key tradeoff:** Private EMS can reduce municipal costs but shifts financial risk to patients (higher out-of-pocket billing) and creates accountability gaps. When a private ambulance company fails to meet response times, the municipality — not the company — bears the political consequences.
+
+### Summary: Contracting Tradeoffs
+
+| Dimension | Government-Provided | Contracted/Private |
+|---|---|---|
+| Cost | Higher (pensions, unions, benefits) | Lower (variable labor, fewer benefits) |
+| Quality control | Direct management | Requires robust contract oversight |
+| Accountability | Elected officials, public records | Contract terms, less transparency |
+| Coverage equity | Mandated for entire jurisdiction | Risk of cherry-picking profitable areas |
+| Responsiveness to public | Political pressure is direct | Mediated through contract |
+| Innovation | Slower (bureaucratic) | Faster (competitive pressure) |
+| Labor stability | Higher (career service) | Lower (turnover, cost-cutting) |
+
+---
+
+## Emergency Response Coordination
+
+### The Multi-Agency Problem
+
+Major incidents — structure fires, mass casualty events, active shooters, hazmat spills — require coordinated response from multiple agencies that normally operate independently. The core challenge: agencies have different chains of command, different radio systems, different protocols, and different organizational cultures.
+
+### Incident Command System (ICS)
+
+The Incident Command System was developed after the 1970 California wildfire season revealed catastrophic coordination failures between agencies. It is now mandated by NIMS (National Incident Management System) for all federally funded agencies.
+
+**ICS principles:**
+- **Unity of command** — every responder reports to exactly one supervisor
+- **Modular organization** — structure expands or contracts based on incident complexity
+- **Manageable span of control** — 3 to 7 subordinates per supervisor (optimal: 5)
+- **Common terminology** — all agencies use the same terms for functions and resources
+- **Integrated communications** — common frequencies or interoperable systems
+
+**Unified Command** extends ICS to multi-agency incidents. Rather than a single incident commander, representatives from each agency with jurisdictional authority form a unified command team. They jointly develop objectives and strategy without any agency relinquishing its own authority. This structure is activated automatically when two or more agencies with jurisdictional responsibility arrive at an incident.
+
+### Mutual Aid Agreements
+
+Mutual aid is the mechanism by which jurisdictions share resources across boundaries:
+
+| Type | Description | Activation |
+|---|---|---|
+| Automatic aid | Closest unit dispatched regardless of jurisdiction | Standing agreement, dispatched automatically |
+| Mutual aid | Resources requested when local capacity is exceeded | Request-based, typically through dispatch |
+| Regional mutual aid (MABAS model) | Structured box alarm system covering multi-county regions | Tiered escalation (box cards) |
+| Statewide mutual aid (EMAC) | Governor-to-governor interstate resource sharing | Governor-declared emergency |
+
+**How fire mutual aid works in practice:**
+1. A structure fire is dispatched as a first alarm (typically 3-4 engines, 1-2 trucks, 1 chief)
+2. If the incident escalates, the IC requests a second alarm — pulling units from neighboring jurisdictions via mutual aid
+3. As local stations empty, neighboring departments "fill" those stations (move-up coverage) to maintain baseline protection
+4. For mass-casualty or conflagration events, regional systems (like Illinois's MABAS) can mobilize hundreds of units through pre-planned "box card" escalation tiers
+
+**The "move-up" problem:** When a city sends mutual aid to a neighbor, it leaves gaps in its own coverage. Smart mutual aid systems address this by automatically deploying cover units from the next ring of jurisdictions into the emptied stations. This creates a cascade of resource movement that must be coordinated in real time.
+
+### Police-Fire-EMS Coordination
+
+Day-to-day coordination between the three primary emergency services follows established protocols:
+
+**Structure fire response:**
+- Fire department has incident command
+- EMS stages for potential victim treatment and firefighter rehabilitation
+- Police handles traffic control, scene perimeter, and evacuation if needed
+
+**Active shooter / mass casualty:**
+- Police has incident command (law enforcement threat)
+- Fire/EMS stages in a "warm zone" until police clears the "hot zone"
+- Unified command established if incident has both ongoing threat and mass casualties
+- "Rescue Task Forces" — mixed teams of police and paramedics — enter warm zones together
+
+**Hazmat incidents:**
+- Fire department hazmat team has technical command
+- Police establishes perimeter and evacuation
+- EMS provides decontamination and treatment
+- Environmental agencies may assume command for long-duration incidents
+
+### Communication Interoperability
+
+Radio interoperability — the ability for different agencies to communicate on the same frequency — remains a persistent challenge. Despite decades of investment since 9/11:
+- Many jurisdictions still use incompatible radio systems
+- Workarounds include shared channels, cache radios, and gateway devices
+- The P25 standard was designed to solve this but adoption is incomplete and expensive
+- Cellular-based solutions (FirstNet) are supplementing but not replacing radio
 
 ---
 
@@ -561,6 +941,84 @@ landValue = baseLandValue * (1.0 + servicePremium)
 
 This creates the positive/negative feedback loops observed in real cities: well-served areas appreciate in value, generating more tax revenue, enabling better service. Underserved areas stagnate. The player must actively intervene to break vicious cycles.
 
+### Suggested Mechanic: Service Quality Outcomes
+
+Rather than treating service presence as binary (covered/uncovered), service *quality* could vary based on the research in the Service Quality Outcomes section:
+
+**Police quality tiers:**
+```
+// Deterrence (patrol) — scales with funding and coverage
+deterrenceEffect = influence * (funding / 100) * 40
+
+// Investigation (clearance) — separate mechanic, scales with detective allocation
+// Could be modeled as a city-wide stat rather than per-tile
+clearanceRate = baseRate * (detectiveBudgetShare / targetShare)
+// Low clearance -> higher repeat offending -> crime rises over time
+```
+
+This separates the two real-world police mechanisms: visible patrol (deterrence) and case solving (investigation). Players would need to balance between patrol-heavy and investigation-heavy funding.
+
+**Fire quality — response time modeling:**
+```
+// Currently: binary coverage check. Enhancement: model response delay.
+responseDelay = manhattanDistance(fire, nearestStation) / FIRE_TRAVEL_SPEED
+if (responseDelay <= FLASHOVER_TICKS) {
+  containmentChance = 0.85 * stationStaffing  // high containment
+} else {
+  containmentChance = 0.30 * stationStaffing  // post-flashover, much harder
+}
+```
+
+This would make station *placement* matter more — a station 3 tiles away produces dramatically different outcomes than one 8 tiles away, matching the real-world flashover cliff.
+
+### Suggested Mechanic: Mental Health Demand
+
+As population grows and poverty concentration increases, a share of police/EMS calls could shift to mental health crises that consume capacity without producing the service's intended outcome:
+
+```
+mentalHealthCallShare = baseMHRate + (povertyRate * MH_POVERTY_MULTIPLIER)
+// These calls consume police/EMS capacity but don't reduce crime or improve health
+effectivePoliceCapacity = totalCapacity * (1.0 - mentalHealthCallShare)
+
+// Optional: Mental health facility building reduces the call share
+if (mhFacilityInfluence[idx] > 0.2) {
+  mentalHealthCallShare *= 0.4  // 60% diversion rate, consistent with real data
+}
+```
+
+This creates a mid-to-late-game pressure: as the city grows, mental health demand degrades emergency service effectiveness unless the player builds specialized facilities.
+
+### Suggested Mechanic: Service Equity Score
+
+A city-wide equity score could measure how evenly services are distributed:
+
+```
+// For each service, compute coverage standard deviation across occupied tiles
+equityScore = 1.0 - stddev(coverageByNeighborhood) / mean(coverageByNeighborhood)
+// Range: 0.0 (wildly unequal) to 1.0 (perfectly equal)
+
+// Equity score affects city-wide satisfaction / approval rating
+// Low equity -> protests, population loss from underserved areas
+// High equity -> small happiness bonus, attracts new residents
+```
+
+This gives the player a strategic reason to distribute services evenly rather than concentrating everything in high-value areas — matching the real-world political dynamics of service equity.
+
+### Suggested Mechanic: Mutual Aid (Multi-Map)
+
+If Bitborough eventually supports neighboring cities or regional scenarios, mutual aid could be modeled:
+
+```
+// When a fire exceeds local suppression capacity:
+if (activeFires > localEngines) {
+  mutualAidDelay = MUTUAL_AID_BASE_DELAY  // several ticks
+  mutualAidEngines = min(requestedEngines, neighborAvailableEngines)
+  // Neighbor's coverage degrades while their engines are committed
+}
+```
+
+Even on a single map, the concept applies: when one fire station's units are committed to a fire, its coverage area is unprotected. A "unit availability" mechanic would force the player to think about redundancy and station spacing.
+
 ### Summary of Proposed New Parameters
 
 | Service | Build Cost | Maintenance | Radius | Desirability Bonus |
@@ -570,6 +1028,7 @@ This creates the positive/negative feedback loops observed in real cities: well-
 | Park (existing) | $10 | $0 | 5 | +0.25 (binary; suggest decay) |
 | School (proposed) | $500 | $75/mo | 12 | +0.20 (threshold) |
 | Hospital (proposed) | $2,000 | $120/mo | 20 | +0.10 (threshold) |
+| Mental Health Facility (proposed) | $400 | $60/mo | 10 | None (reduces MH call share) |
 
 ---
 
@@ -629,3 +1088,65 @@ This creates the positive/negative feedback loops observed in real cities: well-
 - [Tiebout Model (Wikipedia)](https://en.wikipedia.org/wiki/Tiebout_model) — "Voting with your feet" theory
 - [Tiebout Sorting and Selective Satisfaction (SAGE)](https://journals.sagepub.com/doi/10.1177/10780870222185405)
 - [Tiebout Sorting, Zoning, and Property Tax Rates (MDPI)](https://www.mdpi.com/2413-8851/6/1/13)
+
+### Service Quality Outcomes
+- [More Law Enforcement Spending Accompanies Worse Crime-Solving (CJCJ)](https://www.cjcj.org/reports-publications/report/more-law-enforcement-spending-accompanies-worse-not-improved-crime-solving) — Spending vs. clearance rate analysis
+- [Clearance Rates (Vera Institute)](https://arresttrends.vera.org/clearance-rates) — National clearance rate trends
+- [FBI Reported Crimes in the Nation 2024](https://www.fbi.gov/news/press-releases/fbi-releases-2024-reported-crimes-in-the-nation-statistics) — 2024 UCR clearance data
+- [US Violent Crime Clearance Rate by Type 2024](https://beautifydata.com/united-states-crimes/fbi-ucr/2024/us-violent-crime-clearance-rate-by-crime-type) — Clearance rates by crime type
+- [Staffing Levels and Police Response Times (CrimRxiv)](https://www.crimrxiv.com/pub/02md8eqk/release/1) — Staffing as primary factor in response time
+- [Fire Is Fast and Getting Faster (USFA)](https://www.usfa.fema.gov/blog/fire-is-fast-and-getting-faster/) — Modern flashover acceleration
+- [Fire Department Response Times vs. Flashover (Fire Engineering)](https://www.fireengineering.com/firefighting/fire-department-response-times-vs-flashover/) — Response time vs. flashover comparison
+- [3 Fire Service Myths (FireRescue1)](https://www.firerescue1.com/response-time/articles/3-fire-service-myths-data-response-times-and-coverage-equity-GaCh6wfeKUDFrmqr/) — Compliance and equity data
+- [School Spending and Educational Outcomes (Brookings)](https://www.brookings.edu/articles/a-state-level-perspective-on-school-spending-and-educational-outcomes/) — State-level spending-outcome analysis
+- [School Spending Policy Impacts (AEJ: Applied Economics)](https://www.aeaweb.org/articles?id=10.1257%2Fapp.20220279) — Meta-analysis of spending evaluations
+- [Nurse Staffing and Inpatient Mortality (NEJM)](https://www.nejm.org/doi/full/10.1056/NEJMsa1001025) — Seminal nurse-mortality study
+- [Nurse Staffing and Mortality: Shift-Level Study (ScienceDirect)](https://www.sciencedirect.com/science/article/pii/S0020748921000936) — Shift-level staffing-outcome association
+- [Safe Nurse Staffing Legislation and Outcomes (PMC)](https://pmc.ncbi.nlm.nih.gov/articles/PMC8655582/) — Cost savings from mandated ratios
+- [Reducing Patient-to-Nurse Ratios Saves Lives and Money (NINR)](https://www.ninr.nih.gov/newsandevents/featured-research/evidence-reducing-patient-nurse-staffing-ratios-can-save-lives-and) — Economic case for safe staffing
+- [Patient-to-Nurse Ratios and Hospital Outcomes (Penn LDI)](https://ldi.upenn.edu/our-work/research-updates/what-patient-to-nurse-ratios-mean-for-hospital-patient-health-and-outcomes/) — Variation in staffing and outcomes
+
+### Mental Health and Homelessness Services
+- [Mobile Crisis Teams Reduce Police and EMS Calls (EMS1)](https://www.ems1.com/behavioral-health/mobile-crisis-teams-ease-ems-police-workload-but-face-uncertain-funding) — Co-responder team effectiveness and funding
+- [Behavioral Health Crisis Alternatives (Vera Institute)](https://www.vera.org/behavioral-health-crisis-alternatives) — Alternative response models overview
+- [Mobile Crisis Teams and Policing (Stanford)](https://yotamshemtov.github.io/files/cahoots.pdf) — CAHOOTS empirical evaluation
+- [CAHOOTS Program (White Bird Clinic)](https://whitebirdclinic.org/what-is-cahoots/) — Program overview and data
+- [Eugene After CAHOOTS (OPB)](https://www.opb.org/article/2025/06/04/eugene-after-cahoots-the-end-of-the-crisis-response-program-and-the-efforts-to-bring-it-back/) — Program closure and funding challenges
+- [Police Mental Health Mobile Crisis Teams in Crisis (NPR)](https://www.npr.org/2026/02/05/nx-s1-5693908/police-mental-health-calls-988-911-mobile-crisis-teams) — National funding challenges
+- [988 Suicide and Crisis Lifeline Implementation (PMC)](https://pmc.ncbi.nlm.nih.gov/articles/PMC11733462/) — Call volume, wait times, adoption
+- [988 Lifeline Two Years After Launch (KFF)](https://www.kff.org/mental-health/988-suicide-crisis-lifeline-two-years-after-launch/) — Performance and awareness data
+- [Costs and Harms of Homelessness (Community Solutions)](https://community.solutions/research-posts/the-costs-and-harms-of-homelessness/) — Service cost data per homeless individual
+- [EMS Utilization by Homeless Patients (PubMed)](https://pubmed.ncbi.nlm.nih.gov/32501745/) — Los Angeles EMS utilization rates
+- [Homelessness as Law Enforcement Problem (National Policing Institute)](https://www.policinginstitute.org/onpolicing/when-homelessness-becomes-a-law-enforcement-problem-and-why-they-cant-solve-it-alone/) — Police burden
+- [Exploring Homelessness Among People in Encampments (HUD)](https://www.huduser.gov/portal/sites/default/files/pdf/Exploring-Homelessness-Among-People.pdf) — Encampment response costs
+- [Firefighting and the Homeless (Lexipol)](https://www.lexipol.com/resources/blog/firefighting-and-the-homeless-the-new-norm/) — Fire department impacts
+- [Supportive Housing Cost Offsets (Urban Institute)](https://www.urban.org/sites/default/files/publication/104499/costs-and-offsets-of-providing-supportive-housing-to-break-the-homelessness-jail-cycle_0.pdf) — Denver housing-first cost reductions
+
+### Service Equity Measurement
+- [Equity in Public Services: Systematic Literature Review (Public Administration Review)](https://onlinelibrary.wiley.com/doi/10.1111/puar.13402) — Comprehensive equity research mapping
+- [Conducting an Equity Audit (Hanover Research)](https://wasa-oly.org/WASA/images/WASA/6.0%20Resources/Hanover/Research%20Brief---Conducting%20an%20Equity%20Audit.pdf) — Audit methodology guide
+- [Park Access Equity GIS Analysis, Salt Lake City (MDPI Sustainability)](https://www.mdpi.com/2071-1050/17/9/3774) — Income-race-park access disparities
+- [Mapping and Spatial Analysis (Trust for Public Land)](https://www.tpl.org/lab/mapping-spatial-analysis) — ParkServe and 10-Minute Walk methodology
+- [Evaluating Equity in Library Service Delivery (Journal of Urban Affairs)](https://www.tandfonline.com/doi/abs/10.1111/j.1467-9906.1994.tb00320.x) — Spatial equity measurement for branch services
+- [Policy Equity Assessments (diversitydatakids.org)](https://www.diversitydatakids.org/policy-equity-assessments) — Child-focused equity assessment tools
+
+### Contracted vs. Government-Provided Services
+- [Private Police (Wikipedia)](https://en.wikipedia.org/wiki/Private_police) — Private security staffing and scope
+- [Police and Private Security Relationships (FSU Criminology)](https://criminology.fsu.edu/sites/g/files/upcbnu3076/files/1%20Center%202024/Police%20&%20Private%20Security%20Roundtable%20Final%20Report.pdf) — Public-private coordination
+- [Managing the Boundary Between Public and Private Policing (NIJ)](https://www.ojp.gov/pdffiles1/nij/247182.pdf) — Oversight and accountability
+- [Fire Subscription Services: Legal and Moral Conundrum (Fire Engineering)](https://www.fireengineering.com/firefighting/fire-subscription-service/) — South Fulton case and subscription model analysis
+- [Rural Metro Fire FAQ](https://www.ruralmetrofire.com/faq) — Subscription fire service costs and model
+- [Private vs. Public Ambulance Services (EMS1)](https://www.ems1.com/private-public-dispute/articles/private-vs-public-ambulance-services-whats-the-difference-WTgJNJgR4KlljlV9/) — EMS ownership model comparison
+- [Ambulance Service Ownership and Management (Haverford)](https://www.haverford.edu/sites/default/files/Department/Economics/ambulance-service-ownership-2018.pdf) — Quality by ownership structure
+- [EMS Disparities in Funding and Outcomes (CDC)](https://www.cdc.gov/ems-community-paramedicine/php/us/disparities.html) — EMS equity data
+- [EMS Is Not a Business Model (JEMS)](https://www.jems.com/ems-management/ems-is-not-a-business-model-and-we-are-paying-the-price/) — Private EMS critique
+
+### Emergency Response Coordination
+- [Mutual Aid — Emergency Services (Wikipedia)](https://en.wikipedia.org/wiki/Mutual_aid_(emergency_services)) — Overview and agreement types
+- [Fire and EMS Multi-Agency Mutual Aid Guide (IAFC)](https://www.iafc.org/docs/default-source/lg-scale-response/fire-and-ems-mutual-aid-preparedness-and-operations-guide.pdf) — Operational guide
+- [NIMS Guideline for Mutual Aid (FEMA)](https://www.fema.gov/sites/default/files/2020-07/fema_nims_mutual_aid_guideline_20171105.pdf) — Federal mutual aid framework
+- [Mutual Aid: Partnerships for Regional Threats (BJA/DOJ)](https://www.ojp.gov/pdffiles1/bja/210679.pdf) — Cross-jurisdictional coordination
+- [MABAS — Mutual Aid Box Alarm System](https://www.mabas-il.org/about/) — Regional mutual aid model (Illinois)
+- [Incident Command System (Wikipedia)](https://en.wikipedia.org/wiki/Incident_Command_System) — ICS history, structure, and principles
+- [Unified Command (Wikipedia)](https://en.wikipedia.org/wiki/Unified_command_(ICS)) — Multi-agency command structure
+- [ICS/UC Technical Assistance (NRT)](https://www.nrt.org/sites/2/files/ICSUCTA.pdf) — Unified command implementation guide
