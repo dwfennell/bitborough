@@ -76,7 +76,7 @@ export function createNoise2D(prng: PRNG): (x: number, y: number) => number {
       n2 = t2 * t2 * (g[0] * x2 + g[1] * y2)
     }
 
-    return 70.0 * (n0 + n1 + n2)
+    return Math.max(-1, Math.min(1, 70.0 * (n0 + n1 + n2)))
   }
 }
 
