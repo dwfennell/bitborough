@@ -30,7 +30,7 @@ function sumResidentialResidents(map: GameMap): number {
  *
  * Key formulas (from PRD):
  * - Tax modifier: 1.0 - ((taxRate - 0.07) * 5.0) — neutral at 7%
- * - Residential base: 0.7 (always positive base demand)
+ * - Residential base: 0.9 (always positive base demand)
  * - Commercial: follows total residential capacity (planning intent, not actual residents)
  * - Industrial: base 0.3 with dampened tax sensitivity
  * - Congestion: average road congestion > 0.8 suppresses all demand
@@ -43,7 +43,7 @@ export function calculateDemand(map: GameMap, taxRate: number, trafficDensity?: 
   const taxModifier = 1.0 - (taxRate - 0.07) * 5.0
 
   // Residential demand:
-  const rBase = 1.0
+  const rBase = 0.9
   let rDemand = rBase * taxModifier
 
   // Commercial demand uses total residential capacity (not actual residents).
@@ -93,6 +93,23 @@ export function calculateDemand(map: GameMap, taxRate: number, trafficDensity?: 
     if (vacancy > 0.08) {
       const vacancyPenalty = Math.min(0.5, (vacancy - 0.08) * 3)
       rDemand -= vacancyPenalty
+    }
+  }
+
+  // Demographic signals
+  if (citizens) {
+    const totalPop = citizens.totalChildren + citizens.totalWorking + citizens.totalElderly
+    if (totalPop > 0 && citizens.totalWorking > 0) {
+      const depRatio = (citizens.totalChildren + citizens.totalElderly) / citizens.totalWorking
+      if (depRatio > 0.6) {
+        const penalty = Math.min(0.15, (depRatio - 0.6) * 0.3)
+        cDemand -= penalty
+        iDemand -= penalty
+      }
+      const childFraction = citizens.totalChildren / totalPop
+      if (childFraction > 0.25) {
+        rDemand += 0.05
+      }
     }
   }
 
