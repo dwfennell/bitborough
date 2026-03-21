@@ -1,6 +1,6 @@
 import { Command } from 'commander'
 import { loadEngine } from '../state.js'
-import { out } from '../output.js'
+import { out, outErr } from '../output.js'
 import { TileType, ZoneType, Infrastructure } from '@bitborough/core'
 import type { Building } from '@bitborough/core'
 import { BUILDING_DEFS } from '@bitborough/engine'
@@ -20,7 +20,7 @@ export function tilesCommand(program: Command) {
         x1i >= state.map.width || y1i >= state.map.height ||
         x2i >= state.map.width || y2i >= state.map.height
       ) {
-        out({ ok: false, error: `Coordinates (${x1i},${y1i})-(${x2i},${y2i}) out of bounds` })
+        outErr({ ok: false, error: `Coordinates (${x1i},${y1i})-(${x2i},${y2i}) out of bounds` })
       }
       const tiles = []
       const gridRows: string[] = []

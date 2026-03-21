@@ -1,7 +1,7 @@
 import { Command } from 'commander'
 import { Infrastructure, FailReason } from '@bitborough/core'
 import { loadEngine, saveEngine } from '../state.js'
-import { out } from '../output.js'
+import { out, outErr } from '../output.js'
 
 const INFRA_MAP: Record<string, Infrastructure> = {
   road:      Infrastructure.Road,
@@ -28,7 +28,7 @@ export function placeCommand(program: Command) {
       const tx = parseInt(x), ty = parseInt(y)
 
       if (!(type in INFRA_MAP) && type !== 'pave' && !(type in BUILDING_MAP)) {
-        out({ ok: false, error: `Unknown type: ${type}. Valid: road, powerline, pave, ${Object.keys(BUILDING_MAP).join(', ')}` })
+        outErr({ ok: false, error: `Unknown type: ${type}. Valid: road, powerline, pave, ${Object.keys(BUILDING_MAP).join(', ')}` })
       }
 
       let result: { ok: boolean; reason?: unknown; detail?: string }
@@ -42,11 +42,12 @@ export function placeCommand(program: Command) {
       }
 
       if (result.ok) saveEngine(engine, opts.file)
-      out({
+      const response = {
         ok: result.ok,
         reason: result.ok ? undefined : FailReason[result.reason as FailReason],
         detail: (result as { detail?: string }).detail,
         funds: engine.getState().funds,
-      })
+      }
+      if (result.ok) out(response); else outErr(response)
     })
 }
