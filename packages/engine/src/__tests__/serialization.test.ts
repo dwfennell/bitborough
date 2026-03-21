@@ -3,6 +3,7 @@ import { Engine } from '../Engine.js'
 import { createTestMap, advanceYear, advanceMonth } from '../test-helpers.js'
 import { Infrastructure, ZoneType } from '@bitborough/core'
 import { BUILDING_DEFS } from '../buildings-registry.js'
+import { setNextAgentId, getNextAgentId } from '../simulation/citizens.js'
 import type { SaveFile } from '@bitborough/core'
 
 describe('Serialization', () => {
@@ -214,6 +215,27 @@ describe('Serialization', () => {
     const v4Save = { ...save, version: 4 as const, state: { ...save.state, citizens: undefined } }
     const restored = Engine.restore(v4Save as any)
     expect(restored.getState().citizens.agentCount).toBe(0)
+  })
+
+  test('restores nextAgentId so new citizens get unique IDs', () => {
+    const engine = Engine.create(createTestMap(32), { seed: 1 })
+
+    // Inject agents with high IDs to simulate a save with existing citizens
+    const registry = (engine as any).citizenRegistry
+    registry.agents.push(
+      { id: 'c10', homeBuildingId: 'b1', workBuildingId: null, commerceBuildingId: null, homeAccessRoad: 0, workAccessRoad: null, commerceAccessRoad: null, homeWorkRoute: [], homeCommerceRoute: [], homeWorkRouteStale: false, homeCommerceRouteStale: false, homeWorkRouteTileSet: new Set(), homeCommerceRouteTileSet: new Set(), satisfaction: 0.5 },
+      { id: 'c20', homeBuildingId: 'b1', workBuildingId: null, commerceBuildingId: null, homeAccessRoad: 0, workAccessRoad: null, commerceAccessRoad: null, homeWorkRoute: [], homeCommerceRoute: [], homeWorkRouteStale: false, homeCommerceRouteStale: false, homeWorkRouteTileSet: new Set(), homeCommerceRouteTileSet: new Set(), satisfaction: 0.5 },
+    )
+
+    const save = engine.serialize()
+    // Reset the counter to 1 to simulate a fresh process loading a save
+    setNextAgentId(1)
+    expect(getNextAgentId()).toBe(1) // precondition: counter is low
+
+    const restored = Engine.restore(save)
+
+    // After restore, nextAgentId should be past the highest existing ID (c20 → 21)
+    expect(getNextAgentId()).toBe(21)
   })
 
   test('restored engine is deterministic with original', () => {

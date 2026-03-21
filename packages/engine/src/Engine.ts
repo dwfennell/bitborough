@@ -34,7 +34,7 @@ import { buildRoadGraph, updateRoadGraph, type RoadGraph } from './road-graph.js
 import {
   createRegistry, syncAgentsForBuilding, removeOrphanedAgents,
   citizenMonthlyTick, computeCitizenSummary, markRoutesStale,
-  EMPTY_CITIZEN_SUMMARY,
+  setNextAgentId, EMPTY_CITIZEN_SUMMARY,
   type CitizenRegistry,
 } from './simulation/citizens.js'
 import { updateDensity } from './simulation/density.js'
@@ -614,6 +614,15 @@ export class Engine {
     }
     engine.roadGraph = buildRoadGraph(engine.map)
     engine.citizenSummary = computeCitizenSummary(engine.citizenRegistry)
+
+    if (engine.citizenRegistry.agents.length > 0) {
+      let maxAgentId = 0
+      for (const a of engine.citizenRegistry.agents) {
+        const num = parseInt(a.id.replace('c', ''), 10)
+        if (num > maxAgentId) maxAgentId = num
+      }
+      setNextAgentId(maxAgentId + 1)
+    }
 
     // Rebuild derived state
     propagatePower(engine.map, engine.powerGrid, engine.bldIdx)

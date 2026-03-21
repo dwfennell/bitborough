@@ -104,6 +104,15 @@ function buildTileSets(agent: Citizen): void {
 
 let nextAgentId = 1
 
+export function setNextAgentId(id: number): void {
+  nextAgentId = id
+}
+
+/** @internal — exposed for testing only */
+export function getNextAgentId(): number {
+  return nextAgentId
+}
+
 function createAgent(map: GameMap, graph: RoadGraph, homeBuildingId: string, homeAccessRoad: number): Citizen {
   const id = `c${nextAgentId++}`
   const jobMatch = findNearestBuilding(map, graph, homeAccessRoad, d => d.jobs > 0)
