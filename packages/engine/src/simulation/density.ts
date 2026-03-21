@@ -6,6 +6,18 @@ import { BuildingIndex } from '../building-index.js'
 import { computeDesirability } from './desirability.js'
 import { hasNearbyPavedRoad } from './road-access.js'
 
+const CONSTRUCTION_MONTHS: Record<number, number> = {
+  [DensityLevel.Low]: 1,
+  [DensityLevel.Medium]: 2,
+  [DensityLevel.High]: 4,
+}
+
+function constructionTime(targetDefId: string): number {
+  const def = BUILDING_DEFS[targetDefId]
+  if (!def) return 2
+  return CONSTRUCTION_MONTHS[def.density] ?? 2
+}
+
 export const TRANSIT_RADIUS = 10
 export const FILL_RATE = 0.12
 export const DRAIN_RATE = 0.2
@@ -301,7 +313,7 @@ function pickVariant(variants: Array<[string, number]>, prng: PRNG): string {
 function startConstruction(building: Building, targetDefId: string): void {
   building.state = 'under_construction'
   building.upgradingToDefId = targetDefId
-  building.constructionMonthsRemaining = 2 // fixed 2 months (deterministic)
+  building.constructionMonthsRemaining = constructionTime(targetDefId)
 }
 
 function tickConstruction(map: GameMap, building: Building, bldIdx: BuildingIndex): number {

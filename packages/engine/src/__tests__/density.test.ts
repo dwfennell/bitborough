@@ -611,9 +611,11 @@ describe('occupancy-based dereliction', () => {
     const empty = new Uint8Array(map.width * map.height)
 
     updateDensity(map, powerGrid, demand, 0, prng, nextId, empty, empty, empty)
-    // Month 3 (2+1) → triggers dereliction → startConstruction to downgrade
-    expect(map.buildings[0]!.state).toBe('under_construction')
-    expect(map.buildings[0]!.upgradingToDefId).toBe('res.low')
+    // Month 3 (2+1) → triggers dereliction → startConstruction to downgrade to res.low
+    // With variable construction time, low-density construction takes 1 month,
+    // so tickConstruction completes it in the same tick → state = 'active', defId = 'res.low'
+    expect(map.buildings[0]!.defId).toBe('res.low')
+    expect(map.buildings[0]!.state).toBe('active')
   })
 
   test('lowOccupancyMonths resets to undefined when residents recover above 10%', () => {
@@ -1470,6 +1472,104 @@ describe('occupancy-based upgrade gates', () => {
   test('MEDIUM_DENSITY_POP_THRESHOLD is not exported (removed)', () => {
     // @ts-expect-error — should not exist
     expect(typeof MEDIUM_DENSITY_POP_THRESHOLD).toBe('undefined')
+  })
+})
+
+describe('variable construction time', () => {
+  test('upgrading to high-density sets constructionMonthsRemaining to 4', () => {
+    const map = createTestMap(32)
+    // Zone tiles for 2x2 expansion across a wide area
+    for (let y = 7; y <= 13; y++) {
+      for (let x = 7; x <= 13; x++) {
+        map.zones[y * map.width + x] = ZoneType.Residential
+        map.infrastructure[y * map.width + x] = Infrastructure.Road
+      }
+    }
+    // Transit stop for medium→high gate
+    map.buildings.push({
+      id: 'ts', defId: 'transit.stop', x: 12, y: 10,
+      powered: true, density: DensityLevel.Low, age: 0, state: 'active', residents: 0,
+    })
+    // Main building: res.med at high occupancy
+    map.buildings.push({
+      id: 'b1', defId: 'res.med', x: 10, y: 10,
+      powered: true, density: DensityLevel.Medium, age: 5, state: 'active', residents: 90,
+    })
+    // Fill neighbourhood with medium density for critical mass
+    const range = 3
+    let id = 0
+    for (let dy = -range; dy <= range; dy++) {
+      for (let dx = -range; dx <= range; dx++) {
+        if (dx === 0 && dy === 0) continue
+        if (Math.abs(dx) + Math.abs(dy) > range) continue
+        map.buildings.push({
+          id: `m${id++}`, defId: 'res.med', x: 10 + dx, y: 10 + dy,
+          powered: true, density: DensityLevel.Medium, age: 0, state: 'active', residents: 90,
+        })
+      }
+    }
+
+    const prng = new PRNG(1)
+    const demand = { residential: 1.0, commercial: 1.0, industrial: 1.0 }
+    const size = map.width * map.height
+    const powerGrid = new Uint8Array(size)
+    powerGrid.fill(1) // power everywhere
+    const crimeLevel = new Uint8Array(size)
+    const fireCoverage = new Uint8Array(size)
+    const pollutionLevel = new Uint8Array(size)
+
+    // Run until upgrade triggers
+    let found = false
+    for (let i = 0; i < 5000 && !found; i++) {
+      // Pin residents high so fill loop doesn't drain below 85%
+      for (const b of map.buildings) {
+        if (b.state === 'active' && b.defId.startsWith('res')) b.residents = 95
+        b.lowOccupancyMonths = undefined
+      }
+      updateDensity(map, powerGrid, demand, 5000, prng, { value: 100 }, crimeLevel, fireCoverage, pollutionLevel)
+      const uc = map.buildings.find((b) => b.state === 'under_construction' && b.upgradingToDefId === 'res.high')
+      if (uc) {
+        expect(uc.constructionMonthsRemaining).toBe(4)
+        found = true
+      }
+    }
+    expect(found).toBe(true)
+  })
+
+  test('upgrading to medium-density sets constructionMonthsRemaining to 2', () => {
+    const map = createTestMap(32)
+    // Set up a low→medium upgrade
+    map.infrastructure[5 * map.width + 5] = Infrastructure.Road | Infrastructure.PavedRoad
+    map.zones[5 * map.width + 5] = ZoneType.Residential
+    // Multiple nearby buildings for neighbourhood occupancy
+    for (let dx = 0; dx < 6; dx++) {
+      const x = 5 + dx
+      map.infrastructure[5 * map.width + x] = Infrastructure.Road | Infrastructure.PavedRoad
+      map.zones[5 * map.width + x] = ZoneType.Residential
+      map.buildings.push({
+        id: `b${dx}`, defId: 'res.low', x, y: 5,
+        powered: true, density: DensityLevel.Low, age: 0, state: 'active', residents: 9,
+      })
+    }
+    const powerGrid = new Uint8Array(map.width * map.height)
+    for (let dx = 0; dx < 7; dx++) powerGrid[5 * map.width + 5 + dx] = 1
+    const prng = new PRNG(42)
+    const demand = { residential: 1.0, commercial: 0.5, industrial: 0.5 }
+    const empty = new Uint8Array(map.width * map.height)
+
+    let found = false
+    for (let i = 0; i < 5000 && !found; i++) {
+      for (const b of map.buildings) {
+        if (b.state === 'active') b.residents = 9
+      }
+      updateDensity(map, powerGrid, demand, 5000, prng, { value: 100 }, empty, empty, empty)
+      const uc = map.buildings.find((b) => b.state === 'under_construction' && b.upgradingToDefId?.startsWith('res.med'))
+      if (uc) {
+        expect(uc.constructionMonthsRemaining).toBe(2)
+        found = true
+      }
+    }
+    expect(found).toBe(true)
   })
 })
 
