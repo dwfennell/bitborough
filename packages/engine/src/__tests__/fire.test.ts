@@ -47,6 +47,31 @@ describe('Fire system', () => {
     expect(state.fireCoverage).toBeDefined()
   })
 
+  test('fires spread at most one tile per tick', () => {
+    const engine = Engine.create(createTestMap(32), { seed: 53 })
+    // Place a row of zones for fire to potentially spread through
+    for (let x = 5; x < 20; x++) {
+      engine.placeTile(x, 10, Infrastructure.Road)
+      engine.placeZone(x, 9, ZoneType.Residential)
+      engine.placeZone(x, 11, ZoneType.Residential)
+    }
+    // Access engine internals to set a single fire
+    ;(engine as any).fireState.activeFires.set(9 * 32 + 10, 5)
+
+    // Tick once — next tick triggers monthly (ticksPerMonth=4, set tickCount=3)
+    ;(engine as any).tickCount = 3
+    engine.tick()
+
+    const fires = engine.getState().activeFires
+    // All fires should be within Manhattan distance 1 of original (x=10, y=9)
+    for (const idx of fires) {
+      const fx = idx % 32
+      const fy = Math.floor(idx / 32)
+      const dist = Math.abs(fx - 10) + Math.abs(fy - 9)
+      expect(dist).toBeLessThanOrEqual(1)
+    }
+  })
+
   test('active fires can start in developed areas', () => {
     const engine = Engine.create(createTestMap(32), { startingFunds: 100_000, seed: 42 })
     // Create dense development WITHOUT fire station to increase fire risk

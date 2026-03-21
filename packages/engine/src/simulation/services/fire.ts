@@ -31,7 +31,10 @@ export function calculateFireCoverage(
 export function updateFires(map: GameMap, fireState: FireState, fireCoverage: Uint8Array, prng: PRNG, bldIdx: BuildingIndex): void {
   const { width, height } = map
 
-  // Tick existing fires
+  // Tick existing fires — collect spread fires separately to avoid
+  // spreading multiple tiles in a single tick via Map iteration order.
+  const newFires = new Map<number, number>()
+
   for (const [idx, remaining] of fireState.activeFires) {
     const coverage = fireCoverage[idx]! / 255
     // Fire station speeds up extinguishing
@@ -63,7 +66,7 @@ export function updateFires(map: GameMap, fireState: FireState, fireCoverage: Ui
       ]
 
       for (const nIdx of neighbors) {
-        if (nIdx < 0 || fireState.activeFires.has(nIdx)) continue
+        if (nIdx < 0 || fireState.activeFires.has(nIdx) || newFires.has(nIdx)) continue
         if (map.terrain[nIdx] === TileType.Water) continue
         if (map.infrastructure[nIdx]! & Infrastructure.Road) continue
         if (map.zones[nIdx] === 0) continue
@@ -71,10 +74,15 @@ export function updateFires(map: GameMap, fireState: FireState, fireCoverage: Ui
         const nCoverage = fireCoverage[nIdx]! / 255
         const spreadChance = 0.15 * (1.0 - nCoverage * 0.7)
         if (prng.next() < spreadChance) {
-          fireState.activeFires.set(nIdx, prng.nextInt(3, 5))
+          newFires.set(nIdx, prng.nextInt(3, 5))
         }
       }
     }
+  }
+
+  // Merge spread fires after iteration completes
+  for (const [idx, remaining] of newFires) {
+    fireState.activeFires.set(idx, remaining)
   }
 
   // Check for new fires (monthly) — skip tiles without zones
