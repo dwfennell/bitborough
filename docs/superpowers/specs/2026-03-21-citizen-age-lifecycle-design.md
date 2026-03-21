@@ -43,7 +43,7 @@ netMigrationLastTick: number
 
 ### MonthlySnapshot Extension
 
-`MonthlySnapshot` gains `births`, `deaths`, and `netMigration` fields for historical tracking in the stats panel.
+`MonthlySnapshot` gains `births`, `deaths`, and `netMigration` fields (absolute counts per month, not per-capita rates) for historical tracking in the stats panel.
 
 ### SaveFile Changes
 
@@ -63,12 +63,14 @@ interface DemographicResult {
 function demographicTick(
   registry: CitizenRegistry,
   map: GameMap,
-  roadGraph: RoadGraph,
+  prng: PRNG,
   avgSatisfaction: number,
 ): DemographicResult
 ```
 
-Called monthly from `Engine.tick()` after the citizen monthly tick.
+The function only mutates demographic counts on existing agents — it does not create or destroy agent objects. Agent creation/destruction is handled by `syncAgentsForBuilding` which runs after demographics (see Engine Integration).
+
+Called monthly from `Engine.tick()` after zone development.
 
 ### Pass 1 — Aging Transitions
 
@@ -126,22 +128,36 @@ citizenSummary = computeCitizenSummary(registry)
 updateZones(...)
 updateDensity(...)
 
-// 4. Sync agents for any NEW buildings from zone development
+// 4. Sync agents for NEW buildings from zone development
+//    (uses pre-demographics residents — correct for new buildings)
 for (const b of map.buildings) {
-  if (b.state === 'active' && def.category === Residential) {
-    syncAgentsForBuilding(...)  // only spawns agents for buildings that need them
+  if (b.state === 'active') {
+    const def = BUILDING_DEFS[b.defId]
+    if (def && def.category === BuildingCategory.Residential) {
+      syncAgentsForBuilding(...)
+    }
   }
 }
 
-// 5. Demographics (NEW — aging, deaths, births, migration)
+// 5. Demographics (NEW — mutates demographic counts only, no agent creation)
 const demo = demographicTick(registry, map, prng, citizenSummary.avgSatisfaction)
 
 // 6. Sync building residents from agent demographics (NEW)
 syncBuildingResidents(map, registry)
+
+// 7. Re-sync agent count — demographics changed residents, so agent
+//    count may need adjusting (e.g. deaths reduced population below
+//    a samplingRatio threshold, or immigration grew it above one)
+for (const b of map.buildings) { ... syncAgentsForBuilding(...) }
+
+// 8. Refresh citizen summary with post-demographics data (NEW)
+citizenSummary = computeCitizenSummary(registry)
 this.population = computeTotalPopulation(map)
 
-// 7. Budget, loans, events (existing)
+// 9. Budget, loans, events (existing)
 ```
+
+Steps 6–8 are the key additions. The double `syncAgentsForBuilding` (steps 4 and 7) is intentional: step 4 handles new buildings from zone development, step 7 reconciles agent counts after demographic changes. Both are cheap no-ops when agent count already matches `Math.floor(building.residents / samplingRatio)`.
 
 ### syncBuildingResidents
 
