@@ -1,18 +1,8 @@
 import { type GameMap, type DemandInfo, type CitizenSummary, Infrastructure } from '@bitborough/core'
 import { BUILDING_DEFS } from '../buildings-registry.js'
-
-const TRAFFIC_CAPACITY = 100
+import { TRAFFIC_CAPACITY } from '../road-graph.js'
 
 export const COMMERCIAL_DEMAND_CAPACITY_DIVISOR = 500
-
-function totalResCap(map: GameMap): number {
-  let total = 0
-  for (const b of map.buildings) {
-    if (!b.defId.startsWith('res') || b.state !== 'active') continue
-    total += BUILDING_DEFS[b.defId]?.capacity ?? 0
-  }
-  return total
-}
 
 function sumResidentialCapacity(map: GameMap): number {
   let total = 0
@@ -57,7 +47,8 @@ export function calculateDemand(map: GameMap, taxRate: number, trafficDensity?: 
 
   // Commercial demand uses total residential capacity (not actual residents).
   // This avoids a deadlock where 0 residents → 0 commercial demand → no foot traffic.
-  const cBase = Math.min(totalResCap(map) / COMMERCIAL_DEMAND_CAPACITY_DIVISOR, 0.6)
+  const resCap = sumResidentialCapacity(map)
+  const cBase = Math.min(resCap / COMMERCIAL_DEMAND_CAPACITY_DIVISOR, 0.6)
   let cDemand = cBase * taxModifier
 
   // Industrial demand:
@@ -94,9 +85,8 @@ export function calculateDemand(map: GameMap, taxRate: number, trafficDensity?: 
   }
 
   // Vacancy rate feedback: high vacancy dampens residential demand
-  const totalCapacity = sumResidentialCapacity(map)
   const totalResidents = sumResidentialResidents(map)
-  const vacancy = totalCapacity > 0 ? 1 - totalResidents / totalCapacity : 0
+  const vacancy = resCap > 0 ? 1 - totalResidents / resCap : 0
   if (vacancy > 0.08) {
     const vacancyPenalty = Math.min(0.5, (vacancy - 0.08) * 3)
     rDemand -= vacancyPenalty

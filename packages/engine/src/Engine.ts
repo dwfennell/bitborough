@@ -99,8 +99,9 @@ export class Engine {
   // Fire system
   private fireState: FireState
 
-  // Reusable buffer for radial influence calculations (avoids per-tick allocation)
+  // Reusable buffers for radial calculations (avoids per-tick allocation)
   private influenceBuffer: Float32Array
+  private pollutionBuffer: Float32Array
 
   // Spatial index for O(1) building lookups; rebuilt when buildings change
   private bldIdx: BuildingIndex
@@ -139,6 +140,7 @@ export class Engine {
     this.trafficDensity = new Uint8Array(size)
     this.fireState = createFireState()
     this.influenceBuffer = new Float32Array(size)
+    this.pollutionBuffer = new Float32Array(size)
     this.bldIdx = new BuildingIndex(map)
     this.citizenRegistry = createRegistry()
     this.roadGraph = buildRoadGraph(this.map)
@@ -180,7 +182,7 @@ export class Engine {
       this.demand = calculateDemand(this.map, this.taxRate, this.trafficDensity, this.citizenSummary)
 
       // Pollution propagation — must run before land values / desirability
-      calculatePollution(this.map, this.pollutionLevel)
+      calculatePollution(this.map, this.pollutionLevel, this.pollutionBuffer)
 
       // Land values use previous month's crime; crime uses updated land values
       calculateLandValues(this.map, this.powerGrid, this.pollutionLevel, this.crimeLevel, this.landValues, this.bldIdx)

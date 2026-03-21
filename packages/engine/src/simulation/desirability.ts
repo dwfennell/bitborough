@@ -1,6 +1,7 @@
-import { type GameMap, ZoneType, Infrastructure, BuildingCategory } from '@bitborough/core'
+import { type GameMap, ZoneType, BuildingCategory } from '@bitborough/core'
 import type { BuildingIndex } from '../building-index.js'
 import { BUILDING_DEFS } from '../buildings-registry.js'
+import { hasNearbyRoad } from './road-access.js'
 
 // Residential weights (sum to 1.0 at perfect conditions, no pollution)
 const RES_BASELINE = 0.3 // constant when power + road present
@@ -70,7 +71,7 @@ export function computeDesirability(
   const idx = y * map.width + x
 
   if (!powerGrid[idx]) return 0
-  if (!hasRoadAccess(map, x, y)) return 0
+  if (!hasNearbyRoad(map, x, y)) return 0
 
   switch (zone) {
     case ZoneType.Residential:
@@ -114,19 +115,6 @@ function commercialDesirability(x: number, y: number, map: GameMap, bldIdx?: Bui
   return Math.max(0, Math.min(1, score))
 }
 
-function hasRoadAccess(map: GameMap, x: number, y: number): boolean {
-  const range = 3
-  for (let dy = -range; dy <= range; dy++) {
-    for (let dx = -range; dx <= range; dx++) {
-      if (Math.abs(dx) + Math.abs(dy) > range) continue
-      const nx = x + dx
-      const ny = y + dy
-      if (nx < 0 || ny < 0 || nx >= map.width || ny >= map.height) continue
-      if (map.infrastructure[ny * map.width + nx]! & Infrastructure.Road) return true
-    }
-  }
-  return false
-}
 
 function parkDesirabilityBonus(x: number, y: number, map: GameMap, bldIdx?: BuildingIndex): number {
   let best = 0

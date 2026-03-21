@@ -1,12 +1,12 @@
 import type { GameMap } from '@bitborough/core'
 import { BUILDING_DEFS } from '../buildings-registry.js'
 
-export function calculatePollution(map: GameMap, pollutionLevel: Uint8Array): void {
+export function calculatePollution(map: GameMap, pollutionLevel: Uint8Array, scratchBuffer: Float32Array): void {
   const { width, height, buildings } = map
   const size = width * height
 
-  // Use Float64Array for accumulation to avoid precision loss
-  const buffer = new Float64Array(size)
+  // Clear reusable scratch buffer
+  scratchBuffer.fill(0)
 
   for (const building of buildings) {
     if (building.state !== 'active') continue
@@ -27,21 +27,20 @@ export function calculatePollution(map: GameMap, pollutionLevel: Uint8Array): vo
 
     for (let ty = minY; ty <= maxY; ty++) {
       for (let tx = minX; tx <= maxX; tx++) {
-        // Compute distance from tile to nearest point on building footprint
         const clampedX = Math.max(bx, Math.min(bx + bw - 1, tx))
         const clampedY = Math.max(by, Math.min(by + bh - 1, ty))
         const dist = Math.abs(tx - clampedX) + Math.abs(ty - clampedY)
 
         if (dist >= pollutionRadius) continue
 
-        const contribution = pollutionAmount * Math.max(0, 1 - dist / pollutionRadius)
-        buffer[ty * width + tx]! += contribution
+        const contribution = pollutionAmount * (1 - dist / pollutionRadius)
+        scratchBuffer[ty * width + tx]! += contribution
       }
     }
   }
 
   // Write clamped values to output
   for (let i = 0; i < size; i++) {
-    pollutionLevel[i] = Math.min(255, Math.round(buffer[i]!))
+    pollutionLevel[i] = Math.min(255, Math.round(scratchBuffer[i]!))
   }
 }

@@ -192,12 +192,12 @@ export function updateDensity(
 
     populationDelta += building.residents - before
 
-    // Track low occupancy for dereliction
+    // Track low occupancy for dereliction (uses post-fill occupancy)
     if (def.capacity > 0) {
-      const occupancyRatio = building.residents / def.capacity
-      if (occupancyRatio < 0.1) {
+      const postFillOccupancy = building.residents / def.capacity
+      if (postFillOccupancy < 0.1) {
         building.lowOccupancyMonths = (building.lowOccupancyMonths ?? 0) + 1
-        if (building.lowOccupancyMonths >= 3) {
+        if (building.lowOccupancyMonths >= LOW_OCCUPANCY_DERELICT_MONTHS) {
           // Trigger dereliction
           const downgradeTarget = DOWNGRADE_TARGET[building.defId]
           populationDelta -= building.residents // subtract actual residents
@@ -424,6 +424,7 @@ function categoryToZone(category: BuildingCategory): ZoneType {
   return ZoneType.None
 }
 
+const LOW_OCCUPANCY_DERELICT_MONTHS = 3
 const DERELICT_DOWNGRADE_MONTHS = 6
 
 const DOWNGRADE_TARGET: Record<string, string> = {

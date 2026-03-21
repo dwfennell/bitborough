@@ -33,7 +33,7 @@ export function buildRoadGraph(map: GameMap): RoadGraph {
 
 export const MAX_ROUTE_LENGTH = 60
 
-const TRAFFIC_CAPACITY = 100
+export const TRAFFIC_CAPACITY = 100
 
 function edgeCost(tile: number, trafficDensity?: Uint8Array): number {
   if (!trafficDensity) return 1

@@ -8,6 +8,10 @@ function makePollutionLevel(map: { width: number; height: number }): Uint8Array 
   return new Uint8Array(map.width * map.height)
 }
 
+function makeScratchBuffer(map: { width: number; height: number }): Float32Array {
+  return new Float32Array(map.width * map.height)
+}
+
 function makeBuilding(defId: string, x: number, y: number, overrides?: Partial<Building>): Building {
   const def = BUILDING_DEFS[defId]!
   return {
@@ -28,7 +32,7 @@ describe('calculatePollution', () => {
   test('empty map produces zero pollution everywhere', () => {
     const map = createTestMap(32)
     const pollutionLevel = makePollutionLevel(map)
-    calculatePollution(map, pollutionLevel)
+    calculatePollution(map, pollutionLevel, makeScratchBuffer(map))
     const total = Array.from(pollutionLevel).reduce((a, b) => a + b, 0)
     expect(total).toBe(0)
   })
@@ -37,7 +41,7 @@ describe('calculatePollution', () => {
     const map = createTestMap(32)
     map.buildings.push(makeBuilding('ind.low', 10, 10))
     const pollutionLevel = makePollutionLevel(map)
-    calculatePollution(map, pollutionLevel)
+    calculatePollution(map, pollutionLevel, makeScratchBuffer(map))
 
     // At origin: dist=0, contribution = 10 * max(0, 1 - 0/3) = 10
     expect(pollutionLevel[10 * 32 + 10]).toBe(10)
@@ -47,7 +51,7 @@ describe('calculatePollution', () => {
     const map = createTestMap(32)
     map.buildings.push(makeBuilding('ind.low', 10, 10))
     const pollutionLevel = makePollutionLevel(map)
-    calculatePollution(map, pollutionLevel)
+    calculatePollution(map, pollutionLevel, makeScratchBuffer(map))
 
     // dist=1: contribution = 10 * max(0, 1 - 1/3) = 10 * 2/3 ≈ 6.67 → clamped to 7
     const atDist1 = pollutionLevel[10 * 32 + 11]! // (11,10)
@@ -62,7 +66,7 @@ describe('calculatePollution', () => {
     const map = createTestMap(32)
     map.buildings.push(makeBuilding('ind.low', 10, 10))
     const pollutionLevel = makePollutionLevel(map)
-    calculatePollution(map, pollutionLevel)
+    calculatePollution(map, pollutionLevel, makeScratchBuffer(map))
 
     // dist=3 (radius edge): contribution = 10 * max(0, 1 - 3/3) = 0
     expect(pollutionLevel[10 * 32 + 13]).toBe(0) // (13,10)
@@ -76,7 +80,7 @@ describe('calculatePollution', () => {
     // ind.high is 3x3, pollutionAmount=40, pollutionRadius=6
     map.buildings.push(makeBuilding('ind.high', 10, 10, { id: 'b1' }))
     const pollutionLevel = makePollutionLevel(map)
-    calculatePollution(map, pollutionLevel)
+    calculatePollution(map, pollutionLevel, makeScratchBuffer(map))
 
     // All tiles within the 3x3 footprint should have dist=0 → full pollutionAmount=40
     for (let dy = 0; dy < 3; dy++) {
@@ -105,7 +109,7 @@ describe('calculatePollution', () => {
     map.buildings.push(makeBuilding('ind.low', 10, 10, { id: 'b1' }))
     map.buildings.push(makeBuilding('ind.low', 12, 10, { id: 'b2' }))
     const pollutionLevel = makePollutionLevel(map)
-    calculatePollution(map, pollutionLevel)
+    calculatePollution(map, pollutionLevel, makeScratchBuffer(map))
 
     // At (11,10): dist to b1=1, dist to b2=1
     // From b1: 10 * (1 - 1/3) ≈ 6.667
@@ -128,7 +132,7 @@ describe('calculatePollution', () => {
       map.buildings.push(makeBuilding('ind.high', 10, 10 + i * 3, { id: `b${i + 1}` }))
     }
     const pollutionLevel = makePollutionLevel(map)
-    calculatePollution(map, pollutionLevel)
+    calculatePollution(map, pollutionLevel, makeScratchBuffer(map))
 
     // Find max value — should not exceed 255
     let maxVal = 0
@@ -149,7 +153,7 @@ describe('calculatePollution', () => {
     map.buildings.push(makeBuilding('power.nuclear', 10, 10))
     map.buildings.push(makeBuilding('res.low', 15, 15, { id: 'b2' }))
     const pollutionLevel = makePollutionLevel(map)
-    calculatePollution(map, pollutionLevel)
+    calculatePollution(map, pollutionLevel, makeScratchBuffer(map))
 
     const total = Array.from(pollutionLevel).reduce((a, b) => a + b, 0)
     expect(total).toBe(0)
@@ -159,7 +163,7 @@ describe('calculatePollution', () => {
     const map = createTestMap(32)
     map.buildings.push(makeBuilding('ind.low', 10, 10, { state: 'derelict' }))
     const pollutionLevel = makePollutionLevel(map)
-    calculatePollution(map, pollutionLevel)
+    calculatePollution(map, pollutionLevel, makeScratchBuffer(map))
 
     const total = Array.from(pollutionLevel).reduce((a, b) => a + b, 0)
     expect(total).toBe(0)
