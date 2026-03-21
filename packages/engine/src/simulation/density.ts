@@ -173,7 +173,9 @@ export function updateDensity(
     const target = def.capacity * Math.max(0, zoneDemand) * desirability
 
     const before = building.residents
-    const rate = target > building.residents ? FILL_RATE : DRAIN_RATE
+    const occupancyRatio = def.capacity > 0 ? building.residents / def.capacity : 0
+    const effectiveFillRate = FILL_RATE * (1 - occupancyRatio)
+    const rate = target > building.residents ? effectiveFillRate : DRAIN_RATE
     building.residents = Math.max(0, Math.min(def.capacity, building.residents + (target - building.residents) * rate))
 
     populationDelta += building.residents - before
