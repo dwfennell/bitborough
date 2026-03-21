@@ -36,9 +36,9 @@ New agents created via migration start as `{ children: 0, working: 50, elderly: 
 totalChildren: number
 totalWorking: number
 totalElderly: number
-birthRate: number       // births last tick
-deathRate: number       // deaths last tick
-netMigration: number    // net migration last tick
+birthsLastTick: number
+deathsLastTick: number
+netMigrationLastTick: number
 ```
 
 ### MonthlySnapshot Extension
@@ -94,42 +94,70 @@ These rates produce a natural age distribution over time. No per-person age trac
 
 Migration is driven by average citizen satisfaction:
 
-- **Immigration** (satisfaction > 0.5): Rate scales linearly from 0 at 0.5 to `0.02 × totalWorking` per month at 1.0. New working-age adults are added to existing agents in buildings with spare capacity, or new agents are spawned via `syncAgentsForBuilding` if needed.
-- **Emigration** (satisfaction < 0.4): Rate scales linearly from 0 at 0.4 to `0.03 × totalWorking` per month at 0.0. Working-age adults leave from the least-satisfied agents first. If an agent's total hits 0, it is removed.
+- **Immigration** (satisfaction > 0.5): Rate scales linearly from 0 at 0.5 to `0.02 × totalWorking` per month at 1.0. Immigrants are working-age adults distributed to agents in buildings with spare capacity (`building.residents < BUILDING_DEFS[building.defId].capacity`). The function iterates residential buildings, finds ones with headroom, and increments the `working` count on their agents. If all existing buildings are full, no immigration occurs (the player needs to zone more residential).
+- **Emigration** (satisfaction < 0.4): Rate scales linearly from 0 at 0.4 to `0.03 × totalWorking` per month at 0.0. Working-age adults leave from the least-satisfied agents first — agents are sorted by satisfaction and people are removed from the lowest-satisfaction agent until the emigration quota is met, then the next agent, etc. If an agent's total hits 0, it is removed.
 - **Dead band** (0.4–0.5): No net migration. Gives the player breathing room before population starts declining.
 
 Emigration is slightly faster than immigration at equivalent distances from the dead band, making population loss feel urgent.
 
+All probabilistic transitions (aging, deaths, births, migration counts) use the engine's seeded `PRNG` for deterministic replay and save/load consistency.
+
 ## Engine Integration
 
-In `Engine.tick()`, after the existing citizen block:
+The demographic tick runs **after** `updateZones`/`updateDensity` and the existing `syncAgentsForBuilding` loop. This is important: the zone/density system continues to handle building creation, upgrades, and initial capacity allocation. Demographics then operates on the agents that exist after zone development.
+
+The existing `syncAgentsForBuilding` loop (which currently runs after density changes) is **replaced** by the demographic tick's migration pass for population changes. `syncAgentsForBuilding` remains only for initial agent creation when new buildings appear — it should no-op when agent count already matches. The `population += densityDelta` accumulation is removed; population is derived.
+
+Tick order within the monthly block:
 
 ```
-// Existing
+// 1. Existing simulation passes
+calculateDemand(...)
+calculateLandValues(...)
+calculateCrime(...)
+calculateFireCoverage(...)
+updateFires(...)
+
+// 2. Citizen traffic (existing)
 citizenMonthlyTick(registry, map, roadGraph, trafficDensity)
 citizenSummary = computeCitizenSummary(registry)
 
-// New
-const demo = demographicTick(registry, map, roadGraph, citizenSummary.avgSatisfaction)
+// 3. Zone development (existing — creates/upgrades buildings)
+updateZones(...)
+updateDensity(...)
+
+// 4. Sync agents for any NEW buildings from zone development
+for (const b of map.buildings) {
+  if (b.state === 'active' && def.category === Residential) {
+    syncAgentsForBuilding(...)  // only spawns agents for buildings that need them
+  }
+}
+
+// 5. Demographics (NEW — aging, deaths, births, migration)
+const demo = demographicTick(registry, map, prng, citizenSummary.avgSatisfaction)
+
+// 6. Sync building residents from agent demographics (NEW)
 syncBuildingResidents(map, registry)
 this.population = computeTotalPopulation(map)
+
+// 7. Budget, loans, events (existing)
 ```
 
 ### syncBuildingResidents
 
-A new utility in `citizens.ts` that iterates all buildings and sets each building's `residents` to the sum of `children + working + elderly` across its agents. This replaces the current implicit population tracking.
+A new utility in `citizens.ts` that iterates all residential buildings and sets each building's `residents` to the sum of `children + working + elderly` across its agents. Non-residential buildings are unaffected.
 
 ### computeTotalPopulation
 
-Sums `building.residents` across all buildings. Replaces the current `population += densityDelta` approach. Population is now fully derived from demographics.
+Sums `building.residents` across all residential buildings. Replaces the `population += densityDelta` accumulation.
 
 ## Demand Integration
 
 `calculateDemand` already accepts `CitizenSummary`. The new demographic fields feed demand naturally:
 
-- High `totalChildren / totalWorking` ratio (many dependents, few workers) suppresses commercial and industrial demand slightly — a workforce shortage signal.
-- High `totalElderly / totalWorking` ratio has the same but weaker effect.
-- The existing satisfaction-based signals already capture the main dynamics. Demographic demand modifiers are additive, clamped to ±0.15.
+- **Dependency ratio penalty:** When `(totalChildren + totalElderly) / totalWorking > 0.6`, commercial and industrial demand are suppressed. Penalty = `min(0.15, (ratio - 0.6) × 0.3)`. A ratio of 0.6 means no penalty; a ratio of 1.1 (equal dependents and workers) hits the -0.15 cap. This signals a workforce shortage.
+- **Children-heavy bonus:** When `totalChildren / (totalChildren + totalWorking + totalElderly) > 0.25`, residential demand gets a small boost of +0.05 (families want more housing). This is a soft signal, not a strong driver.
+- All demographic modifiers are additive to existing demand values, applied before the final [-1, 1] clamp.
 
 ## Backwards Compatibility
 
