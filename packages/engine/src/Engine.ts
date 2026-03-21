@@ -37,6 +37,7 @@ import {
   setNextAgentId, EMPTY_CITIZEN_SUMMARY,
   type CitizenRegistry,
 } from './simulation/citizens.js'
+import { calculatePollution } from './simulation/pollution.js'
 import { updateDensity } from './simulation/density.js'
 import { hasNearbyRoad } from './simulation/road-access.js'
 import { BUILDING_DEFS } from './buildings-registry.js'
@@ -177,6 +178,9 @@ export class Engine {
       }
 
       this.demand = calculateDemand(this.map, this.taxRate, this.trafficDensity, this.citizenSummary)
+
+      // Pollution propagation — must run before land values / desirability
+      calculatePollution(this.map, this.pollutionLevel)
 
       // Land values use previous month's crime; crime uses updated land values
       calculateLandValues(this.map, this.powerGrid, this.pollutionLevel, this.crimeLevel, this.landValues, this.bldIdx)
