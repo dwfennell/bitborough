@@ -8,7 +8,7 @@ import { FailReason, Infrastructure, ZoneType } from '@bitborough/core'
  * meaningful taxIncome. Uses a 64x64 map with zones and advances 20 years.
  */
 function createEngineWithIncome() {
-  const engine = Engine.create(createTestMap(64), { seed: 42, startingFunds: 200_000 })
+  const engine = Engine.create(createTestMap(64), { seed: 42, startingFunds: 2_000_000 })
   // Power plant at (0,0)
   engine.placeBuilding(0, 0, 'power.coal')
   // Power line from plant edge down to zones

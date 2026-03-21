@@ -35,7 +35,7 @@ export function calculatePollution(map: GameMap, pollutionLevel: Uint8Array): vo
         if (dist >= pollutionRadius) continue
 
         const contribution = pollutionAmount * Math.max(0, 1 - dist / pollutionRadius)
-        buffer[ty * width + tx] += contribution
+        buffer[ty * width + tx]! += contribution
       }
     }
   }
