@@ -66,7 +66,7 @@ function residentialDesirability(
   let score = RES_BASELINE
   score += (1 - crimeNorm) * RES_SAFETY_WEIGHT
   if (fireCoverage[idx]) score += RES_FIRE_BONUS
-  if (hasParkNearby(x, y, map, bldIdx)) score += RES_PARK_BONUS
+  score += parkDesirabilityBonus(x, y, map, bldIdx)
   score -= pollNorm * RES_POLLUTION_PENALTY
 
   return Math.max(0, Math.min(1, score))
@@ -93,22 +93,31 @@ function hasRoadAccess(map: GameMap, x: number, y: number): boolean {
   return false
 }
 
-function hasParkNearby(x: number, y: number, map: GameMap, bldIdx?: BuildingIndex): boolean {
+function parkDesirabilityBonus(x: number, y: number, map: GameMap, bldIdx?: BuildingIndex): number {
+  let best = 0
   if (bldIdx) {
     for (let dy = -PARK_RADIUS; dy <= PARK_RADIUS; dy++) {
       for (let dx = -PARK_RADIUS; dx <= PARK_RADIUS; dx++) {
-        if (Math.abs(dx) + Math.abs(dy) > PARK_RADIUS) continue
+        const dist = Math.abs(dx) + Math.abs(dy)
+        if (dist > PARK_RADIUS) continue
         const b = bldIdx.get(x + dx, y + dy)
-        if (b && b.defId === 'special.park' && b.state === 'active') return true
+        if (b && b.defId === 'special.park' && b.state === 'active') {
+          const bonus = RES_PARK_BONUS * (1 - dist / PARK_RADIUS)
+          if (bonus > best) best = bonus
+        }
       }
     }
-    return false
+    return best
   }
   for (const b of map.buildings) {
     if (b.defId !== 'special.park' || b.state !== 'active') continue
-    if (Math.abs(b.x - x) + Math.abs(b.y - y) <= PARK_RADIUS) return true
+    const dist = Math.abs(b.x - x) + Math.abs(b.y - y)
+    if (dist <= PARK_RADIUS) {
+      const bonus = RES_PARK_BONUS * (1 - dist / PARK_RADIUS)
+      if (bonus > best) best = bonus
+    }
   }
-  return false
+  return best
 }
 
 function hasTransitNearby(x: number, y: number, map: GameMap, bldIdx?: BuildingIndex): boolean {

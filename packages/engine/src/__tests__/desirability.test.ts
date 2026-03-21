@@ -2,6 +2,7 @@ import { describe, test, expect } from 'vitest'
 import { ZoneType, DensityLevel } from '@bitborough/core'
 import { createTestMap } from '../test-helpers.js'
 import { computeDesirability } from '../simulation/desirability.js'
+import { BuildingIndex } from '../building-index.js'
 
 // Helper: blank simulation layers
 function makeLayers(size: number) {
@@ -101,7 +102,7 @@ describe('residential desirability', () => {
     expect(d).toBeCloseTo(0.75, 2)
   })
 
-  test('park within 5 tiles adds 0.25', () => {
+  test('park within 5 tiles adds distance-decayed bonus', () => {
     const { map, powerGrid, crimeLevel, fireCoverage, pollutionLevel } = setup()
     map.buildings.push({
       id: 'park1',
@@ -115,11 +116,12 @@ describe('residential desirability', () => {
       residents: 0,
     })
     const d = computeDesirability(ZoneType.Residential, 5, 5, map, powerGrid, crimeLevel, fireCoverage, pollutionLevel)
-    // 0.30 + 0.30 + 0.25 = 0.85
-    expect(d).toBeCloseTo(0.85, 2)
+    // park at dist 2: bonus = 0.25 * (1 - 2/5) = 0.15
+    // 0.30 + 0.30 + 0.15 = 0.75
+    expect(d).toBeCloseTo(0.75, 2)
   })
 
-  test('perfect conditions (no crime, fire, park, no pollution) → 1.0', () => {
+  test('perfect conditions (no crime, fire, park, no pollution) → 0.90', () => {
     const { map, powerGrid, crimeLevel, fireCoverage, pollutionLevel } = setup()
     fireCoverage[5 * 16 + 5] = 1
     map.buildings.push({
@@ -134,7 +136,9 @@ describe('residential desirability', () => {
       residents: 0,
     })
     const d = computeDesirability(ZoneType.Residential, 5, 5, map, powerGrid, crimeLevel, fireCoverage, pollutionLevel)
-    expect(d).toBeCloseTo(1.0, 2)
+    // park at dist 2: bonus = 0.25 * (1 - 2/5) = 0.15
+    // 0.30 + 0.30 + 0.15 + 0.15 = 0.90
+    expect(d).toBeCloseTo(0.90, 2)
   })
 
   test('max pollution penalises (result ≥ 0)', () => {
@@ -161,6 +165,45 @@ describe('residential desirability', () => {
     })
     const d = computeDesirability(ZoneType.Residential, 5, 5, map, powerGrid, crimeLevel, fireCoverage, pollutionLevel)
     expect(d).toBeCloseTo(0.6, 2) // no park bonus
+  })
+
+  test('park bonus decays linearly with Manhattan distance', () => {
+    // Place a park at (8, 8) and measure residential desirability at dist 1, 4, and 5
+    function desirabilityAt(tx: number, ty: number) {
+      const map = createTestMap(20)
+      const layers = makeLayers(20 * 20)
+      layers.powerGrid[ty * 20 + tx] = 1
+      map.infrastructure[ty * 20 + tx] = 0b1 // Road
+      map.buildings.push({
+        id: 'park1',
+        defId: 'special.park',
+        x: 8,
+        y: 8,
+        density: DensityLevel.Low,
+        state: 'active',
+        residents: 0,
+        age: 0,
+        powered: true,
+      })
+      const bldIdx = new BuildingIndex(map)
+      return computeDesirability(
+        ZoneType.Residential, tx, ty, map,
+        layers.powerGrid, layers.crimeLevel, layers.fireCoverage, layers.pollutionLevel,
+        bldIdx,
+      )
+    }
+
+    const d1 = desirabilityAt(9, 8) // dist 1 from park
+    const d4 = desirabilityAt(12, 8) // dist 4 from park
+    const d5 = desirabilityAt(13, 8) // dist 5 from park (boundary)
+
+    // Bonus should decay: closer park → higher desirability
+    expect(d1).toBeGreaterThan(d4)
+    expect(d4).toBeGreaterThan(d5)
+
+    // At dist 5 the bonus should be 0 (same as no park)
+    const baseline = 0.6 // baseline(0.3) + safety(0.3) with zero crime
+    expect(d5).toBeCloseTo(baseline, 2)
   })
 })
 
