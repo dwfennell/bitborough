@@ -40,6 +40,10 @@ export class AudioManager {
     gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration)
     osc.connect(gain)
     gain.connect(ctx.destination)
+    osc.onended = () => {
+      osc.disconnect()
+      gain.disconnect()
+    }
     osc.start()
     osc.stop(ctx.currentTime + duration)
   }
