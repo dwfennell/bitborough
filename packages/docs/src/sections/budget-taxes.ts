@@ -29,6 +29,6 @@ export const budgetTaxes: DocSection = {
     '| Transit Stop | $50 |',
     '| Police/Fire Stations | $50 × (Funding ÷ 100) |',
     '',
-    "**Balance** is calculated monthly but applied to your funds each January. If your funds run out, you can't build — but existing buildings continue to function.",
+    "**Balance** is calculated and applied to your funds **each month**. If your funds run out, you can't build — but existing buildings continue to function.",
   ].join('\n'),
 }

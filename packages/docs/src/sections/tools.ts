@@ -7,7 +7,7 @@ export const tools: DocSection = {
 | Key | Tool |
 |---|---|
 | **1** | Road ($10) |
-| **\`** | Pave Road ($25) |
+| **\`** | Pave Road ($20) |
 | **2** | Power Line ($5) |
 | **3** | Residential Zone (free) |
 | **4** | Commercial Zone (free) |

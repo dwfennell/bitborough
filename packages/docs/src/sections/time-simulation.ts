@@ -16,7 +16,7 @@ Each month the simulation recalculates:
 - Traffic density
 - Monthly budget balance
 
-Your budget balance accumulates monthly but is **applied to your funds once per year in January**.
+Your budget balance is **applied to your funds each month**.
 
 Control game speed with **Space** (pause), **[** (slower), and **]** (faster).
 `.trim(),

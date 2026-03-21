@@ -14,6 +14,6 @@ Welcome to Bitborough! Build and manage a thriving city.
 4. Zone *Residential* (3), *Commercial* (4), and *Industrial* (5) areas next to roads
 5. Wait for buildings to develop automatically
 
-Zones only develop when they are **powered** and **adjacent to a road**.
+Zones only develop when they are **powered** and **within 3 tiles of a road**.
 `.trim(),
 }
