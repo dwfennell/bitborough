@@ -340,8 +340,8 @@ describe('bitt docs', () => {
     expect(Array.isArray(result.sections)).toBe(true)
     const sections = result.sections as Record<string, unknown>[]
     expect(sections.length).toBeGreaterThan(0)
-    expect(typeof sections[0].id).toBe('string')
-    expect(typeof sections[0].title).toBe('string')
+    expect(typeof sections[0]!.id).toBe('string')
+    expect(typeof sections[0]!.title).toBe('string')
   })
 
   test('with getting-started section returns id, title, body', () => {
@@ -357,8 +357,8 @@ describe('bitt docs', () => {
     expect(Array.isArray(result)).toBe(true)
     const rows = result as Record<string, unknown>[]
     expect(rows.length).toBeGreaterThan(0)
-    expect(typeof rows[0].id).toBe('string')
-    expect(typeof rows[0].cost).toBe('number')
-    expect(typeof rows[0].maintenanceCost).toBe('number')
+    expect(typeof rows[0]!.id).toBe('string')
+    expect(typeof rows[0]!.cost).toBe('number')
+    expect(typeof rows[0]!.maintenanceCost).toBe('number')
   })
 })

@@ -4,6 +4,8 @@ Reference material informing Bitborough game design decisions. Each document cov
 
 **16 documents** | ~15,000 lines | ~80,000 words
 
+See also: **[Meta-Research: City-Builder Games](./meta/index.md)** — genre history, mechanics comparison, design analysis (6 docs)
+
 ## Table of Contents
 
 - [Land & Growth](#land--growth) (4 docs)
