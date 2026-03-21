@@ -79,14 +79,14 @@ export class OverlayRenderer {
 
       case 'fire': {
         const coverage = state.fireCoverage
-        const fires = state.activeFires
+        const fireSet = new Set(state.activeFires)
 
         for (let y = startY; y <= endY; y++) {
           for (let x = startX; x <= endX; x++) {
             const idx = y * mapWidth + x
 
             // Active fires: bright orange (check small array directly)
-            if (fires.includes(idx)) {
+            if (fireSet.has(idx)) {
               ctx.fillStyle = FIRE_ACTIVE
               ctx.fillRect(Math.floor((x - cameraX) * posTs), Math.floor((y - cameraY) * posTs), ts, ts)
               continue
