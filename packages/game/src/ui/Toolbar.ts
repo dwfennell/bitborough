@@ -55,7 +55,7 @@ const TOOL_ENTRIES: ToolEntry[] = [
   // Services
   {
     label: `Transit ${fmtCost(BUILDING_DEFS['transit.stop']!.cost)}`,
-    key: 't',
+    key: 'y',
     factory: () => new BuildingTool('transit.stop'),
   },
   {
@@ -81,6 +81,7 @@ const TOOL_ENTRIES: ToolEntry[] = [
 export class Toolbar {
   private el: HTMLElement
   private buttons: HTMLButtonElement[] = []
+  private boundKeyDown: (e: KeyboardEvent) => void
 
   constructor(
     container: HTMLElement,
@@ -100,13 +101,18 @@ export class Toolbar {
 
     container.appendChild(this.el)
 
-    window.addEventListener('keydown', (e) => {
+    this.boundKeyDown = (e: KeyboardEvent) => {
       const entry = TOOL_ENTRIES.find((t) => t.key === e.key)
       if (entry) {
         const btn = this.buttons.find((b) => b.dataset.key === e.key)!
         this.selectTool(entry, btn)
       }
-    })
+    }
+    window.addEventListener('keydown', this.boundKeyDown)
+  }
+
+  destroy(): void {
+    window.removeEventListener('keydown', this.boundKeyDown)
   }
 
   private selectTool(entry: ToolEntry, btn: HTMLButtonElement): void {

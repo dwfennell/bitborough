@@ -15,7 +15,7 @@ export const tools: DocSection = {
 | **6** | Diesel Generator ($300) |
 | **7** | Coal Power Plant ($2,000) |
 | **8** | Nuclear Power Plant ($5,000) |
-| **t** | Transit Stop ($500) |
+| **y** | Transit Stop ($500) |
 | **9** | Police Station ($300) |
 | **0** | Fire Station ($300) |
 | **N** | Park ($10) |

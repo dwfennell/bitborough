@@ -16,6 +16,7 @@ export class SpeedControls {
   private buttons: HTMLButtonElement[] = []
   private _speed: SimSpeed
   private onChange: (speed: SimSpeed) => void
+  private boundKeyDown: (e: KeyboardEvent) => void
 
   constructor(container: HTMLElement, onChange: (speed: SimSpeed) => void) {
     this.onChange = onChange
@@ -46,7 +47,7 @@ export class SpeedControls {
 
     const speedOrder = [SimSpeed.Paused, SimSpeed.Slow, SimSpeed.Normal, SimSpeed.Fast]
 
-    window.addEventListener('keydown', (e) => {
+    this.boundKeyDown = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement || e.target instanceof HTMLSelectElement) return
       if (e.key === ' ') {
         e.preventDefault()
@@ -62,7 +63,12 @@ export class SpeedControls {
         const idx = Math.min(speedOrder.length - 1, speedOrder.indexOf(this._speed) + 1)
         this.setSpeed(speedOrder[idx]!, this.buttons[idx]!)
       }
-    })
+    }
+    window.addEventListener('keydown', this.boundKeyDown)
+  }
+
+  destroy(): void {
+    window.removeEventListener('keydown', this.boundKeyDown)
   }
 
   private setSpeed(speed: SimSpeed, btn: HTMLButtonElement): void {

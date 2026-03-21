@@ -326,6 +326,9 @@ export class Game {
     this.lastFrameTime = performance.now()
     this.loop(this.lastFrameTime)
 
+    if (this.boundBeforeUnload) {
+      window.removeEventListener('beforeunload', this.boundBeforeUnload)
+    }
     this.boundBeforeUnload = () => this.autoSave()
     window.addEventListener('beforeunload', this.boundBeforeUnload)
   }
@@ -436,6 +439,8 @@ export class Game {
   destroy(): void {
     cancelAnimationFrame(this.animationId)
     this.inputManager.destroy()
+    this.toolbar.destroy()
+    this.speedControls.destroy()
     if (this.boundKeyDown) window.removeEventListener('keydown', this.boundKeyDown)
     if (this.boundKeyUp) window.removeEventListener('keyup', this.boundKeyUp)
     if (this.boundBeforeUnload) window.removeEventListener('beforeunload', this.boundBeforeUnload)
