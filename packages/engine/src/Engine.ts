@@ -196,11 +196,11 @@ export class Engine {
 
       // Zone development
       const nextBuildingIdRef = { value: this.nextBuildingId }
-      const { populationDelta: _zoneDelta } = updateZones(this.map, this.powerGrid, this.demand, this.prng, nextBuildingIdRef, this.bldIdx)
+      updateZones(this.map, this.powerGrid, this.demand, this.prng, nextBuildingIdRef, this.bldIdx)
       this.nextBuildingId = nextBuildingIdRef.value
 
       // Density progression
-      const { populationDelta: _densityDelta } = updateDensity(
+      updateDensity(
         this.map,
         this.powerGrid,
         this.demand,

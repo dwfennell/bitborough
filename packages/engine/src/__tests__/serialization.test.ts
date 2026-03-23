@@ -232,7 +232,7 @@ describe('Serialization', () => {
     setNextAgentId(1)
     expect(getNextAgentId()).toBe(1) // precondition: counter is low
 
-    const restored = Engine.restore(save)
+    Engine.restore(save)
 
     // After restore, nextAgentId should be past the highest existing ID (c20 → 21)
     expect(getNextAgentId()).toBe(21)
@@ -271,7 +271,8 @@ describe('Serialization', () => {
     const v5Save = { ...save, version: 5 as const }
     if (v5Save.state.citizens) {
       v5Save.state.citizens.agents = v5Save.state.citizens.agents.map(a => {
-        const { demographics: _, ...rest } = a as any
+        const { demographics: _d, ...rest } = a as any
+        void _d
         return rest
       })
     }

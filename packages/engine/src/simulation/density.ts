@@ -1,4 +1,4 @@
-import { Infrastructure, DensityLevel, BuildingCategory, ZoneType } from '@bitborough/core'
+import { DensityLevel, BuildingCategory, ZoneType } from '@bitborough/core'
 import type { Building, DemandInfo, GameMap } from '@bitborough/core'
 import { BUILDING_DEFS } from '../buildings-registry.js'
 import type { PRNG } from '../prng.js'
