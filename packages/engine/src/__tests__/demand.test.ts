@@ -151,6 +151,12 @@ const baseSummary: CitizenSummary = {
   unmatchedJobFraction: 0,
   unmatchedCommerceFraction: 0,
   avgCommuteLengthTiles: 10,
+  totalChildren: 20,
+  totalWorking: 70,
+  totalElderly: 10,
+  birthsLastTick: 0,
+  deathsLastTick: 0,
+  netMigrationLastTick: 0,
 }
 
 describe('Citizen demand signals', () => {
@@ -210,8 +216,6 @@ describe('Citizen demand signals', () => {
 
 describe('Vacancy rate feedback', () => {
   test('high vacancy dampens residential demand when population exceeds gate', () => {
-    // High vacancy city: 200 capacity, 110 residents (~45% vacancy, above 8% threshold)
-    // Population > 100 so the vacancy gate is passed
     const map = createTestMap(32)
     map.buildings.push({
       id: 'r1', defId: 'res.med', x: 0, y: 0,
@@ -223,7 +227,6 @@ describe('Vacancy rate feedback', () => {
     })
     const withVacancy = calculateDemand(map, 0.07)
 
-    // Full occupancy city: same capacity, full residents
     const mapFull = createTestMap(32)
     mapFull.buildings.push({
       id: 'r1', defId: 'res.med', x: 0, y: 0,
@@ -239,7 +242,6 @@ describe('Vacancy rate feedback', () => {
   })
 
   test('vacancy has no effect below population gate (100)', () => {
-    // Small city with high vacancy but below population gate
     const map = createTestMap(32)
     for (let x = 0; x < 5; x++) {
       map.buildings.push({
@@ -248,52 +250,69 @@ describe('Vacancy rate feedback', () => {
       })
     }
     const demand = calculateDemand(map, 0.07)
-    // Should not be penalized — demand stays at base level
-    expect(demand.residential).toBe(1)
+    // rBase is 0.9 at neutral tax — no vacancy penalty since population < 100
+    expect(demand.residential).toBeCloseTo(0.9, 2)
   })
 
   test('vacancy below 8% has no effect on demand', () => {
     const map = createTestMap(32)
-    // Add buildings with ~5% vacancy (95% occupied)
     for (let x = 0; x < 10; x++) {
       map.buildings.push({
-        id: `r${x}`,
-        defId: 'res.low',
-        x,
-        y: 0,
-        density: DensityLevel.Low,
-        state: 'active',
-        residents: 9.5, // 95% of capacity 10
-        age: 0,
-        powered: true,
+        id: `r${x}`, defId: 'res.low', x, y: 0,
+        density: DensityLevel.Low, state: 'active', residents: 9.5, age: 0, powered: true,
       })
     }
     const withLowVacancy = calculateDemand(map, 0.07)
 
-    // Baseline: empty map (no buildings → no vacancy penalty either, since capacity=0)
-    const emptyMap = createTestMap(32)
-    const baseline = calculateDemand(emptyMap, 0.07)
-
-    // With low vacancy: demand should be same as baseline (commercial may differ due to capacity)
-    // The residential demand should not be penalized since vacancy < 8%
-    // Compare to full occupancy instead for a cleaner comparison
     const mapFull = createTestMap(32)
     for (let x = 0; x < 10; x++) {
       mapFull.buildings.push({
-        id: `r${x}`,
-        defId: 'res.low',
-        x,
-        y: 0,
-        density: DensityLevel.Low,
-        state: 'active',
-        residents: 10, // full capacity — 0% vacancy
-        age: 0,
-        powered: true,
+        id: `r${x}`, defId: 'res.low', x, y: 0,
+        density: DensityLevel.Low, state: 'active', residents: 10, age: 0, powered: true,
       })
     }
     const withFullOccupancy = calculateDemand(mapFull, 0.07)
 
-    // 5% vacancy is below 8% threshold, so residential demand should be the same
     expect(withLowVacancy.residential).toBe(withFullOccupancy.residential)
+  })
+})
+
+describe('Demographic demand signals', () => {
+  test('high dependency ratio suppresses commercial and industrial demand', () => {
+    const map = createTestMap(32)
+    const baseline = calculateDemand(map, 0.07)
+    const highDependency = calculateDemand(map, 0.07, undefined, {
+      ...baseSummary,
+      totalChildren: 60,
+      totalWorking: 40,
+      totalElderly: 30,
+    })
+    expect(highDependency.commercial).toBeLessThan(baseline.commercial)
+    expect(highDependency.industrial).toBeLessThan(baseline.industrial)
+  })
+
+  test('low dependency ratio produces no penalty', () => {
+    const map = createTestMap(32)
+    const baseline = calculateDemand(map, 0.07)
+    const lowDependency = calculateDemand(map, 0.07, undefined, {
+      ...baseSummary,
+      totalChildren: 10,
+      totalWorking: 80,
+      totalElderly: 5,
+    })
+    expect(lowDependency.commercial).toBeCloseTo(baseline.commercial, 2)
+    expect(lowDependency.industrial).toBeCloseTo(baseline.industrial, 2)
+  })
+
+  test('children-heavy population boosts residential demand', () => {
+    const map = createTestMap(32)
+    const baseline = calculateDemand(map, 0.07)
+    const childHeavy = calculateDemand(map, 0.07, undefined, {
+      ...baseSummary,
+      totalChildren: 40,
+      totalWorking: 50,
+      totalElderly: 10,
+    })
+    expect(childHeavy.residential).toBeGreaterThan(baseline.residential)
   })
 })

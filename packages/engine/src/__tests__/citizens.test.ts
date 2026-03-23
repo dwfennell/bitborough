@@ -3,13 +3,12 @@ import { createTestMap } from '../test-helpers.js'
 import {
   resolveAccessRoad, createRegistry, syncAgentsForBuilding, removeAgentsForBuilding,
   markRoutesStale, replanStaleRoutes, citizenMonthlyTick, computeCitizenSummary,
-  type CitizenRegistry,
 } from '../simulation/citizens.js'
 import { buildRoadGraph, updateRoadGraph } from '../road-graph.js'
 import { Infrastructure, DensityLevel } from '@bitborough/core'
 import type { Building } from '@bitborough/core'
 
-function makeBuilding(x: number, y: number, w: number, h: number): Building {
+function makeBuilding(x: number, y: number, _w: number, _h: number): Building {
   return { id: 'b1', defId: 'res.low', x, y, powered: false, density: DensityLevel.Low, age: 0, state: 'active', residents: 5 }
 }
 

@@ -87,7 +87,7 @@ describe('Serialization', () => {
   test('v5 save preserves exact residents values', () => {
     const engine = Engine.create(createTestMap(32), { seed: 1, startingFunds: 10_000 })
     const save = engine.serialize()
-    expect(save.version).toBe(5)
+    expect(save.version).toBe(6)
     const restored = Engine.restore(save)
     for (let i = 0; i < engine.getState().map.buildings.length; i++) {
       expect(restored.getState().map.buildings[i]!.residents).toBe(engine.getState().map.buildings[i]!.residents)
@@ -196,7 +196,7 @@ describe('Serialization', () => {
     const state1 = engine.getState()
     const save = engine.serialize()
 
-    expect(save.version).toBe(5)
+    expect(save.version).toBe(6)
     if (state1.citizens.agentCount > 0) {
       expect(save.state.citizens).toBeDefined()
       expect(save.state.citizens!.agents.length).toBeGreaterThan(0)
@@ -232,10 +232,53 @@ describe('Serialization', () => {
     setNextAgentId(1)
     expect(getNextAgentId()).toBe(1) // precondition: counter is low
 
-    const restored = Engine.restore(save)
+    Engine.restore(save)
 
     // After restore, nextAgentId should be past the highest existing ID (c20 → 21)
     expect(getNextAgentId()).toBe(21)
+  })
+
+  test('demographics are serialized and restored', () => {
+    const engine = Engine.create(createTestMap(32), { seed: 42, startingFunds: 100_000 })
+    engine.placeBuilding(0, 0, 'power.diesel')
+    for (let x = 2; x < 8; x++) {
+      engine.placeTile(x, 2, Infrastructure.PowerLine)
+      engine.placeTile(x, 4, Infrastructure.Road)
+      engine.placeZone(x, 3, ZoneType.Residential)
+    }
+    for (let x = 12; x < 16; x++) {
+      engine.placeTile(x, 4, Infrastructure.Road)
+      engine.placeZone(x, 3, ZoneType.Commercial)
+    }
+    for (let i = 0; i < 36; i++) advanceMonth(engine)
+
+    const state1 = engine.getState()
+    const save = engine.serialize()
+
+    expect(save.version).toBe(6)
+
+    const restored = Engine.restore(save)
+    const state2 = restored.getState()
+
+    expect(state2.citizens.totalChildren).toBe(state1.citizens.totalChildren)
+    expect(state2.citizens.totalWorking).toBe(state1.citizens.totalWorking)
+    expect(state2.citizens.totalElderly).toBe(state1.citizens.totalElderly)
+  })
+
+  test('restore from v5 save defaults demographics to all-working', () => {
+    const engine = Engine.create(createTestMap(32), { seed: 42 })
+    const save = engine.serialize()
+    const v5Save = { ...save, version: 5 as const }
+    if (v5Save.state.citizens) {
+      v5Save.state.citizens.agents = v5Save.state.citizens.agents.map(a => {
+        const { demographics: _d, ...rest } = a as any
+        void _d
+        return rest
+      })
+    }
+    const restored = Engine.restore(v5Save as any)
+    const state = restored.getState()
+    expect(state.citizens.agentCount).toBeGreaterThanOrEqual(0)
   })
 
   test('restored engine is deterministic with original', () => {

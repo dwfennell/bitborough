@@ -59,14 +59,15 @@ describe('History collection', () => {
     const engine = Engine.create(createTestMap(32), { seed: 42 })
     const save = engine.serialize()
     // Simulate an old save: remove the history field
-    const { history: _removed, ...stateWithout } = save.state as typeof save.state & { history?: unknown }
+    const { history: _hist, ...stateWithout } = save.state as typeof save.state & { history?: unknown }
+    void _hist
     const oldSave = { ...save, state: stateWithout }
     const restored = Engine.restore(oldSave as typeof save)
     expect(restored.getState().history).toEqual([])
   })
 
-  test('save version is 5', () => {
+  test('save version is 6', () => {
     const engine = Engine.create(createTestMap(32), { seed: 42 })
-    expect(engine.serialize().version).toBe(5)
+    expect(engine.serialize().version).toBe(6)
   })
 })

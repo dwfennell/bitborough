@@ -154,8 +154,6 @@ describe('Loan system', () => {
     const statePartial = engine.getState()
     expect(statePartial.loan).not.toBeNull()
     expect(statePartial.loan!.monthsLeft).toBeLessThan(120)
-    const monthsLeftBefore = statePartial.loan!.monthsLeft
-
     // Now pay off the remaining balance in one shot
     const remaining = statePartial.loan!.remaining
     const result = engine.setLoanRepayment(remaining)

@@ -5,6 +5,12 @@ import { astar } from '../road-graph.js'
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
+export interface AgentDemographics {
+  children: number    // ages 0-17
+  working: number     // ages 18-64
+  elderly: number     // ages 65+
+}
+
 export interface Citizen {
   id: string
   homeBuildingId: string
@@ -20,6 +26,7 @@ export interface Citizen {
   homeWorkRouteStale: boolean
   homeCommerceRouteStale: boolean
   satisfaction: number
+  demographics: AgentDemographics
 }
 
 export interface CitizenRegistry {
@@ -35,6 +42,12 @@ export const EMPTY_CITIZEN_SUMMARY: CitizenSummary = {
   unmatchedJobFraction: 0,
   unmatchedCommerceFraction: 0,
   avgCommuteLengthTiles: 0,
+  totalChildren: 0,
+  totalWorking: 0,
+  totalElderly: 0,
+  birthsLastTick: 0,
+  deathsLastTick: 0,
+  netMigrationLastTick: 0,
 }
 
 export const DEFAULT_SAMPLING_RATIO = 50
@@ -133,6 +146,7 @@ function createAgent(map: GameMap, graph: RoadGraph, homeBuildingId: string, hom
     homeWorkRouteStale: false,
     homeCommerceRouteStale: false,
     satisfaction: 1,
+    demographics: { children: 0, working: 50, elderly: 0 },
   }
   buildTileSets(agent)
   return agent
@@ -287,12 +301,18 @@ export function computeCitizenSummary(registry: CitizenRegistry): CitizenSummary
   let unmatchedJob = 0
   let unmatchedCommerce = 0
   let commuteLengthSum = 0
+  let totalChildren = 0
+  let totalWorking = 0
+  let totalElderly = 0
 
   for (const agent of agents) {
     satSum += agent.satisfaction
     if (agent.workBuildingId === null) unmatchedJob++
     if (agent.commerceBuildingId === null) unmatchedCommerce++
     commuteLengthSum += agent.homeWorkRoute.length
+    totalChildren += agent.demographics.children
+    totalWorking += agent.demographics.working
+    totalElderly += agent.demographics.elderly
   }
 
   return {
@@ -301,6 +321,41 @@ export function computeCitizenSummary(registry: CitizenRegistry): CitizenSummary
     unmatchedJobFraction: unmatchedJob / agents.length,
     unmatchedCommerceFraction: unmatchedCommerce / agents.length,
     avgCommuteLengthTiles: commuteLengthSum / agents.length,
+    totalChildren,
+    totalWorking,
+    totalElderly,
+    birthsLastTick: 0,
+    deathsLastTick: 0,
+    netMigrationLastTick: 0,
   }
 }
 
+/** Sync each residential building's `residents` from the sum of its agents' demographics.
+ *  Only updates buildings that have at least one agent; buildings below the sampling
+ *  threshold keep their fill-system residents value. */
+export function syncBuildingResidents(map: GameMap, registry: CitizenRegistry): void {
+  const popByBuilding = new Map<string, number>()
+  for (const agent of registry.agents) {
+    const d = agent.demographics
+    const total = d.children + d.working + d.elderly
+    popByBuilding.set(agent.homeBuildingId, (popByBuilding.get(agent.homeBuildingId) ?? 0) + total)
+  }
+  for (const b of map.buildings) {
+    const def = BUILDING_DEFS[b.defId]
+    if (!def || def.category !== BuildingCategory.Residential) continue
+    if (popByBuilding.has(b.id)) {
+      b.residents = popByBuilding.get(b.id)!
+    }
+  }
+}
+
+/** Sum all residential building residents. */
+export function computeTotalPopulation(map: GameMap): number {
+  let total = 0
+  for (const b of map.buildings) {
+    const def = BUILDING_DEFS[b.defId]
+    if (!def || def.category !== BuildingCategory.Residential) continue
+    if (b.state === 'active') total += b.residents
+  }
+  return total
+}
