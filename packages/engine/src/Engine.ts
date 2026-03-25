@@ -518,7 +518,7 @@ export class Engine {
     const activeFires: Array<[number, number]> = Array.from(this.fireState.activeFires.entries())
 
     return {
-      version: 6,
+      version: 7,
       map: {
         version: this.map.version,
         width: this.map.width,
@@ -558,8 +558,10 @@ export class Engine {
             homeCommerceRoute: a.homeCommerceRoute,
             satisfaction: a.satisfaction,
             demographics: a.demographics,
+            wealthTier: a.wealthTier,
           })),
         },
+        reputationLayer: Array.from(this.reputationLayer),
       },
       timestamp: new Date().toISOString(),
     }
@@ -651,6 +653,12 @@ export class Engine {
     }
     engine.roadGraph = buildRoadGraph(engine.map)
     engine.citizenSummary = computeCitizenSummary(engine.citizenRegistry)
+
+    if (save.state.reputationLayer) {
+      engine.reputationLayer = new Float32Array(save.state.reputationLayer)
+    } else {
+      engine.reputationLayer.fill(0.5)
+    }
 
     if (engine.citizenRegistry.agents.length > 0) {
       let maxAgentId = 0

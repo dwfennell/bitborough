@@ -87,7 +87,7 @@ describe('Serialization', () => {
   test('v5 save preserves exact residents values', () => {
     const engine = Engine.create(createTestMap(32), { seed: 1, startingFunds: 10_000 })
     const save = engine.serialize()
-    expect(save.version).toBe(6)
+    expect(save.version).toBe(7)
     const restored = Engine.restore(save)
     for (let i = 0; i < engine.getState().map.buildings.length; i++) {
       expect(restored.getState().map.buildings[i]!.residents).toBe(engine.getState().map.buildings[i]!.residents)
@@ -196,7 +196,7 @@ describe('Serialization', () => {
     const state1 = engine.getState()
     const save = engine.serialize()
 
-    expect(save.version).toBe(6)
+    expect(save.version).toBe(7)
     if (state1.citizens.agentCount > 0) {
       expect(save.state.citizens).toBeDefined()
       expect(save.state.citizens!.agents.length).toBeGreaterThan(0)
@@ -255,7 +255,7 @@ describe('Serialization', () => {
     const state1 = engine.getState()
     const save = engine.serialize()
 
-    expect(save.version).toBe(6)
+    expect(save.version).toBe(7)
 
     const restored = Engine.restore(save)
     const state2 = restored.getState()
@@ -263,6 +263,43 @@ describe('Serialization', () => {
     expect(state2.citizens.totalChildren).toBe(state1.citizens.totalChildren)
     expect(state2.citizens.totalWorking).toBe(state1.citizens.totalWorking)
     expect(state2.citizens.totalElderly).toBe(state1.citizens.totalElderly)
+  })
+
+  test('v6 save migrates to v7 — agents get wealthTier 2', () => {
+    const engine = Engine.create(createTestMap(16), { seed: 42 })
+    engine.placeBuilding(0, 0, 'power.diesel')
+    for (let x = 2; x < 6; x++) {
+      engine.placeTile(x, 2, Infrastructure.Road)
+      engine.placeZone(x, 1, ZoneType.Residential)
+    }
+    advanceYear(engine)
+
+    const save = engine.serialize()
+
+    // Simulate v6 save: remove wealthTier from agents, set version to 6, remove reputationLayer
+    const v6Save = {
+      ...save,
+      version: 6,
+      state: {
+        ...save.state,
+        reputationLayer: undefined,
+        citizens: {
+          ...save.state.citizens!,
+          agents: save.state.citizens!.agents.map(({ wealthTier, ...rest }: any) => rest),
+        },
+      },
+    }
+
+    const restored = Engine.restore(v6Save as any)
+    const reSerialized = restored.serialize()
+
+    // All agents should have wealthTier 2 (migration default)
+    for (const agent of reSerialized.state.citizens!.agents) {
+      expect(agent.wealthTier).toBe(2)
+    }
+
+    // Version should be current
+    expect(reSerialized.version).toBe(7)
   })
 
   test('restore from v5 save defaults demographics to all-working', () => {
