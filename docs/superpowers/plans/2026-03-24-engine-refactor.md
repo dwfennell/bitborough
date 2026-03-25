@@ -166,6 +166,7 @@ export function createEngineState(map: GameMap, config: EngineConfig = {}): Engi
 
   propagatePower(state.map, state.powerGrid, state.bldIdx)
   rebuildDerivedState(state)
+  computeReputation(state.reputationLayer, state.map, state.crimeLevel, state.fireCoverage, state.pollutionLevel, state.bldIdx)
   state.demand = calculateDemand(state.map, state.taxRate)
   state.budgetInfo = calculateBudget(state.map, computeTotalPopulation(state.map), state.taxRate, state.landValues, state.funding)
 
@@ -190,13 +191,18 @@ import { calculateCrime } from './simulation/services/crime.js'
 import { calculateFireCoverage } from './simulation/services/fire.js'
 import { computeReputation } from './simulation/reputation.js'
 
+/**
+ * Recompute derived layers from map state. Does NOT include reputation
+ * (which must run after updateFires in the monthly tick) or power
+ * (which runs every tick). Call computeReputation separately after
+ * updateFires in the tick, or directly after this in create/restore.
+ */
 export function rebuildDerivedState(state: EngineState): void {
   state.bldIdx = new BuildingIndex(state.map)
   calculatePollution(state.map, state.pollutionLevel, state.pollutionBuffer)
   calculateLandValues(state.map, state.powerGrid, state.pollutionLevel, state.crimeLevel, state.landValues, state.bldIdx)
   calculateCrime(state.map, state.landValues, state.crimeLevel, state.funding.police, state.influenceBuffer)
   calculateFireCoverage(state.map, state.fireCoverage, state.funding.fire, state.influenceBuffer)
-  computeReputation(state.reputationLayer, state.map, state.crimeLevel, state.fireCoverage, state.pollutionLevel, state.bldIdx)
 }
 ```
 
@@ -431,9 +437,10 @@ export function restoreState(save: SaveFile): EngineState {
     }
   }
 
-  // Rebuild ALL derived state — single code path with createEngineState
+  // Rebuild ALL derived state — same sequence as createEngineState
   propagatePower(state.map, state.powerGrid, state.bldIdx)
   rebuildDerivedState(state)
+  computeReputation(state.reputationLayer, state.map, state.crimeLevel, state.fireCoverage, state.pollutionLevel, state.bldIdx)
   state.demand = calculateDemand(state.map, state.taxRate, undefined, state.citizenSummary)
   state.budgetInfo = calculateBudget(
     state.map,
@@ -502,6 +509,7 @@ import type { GameEvent } from '@bitborough/core'
 import { BuildingCategory, calcMonthlyPayment } from '@bitborough/core'
 import type { EngineState } from '../engine-state.js'
 import { rebuildDerivedState, computeLoanRepayment } from '../engine-state.js'
+import { computeReputation } from './reputation.js'
 import { BUILDING_DEFS } from '../buildings-registry.js'
 import { calculateDemand } from './demand.js'
 import { calculateBudget } from './budget.js'
@@ -539,14 +547,17 @@ export function monthlyTick(state: EngineState): MonthlyTickResult {
     state.year++
   }
 
-  // 1. Rebuild derived layers
+  // 1. Rebuild derived layers (bldIdx, pollution, land values, crime, fire coverage)
   rebuildDerivedState(state)
 
   // 2. Calculate demand
   state.demand = calculateDemand(state.map, state.taxRate, state.trafficDensity, state.citizenSummary)
 
-  // 3. Update fires
+  // 3. Update fires (after fire coverage, before reputation — fires can destroy buildings)
   updateFires(state.map, state.fireState, state.fireCoverage, state.prng, state.bldIdx)
+
+  // 3b. Reputation (after fires, matches original Engine.ts tick order)
+  computeReputation(state.reputationLayer, state.map, state.crimeLevel, state.fireCoverage, state.pollutionLevel, state.bldIdx)
 
   // 4. Citizen monthly tick
   const tileLayers: TileLayers = {
