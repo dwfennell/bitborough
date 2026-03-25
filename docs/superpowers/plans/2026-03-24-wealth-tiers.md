@@ -16,7 +16,7 @@
 
 | File | Action | Responsibility |
 |---|---|---|
-| `packages/core/src/state.ts` | Modify | Add `WealthTier` type, `tierCounts` to `CitizenSummary`, `wealthTier` to saved agent in `SaveFile` |
+| `packages/core/src/state.ts` | Modify | Add `WealthTier` type, `tierCounts` to `CitizenSummary`, `wealthTier` to saved agent in `SaveFile`, `reputationLayer?: number[]` to saved state |
 | `packages/core/src/index.ts` | Modify | Export `WealthTier` |
 | `packages/engine/src/simulation/wealth-tiers.ts` | Create | `TIER_WEIGHTS` table, `sampleWealthTier()`, `computeSchellingPenalty()`, all tier constants |
 | `packages/engine/src/__tests__/wealth-tiers.test.ts` | Create | Unit tests for tier sampling, Schelling penalty |
@@ -1123,7 +1123,7 @@ test('v6 save migrates to v7 — agents get wealthTier 2', () => {
   const reSerialized = restored.serialize()
 
   // All agents should have wealthTier 2 (migration default)
-  for (const agent of reSerialized.state.citizens.agents) {
+  for (const agent of reSerialized.state.citizens!.agents) {
     expect(agent.wealthTier).toBe(2)
   }
 
@@ -1263,9 +1263,9 @@ describe('wealth tiers integration', () => {
     const restoredSave = restored.serialize()
 
     // Agent wealth tiers should be preserved
-    expect(restoredSave.state.citizens.agents.length).toBe(save.state.citizens.agents.length)
-    for (let i = 0; i < save.state.citizens.agents.length; i++) {
-      expect(restoredSave.state.citizens.agents[i].wealthTier).toBe(save.state.citizens.agents[i].wealthTier)
+    expect(restoredSave.state.citizens!.agents.length).toBe(save.state.citizens!.agents.length)
+    for (let i = 0; i < save.state.citizens!.agents.length; i++) {
+      expect(restoredSave.state.citizens!.agents[i].wealthTier).toBe(save.state.citizens!.agents[i].wealthTier)
     }
   })
 
@@ -1287,7 +1287,7 @@ describe('wealth tiers integration', () => {
     const restored = Engine.restore(save)
     const reSave = restored.serialize()
     // Reputation values should be preserved (not reset to 0.5)
-    expect(reSave.state.reputationLayer).toEqual(save.state.reputationLayer)
+    expect(reSave.state.reputationLayer!).toEqual(save.state.reputationLayer!)
   })
 })
 ```
