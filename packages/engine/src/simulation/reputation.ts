@@ -14,6 +14,7 @@ const QUALITY_OCCUPANCY_WEIGHT = 0.10
 const OCCUPANCY_SEARCH_RADIUS = 5
 const OCCUPANCY_HEALTH_THRESHOLD = 0.7
 
+/** @internal — exported for testing only */
 export function computeCurrentQuality(
   crimeNorm: number, pollNorm: number, fireNorm: number, parkNorm: number, occupancyHealth: number,
 ): number {
@@ -42,7 +43,7 @@ function computeOccupancyHealth(x: number, y: number, map: GameMap, bldIdx: Buil
   return bestHealth
 }
 
-function computeParkNorm(x: number, y: number, map: GameMap, bldIdx: BuildingIndex): number {
+export function computeParkNorm(x: number, y: number, map: GameMap, bldIdx: BuildingIndex): number {
   return Math.min(1, parkDesirabilityBonus(x, y, map, bldIdx) / RES_PARK_BONUS)
 }
 

@@ -3,10 +3,22 @@ import { createTestMap } from '../test-helpers.js'
 import {
   resolveAccessRoad, createRegistry, syncAgentsForBuilding, removeAgentsForBuilding,
   markRoutesStale, replanStaleRoutes, citizenMonthlyTick, computeCitizenSummary,
+  type TileLayers,
 } from '../simulation/citizens.js'
 import { buildRoadGraph, updateRoadGraph } from '../road-graph.js'
+import { BuildingIndex } from '../building-index.js'
 import { Infrastructure, DensityLevel } from '@bitborough/core'
-import type { Building } from '@bitborough/core'
+import type { Building, GameMap } from '@bitborough/core'
+
+function makeTileLayers(map: GameMap): TileLayers {
+  const size = map.width * map.height
+  return {
+    crimeLevel: new Uint8Array(size),
+    fireCoverage: new Uint8Array(size),
+    pollutionLevel: new Uint8Array(size),
+    reputationLayer: new Float32Array(size).fill(0.5),
+  }
+}
 
 function makeBuilding(x: number, y: number, _w: number, _h: number): Building {
   return { id: 'b1', defId: 'res.low', x, y, powered: false, density: DensityLevel.Low, age: 0, state: 'active', residents: 5 }
@@ -187,14 +199,14 @@ describe('Monthly tick — traffic + satisfaction', () => {
     const graph = buildRoadGraph(map)
     const registry = createRegistry()
     const trafficDensity = new Uint8Array(64)
-    citizenMonthlyTick(registry, map, graph, trafficDensity)
+    citizenMonthlyTick(registry, map, graph, trafficDensity, makeTileLayers(map), new BuildingIndex(map))
     expect(Array.from(trafficDensity).every(v => v === 0)).toBe(true)
   })
 
   test('traffic appears on road tiles along agent routes', () => {
     const { map, graph, registry } = buildCity()
     const trafficDensity = new Uint8Array(64)
-    citizenMonthlyTick(registry, map, graph, trafficDensity)
+    citizenMonthlyTick(registry, map, graph, trafficDensity, makeTileLayers(map), new BuildingIndex(map))
     // Road at y=0 (indices 0..7) should have traffic from commerce route
     const roadTraffic = Array.from(trafficDensity.slice(0, 8))
     expect(roadTraffic.some(v => v > 0)).toBe(true)
@@ -212,14 +224,14 @@ describe('Monthly tick — traffic + satisfaction', () => {
     syncAgentsForBuilding(map, registry, graph, home)
 
     const t1 = new Uint8Array(64)
-    citizenMonthlyTick(registry, map, graph, t1)
+    citizenMonthlyTick(registry, map, graph, t1, makeTileLayers(map), new BuildingIndex(map))
     const sum1 = Array.from(t1).reduce((a, b) => a + b, 0)
 
     // Double residents
     home.residents = 4
     syncAgentsForBuilding(map, registry, graph, home)
     const t2 = new Uint8Array(64)
-    citizenMonthlyTick(registry, map, graph, t2)
+    citizenMonthlyTick(registry, map, graph, t2, makeTileLayers(map), new BuildingIndex(map))
     const sum2 = Array.from(t2).reduce((a, b) => a + b, 0)
     expect(sum2).toBeGreaterThan(sum1)
   })
@@ -241,7 +253,7 @@ describe('Monthly tick — traffic + satisfaction', () => {
     map.buildings = [home]
     syncAgentsForBuilding(map, registry, graph, home)
     const trafficDensity = new Uint8Array(64)
-    citizenMonthlyTick(registry, map, graph, trafficDensity)
+    citizenMonthlyTick(registry, map, graph, trafficDensity, makeTileLayers(map), new BuildingIndex(map))
     const agent = registry.agents[0]!
     // jobPenalty = 0.5, so satisfaction ≤ 0.5
     expect(agent.satisfaction).toBeLessThanOrEqual(0.5)

@@ -3,7 +3,7 @@ import { BUILDING_DEFS } from '../buildings-registry.js'
 import type { RoadGraph } from '../road-graph.js'
 import { astar } from '../road-graph.js'
 import { sampleWealthTier, TIER_WEIGHTS, buildTierCountsByBuilding, computeSchellingPenalty } from './wealth-tiers.js'
-import { parkDesirabilityBonus, RES_PARK_BONUS } from './desirability.js'
+import { computeParkNorm } from './reputation.js'
 import type { BuildingIndex } from '../building-index.js'
 import type { PRNG } from '../prng.js'
 
@@ -296,8 +296,7 @@ function computeSatisfaction(
     crimeNorm = layers.crimeLevel[idx]! / 255
     pollNorm = layers.pollutionLevel[idx]! / 255
     fireNorm = layers.fireCoverage[idx]! / 255
-    const rawPark = parkDesirabilityBonus(building.x, building.y, map, bldIdx)
-    parkNorm = Math.min(1, rawPark / RES_PARK_BONUS)
+    parkNorm = computeParkNorm(building.x, building.y, map, bldIdx)
   }
 
   const tierCounts = buildingTierCounts.get(agent.homeBuildingId) ?? [0, 0, 0]
@@ -322,8 +321,8 @@ export function citizenMonthlyTick(
   map: GameMap,
   graph: RoadGraph,
   trafficDensity: Uint8Array,
-  layers?: TileLayers,
-  bldIdx?: BuildingIndex,
+  layers: TileLayers,
+  bldIdx: BuildingIndex,
 ): void {
   // Pass 1: replan stale routes (traffic-aware)
   replanStaleRoutes(registry, map, graph, trafficDensity)
@@ -343,14 +342,7 @@ export function citizenMonthlyTick(
     for (const tileIdx of agent.homeCommerceRoute) {
       rawTraffic[tileIdx]! += COMMERCE_TRIP_WEIGHT
     }
-    if (layers && bldIdx) {
-      agent.satisfaction = computeSatisfaction(agent, map, layers, bldIdx, buildingTierCounts, buildingById)
-    } else {
-      const commuteNorm = clamp(agent.homeWorkRoute.length / MAX_SATISFACTION_COMMUTE, 0, 1)
-      const jobless = agent.workBuildingId === null ? 1 : 0
-      const noCommerce = agent.commerceBuildingId === null ? 1 : 0
-      agent.satisfaction = clamp(1 - commuteNorm * 0.4 - jobless * 0.5 - noCommerce * 0.3, 0, 1)
-    }
+    agent.satisfaction = computeSatisfaction(agent, map, layers, bldIdx, buildingTierCounts, buildingById)
   }
 
   // Scale by sampling ratio and write to trafficDensity
