@@ -1,5 +1,4 @@
 import { describe, test, expect } from 'vitest'
-import { PRNG } from '../prng.js'
 import {
   createRegistry,
   computeCitizenSummary,

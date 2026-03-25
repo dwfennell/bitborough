@@ -285,7 +285,7 @@ describe('Serialization', () => {
         reputationLayer: undefined,
         citizens: {
           ...save.state.citizens!,
-          agents: save.state.citizens!.agents.map(({ wealthTier, ...rest }: any) => rest),
+          agents: save.state.citizens!.agents.map(({ wealthTier: _wealthTier, ...rest }: any) => rest),
         },
       },
     }
