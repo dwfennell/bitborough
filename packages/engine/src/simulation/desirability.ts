@@ -7,7 +7,7 @@ import { hasNearbyRoad } from './road-access.js'
 const RES_BASELINE = 0.3 // constant when power + road present
 const RES_SAFETY_WEIGHT = 0.3 // (1 - crimeNorm) × this
 const RES_FIRE_BONUS = 0.15 // flat bonus when fire-covered
-const RES_PARK_BONUS = 0.25 // flat bonus when park within PARK_RADIUS tiles
+export const RES_PARK_BONUS = 0.25 // flat bonus when park within PARK_RADIUS tiles
 const RES_POLLUTION_PENALTY = 0.3 // pollutionNorm × this, subtracted
 const PARK_RADIUS = 5
 
@@ -116,7 +116,7 @@ function commercialDesirability(x: number, y: number, map: GameMap, bldIdx?: Bui
 }
 
 
-function parkDesirabilityBonus(x: number, y: number, map: GameMap, bldIdx?: BuildingIndex): number {
+export function parkDesirabilityBonus(x: number, y: number, map: GameMap, bldIdx?: BuildingIndex): number {
   let best = 0
   if (bldIdx) {
     for (let dy = -PARK_RADIUS; dy <= PARK_RADIUS; dy++) {
