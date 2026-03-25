@@ -76,20 +76,25 @@ interface EngineState {
 
 #### Functions
 
-- **`createEngineState(map, config): EngineState`** — Allocates all layers as typed arrays, sets defaults for economy/time fields. Calls `rebuildDerivedState` before returning. Replaces the Engine constructor's initialization logic.
+- **`createEngineState(map, config: EngineConfig): EngineState`** — Allocates all layers as typed arrays, sets defaults for economy/time fields. Calls `propagatePower` and `rebuildDerivedState` before returning. Replaces the Engine constructor's initialization logic. The existing `EngineConfig` interface (seed, startingFunds, ticksPerMonth, etc.) moves here alongside the state.
 
-- **`rebuildDerivedState(state): void`** — Recomputes all derived layers from the map and configuration state. Called by `createEngineState`, `restoreState`, and `monthlyTick`. Sequence:
+- **`rebuildDerivedState(state): void`** — Recomputes all derived layers from the map and configuration state. Called by `createEngineState`, `restoreState`, and `monthlyTick`. Does NOT include power propagation (which runs every tick, not just monthly). Sequence:
   1. `state.bldIdx = new BuildingIndex(state.map)`
-  2. `propagatePower(state.map, state.powerGrid, state.bldIdx)`
-  3. `calculatePollution(state.map, state.pollutionLevel, state.pollutionBuffer)`
-  4. `calculateLandValues(state.map, state.powerGrid, state.pollutionLevel, state.crimeLevel, state.landValues, state.bldIdx)`
-  5. `calculateCrime(state.map, state.landValues, state.crimeLevel, state.funding.police, state.influenceBuffer)`
-  6. `calculateFireCoverage(state.map, state.fireCoverage, state.funding.fire, state.influenceBuffer)`
-  7. `computeReputation(state.reputationLayer, state.map, state.crimeLevel, state.fireCoverage, state.pollutionLevel, state.bldIdx)`
+  2. `calculatePollution(state.map, state.pollutionLevel, state.pollutionBuffer)`
+  3. `calculateLandValues(state.map, state.powerGrid, state.pollutionLevel, state.crimeLevel, state.landValues, state.bldIdx)`
+  4. `calculateCrime(state.map, state.landValues, state.crimeLevel, state.funding.police, state.influenceBuffer)`
+  5. `calculateFireCoverage(state.map, state.fireCoverage, state.funding.fire, state.influenceBuffer)`
+  6. `computeReputation(state.reputationLayer, state.map, state.crimeLevel, state.fireCoverage, state.pollutionLevel, state.bldIdx)`
+
+  Note: `propagatePower` is NOT included here because it runs every tick (not just monthly) in the current Engine. It is called separately by `Engine.tick()` and by `createEngineState`/`restoreState` after `rebuildDerivedState`.
 
 - **`serializeState(state): SaveFile`** — Converts EngineState to the JSON-safe SaveFile format. Moves the current `Engine.serialize()` body here. References `state.*` instead of `this.*`.
 
-- **`restoreState(save: SaveFile): EngineState`** — Reconstructs EngineState from a SaveFile. Handles version migration (v6→v7 wealthTier defaults, etc). Calls `rebuildDerivedState(state)` before returning. This is the key fix — rebuild is no longer a separate code path from init.
+- **`restoreState(save: SaveFile): EngineState`** — Reconstructs EngineState from a SaveFile. Handles version migration (v6→v7 wealthTier defaults, etc). After reconstructing the base state, calls `propagatePower`, `rebuildDerivedState`, `calculateDemand`, and `calculateBudget` to fully hydrate all derived fields. This is the key fix — rebuild is no longer a separate code path from init.
+
+- **`computeLoanRepayment(state): number`** — Pure helper, extracts the current `Engine.computeLoanRepayment()` private method. Used by `monthlyTick` (budget step) and by Engine mutation methods (`setTaxRate`, `setFunding`).
+
+- **`maxPrefixedId(items, prefix): number`** — Utility for restoring ID counters from saved data. Already exists, moves here alongside `restoreState`.
 
 ### `packages/engine/src/simulation/tick.ts` (~150 lines)
 
@@ -102,28 +107,29 @@ interface MonthlyTickResult {
   births: number
   deaths: number
   netMigration: number
+  events: GameEvent[]   // emergency_loan, bankruptcy, etc.
 }
 ```
 
 #### Functions
 
 - **`monthlyTick(state: EngineState): MonthlyTickResult`** — The full monthly simulation sequence, extracted from the `if (tickCount % ticksPerMonth === 0)` block in Engine.tick(). Steps:
-  1. Rebuild building index
+  0. Advance month/year (`state.month++`, wrap to next year)
+  1. Rebuild derived layers (`rebuildDerivedState` — this rebuilds bldIdx, pollution, land values, crime, fire, reputation in one call)
   2. Calculate demand
-  3. Rebuild derived layers (`rebuildDerivedState`)
-  4. Update fires
-  5. Citizen monthly tick (routes, satisfaction, traffic)
-  6. Compute citizen summary
-  7. Zone development
-  8. Density progression (fill/drain, upgrades, dereliction)
-  9. Sync residential agents
-  10. Demographics (aging, births, deaths, migration)
-  11. Sync building residents + re-sync agents
-  12. Final citizen summary
-  13. Budget calculation + loan/bankruptcy logic
-  14. Record history snapshot
+  3. Update fires
+  4. Citizen monthly tick (routes, satisfaction, traffic)
+  5. Compute citizen summary
+  6. Zone development
+  7. Density progression (fill/drain, upgrades, dereliction)
+  8. Sync residential agents
+  9. Demographics (aging, births, deaths, migration)
+  10. Sync building residents + re-sync agents
+  11. Final citizen summary
+  12. Budget calculation + loan/bankruptcy logic → emit events
+  13. Record history snapshot
 
-  Returns births/deaths/netMigration for the citizen summary.
+  Returns births/deaths/netMigration and any events (emergency loan, bankruptcy).
 
 - **`syncResidentialAgents(state: EngineState): void`** — Moves from Engine's private method. Iterates active residential buildings and calls `syncAgentsForBuilding`.
 
@@ -142,7 +148,8 @@ export class Engine {
   static restore(save): Engine
 
   // Simulation
-  tick(): void  // increments tickCount, calls monthlyTick on month boundary
+  tick(): void  // propagatePower every tick; increments tickCount, calls monthlyTick on month boundary
+  serialize(): SaveFile  // delegates to serializeState(this.state)
 
   // Queries
   getState(): GameState
@@ -164,7 +171,7 @@ export class Engine {
 
 `Engine.create()` calls `createEngineState()` and wraps in Engine.
 `Engine.restore()` calls `restoreState()` and wraps in Engine.
-`Engine.tick()` increments `state.tickCount`, calls `monthlyTick(this.state)` on month boundary, manages speed/events.
+`Engine.tick()` calls `propagatePower` every tick (preserving current per-tick power behavior), increments `state.tickCount`, calls `monthlyTick(this.state)` on month boundary, collects events from `MonthlyTickResult`.
 All mutation methods operate on `this.state.map` directly and trigger localized rebuilds where needed (e.g., `placeTile` updates road graph, `bulldoze` rebuilds building index).
 
 ---
@@ -187,9 +194,13 @@ Simulation functions mutate the arrays in place (filling `Uint8Array` buffers, p
 
 The loan/bankruptcy logic could arguably stay in Engine since it produces events. But it's deeply interleaved with the budget calculation which depends on population computed in the same tick. Keeping it in `monthlyTick` avoids splitting the sequence across modules. Engine just reads the result.
 
-### Events stay on Engine, not EngineState
+### Events flow through MonthlyTickResult
 
-Game events (bankruptcy, milestone unlocks) are consumed by the UI layer and cleared each tick. They're not simulation state — they're notifications. Engine manages them; `monthlyTick` returns data that Engine converts to events.
+Game events (emergency loan, bankruptcy) are produced by `monthlyTick` and returned in `MonthlyTickResult.events`. Engine collects them into its `events` array, which is cleared at the start of each monthly tick. Events are not part of `EngineState` — they're transient notifications for the UI layer.
+
+### population is always derived
+
+Population is currently a getter on Engine that calls `computeTotalPopulation(state.map)`. This stays as a derived value — never stored on `EngineState`. Both `monthlyTick` (for budget/snapshot) and Engine methods (for `getState`) call it on demand. The function is cheap (single pass over buildings).
 
 ### speed stays on Engine
 
