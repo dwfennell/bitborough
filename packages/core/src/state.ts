@@ -1,5 +1,7 @@
 import type { GameMap } from './map.js'
 
+export type WealthTier = 1 | 2 | 3 // 1=Low, 2=Mid, 3=High
+
 export enum SimSpeed {
   Paused,
   Slow,
@@ -61,6 +63,7 @@ export interface CitizenSummary {
   birthsLastTick: number
   deathsLastTick: number
   netMigrationLastTick: number
+  tierCounts: [low: number, mid: number, high: number]
 }
 
 export interface DemandInfo {
@@ -165,8 +168,10 @@ export interface SaveFile {
           working: number
           elderly: number
         }
+        wealthTier?: WealthTier
       }>
     }
+    reputationLayer?: number[]
   }
   timestamp: string
 }
