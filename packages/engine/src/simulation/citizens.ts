@@ -1,7 +1,9 @@
-import { type GameMap, type Building, type BuildingDef, type CitizenSummary, Infrastructure, BuildingCategory } from '@bitborough/core'
+import { type GameMap, type Building, type BuildingDef, type CitizenSummary, type WealthTier, Infrastructure, BuildingCategory } from '@bitborough/core'
 import { BUILDING_DEFS } from '../buildings-registry.js'
 import type { RoadGraph } from '../road-graph.js'
 import { astar } from '../road-graph.js'
+import { sampleWealthTier } from './wealth-tiers.js'
+import type { PRNG } from '../prng.js'
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -27,6 +29,7 @@ export interface Citizen {
   homeCommerceRouteStale: boolean
   satisfaction: number
   demographics: AgentDemographics
+  wealthTier: WealthTier
 }
 
 export interface CitizenRegistry {
@@ -48,6 +51,7 @@ export const EMPTY_CITIZEN_SUMMARY: CitizenSummary = {
   birthsLastTick: 0,
   deathsLastTick: 0,
   netMigrationLastTick: 0,
+  tierCounts: [0, 0, 0],
 }
 
 export const DEFAULT_SAMPLING_RATIO = 50
@@ -127,8 +131,15 @@ export function getNextAgentId(): number {
   return nextAgentId
 }
 
-function createAgent(map: GameMap, graph: RoadGraph, homeBuildingId: string, homeAccessRoad: number, trafficDensity?: Uint8Array): Citizen {
+function createAgent(map: GameMap, graph: RoadGraph, homeBuildingId: string, homeAccessRoad: number, trafficDensity?: Uint8Array, prng?: PRNG, reputationLayer?: Float32Array): Citizen {
   const id = `c${nextAgentId++}`
+  let wealthTier: WealthTier = 2
+  if (prng) {
+    const building = map.buildings.find(b => b.id === homeBuildingId)
+    const tileIdx = building ? building.y * map.width + building.x : 0
+    const reputation = reputationLayer ? (reputationLayer[tileIdx] ?? 0.5) : 0.5
+    wealthTier = sampleWealthTier(prng, reputation)
+  }
   const jobMatch = findNearestBuilding(map, graph, homeAccessRoad, d => d.jobs > 0, trafficDensity)
   const commerceMatch = findNearestBuilding(map, graph, homeAccessRoad, d => d.category === BuildingCategory.Commercial, trafficDensity)
   const agent: Citizen = {
@@ -147,12 +158,13 @@ function createAgent(map: GameMap, graph: RoadGraph, homeBuildingId: string, hom
     homeCommerceRouteStale: false,
     satisfaction: 1,
     demographics: { children: 0, working: 50, elderly: 0 },
+    wealthTier,
   }
   buildTileSets(agent)
   return agent
 }
 
-export function syncAgentsForBuilding(map: GameMap, registry: CitizenRegistry, graph: RoadGraph, building: Building, trafficDensity?: Uint8Array): void {
+export function syncAgentsForBuilding(map: GameMap, registry: CitizenRegistry, graph: RoadGraph, building: Building, trafficDensity?: Uint8Array, prng?: PRNG, reputationLayer?: Float32Array): void {
   const homeAccessRoad = resolveAccessRoad(map, building)
   if (homeAccessRoad < 0) return  // building has no road access — no agents
 
@@ -162,7 +174,7 @@ export function syncAgentsForBuilding(map: GameMap, registry: CitizenRegistry, g
 
   if (delta > 0) {
     for (let i = 0; i < delta; i++) {
-      registry.agents.push(createAgent(map, graph, building.id, homeAccessRoad, trafficDensity))
+      registry.agents.push(createAgent(map, graph, building.id, homeAccessRoad, trafficDensity, prng, reputationLayer))
     }
   } else if (delta < 0) {
     // Remove from end
@@ -304,6 +316,7 @@ export function computeCitizenSummary(registry: CitizenRegistry): CitizenSummary
   let totalChildren = 0
   let totalWorking = 0
   let totalElderly = 0
+  const tierCounts: [number, number, number] = [0, 0, 0]
 
   for (const agent of agents) {
     satSum += agent.satisfaction
@@ -313,6 +326,7 @@ export function computeCitizenSummary(registry: CitizenRegistry): CitizenSummary
     totalChildren += agent.demographics.children
     totalWorking += agent.demographics.working
     totalElderly += agent.demographics.elderly
+    tierCounts[agent.wealthTier - 1]++
   }
 
   return {
@@ -327,6 +341,7 @@ export function computeCitizenSummary(registry: CitizenRegistry): CitizenSummary
     birthsLastTick: 0,
     deathsLastTick: 0,
     netMigrationLastTick: 0,
+    tierCounts,
   }
 }
 
