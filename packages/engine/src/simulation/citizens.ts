@@ -227,11 +227,11 @@ export function markRoutesStale(registry: CitizenRegistry, tileIndex: number): v
 
 export function markRoutesStaleBatch(registry: CitizenRegistry, tileIndices: Set<number>): void {
   for (const agent of registry.agents) {
+    if (agent.homeWorkRouteStale && agent.homeCommerceRouteStale) continue
     for (const idx of tileIndices) {
-      if (agent.homeWorkRouteTileSet.has(idx)) { agent.homeWorkRouteStale = true; break }
-    }
-    for (const idx of tileIndices) {
-      if (agent.homeCommerceRouteTileSet.has(idx)) { agent.homeCommerceRouteStale = true; break }
+      if (!agent.homeWorkRouteStale && agent.homeWorkRouteTileSet.has(idx)) agent.homeWorkRouteStale = true
+      if (!agent.homeCommerceRouteStale && agent.homeCommerceRouteTileSet.has(idx)) agent.homeCommerceRouteStale = true
+      if (agent.homeWorkRouteStale && agent.homeCommerceRouteStale) break
     }
   }
 }
@@ -280,7 +280,7 @@ export function replanStaleRoutes(registry: CitizenRegistry, map: GameMap, graph
 
 const WORK_TRIP_WEIGHT = 2
 const COMMERCE_TRIP_WEIGHT = 1
-const MAX_SATISFACTION_COMMUTE = 60  // same as MAX_ROUTE_LENGTH
+const MAX_SATISFACTION_COMMUTE = 60
 
 function computeSatisfaction(
   agent: Citizen,

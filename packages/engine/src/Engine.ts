@@ -67,6 +67,15 @@ export interface EngineConfig {
   taxRate?: number
 }
 
+function maxPrefixedId(items: ReadonlyArray<{ id: string }>, prefix: string): number {
+  let max = 0
+  for (const item of items) {
+    const n = parseInt(item.id.slice(prefix.length), 10)
+    if (n > max) max = n
+  }
+  return max
+}
+
 export class Engine {
   private map: GameMap
   private prng: PRNG
@@ -619,13 +628,7 @@ export class Engine {
       }
     }
 
-    // Restore nextBuildingId from existing buildings
-    let maxId = 0
-    for (const b of map.buildings) {
-      const num = parseInt(b.id.replace('b', ''), 10)
-      if (num > maxId) maxId = num
-    }
-    engine.nextBuildingId = maxId + 1
+    engine.nextBuildingId = maxPrefixedId(map.buildings, 'b') + 1
 
     // Restore loan state
     engine.loan = save.state.loan ?? null
@@ -659,12 +662,7 @@ export class Engine {
     }
 
     if (engine.citizenRegistry.agents.length > 0) {
-      let maxAgentId = 0
-      for (const a of engine.citizenRegistry.agents) {
-        const num = parseInt(a.id.replace('c', ''), 10)
-        if (num > maxAgentId) maxAgentId = num
-      }
-      setNextAgentId(maxAgentId + 1)
+      setNextAgentId(maxPrefixedId(engine.citizenRegistry.agents, 'c') + 1)
     }
 
     // Rebuild derived state

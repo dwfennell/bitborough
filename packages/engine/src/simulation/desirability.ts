@@ -2,6 +2,7 @@ import { type GameMap, ZoneType, BuildingCategory } from '@bitborough/core'
 import { type BuildingIndex, forEachBuildingInRadius } from '../building-index.js'
 import { BUILDING_DEFS } from '../buildings-registry.js'
 import { hasNearbyRoad } from './road-access.js'
+import { clamp } from './math.js'
 
 // Residential weights (sum to 1.0 at perfect conditions, no pollution)
 const RES_BASELINE = 0.3 // constant when power + road present
@@ -100,14 +101,14 @@ function residentialDesirability(
   score -= pollNorm * RES_POLLUTION_PENALTY
   score += zoneBoundaryEffect(x, y, map, bldIdx)
 
-  return Math.max(0, Math.min(1, score))
+  return clamp(score, 0, 1)
 }
 
 function commercialDesirability(x: number, y: number, map: GameMap, bldIdx?: BuildingIndex): number {
   let score = COM_BASELINE
   if (hasTransitNearby(x, y, map, bldIdx)) score += COM_TRANSIT_BONUS
   if (hasResidentialDensity(x, y, map, bldIdx)) score += COM_RESIDENTIAL_BONUS
-  return Math.max(0, Math.min(1, score))
+  return clamp(score, 0, 1)
 }
 
 
