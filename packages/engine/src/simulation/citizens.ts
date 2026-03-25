@@ -140,13 +140,11 @@ export function getNextAgentId(): number {
   return nextAgentId
 }
 
-function createAgent(map: GameMap, graph: RoadGraph, homeBuildingId: string, homeAccessRoad: number, trafficDensity?: Uint8Array, prng?: PRNG, reputationLayer?: Float32Array): Citizen {
+function createAgent(map: GameMap, graph: RoadGraph, homeBuildingId: string, homeAccessRoad: number, trafficDensity?: Uint8Array, prng?: PRNG, reputationLayer?: Float32Array, homeTileIdx?: number): Citizen {
   const id = `c${nextAgentId++}`
   let wealthTier: WealthTier = 2
   if (prng) {
-    const building = map.buildings.find(b => b.id === homeBuildingId)
-    const tileIdx = building ? building.y * map.width + building.x : 0
-    const reputation = reputationLayer ? (reputationLayer[tileIdx] ?? 0.5) : 0.5
+    const reputation = reputationLayer && homeTileIdx !== undefined ? (reputationLayer[homeTileIdx] ?? 0.5) : 0.5
     wealthTier = sampleWealthTier(prng, reputation)
   }
   const jobMatch = findNearestBuilding(map, graph, homeAccessRoad, d => d.jobs > 0, trafficDensity)
@@ -182,8 +180,9 @@ export function syncAgentsForBuilding(map: GameMap, registry: CitizenRegistry, g
   const delta = needed - existing.length
 
   if (delta > 0) {
+    const homeTileIdx = building.y * map.width + building.x
     for (let i = 0; i < delta; i++) {
-      registry.agents.push(createAgent(map, graph, building.id, homeAccessRoad, trafficDensity, prng, reputationLayer))
+      registry.agents.push(createAgent(map, graph, building.id, homeAccessRoad, trafficDensity, prng, reputationLayer, homeTileIdx))
     }
   } else if (delta < 0) {
     // Remove from end
@@ -363,7 +362,7 @@ export function citizenMonthlyTick(
 
 export function computeCitizenSummary(registry: CitizenRegistry): CitizenSummary {
   const { agents } = registry
-  if (agents.length === 0) return { ...EMPTY_CITIZEN_SUMMARY }
+  if (agents.length === 0) return { ...EMPTY_CITIZEN_SUMMARY, tierCounts: [0, 0, 0] }
 
   let satSum = 0
   let unmatchedJob = 0
