@@ -71,11 +71,11 @@ export class Engine {
   private map: GameMap
   private prng: PRNG
   private tickCount = 0
+  private get population(): number { return computeTotalPopulation(this.map) }
   private month: number
   private year: number
   private speed: SimSpeed = SimSpeed.Normal
   private funds: number
-  private population = 0
   private taxRate: number
   private ticksPerMonth: number
   private monthsPerYear: number
@@ -238,7 +238,6 @@ export class Engine {
       this.citizenSummary.birthsLastTick = demoResult.births
       this.citizenSummary.deathsLastTick = demoResult.deaths
       this.citizenSummary.netMigrationLastTick = demoResult.netMigration
-      this.population = computeTotalPopulation(this.map)
 
       // 1. Compute budget including loan repayment
       const loanRepayment = this.computeLoanRepayment()
@@ -627,8 +626,6 @@ export class Engine {
       if (num > maxId) maxId = num
     }
     engine.nextBuildingId = maxId + 1
-
-    engine.population = computeTotalPopulation(map)
 
     // Restore loan state
     engine.loan = save.state.loan ?? null

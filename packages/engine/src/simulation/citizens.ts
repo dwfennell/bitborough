@@ -141,15 +141,16 @@ export function getNextAgentId(): number {
   return nextAgentId
 }
 
-function createAgent(map: GameMap, graph: RoadGraph, homeBuildingId: string, homeAccessRoad: number, trafficDensity?: Uint8Array, prng?: PRNG, reputationLayer?: Float32Array, homeTileIdx?: number): Citizen {
+type RouteMatch = { buildingId: string; accessRoad: number; route: number[] } | null
+
+function createAgent(
+  homeBuildingId: string,
+  homeAccessRoad: number,
+  jobMatch: RouteMatch,
+  commerceMatch: RouteMatch,
+  wealthTier: WealthTier,
+): Citizen {
   const id = `c${nextAgentId++}`
-  let wealthTier: WealthTier = 2
-  if (prng) {
-    const reputation = reputationLayer && homeTileIdx !== undefined ? (reputationLayer[homeTileIdx] ?? 0.5) : 0.5
-    wealthTier = sampleWealthTier(prng, reputation)
-  }
-  const jobMatch = findNearestBuilding(map, graph, homeAccessRoad, d => d.jobs > 0, trafficDensity)
-  const commerceMatch = findNearestBuilding(map, graph, homeAccessRoad, d => d.category === BuildingCategory.Commercial, trafficDensity)
   const agent: Citizen = {
     id,
     homeBuildingId,
@@ -181,9 +182,17 @@ export function syncAgentsForBuilding(map: GameMap, registry: CitizenRegistry, g
   const delta = needed - existing.length
 
   if (delta > 0) {
+    // Compute route matches once — all agents from this building share the same access road
+    const jobMatch = findNearestBuilding(map, graph, homeAccessRoad, d => d.jobs > 0, trafficDensity)
+    const commerceMatch = findNearestBuilding(map, graph, homeAccessRoad, d => d.category === BuildingCategory.Commercial, trafficDensity)
     const homeTileIdx = building.y * map.width + building.x
     for (let i = 0; i < delta; i++) {
-      registry.agents.push(createAgent(map, graph, building.id, homeAccessRoad, trafficDensity, prng, reputationLayer, homeTileIdx))
+      let wealthTier: WealthTier = 2
+      if (prng) {
+        const reputation = reputationLayer ? (reputationLayer[homeTileIdx] ?? 0.5) : 0.5
+        wealthTier = sampleWealthTier(prng, reputation)
+      }
+      registry.agents.push(createAgent(building.id, homeAccessRoad, jobMatch, commerceMatch, wealthTier))
     }
   } else if (delta < 0) {
     // Remove from end
