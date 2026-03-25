@@ -42,7 +42,7 @@ export function buildTierCountsByBuilding(
   for (const a of agents) {
     let counts = map.get(a.homeBuildingId)
     if (!counts) { counts = [0, 0, 0]; map.set(a.homeBuildingId, counts) }
-    counts[a.wealthTier - 1]++
+    counts[a.wealthTier - 1]! ++
   }
   return map
 }
@@ -53,7 +53,7 @@ export function computeSchellingPenalty(
 ): number {
   const total = buildingTierCounts[0] + buildingTierCounts[1] + buildingTierCounts[2]
   if (total <= 1) return 0
-  const sameTierFraction = buildingTierCounts[agentTier - 1] / total
+  const sameTierFraction = buildingTierCounts[agentTier - 1]! / total
   if (sameTierFraction >= HOMOGENEITY_THRESHOLD) return 0
   return SCHELLING_WEIGHT * (1 - sameTierFraction / HOMOGENEITY_THRESHOLD)
 }

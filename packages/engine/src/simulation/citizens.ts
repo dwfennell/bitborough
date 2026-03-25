@@ -382,7 +382,7 @@ export function computeCitizenSummary(registry: CitizenRegistry): CitizenSummary
     totalChildren += agent.demographics.children
     totalWorking += agent.demographics.working
     totalElderly += agent.demographics.elderly
-    tierCounts[agent.wealthTier - 1]++
+    tierCounts[agent.wealthTier - 1]! ++
   }
 
   return {

@@ -37,7 +37,9 @@ import {
   setNextAgentId, EMPTY_CITIZEN_SUMMARY,
   syncBuildingResidents, computeTotalPopulation,
   type CitizenRegistry,
+  type TileLayers,
 } from './simulation/citizens.js'
+import { computeReputation } from './simulation/reputation.js'
 import { calculatePollution } from './simulation/pollution.js'
 import { demographicTick } from './simulation/demographics.js'
 import { updateDensity } from './simulation/density.js'
@@ -92,6 +94,7 @@ export class Engine {
   private crimeLevel: Uint8Array
   private fireCoverage: Uint8Array
   private trafficDensity: Uint8Array
+  private reputationLayer: Float32Array
 
   // Citizens
   private citizenRegistry: CitizenRegistry
@@ -139,6 +142,7 @@ export class Engine {
     this.crimeLevel = new Uint8Array(size)
     this.fireCoverage = new Uint8Array(size)
     this.trafficDensity = new Uint8Array(size)
+    this.reputationLayer = new Float32Array(size).fill(0.5)
     this.fireState = createFireState()
     this.influenceBuffer = new Float32Array(size)
     this.pollutionBuffer = new Float32Array(size)
@@ -190,8 +194,15 @@ export class Engine {
       calculateCrime(this.map, this.landValues, this.crimeLevel, this.funding.police, this.influenceBuffer)
       calculateFireCoverage(this.map, this.fireCoverage, this.funding.fire, this.influenceBuffer)
       updateFires(this.map, this.fireState, this.fireCoverage, this.prng, this.bldIdx)
+      computeReputation(this.reputationLayer, this.map, this.crimeLevel, this.fireCoverage, this.pollutionLevel, this.bldIdx)
       // Citizen monthly tick: replan stale routes, write trafficDensity from agent routes
-      citizenMonthlyTick(this.citizenRegistry, this.map, this.roadGraph, this.trafficDensity)
+      const tileLayers: TileLayers = {
+        crimeLevel: this.crimeLevel,
+        fireCoverage: this.fireCoverage,
+        pollutionLevel: this.pollutionLevel,
+        reputationLayer: this.reputationLayer,
+      }
+      citizenMonthlyTick(this.citizenRegistry, this.map, this.roadGraph, this.trafficDensity, tileLayers, this.bldIdx)
       this.citizenSummary = computeCitizenSummary(this.citizenRegistry)
 
       // Zone development
@@ -468,7 +479,7 @@ export class Engine {
       if (b.state === 'active') {
         const def = BUILDING_DEFS[b.defId]
         if (def && def.category === BuildingCategory.Residential) {
-          syncAgentsForBuilding(this.map, this.citizenRegistry, this.roadGraph, b, this.trafficDensity)
+          syncAgentsForBuilding(this.map, this.citizenRegistry, this.roadGraph, b, this.trafficDensity, this.prng, this.reputationLayer)
         }
       }
     }
@@ -628,6 +639,7 @@ export class Engine {
         agents: save.state.citizens.agents.map(a => ({
           ...a,
           demographics: a.demographics ?? { children: 0, working: 50, elderly: 0 },
+          wealthTier: a.wealthTier ?? 2,
           homeWorkRouteStale: false,
           homeCommerceRouteStale: false,
           homeWorkRouteTileSet: new Set(a.homeWorkRoute),
