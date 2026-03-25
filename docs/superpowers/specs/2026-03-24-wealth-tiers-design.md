@@ -56,20 +56,35 @@ Route-based only, no environment factors, no tier differentiation.
 
 ### New formula
 
+All input variables are normalized to 0–1 ranges:
+
+- `commuteNorm` = `route.length / MAX_ROUTE_LENGTH` (clamped 0–1). Currently `MAX_ROUTE_LENGTH = 60`.
+- `jobless` = 1 if agent has no work building, 0 otherwise (binary flag).
+- `noCommerce` = 1 if agent has no commerce building, 0 otherwise (binary flag).
+- `crimeNorm` = `crimeLevel[idx] / 255`.
+- `pollNorm` = `pollutionLevel[idx] / 255`.
+- `fireNorm` = `fireCoverage[idx] / 255`.
+- `parkNorm` = distance-decayed park bonus at the agent's home tile, using the existing `parkDesirabilityBonus()` from `desirability.ts`, divided by `RES_PARK_BONUS` (0.25) to normalize to 0–1.
+- `schellingPenalty` = see Schelling Preference section.
+
+The agent's home tile is resolved from the building's anchor position (`building.x`, `building.y`), looked up via `homeBuildingId` from the map's building list.
+
 ```
 satisfaction(agent) =
   1.0
-  - commutePenalty   * 0.4  * tierWeight[tier].commute
-  - jobPenalty       * 0.5  * tierWeight[tier].jobMatch
-  - commercePenalty  * 0.3  * tierWeight[tier].commerce
-  - crimeNorm        * 0.3  * tierWeight[tier].crime
-  - pollutionNorm    * 0.3  * tierWeight[tier].pollution
-  + fireCoverage     * 0.15 * tierWeight[tier].fire
-  + parkBonus        * 0.25 * tierWeight[tier].park
+  - commuteNorm   * 0.4  * tierWeight[tier].commute
+  - jobless       * 0.5  * tierWeight[tier].jobMatch
+  - noCommerce    * 0.3  * tierWeight[tier].commerce
+  - crimeNorm     * 0.3  * tierWeight[tier].crime
+  - pollNorm      * 0.3  * tierWeight[tier].pollution
+  + fireNorm      * 0.15 * tierWeight[tier].fire
+  + parkNorm      * 0.25 * tierWeight[tier].park
   - schellingPenalty
 ```
 
 Clamped to [0, 1].
+
+At Mid tier (all weights 1.0), this produces the same base behavior as the current formula for route-based terms, plus the new environment terms. The maximum possible satisfaction is ~1.0 (short commute, job, commerce, no crime, no pollution, fire coverage, park nearby, no Schelling penalty). The minimum is 0.0 (clamped).
 
 ### Tier weight table
 
@@ -89,7 +104,20 @@ Source: `research/social-dynamics-and-segregation.md`, "Proposed: Wealth Tiers f
 
 ### Implementation
 
-`computeSatisfaction` gains access to tile layers (crime, pollution, fire coverage, park proximity) and the agent's home tile position. The citizen monthly tick already has access to the map; layers are passed through as additional parameters.
+`computeSatisfaction` gains access to tile layers and the agent's home building position. To keep function signatures manageable (and extensible for future layers like education), a `TileLayers` context object is passed through:
+
+```typescript
+interface TileLayers {
+  crimeLevel: Uint8Array
+  fireCoverage: Uint8Array
+  pollutionLevel: Uint8Array
+  reputationLayer: Float32Array
+}
+```
+
+This is passed to `citizenMonthlyTick`, which passes it to `computeSatisfaction`. The agent's home building is looked up from `map.buildings` by `homeBuildingId` to get the anchor tile coordinates.
+
+For the Schelling penalty, a `Map<string, [number, number, number]>` (buildingId → tier counts) is pre-computed once at the start of the satisfaction pass, then each agent's penalty is an O(1) lookup. This avoids O(N^2) per-agent scanning.
 
 ---
 
@@ -141,16 +169,26 @@ reputation(tile, t+1) = DECAY * reputation(tile, t) + (1 - DECAY) * currentQuali
 
 ### Current quality derivation
 
+All inputs normalized to 0–1:
+
 ```
 currentQuality(tile) =
-    (1 - crimeNorm) * 0.35
-  + (1 - pollNorm)  * 0.25
-  + fireCoverage     * 0.15
-  + parkBonus        * 0.15
+    (1 - crimeNorm)  * 0.35      // crimeLevel[idx] / 255
+  + (1 - pollNorm)   * 0.25      // pollutionLevel[idx] / 255
+  + fireNorm         * 0.15      // fireCoverage[idx] / 255
+  + parkNorm         * 0.15      // parkDesirabilityBonus / RES_PARK_BONUS, capped at 1.0
   + occupancyHealth  * 0.10
 ```
 
-`occupancyHealth` is 1.0 when the nearest residential building is well-occupied (~70%+), tapering toward 0 for vacant/derelict areas. Captures the "eyes on the street" effect.
+`occupancyHealth` is computed from the building index: find the nearest residential building within a radius of 5 tiles (Manhattan distance). If found:
+
+```
+occupancyHealth = clamp(building.residents / (def.capacity * 0.7), 0, 1)
+```
+
+This reaches 1.0 at 70% occupancy and tapers linearly to 0 for empty buildings. If no residential building is within range, `occupancyHealth = 0`.
+
+Computation is skipped for tiles with no zone (`zones[idx] === 0`) — water, empty terrain, and roads don't need reputation. Their reputation stays at whatever the decay brings them toward (effectively 0 over time), which is fine since no buildings will reference them.
 
 ### Properties
 
@@ -162,7 +200,8 @@ currentQuality(tile) =
 ### Feeds into
 
 1. **Tier assignment** (location-weighted sampling) — shifts who moves in
-2. **Satisfaction** — as a minor additional factor so existing residents feel neighborhood change
+
+Reputation does not feed directly into satisfaction. Existing residents feel neighborhood change indirectly: as reputation shifts, the *tier mix* of new arrivals changes, which shifts the Schelling penalty for existing agents. This is a more natural feedback path than adding reputation as a direct satisfaction term.
 
 ---
 
@@ -196,11 +235,14 @@ For buildings with only 1 agent: `sameTierFraction = 1.0`, penalty is always zer
 
 ### Feedback loop (gentrification example)
 
-1. A few high-income agents move into a mid-income building (location-weighted assignment as reputation rises)
-2. They feel a mild Schelling penalty (minority tier)
-3. But if reputation continues rising, more high-income agents arrive over subsequent months
-4. Eventually high-income becomes the majority — penalty flips to remaining low-income agents
-5. Low-income agents' satisfaction drops — they drain first — gentrification completes
+1. Services improve in a low-reputation area → reputation begins rising (slowly, due to decay)
+2. Rising reputation shifts tier assignment probabilities → new arrivals skew toward mid/high-income
+3. Incoming high-income agents feel a mild Schelling penalty (minority tier) but location quality compensates
+4. As more high-income agents arrive, the Schelling penalty shifts: low-income agents in the building become the minority
+5. Low-income agents' satisfaction drops (Schelling + they're more sensitive to commute/job factors which may not have improved)
+6. Lower satisfaction feeds into the city-wide average → when buildings drain (via the existing fill/drain loop), the dissatisfied agents are removed
+
+Note: the current drain mechanism in `syncAgentsForBuilding` removes agents from the end of the filtered list, not by satisfaction order. The gentrification dynamic works through a coarser mechanism: buildings in gentrifying areas fill with new high-tier agents while buildings in declining areas drain agents indiscriminately. Satisfaction-ordered removal could be added as a future refinement but is not required for the basic sorting dynamic.
 
 ---
 
@@ -231,16 +273,17 @@ Tier effects flow through satisfaction → citizen summary → demand feedback. 
 
 | File | Change |
 |------|--------|
-| `core/state.ts` | Add `WealthTier` type, `tierCounts` to `CitizenSummary` |
-| `citizens.ts` | Add `wealthTier` to `Citizen`, tier-weighted `computeSatisfaction`, location-weighted tier in `createAgent`, `tierCounts` in summary, Schelling check |
-| `Engine.ts` | Allocate reputation layer, call `computeReputation` in tick, pass layers to citizen tick |
+| `core/state.ts` | Add `WealthTier` type, `tierCounts` to `CitizenSummary`, add `wealthTier` to saved agent schema in `SaveFile` |
+| `citizens.ts` | Add `wealthTier` to `Citizen`. `createAgent` gains `reputationLayer` and `prng` params for location-weighted tier sampling. `syncAgentsForBuilding` gains `reputationLayer` and `prng` params (passed through from Engine). `citizenMonthlyTick` gains `TileLayers` param. `computeSatisfaction` gains `TileLayers`, building position, and per-building tier counts. `computeCitizenSummary` aggregates `tierCounts`. |
+| `Engine.ts` | Allocate `reputationLayer: Float32Array`. Call `computeReputation` in monthly tick. Pass `TileLayers` to `citizenMonthlyTick`. Pass `reputationLayer` to `syncResidentialAgents` → `syncAgentsForBuilding` → `createAgent`. |
 
 ### Save/load
 
-Version bump (v6 → v7). Migration for old saves:
-- Existing agents get `wealthTier: 2` (mid — safe default)
-- `reputationLayer` initialized to 0.5 for all tiles
-- `tierCounts` derived from agents on load
+Version bump (v6 → v7). Migration for old saves applies during the `restore()` path in Engine.ts, which reconstructs agents from saved data via object spread (not via `createAgent`):
+
+- Existing saved agent objects get `wealthTier: 2` (mid — safe default) added during deserialization
+- `reputationLayer` initialized to 0.5 for all tiles via `Float32Array.fill(0.5)`
+- `tierCounts` derived from agents on load (not persisted separately)
 
 ### Constants
 
