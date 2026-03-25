@@ -1,5 +1,5 @@
 import { type GameMap, ZoneType, BuildingCategory } from '@bitborough/core'
-import type { BuildingIndex } from '../building-index.js'
+import { type BuildingIndex, forEachBuildingInRadius } from '../building-index.js'
 import { BUILDING_DEFS } from '../buildings-registry.js'
 import { hasNearbyRoad } from './road-access.js'
 
@@ -22,25 +22,20 @@ function zoneBoundaryEffect(x: number, y: number, map: GameMap, bldIdx?: Buildin
   let hasCommercial = false
   let hasIndustrial = false
 
-  for (let dy = -ZONE_BOUNDARY_RADIUS; dy <= ZONE_BOUNDARY_RADIUS; dy++) {
-    for (let dx = -ZONE_BOUNDARY_RADIUS; dx <= ZONE_BOUNDARY_RADIUS; dx++) {
-      if (Math.abs(dx) + Math.abs(dy) > ZONE_BOUNDARY_RADIUS) continue
-      const b = bldIdx.get(x + dx, y + dy)
-      if (!b || b.state !== 'active') continue
-      const def = BUILDING_DEFS[b.defId]
-      if (!def) continue
-      if (def.category === BuildingCategory.Commercial && !hasCommercial) {
-        hasCommercial = true
-        effect += COM_ADJACENCY_BONUS
-      }
-      if (def.category === BuildingCategory.Industrial && !hasIndustrial) {
-        hasIndustrial = true
-        effect -= IND_ADJACENCY_PENALTY
-      }
-      if (hasCommercial && hasIndustrial) break
+  forEachBuildingInRadius(bldIdx, x, y, ZONE_BOUNDARY_RADIUS, (b) => {
+    if (b.state !== 'active') return
+    const def = BUILDING_DEFS[b.defId]
+    if (!def) return
+    if (def.category === BuildingCategory.Commercial && !hasCommercial) {
+      hasCommercial = true
+      effect += COM_ADJACENCY_BONUS
     }
-    if (hasCommercial && hasIndustrial) break
-  }
+    if (def.category === BuildingCategory.Industrial && !hasIndustrial) {
+      hasIndustrial = true
+      effect -= IND_ADJACENCY_PENALTY
+    }
+    if (hasCommercial && hasIndustrial) return true
+  })
   return effect
 }
 
@@ -119,17 +114,12 @@ function commercialDesirability(x: number, y: number, map: GameMap, bldIdx?: Bui
 export function parkDesirabilityBonus(x: number, y: number, map: GameMap, bldIdx?: BuildingIndex): number {
   let best = 0
   if (bldIdx) {
-    for (let dy = -PARK_RADIUS; dy <= PARK_RADIUS; dy++) {
-      for (let dx = -PARK_RADIUS; dx <= PARK_RADIUS; dx++) {
-        const dist = Math.abs(dx) + Math.abs(dy)
-        if (dist > PARK_RADIUS) continue
-        const b = bldIdx.get(x + dx, y + dy)
-        if (b && b.defId === 'special.park' && b.state === 'active') {
-          const bonus = RES_PARK_BONUS * (1 - dist / PARK_RADIUS)
-          if (bonus > best) best = bonus
-        }
+    forEachBuildingInRadius(bldIdx, x, y, PARK_RADIUS, (b, dist) => {
+      if (b.defId === 'special.park' && b.state === 'active') {
+        const bonus = RES_PARK_BONUS * (1 - dist / PARK_RADIUS)
+        if (bonus > best) best = bonus
       }
-    }
+    })
     return best
   }
   for (const b of map.buildings) {
@@ -145,14 +135,14 @@ export function parkDesirabilityBonus(x: number, y: number, map: GameMap, bldIdx
 
 function hasTransitNearby(x: number, y: number, map: GameMap, bldIdx?: BuildingIndex): boolean {
   if (bldIdx) {
-    for (let dy = -COM_TRANSIT_RADIUS; dy <= COM_TRANSIT_RADIUS; dy++) {
-      for (let dx = -COM_TRANSIT_RADIUS; dx <= COM_TRANSIT_RADIUS; dx++) {
-        if (Math.abs(dx) + Math.abs(dy) > COM_TRANSIT_RADIUS) continue
-        const b = bldIdx.get(x + dx, y + dy)
-        if (b && b.defId === 'transit.stop' && b.state === 'active') return true
+    let found = false
+    forEachBuildingInRadius(bldIdx, x, y, COM_TRANSIT_RADIUS, (b) => {
+      if (b.defId === 'transit.stop' && b.state === 'active') {
+        found = true
+        return true
       }
-    }
-    return false
+    })
+    return found
   }
   for (const b of map.buildings) {
     if (b.defId !== 'transit.stop' || b.state !== 'active') continue
@@ -164,15 +154,13 @@ function hasTransitNearby(x: number, y: number, map: GameMap, bldIdx?: BuildingI
 function hasResidentialDensity(x: number, y: number, map: GameMap, bldIdx?: BuildingIndex): boolean {
   let count = 0
   if (bldIdx) {
-    for (let dy = -COM_RESIDENTIAL_RADIUS; dy <= COM_RESIDENTIAL_RADIUS; dy++) {
-      for (let dx = -COM_RESIDENTIAL_RADIUS; dx <= COM_RESIDENTIAL_RADIUS; dx++) {
-        if (Math.abs(dx) + Math.abs(dy) > COM_RESIDENTIAL_RADIUS) continue
-        const b = bldIdx.get(x + dx, y + dy)
-        if (b && b.defId.startsWith('res') && b.state === 'active') count++
+    forEachBuildingInRadius(bldIdx, x, y, COM_RESIDENTIAL_RADIUS, (b) => {
+      if (b.defId.startsWith('res') && b.state === 'active') {
+        count++
         if (count >= COM_RESIDENTIAL_MIN_COUNT) return true
       }
-    }
-    return false
+    })
+    return count >= COM_RESIDENTIAL_MIN_COUNT
   }
   for (const b of map.buildings) {
     if (!b.defId.startsWith('res') || b.state !== 'active') continue

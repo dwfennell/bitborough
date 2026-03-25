@@ -1,6 +1,6 @@
 import type { GameMap } from '@bitborough/core'
 import { BuildingCategory } from '@bitborough/core'
-import type { BuildingIndex } from '../building-index.js'
+import { type BuildingIndex, forEachBuildingInRadius } from '../building-index.js'
 import { BUILDING_DEFS } from '../buildings-registry.js'
 import { REPUTATION_DECAY } from './wealth-tiers.js'
 import { parkDesirabilityBonus, RES_PARK_BONUS } from './desirability.js'
@@ -27,19 +27,15 @@ export function computeCurrentQuality(
   )
 }
 
-function computeOccupancyHealth(x: number, y: number, map: GameMap, bldIdx: BuildingIndex): number {
+function computeOccupancyHealth(x: number, y: number, bldIdx: BuildingIndex): number {
   let bestHealth = 0
-  for (let dy = -OCCUPANCY_SEARCH_RADIUS; dy <= OCCUPANCY_SEARCH_RADIUS; dy++) {
-    for (let dx = -OCCUPANCY_SEARCH_RADIUS; dx <= OCCUPANCY_SEARCH_RADIUS; dx++) {
-      if (Math.abs(dx) + Math.abs(dy) > OCCUPANCY_SEARCH_RADIUS) continue
-      const b = bldIdx.get(x + dx, y + dy)
-      if (!b || b.state !== 'active') continue
-      const def = BUILDING_DEFS[b.defId]
-      if (!def || def.category !== BuildingCategory.Residential || def.capacity === 0) continue
-      const health = Math.min(1, b.residents / (def.capacity * OCCUPANCY_HEALTH_THRESHOLD))
-      if (health > bestHealth) bestHealth = health
-    }
-  }
+  forEachBuildingInRadius(bldIdx, x, y, OCCUPANCY_SEARCH_RADIUS, (b) => {
+    if (b.state !== 'active') return
+    const def = BUILDING_DEFS[b.defId]
+    if (!def || def.category !== BuildingCategory.Residential || def.capacity === 0) return
+    const health = Math.min(1, b.residents / (def.capacity * OCCUPANCY_HEALTH_THRESHOLD))
+    if (health > bestHealth) bestHealth = health
+  })
   return bestHealth
 }
 
@@ -64,7 +60,7 @@ export function computeReputation(
       const pollNorm = pollutionLevel[idx]! / 255
       const fireNorm = fireCoverage[idx]! / 255
       const parkNorm = computeParkNorm(x, y, map, bldIdx)
-      const occupancyHealth = computeOccupancyHealth(x, y, map, bldIdx)
+      const occupancyHealth = computeOccupancyHealth(x, y, bldIdx)
       const quality = computeCurrentQuality(crimeNorm, pollNorm, fireNorm, parkNorm, occupancyHealth)
       reputationLayer[idx] = REPUTATION_DECAY * reputationLayer[idx]! + (1 - REPUTATION_DECAY) * quality
     }

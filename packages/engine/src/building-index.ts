@@ -44,3 +44,25 @@ export class BuildingIndex {
     }
   }
 }
+
+/**
+ * Iterate buildings within Manhattan-distance radius, calling `fn` for each.
+ * Return `true` from `fn` to stop early.
+ */
+export function forEachBuildingInRadius(
+  bldIdx: BuildingIndex,
+  cx: number,
+  cy: number,
+  radius: number,
+  fn: (building: Building, dist: number) => boolean | void,
+): void {
+  for (let dy = -radius; dy <= radius; dy++) {
+    for (let dx = -radius; dx <= radius; dx++) {
+      const dist = Math.abs(dx) + Math.abs(dy)
+      if (dist > radius) continue
+      const b = bldIdx.get(cx + dx, cy + dy)
+      if (!b) continue
+      if (fn(b, dist) === true) return
+    }
+  }
+}
