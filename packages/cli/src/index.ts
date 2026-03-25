@@ -10,6 +10,9 @@ import { tileCommand } from './commands/tile.js'
 import { tilesCommand } from './commands/tiles.js'
 import { buildingsCommand } from './commands/buildings.js'
 import { docsCommand } from './commands/docs.js'
+import { taxCommand } from './commands/tax.js'
+import { fundingCommand } from './commands/funding.js'
+import { loanCommand } from './commands/loan.js'
 
 const program = new Command()
   .name('bitt')
@@ -26,5 +29,8 @@ tileCommand(program)
 tilesCommand(program)
 buildingsCommand(program)
 docsCommand(program)
+taxCommand(program)
+fundingCommand(program)
+loanCommand(program)
 
 program.parse()
