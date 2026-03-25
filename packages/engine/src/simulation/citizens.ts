@@ -2,7 +2,9 @@ import { type GameMap, type Building, type BuildingDef, type CitizenSummary, typ
 import { BUILDING_DEFS } from '../buildings-registry.js'
 import type { RoadGraph } from '../road-graph.js'
 import { astar } from '../road-graph.js'
-import { sampleWealthTier } from './wealth-tiers.js'
+import { sampleWealthTier, TIER_WEIGHTS, buildTierCountsByBuilding, computeSchellingPenalty } from './wealth-tiers.js'
+import { parkDesirabilityBonus, RES_PARK_BONUS } from './desirability.js'
+import type { BuildingIndex } from '../building-index.js'
 import type { PRNG } from '../prng.js'
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -35,6 +37,13 @@ export interface Citizen {
 export interface CitizenRegistry {
   agents: Citizen[]
   samplingRatio: number
+}
+
+export interface TileLayers {
+  crimeLevel: Uint8Array
+  fireCoverage: Uint8Array
+  pollutionLevel: Uint8Array
+  reputationLayer: Float32Array
 }
 
 export type { CitizenSummary }
@@ -268,11 +277,45 @@ function clamp(v: number, lo: number, hi: number): number {
   return Math.max(lo, Math.min(hi, v))
 }
 
-function computeSatisfaction(agent: Citizen): number {
-  const commutePenalty = clamp(agent.homeWorkRoute.length / MAX_SATISFACTION_COMMUTE, 0, 1)
-  const jobPenalty = agent.workBuildingId === null ? 0.5 : 0
-  const commercePenalty = agent.commerceBuildingId === null ? 0.3 : 0
-  return clamp(1 - commutePenalty * 0.4 - jobPenalty - commercePenalty, 0, 1)
+function computeSatisfaction(
+  agent: Citizen,
+  map: GameMap,
+  layers: TileLayers,
+  bldIdx: BuildingIndex,
+  buildingTierCounts: Map<string, [number, number, number]>,
+  buildingById: Map<string, Building>,
+): number {
+  const w = TIER_WEIGHTS[agent.wealthTier]
+  const commuteNorm = clamp(agent.homeWorkRoute.length / MAX_SATISFACTION_COMMUTE, 0, 1)
+  const jobless = agent.workBuildingId === null ? 1 : 0
+  const noCommerce = agent.commerceBuildingId === null ? 1 : 0
+
+  const building = buildingById.get(agent.homeBuildingId)
+  let crimeNorm = 0, pollNorm = 0, fireNorm = 0, parkNorm = 0
+  if (building) {
+    const idx = building.y * map.width + building.x
+    crimeNorm = layers.crimeLevel[idx]! / 255
+    pollNorm = layers.pollutionLevel[idx]! / 255
+    fireNorm = layers.fireCoverage[idx]! / 255
+    const rawPark = parkDesirabilityBonus(building.x, building.y, map, bldIdx)
+    parkNorm = Math.min(1, rawPark / RES_PARK_BONUS)
+  }
+
+  const tierCounts = buildingTierCounts.get(agent.homeBuildingId) ?? [0, 0, 0]
+  const schelling = computeSchellingPenalty(agent.wealthTier, tierCounts)
+
+  return clamp(
+    1.0
+    - commuteNorm * 0.4 * w.commute
+    - jobless * 0.5 * w.jobMatch
+    - noCommerce * 0.3 * w.commerce
+    - crimeNorm * 0.3 * w.crime
+    - pollNorm * 0.3 * w.pollution
+    + fireNorm * 0.15 * w.fire
+    + parkNorm * 0.25 * w.park
+    - schelling,
+    0, 1,
+  )
 }
 
 export function citizenMonthlyTick(
@@ -280,6 +323,8 @@ export function citizenMonthlyTick(
   map: GameMap,
   graph: RoadGraph,
   trafficDensity: Uint8Array,
+  layers?: TileLayers,
+  bldIdx?: BuildingIndex,
 ): void {
   // Pass 1: replan stale routes (traffic-aware)
   replanStaleRoutes(registry, map, graph, trafficDensity)
@@ -288,6 +333,10 @@ export function citizenMonthlyTick(
   const size = map.width * map.height
   const rawTraffic = new Float64Array(size)
 
+  const buildingTierCounts = buildTierCountsByBuilding(registry.agents)
+  const buildingById = new Map<string, Building>()
+  for (const b of map.buildings) buildingById.set(b.id, b)
+
   for (const agent of registry.agents) {
     for (const tileIdx of agent.homeWorkRoute) {
       rawTraffic[tileIdx]! += WORK_TRIP_WEIGHT
@@ -295,7 +344,14 @@ export function citizenMonthlyTick(
     for (const tileIdx of agent.homeCommerceRoute) {
       rawTraffic[tileIdx]! += COMMERCE_TRIP_WEIGHT
     }
-    agent.satisfaction = computeSatisfaction(agent)
+    if (layers && bldIdx) {
+      agent.satisfaction = computeSatisfaction(agent, map, layers, bldIdx, buildingTierCounts, buildingById)
+    } else {
+      const commuteNorm = clamp(agent.homeWorkRoute.length / MAX_SATISFACTION_COMMUTE, 0, 1)
+      const jobless = agent.workBuildingId === null ? 1 : 0
+      const noCommerce = agent.commerceBuildingId === null ? 1 : 0
+      agent.satisfaction = clamp(1 - commuteNorm * 0.4 - jobless * 0.5 - noCommerce * 0.3, 0, 1)
+    }
   }
 
   // Scale by sampling ratio and write to trafficDensity
