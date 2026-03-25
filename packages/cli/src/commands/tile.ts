@@ -22,6 +22,7 @@ export function tileCommand(program: Command) {
         const size = BUILDING_DEFS[b.defId]?.size ?? { w: 1, h: 1 }
         return tx >= b.x && tx < b.x + size.w && ty >= b.y && ty < b.y + size.h
       })
+      const def = building ? BUILDING_DEFS[building.defId] : undefined
       out({
         x: tx, y: ty,
         terrain: TileType[info.terrain],
@@ -29,7 +30,17 @@ export function tileCommand(program: Command) {
         infra: infraFlags(info.infrastructure),
         powered: info.powered,
         hasRoadAccess: info.hasRoadAccess,
-        building: building ? { id: building.defId, state: building.state } : null,
+        landValue: info.landValue,
+        crimeLevel: info.crimeLevel,
+        fireCoverage: info.fireCoverage,
+        pollutionLevel: info.pollutionLevel,
+        reputation: Math.round(info.reputation * 1000) / 1000,
+        building: building ? {
+          id: building.defId,
+          state: building.state,
+          residents: building.residents,
+          capacity: def?.capacity ?? 0,
+        } : null,
       })
     })
 }

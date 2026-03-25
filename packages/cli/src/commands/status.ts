@@ -13,13 +13,18 @@ export function statusCommand(program: Command) {
       out({
         month: s.time.month,
         year: s.time.year,
-        population: s.population,
-        funds: s.funds,
+        population: Math.round(s.population),
+        funds: Math.round(s.funds),
         taxIncome: s.budget.taxIncome,
         maintenanceCosts: s.budget.maintenanceCosts.total,
         serviceCosts: s.budget.serviceCosts.total,
         projectedBalance: s.budget.projectedBalance,
         demand: { R: d.residential, C: d.commercial, I: d.industrial },
+        citizens: {
+          agents: s.citizens.agentCount,
+          avgSatisfaction: Math.round(s.citizens.avgSatisfaction * 100) / 100,
+          tierCounts: { low: s.citizens.tierCounts[0], mid: s.citizens.tierCounts[1], high: s.citizens.tierCounts[2] },
+        },
       })
     })
 }

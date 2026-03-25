@@ -342,4 +342,29 @@ describe('Serialization', () => {
     expect(restored.getState().time.month).toBe(engine.getState().time.month)
     // population and funds diverge until Task 4 fills in residents — tested via 'population after restore' test
   })
+
+  test('restored engine recomputes land values matching original', () => {
+    const engine = Engine.create(createTestMap(32), { seed: 42 })
+    engine.placeBuilding(0, 0, 'power.coal')
+    for (let x = 4; x < 10; x++) {
+      engine.placeTile(x, 4, Infrastructure.Road)
+      engine.placeZone(x, 3, ZoneType.Residential)
+    }
+    for (let x = 4; x < 7; x++) {
+      engine.placeZone(x, 5, ZoneType.Industrial)
+    }
+    advanceYear(engine)
+
+    const preSave = engine.getState()
+    const save = engine.serialize()
+    const restored = Engine.restore(save)
+    const postRestore = restored.getState()
+
+    // Land values should be recomputed — not all zeros
+    const restoredLvSum = Array.from(postRestore.landValues).reduce((a, b) => a + b, 0)
+    const originalLvSum = Array.from(preSave.landValues).reduce((a, b) => a + b, 0)
+    expect(restoredLvSum).toBeGreaterThan(0)
+    // Should be close to original (crime↔landvalue circular dep may cause slight drift)
+    expect(restoredLvSum).toBeGreaterThan(originalLvSum * 0.8)
+  })
 })

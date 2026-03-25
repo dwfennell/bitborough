@@ -55,6 +55,11 @@ export interface TileInfo {
   elevation: number
   powered: boolean
   hasRoadAccess: boolean
+  landValue: number
+  crimeLevel: number
+  fireCoverage: number
+  pollutionLevel: number
+  reputation: number
 }
 
 export interface EngineConfig {
@@ -343,6 +348,11 @@ export class Engine {
       elevation: this.map.elevation[idx]!,
       powered: this.powerGrid[idx] !== 0,
       hasRoadAccess: hasNearbyRoad(this.map, x, y),
+      landValue: this.landValues[idx]!,
+      crimeLevel: this.crimeLevel[idx]!,
+      fireCoverage: this.fireCoverage[idx]!,
+      pollutionLevel: this.pollutionLevel[idx]!,
+      reputation: this.reputationLayer[idx]!,
     }
   }
 
@@ -667,6 +677,10 @@ export class Engine {
 
     // Rebuild derived state
     propagatePower(engine.map, engine.powerGrid, engine.bldIdx)
+    calculatePollution(engine.map, engine.pollutionLevel, engine.pollutionBuffer)
+    calculateLandValues(engine.map, engine.powerGrid, engine.pollutionLevel, engine.crimeLevel, engine.landValues, engine.bldIdx)
+    calculateCrime(engine.map, engine.landValues, engine.crimeLevel, engine.funding.police, engine.influenceBuffer)
+    calculateFireCoverage(engine.map, engine.fireCoverage, engine.funding.fire, engine.influenceBuffer)
     engine.demand = calculateDemand(engine.map, engine.taxRate, undefined, engine.citizenSummary)
     engine.budgetInfo = calculateBudget(
       engine.map,
