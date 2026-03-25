@@ -12,10 +12,8 @@ import {
   BuildingCategory,
   FailReason,
   SimSpeed,
-  DEFAULTS,
   COSTS,
 } from '@bitborough/core'
-import { PRNG } from './prng.js'
 import { placeTile, placeZone } from './actions/place.js'
 import { bulldoze } from './actions/bulldoze.js'
 import { updateConnections } from './connections.js'
@@ -26,11 +24,11 @@ import { updateZones } from './simulation/zones.js'
 import { calculateBudget } from './simulation/budget.js'
 import { calculateCrime } from './simulation/services/crime.js'
 import { calculateFireCoverage, updateFires } from './simulation/services/fire.js'
-import { buildRoadGraph, updateRoadGraph } from './road-graph.js'
+import { updateRoadGraph } from './road-graph.js'
 import {
-  createRegistry, syncAgentsForBuilding, removeAgentsForBuilding,
+  syncAgentsForBuilding, removeAgentsForBuilding,
   citizenMonthlyTick, computeCitizenSummary, markRoutesStale, markRoutesStaleBatch,
-  setNextAgentId, computeTotalPopulation,
+  computeTotalPopulation,
   syncBuildingResidents,
   type TileLayers,
 } from './simulation/citizens.js'
@@ -45,9 +43,9 @@ import {
   type EngineState,
   type EngineConfig,
   createEngineState,
-  rebuildDerivedState,
+  serializeState,
+  restoreState,
   computeLoanRepayment,
-  maxPrefixedId,
 } from './engine-state.js'
 
 export type { EngineConfig }
@@ -436,173 +434,10 @@ export class Engine {
   }
 
   serialize(): SaveFile {
-    // Convert active fires Map to array of [index, remaining] pairs
-    const activeFires: Array<[number, number]> = Array.from(this.state.fireState.activeFires.entries())
-
-    return {
-      version: 7,
-      map: {
-        version: this.state.map.version,
-        width: this.state.map.width,
-        height: this.state.map.height,
-        terrain: Array.from(this.state.map.terrain) as unknown as Uint8Array,
-        zones: Array.from(this.state.map.zones) as unknown as Uint8Array,
-        infrastructure: Array.from(this.state.map.infrastructure) as unknown as Uint16Array,
-        connections: Array.from(this.state.map.connections) as unknown as Uint8Array,
-        elevation: Array.from(this.state.map.elevation) as unknown as Uint8Array,
-        buildings: this.state.map.buildings.map((b) => ({ ...b })),
-        meta: { ...this.state.map.meta },
-      },
-      state: {
-        funds: this.state.funds,
-        population: this.population,
-        month: this.state.month,
-        year: this.state.year,
-        tickCount: this.state.tickCount,
-        taxRate: this.state.taxRate,
-        funding: { ...this.state.funding },
-        seed: this.state.prng.getInternalState(),
-        activeFires,
-        loan: this.state.loan,
-        loanRepaymentAmount: this.state.loanRepaymentAmount,
-        history: this.state.history,
-        citizens: {
-          samplingRatio: this.state.citizenRegistry.samplingRatio,
-          agents: this.state.citizenRegistry.agents.map(a => ({
-            id: a.id,
-            homeBuildingId: a.homeBuildingId,
-            homeAccessRoad: a.homeAccessRoad,
-            workBuildingId: a.workBuildingId,
-            workAccessRoad: a.workAccessRoad,
-            commerceBuildingId: a.commerceBuildingId,
-            commerceAccessRoad: a.commerceAccessRoad,
-            homeWorkRoute: a.homeWorkRoute,
-            homeCommerceRoute: a.homeCommerceRoute,
-            satisfaction: a.satisfaction,
-            demographics: a.demographics,
-            wealthTier: a.wealthTier,
-          })),
-        },
-        reputationLayer: Array.from(this.state.reputationLayer),
-      },
-      timestamp: new Date().toISOString(),
-    }
+    return serializeState(this.state)
   }
 
   static restore(save: SaveFile): Engine {
-    // Rebuild typed arrays from saved number arrays
-    const map: GameMap = {
-      version: save.map.version,
-      width: save.map.width,
-      height: save.map.height,
-      terrain: new Uint8Array(save.map.terrain),
-      zones: new Uint8Array(save.map.zones),
-      infrastructure: new Uint16Array(save.map.infrastructure),
-      connections: new Uint8Array(save.map.connections),
-      elevation: new Uint8Array(save.map.elevation),
-      buildings: save.map.buildings.map((b) => ({
-        ...b,
-        state: b.state ?? 'active',
-        residents:
-          b.residents ??
-          // v1 save: default to capacity so old cities aren't empty
-          (save.version < 2 ? (BUILDING_DEFS[b.defId]?.capacity ?? 0) : 0),
-        lowOccupancyMonths: b.lowOccupancyMonths,
-      })),
-      meta: { ...save.map.meta },
-    }
-
-    const size = map.width * map.height
-
-    // Build citizen registry
-    let citizenRegistry
-    if (save.state.citizens) {
-      citizenRegistry = {
-        samplingRatio: save.state.citizens.samplingRatio,
-        agents: save.state.citizens.agents.map(a => ({
-          ...a,
-          demographics: a.demographics ?? { children: 0, working: 50, elderly: 0 },
-          wealthTier: a.wealthTier ?? 2,
-          homeWorkRouteStale: false,
-          homeCommerceRouteStale: false,
-          homeWorkRouteTileSet: new Set(a.homeWorkRoute),
-          homeCommerceRouteTileSet: new Set(a.homeCommerceRoute),
-        })),
-      }
-    } else {
-      citizenRegistry = createRegistry()
-    }
-
-    const reputationLayer = save.state.reputationLayer
-      ? new Float32Array(save.state.reputationLayer)
-      : new Float32Array(size).fill(0.5)
-
-    // Build EngineState manually for restore (not via createEngineState)
-    const state: EngineState = {
-      map,
-      prng: PRNG.fromState(save.state.seed),
-      tickCount: save.state.tickCount,
-      month: save.state.month,
-      year: save.state.year,
-      funds: save.state.funds,
-      taxRate: save.state.taxRate,
-      ticksPerMonth: DEFAULTS.ticksPerMonth,
-      monthsPerYear: DEFAULTS.monthsPerYear,
-      demand: { residential: 0, commercial: 0, industrial: 0 },
-      funding: {
-        police: save.state.funding.police ?? 100,
-        fire: save.state.funding.fire ?? 100,
-        transit: save.state.funding.transit ?? 100,
-      },
-      budgetInfo: undefined!,  // will be set below
-      powerGrid: new Uint8Array(size),
-      landValues: new Uint8Array(size),
-      pollutionLevel: new Uint8Array(size),
-      crimeLevel: new Uint8Array(size),
-      fireCoverage: new Uint8Array(size),
-      trafficDensity: new Uint8Array(size),
-      reputationLayer,
-      citizenRegistry,
-      roadGraph: buildRoadGraph(map),
-      citizenSummary: computeCitizenSummary(citizenRegistry),
-      fireState: { activeFires: new Map() },
-      influenceBuffer: new Float32Array(size),
-      pollutionBuffer: new Float32Array(size),
-      bldIdx: new BuildingIndex(map),
-      loan: save.state.loan ?? null,
-      loanRepaymentAmount: save.state.loanRepaymentAmount ?? (save.state.loan?.monthlyPayment ?? 0),
-      history: save.state.history ?? [],
-      nextBuildingId: maxPrefixedId(map.buildings, 'b') + 1,
-    }
-
-    // Restore active fires
-    const savedFires = save.state.activeFires
-    if (savedFires) {
-      for (const [idx, remaining] of savedFires) {
-        state.fireState.activeFires.set(idx, remaining)
-      }
-    }
-
-    if (state.citizenRegistry.agents.length > 0) {
-      setNextAgentId(maxPrefixedId(state.citizenRegistry.agents, 'c') + 1)
-    }
-
-    // Rebuild derived state
-    propagatePower(state.map, state.powerGrid, state.bldIdx)
-    calculatePollution(state.map, state.pollutionLevel, state.pollutionBuffer)
-    calculateLandValues(state.map, state.powerGrid, state.pollutionLevel, state.crimeLevel, state.landValues, state.bldIdx)
-    calculateCrime(state.map, state.landValues, state.crimeLevel, state.funding.police, state.influenceBuffer)
-    calculateFireCoverage(state.map, state.fireCoverage, state.funding.fire, state.influenceBuffer)
-    state.demand = calculateDemand(state.map, state.taxRate, undefined, state.citizenSummary)
-    state.budgetInfo = calculateBudget(
-      state.map,
-      computeTotalPopulation(state.map),
-      state.taxRate,
-      state.landValues,
-      state.funding,
-      computeLoanRepayment(state),
-    )
-
-    return new Engine(state)
+    return new Engine(restoreState(save))
   }
 }

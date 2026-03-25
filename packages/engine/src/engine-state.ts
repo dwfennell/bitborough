@@ -4,13 +4,17 @@ import {
   type Loan,
   type MonthlySnapshot,
   type CitizenSummary,
+  type SaveFile,
   DEFAULTS,
 } from '@bitborough/core'
 import { PRNG } from './prng.js'
 import { buildRoadGraph, type RoadGraph } from './road-graph.js'
 import { BuildingIndex } from './building-index.js'
+import { BUILDING_DEFS } from './buildings-registry.js'
 import {
-  createRegistry, computeTotalPopulation, type CitizenRegistry,
+  createRegistry, computeTotalPopulation, computeCitizenSummary,
+  setNextAgentId,
+  type CitizenRegistry,
   EMPTY_CITIZEN_SUMMARY,
 } from './simulation/citizens.js'
 import { propagatePower } from './simulation/power.js'
@@ -105,6 +109,174 @@ export function rebuildDerivedState(state: EngineState): void {
   calculateLandValues(state.map, state.powerGrid, state.pollutionLevel, state.crimeLevel, state.landValues, state.bldIdx)
   calculateCrime(state.map, state.landValues, state.crimeLevel, state.funding.police, state.influenceBuffer)
   calculateFireCoverage(state.map, state.fireCoverage, state.funding.fire, state.influenceBuffer)
+}
+
+export function serializeState(state: EngineState): SaveFile {
+  // Convert active fires Map to array of [index, remaining] pairs
+  const activeFires: Array<[number, number]> = Array.from(state.fireState.activeFires.entries())
+
+  return {
+    version: 7,
+    map: {
+      version: state.map.version,
+      width: state.map.width,
+      height: state.map.height,
+      terrain: Array.from(state.map.terrain) as unknown as Uint8Array,
+      zones: Array.from(state.map.zones) as unknown as Uint8Array,
+      infrastructure: Array.from(state.map.infrastructure) as unknown as Uint16Array,
+      connections: Array.from(state.map.connections) as unknown as Uint8Array,
+      elevation: Array.from(state.map.elevation) as unknown as Uint8Array,
+      buildings: state.map.buildings.map((b) => ({ ...b })),
+      meta: { ...state.map.meta },
+    },
+    state: {
+      funds: state.funds,
+      population: computeTotalPopulation(state.map),
+      month: state.month,
+      year: state.year,
+      tickCount: state.tickCount,
+      taxRate: state.taxRate,
+      funding: { ...state.funding },
+      seed: state.prng.getInternalState(),
+      activeFires,
+      loan: state.loan,
+      loanRepaymentAmount: state.loanRepaymentAmount,
+      history: state.history,
+      citizens: {
+        samplingRatio: state.citizenRegistry.samplingRatio,
+        agents: state.citizenRegistry.agents.map(a => ({
+          id: a.id,
+          homeBuildingId: a.homeBuildingId,
+          homeAccessRoad: a.homeAccessRoad,
+          workBuildingId: a.workBuildingId,
+          workAccessRoad: a.workAccessRoad,
+          commerceBuildingId: a.commerceBuildingId,
+          commerceAccessRoad: a.commerceAccessRoad,
+          homeWorkRoute: a.homeWorkRoute,
+          homeCommerceRoute: a.homeCommerceRoute,
+          satisfaction: a.satisfaction,
+          demographics: a.demographics,
+          wealthTier: a.wealthTier,
+        })),
+      },
+      reputationLayer: Array.from(state.reputationLayer),
+    },
+    timestamp: new Date().toISOString(),
+  }
+}
+
+export function restoreState(save: SaveFile): EngineState {
+  // Rebuild typed arrays from saved number arrays
+  const map: GameMap = {
+    version: save.map.version,
+    width: save.map.width,
+    height: save.map.height,
+    terrain: new Uint8Array(save.map.terrain),
+    zones: new Uint8Array(save.map.zones),
+    infrastructure: new Uint16Array(save.map.infrastructure),
+    connections: new Uint8Array(save.map.connections),
+    elevation: new Uint8Array(save.map.elevation),
+    buildings: save.map.buildings.map((b) => ({
+      ...b,
+      state: b.state ?? 'active',
+      residents:
+        b.residents ??
+        // v1 save: default to capacity so old cities aren't empty
+        (save.version < 2 ? (BUILDING_DEFS[b.defId]?.capacity ?? 0) : 0),
+      lowOccupancyMonths: b.lowOccupancyMonths,
+    })),
+    meta: { ...save.map.meta },
+  }
+
+  const size = map.width * map.height
+
+  // Build citizen registry
+  let citizenRegistry
+  if (save.state.citizens) {
+    citizenRegistry = {
+      samplingRatio: save.state.citizens.samplingRatio,
+      agents: save.state.citizens.agents.map(a => ({
+        ...a,
+        demographics: a.demographics ?? { children: 0, working: 50, elderly: 0 },
+        wealthTier: a.wealthTier ?? 2,
+        homeWorkRouteStale: false,
+        homeCommerceRouteStale: false,
+        homeWorkRouteTileSet: new Set(a.homeWorkRoute),
+        homeCommerceRouteTileSet: new Set(a.homeCommerceRoute),
+      })),
+    }
+  } else {
+    citizenRegistry = createRegistry()
+  }
+
+  const reputationLayer = save.state.reputationLayer
+    ? new Float32Array(save.state.reputationLayer)
+    : new Float32Array(size).fill(0.5)
+
+  // Build EngineState manually for restore (not via createEngineState)
+  const state: EngineState = {
+    map,
+    prng: PRNG.fromState(save.state.seed),
+    tickCount: save.state.tickCount,
+    month: save.state.month,
+    year: save.state.year,
+    funds: save.state.funds,
+    taxRate: save.state.taxRate,
+    ticksPerMonth: DEFAULTS.ticksPerMonth,
+    monthsPerYear: DEFAULTS.monthsPerYear,
+    demand: { residential: 0, commercial: 0, industrial: 0 },
+    funding: {
+      police: save.state.funding.police ?? 100,
+      fire: save.state.funding.fire ?? 100,
+      transit: save.state.funding.transit ?? 100,
+    },
+    budgetInfo: undefined!,  // will be set below
+    powerGrid: new Uint8Array(size),
+    landValues: new Uint8Array(size),
+    pollutionLevel: new Uint8Array(size),
+    crimeLevel: new Uint8Array(size),
+    fireCoverage: new Uint8Array(size),
+    trafficDensity: new Uint8Array(size),
+    reputationLayer,
+    citizenRegistry,
+    roadGraph: buildRoadGraph(map),
+    citizenSummary: computeCitizenSummary(citizenRegistry),
+    fireState: { activeFires: new Map() },
+    influenceBuffer: new Float32Array(size),
+    pollutionBuffer: new Float32Array(size),
+    bldIdx: new BuildingIndex(map),
+    loan: save.state.loan ?? null,
+    loanRepaymentAmount: save.state.loanRepaymentAmount ?? (save.state.loan?.monthlyPayment ?? 0),
+    history: save.state.history ?? [],
+    nextBuildingId: maxPrefixedId(map.buildings, 'b') + 1,
+  }
+
+  // Restore active fires
+  const savedFires = save.state.activeFires
+  if (savedFires) {
+    for (const [idx, remaining] of savedFires) {
+      state.fireState.activeFires.set(idx, remaining)
+    }
+  }
+
+  if (state.citizenRegistry.agents.length > 0) {
+    setNextAgentId(maxPrefixedId(state.citizenRegistry.agents, 'c') + 1)
+  }
+
+  // Rebuild derived state
+  propagatePower(state.map, state.powerGrid, state.bldIdx)
+  rebuildDerivedState(state)
+  state.demand = calculateDemand(state.map, state.taxRate, undefined, state.citizenSummary)
+  state.budgetInfo = calculateBudget(
+    state.map,
+    computeTotalPopulation(state.map),
+    state.taxRate,
+    state.landValues,
+    state.funding,
+    computeLoanRepayment(state),
+  )
+
+  return state
 }
 
 export function createEngineState(map: GameMap, config: EngineConfig): EngineState {
