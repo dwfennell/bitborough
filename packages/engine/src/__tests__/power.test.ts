@@ -124,7 +124,7 @@ describe('Power propagation', () => {
     // Total road tiles: 30 (y=0) + 30 (y=2) = 60 — all should be powered
 
     // Rebuild the BuildingIndex so power propagation sees the manually-added buildings
-    ;(engine as any).bldIdx = new BuildingIndex(state.map)
+    ;(engine as any).state.bldIdx = new BuildingIndex(state.map)
 
     engine.tick()
 

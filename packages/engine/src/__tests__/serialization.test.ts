@@ -221,7 +221,7 @@ describe('Serialization', () => {
     const engine = Engine.create(createTestMap(32), { seed: 1 })
 
     // Inject agents with high IDs to simulate a save with existing citizens
-    const registry = (engine as any).citizenRegistry
+    const registry = (engine as any).state.citizenRegistry
     registry.agents.push(
       { id: 'c10', homeBuildingId: 'b1', workBuildingId: null, commerceBuildingId: null, homeAccessRoad: 0, workAccessRoad: null, commerceAccessRoad: null, homeWorkRoute: [], homeCommerceRoute: [], homeWorkRouteStale: false, homeCommerceRouteStale: false, homeWorkRouteTileSet: new Set(), homeCommerceRouteTileSet: new Set(), satisfaction: 0.5 },
       { id: 'c20', homeBuildingId: 'b1', workBuildingId: null, commerceBuildingId: null, homeAccessRoad: 0, workAccessRoad: null, commerceAccessRoad: null, homeWorkRoute: [], homeCommerceRoute: [], homeWorkRouteStale: false, homeCommerceRouteStale: false, homeWorkRouteTileSet: new Set(), homeCommerceRouteTileSet: new Set(), satisfaction: 0.5 },

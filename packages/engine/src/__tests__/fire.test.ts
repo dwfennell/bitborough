@@ -56,10 +56,10 @@ describe('Fire system', () => {
       engine.placeZone(x, 11, ZoneType.Residential)
     }
     // Access engine internals to set a single fire
-    ;(engine as any).fireState.activeFires.set(9 * 32 + 10, 5)
+    ;(engine as any).state.fireState.activeFires.set(9 * 32 + 10, 5)
 
     // Tick once — next tick triggers monthly (ticksPerMonth=4, set tickCount=3)
-    ;(engine as any).tickCount = 3
+    ;(engine as any).state.tickCount = 3
     engine.tick()
 
     const fires = engine.getState().activeFires

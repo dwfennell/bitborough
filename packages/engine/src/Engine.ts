@@ -2,13 +2,9 @@ import {
   type GameMap,
   type GameState,
   type SaveFile,
-  type BudgetInfo,
   type Building,
   type Result,
-  type Loan,
   type GameEvent,
-  type MonthlySnapshot,
-  type CitizenSummary,
   calcMonthlyPayment,
   TileType,
   ZoneType,
@@ -29,14 +25,13 @@ import { calculateLandValues } from './simulation/land-value.js'
 import { updateZones } from './simulation/zones.js'
 import { calculateBudget } from './simulation/budget.js'
 import { calculateCrime } from './simulation/services/crime.js'
-import { calculateFireCoverage, updateFires, createFireState, type FireState } from './simulation/services/fire.js'
-import { buildRoadGraph, updateRoadGraph, type RoadGraph } from './road-graph.js'
+import { calculateFireCoverage, updateFires } from './simulation/services/fire.js'
+import { buildRoadGraph, updateRoadGraph } from './road-graph.js'
 import {
   createRegistry, syncAgentsForBuilding, removeAgentsForBuilding,
   citizenMonthlyTick, computeCitizenSummary, markRoutesStale, markRoutesStaleBatch,
-  setNextAgentId, EMPTY_CITIZEN_SUMMARY,
-  syncBuildingResidents, computeTotalPopulation,
-  type CitizenRegistry,
+  setNextAgentId, computeTotalPopulation,
+  syncBuildingResidents,
   type TileLayers,
 } from './simulation/citizens.js'
 import { computeReputation } from './simulation/reputation.js'
@@ -46,6 +41,16 @@ import { updateDensity } from './simulation/density.js'
 import { hasNearbyRoad } from './simulation/road-access.js'
 import { BUILDING_DEFS } from './buildings-registry.js'
 import { BuildingIndex } from './building-index.js'
+import {
+  type EngineState,
+  type EngineConfig,
+  createEngineState,
+  rebuildDerivedState,
+  computeLoanRepayment,
+  maxPrefixedId,
+} from './engine-state.js'
+
+export type { EngineConfig }
 
 export interface TileInfo {
   terrain: TileType
@@ -62,321 +67,219 @@ export interface TileInfo {
   reputation: number
 }
 
-export interface EngineConfig {
-  seed?: number
-  startingFunds?: number
-  ticksPerMonth?: number
-  monthsPerYear?: number
-  startYear?: number
-  startMonth?: number
-  taxRate?: number
-}
-
-function maxPrefixedId(items: ReadonlyArray<{ id: string }>, prefix: string): number {
-  let max = 0
-  for (const item of items) {
-    const n = parseInt(item.id.slice(prefix.length), 10)
-    if (n > max) max = n
-  }
-  return max
-}
-
 export class Engine {
-  private map: GameMap
-  private prng: PRNG
-  private tickCount = 0
-  private get population(): number { return computeTotalPopulation(this.map) }
-  private month: number
-  private year: number
+  private state: EngineState
   private speed: SimSpeed = SimSpeed.Normal
-  private funds: number
-  private taxRate: number
-  private ticksPerMonth: number
-  private monthsPerYear: number
-
-  // Demand
-  private demand: { residential: number; commercial: number; industrial: number }
-
-  // Budget
-  private funding: { police: number; fire: number; transit: number }
-  private budgetInfo: BudgetInfo
-
-  // Simulation layers
-  private powerGrid: Uint8Array
-  private landValues: Uint8Array
-  private pollutionLevel: Uint8Array
-  private crimeLevel: Uint8Array
-  private fireCoverage: Uint8Array
-  private trafficDensity: Uint8Array
-  private reputationLayer: Float32Array
-
-  // Citizens
-  private citizenRegistry: CitizenRegistry
-  private roadGraph: RoadGraph
-  private citizenSummary: CitizenSummary
-  // Fire system
-  private fireState: FireState
-
-  // Reusable buffers for radial calculations (avoids per-tick allocation)
-  private influenceBuffer: Float32Array
-  private pollutionBuffer: Float32Array
-
-  // Spatial index for O(1) building lookups; rebuilt when buildings change
-  private bldIdx: BuildingIndex
-
-  // Loan system
-  private loan: Loan | null = null
-  private loanRepaymentAmount: number = 0
   private events: GameEvent[] = []
 
-  // History
-  private history: MonthlySnapshot[] = []
+  private get population(): number { return computeTotalPopulation(this.state.map) }
 
-  private computeLoanRepayment(): number {
-    if (!this.loan) return 0
-    return Math.round(Math.min(this.loanRepaymentAmount, this.loan.remaining))
-  }
-
-  private constructor(map: GameMap, config: EngineConfig) {
-    this.map = map
-    this.prng = new PRNG(config.seed ?? Date.now())
-    this.ticksPerMonth = config.ticksPerMonth ?? DEFAULTS.ticksPerMonth
-    this.monthsPerYear = config.monthsPerYear ?? DEFAULTS.monthsPerYear
-    this.month = config.startMonth ?? DEFAULTS.startMonth
-    this.year = config.startYear ?? DEFAULTS.startYear
-    this.taxRate = config.taxRate ?? DEFAULTS.taxRate
-
-    const defaultFunds = DEFAULTS.startingFunds[map.width] ?? 20_000
-    this.funds = config.startingFunds ?? defaultFunds
-
-    const size = map.width * map.height
-    this.powerGrid = new Uint8Array(size)
-    this.landValues = new Uint8Array(size)
-    this.pollutionLevel = new Uint8Array(size)
-    this.crimeLevel = new Uint8Array(size)
-    this.fireCoverage = new Uint8Array(size)
-    this.trafficDensity = new Uint8Array(size)
-    this.reputationLayer = new Float32Array(size).fill(0.5)
-    this.fireState = createFireState()
-    this.influenceBuffer = new Float32Array(size)
-    this.pollutionBuffer = new Float32Array(size)
-    this.bldIdx = new BuildingIndex(map)
-    this.citizenRegistry = createRegistry()
-    this.roadGraph = buildRoadGraph(this.map)
-    this.citizenSummary = { ...EMPTY_CITIZEN_SUMMARY }
-
-    // Initialize demand
-    this.demand = calculateDemand(this.map, this.taxRate)
-
-    // Initialize budget
-    this.funding = { police: 100, fire: 100, transit: 100 }
-    this.budgetInfo = calculateBudget(this.map, this.population, this.taxRate, this.landValues, this.funding)
+  private constructor(state: EngineState) {
+    this.state = state
   }
 
   static create(map: GameMap, config: EngineConfig = {}): Engine {
-    return new Engine(map, config)
+    return new Engine(createEngineState(map, config))
   }
 
-  private nextBuildingId = 1
-
   tick(): void {
-    this.tickCount++
+    this.state.tickCount++
 
     // Power propagation runs every tick (uses cached building index)
-    propagatePower(this.map, this.powerGrid, this.bldIdx)
+    propagatePower(this.state.map, this.state.powerGrid, this.state.bldIdx)
 
     // Monthly systems
-    if (this.tickCount % this.ticksPerMonth === 0) {
+    if (this.state.tickCount % this.state.ticksPerMonth === 0) {
       // 0. Clear events at start of monthly tick
       this.events = []
 
       // Rebuild index — buildings may change during monthly simulation
-      this.bldIdx = new BuildingIndex(this.map)
-      this.month++
-      if (this.month > this.monthsPerYear) {
-        this.month = 1
-        this.year++
+      this.state.bldIdx = new BuildingIndex(this.state.map)
+      this.state.month++
+      if (this.state.month > this.state.monthsPerYear) {
+        this.state.month = 1
+        this.state.year++
       }
 
-      this.demand = calculateDemand(this.map, this.taxRate, this.trafficDensity, this.citizenSummary)
+      this.state.demand = calculateDemand(this.state.map, this.state.taxRate, this.state.trafficDensity, this.state.citizenSummary)
 
       // Pollution propagation — must run before land values / desirability
-      calculatePollution(this.map, this.pollutionLevel, this.pollutionBuffer)
+      calculatePollution(this.state.map, this.state.pollutionLevel, this.state.pollutionBuffer)
 
       // Land values use previous month's crime; crime uses updated land values
-      calculateLandValues(this.map, this.powerGrid, this.pollutionLevel, this.crimeLevel, this.landValues, this.bldIdx)
-      calculateCrime(this.map, this.landValues, this.crimeLevel, this.funding.police, this.influenceBuffer)
-      calculateFireCoverage(this.map, this.fireCoverage, this.funding.fire, this.influenceBuffer)
-      updateFires(this.map, this.fireState, this.fireCoverage, this.prng, this.bldIdx)
-      computeReputation(this.reputationLayer, this.map, this.crimeLevel, this.fireCoverage, this.pollutionLevel, this.bldIdx)
+      calculateLandValues(this.state.map, this.state.powerGrid, this.state.pollutionLevel, this.state.crimeLevel, this.state.landValues, this.state.bldIdx)
+      calculateCrime(this.state.map, this.state.landValues, this.state.crimeLevel, this.state.funding.police, this.state.influenceBuffer)
+      calculateFireCoverage(this.state.map, this.state.fireCoverage, this.state.funding.fire, this.state.influenceBuffer)
+      updateFires(this.state.map, this.state.fireState, this.state.fireCoverage, this.state.prng, this.state.bldIdx)
+      computeReputation(this.state.reputationLayer, this.state.map, this.state.crimeLevel, this.state.fireCoverage, this.state.pollutionLevel, this.state.bldIdx)
       // Citizen monthly tick: replan stale routes, write trafficDensity from agent routes
       const tileLayers: TileLayers = {
-        crimeLevel: this.crimeLevel,
-        fireCoverage: this.fireCoverage,
-        pollutionLevel: this.pollutionLevel,
-        reputationLayer: this.reputationLayer,
+        crimeLevel: this.state.crimeLevel,
+        fireCoverage: this.state.fireCoverage,
+        pollutionLevel: this.state.pollutionLevel,
+        reputationLayer: this.state.reputationLayer,
       }
-      citizenMonthlyTick(this.citizenRegistry, this.map, this.roadGraph, this.trafficDensity, tileLayers, this.bldIdx)
-      this.citizenSummary = computeCitizenSummary(this.citizenRegistry)
+      citizenMonthlyTick(this.state.citizenRegistry, this.state.map, this.state.roadGraph, this.state.trafficDensity, tileLayers, this.state.bldIdx)
+      this.state.citizenSummary = computeCitizenSummary(this.state.citizenRegistry)
 
       // Zone development
-      const nextBuildingIdRef = { value: this.nextBuildingId }
-      updateZones(this.map, this.powerGrid, this.demand, this.prng, nextBuildingIdRef, this.bldIdx)
-      this.nextBuildingId = nextBuildingIdRef.value
+      const nextBuildingIdRef = { value: this.state.nextBuildingId }
+      updateZones(this.state.map, this.state.powerGrid, this.state.demand, this.state.prng, nextBuildingIdRef, this.state.bldIdx)
+      this.state.nextBuildingId = nextBuildingIdRef.value
 
       // Density progression
       updateDensity(
-        this.map,
-        this.powerGrid,
-        this.demand,
+        this.state.map,
+        this.state.powerGrid,
+        this.state.demand,
         this.population,
-        this.prng,
+        this.state.prng,
         nextBuildingIdRef,
-        this.crimeLevel,
-        this.fireCoverage,
-        this.pollutionLevel,
+        this.state.crimeLevel,
+        this.state.fireCoverage,
+        this.state.pollutionLevel,
       )
-      this.nextBuildingId = nextBuildingIdRef.value
+      this.state.nextBuildingId = nextBuildingIdRef.value
 
       // Sync citizen agents after zone/density changes
       this.syncResidentialAgents()
 
       // Demographics — aging, deaths, births, migration
-      const demoResult = demographicTick(this.citizenRegistry, this.map, this.prng, this.citizenSummary.avgSatisfaction)
-      syncBuildingResidents(this.map, this.citizenRegistry)
+      const demoResult = demographicTick(this.state.citizenRegistry, this.state.map, this.state.prng, this.state.citizenSummary.avgSatisfaction)
+      syncBuildingResidents(this.state.map, this.state.citizenRegistry)
       // Second sync: demographicTick changed resident counts, so agent counts need reconciling
       this.syncResidentialAgents()
 
       // Refresh citizen summary with post-demographics data
-      this.citizenSummary = computeCitizenSummary(this.citizenRegistry)
-      this.citizenSummary.birthsLastTick = demoResult.births
-      this.citizenSummary.deathsLastTick = demoResult.deaths
-      this.citizenSummary.netMigrationLastTick = demoResult.netMigration
+      this.state.citizenSummary = computeCitizenSummary(this.state.citizenRegistry)
+      this.state.citizenSummary.birthsLastTick = demoResult.births
+      this.state.citizenSummary.deathsLastTick = demoResult.deaths
+      this.state.citizenSummary.netMigrationLastTick = demoResult.netMigration
 
       // 1. Compute budget including loan repayment
-      const loanRepayment = this.computeLoanRepayment()
-      this.budgetInfo = calculateBudget(this.map, this.population, this.taxRate, this.landValues, this.funding, loanRepayment)
+      const loanRepayment = computeLoanRepayment(this.state)
+      this.state.budgetInfo = calculateBudget(this.state.map, this.population, this.state.taxRate, this.state.landValues, this.state.funding, loanRepayment)
 
       // 2. Apply monthly balance (already includes repayment deduction)
-      this.funds += this.budgetInfo.balance
+      this.state.funds += this.state.budgetInfo.balance
 
       // 3. Update loan book (funds already adjusted via balance)
-      if (this.loan) {
-        const payment = this.budgetInfo.loanRepayment
-        this.loan.remaining -= payment
-        this.loan.monthsLeft = Math.max(0, this.loan.monthsLeft - 1)
-        if (this.loan.remaining <= 0) {
-          this.loan = null
-          this.loanRepaymentAmount = 0
+      if (this.state.loan) {
+        const payment = this.state.budgetInfo.loanRepayment
+        this.state.loan.remaining -= payment
+        this.state.loan.monthsLeft = Math.max(0, this.state.loan.monthsLeft - 1)
+        if (this.state.loan.remaining <= 0) {
+          this.state.loan = null
+          this.state.loanRepaymentAmount = 0
         }
       }
 
       // 4. Emergency loan check
-      if (this.funds < 0 && this.loan === null) {
-        const baseExpenses = this.budgetInfo.maintenanceCosts.total + this.budgetInfo.serviceCosts.total
-        const emergencyAmount = Math.max(10_000, -this.funds + baseExpenses * 6)
+      if (this.state.funds < 0 && this.state.loan === null) {
+        const baseExpenses = this.state.budgetInfo.maintenanceCosts.total + this.state.budgetInfo.serviceCosts.total
+        const emergencyAmount = Math.max(10_000, -this.state.funds + baseExpenses * 6)
         const monthlyPayment = calcMonthlyPayment(emergencyAmount)
-        this.loan = { principal: emergencyAmount, remaining: emergencyAmount, monthlyPayment, termMonths: 120, monthsLeft: 120, interestRate: 0.08 }
-        this.loanRepaymentAmount = monthlyPayment
-        this.funds += emergencyAmount
+        this.state.loan = { principal: emergencyAmount, remaining: emergencyAmount, monthlyPayment, termMonths: 120, monthsLeft: 120, interestRate: 0.08 }
+        this.state.loanRepaymentAmount = monthlyPayment
+        this.state.funds += emergencyAmount
         this.events.push({ type: 'emergency_loan', amount: emergencyAmount })
       }
 
       // 5. Bankruptcy (loan exists but still broke after emergency loan)
-      if (this.funds < 0 && this.loan !== null) {
+      if (this.state.funds < 0 && this.state.loan !== null) {
         this.events.push({ type: 'bankruptcy' })
       }
 
       // 6. Record monthly snapshot
-      this.history.push({
-        month: this.month,
-        year: this.year,
+      this.state.history.push({
+        month: this.state.month,
+        year: this.state.year,
         population: this.population,
-        funds: this.funds,
-        taxIncome: this.budgetInfo.taxIncome,
-        expenses: this.budgetInfo.projectedExpenses,
-        rDemand: this.demand.residential,
-        cDemand: this.demand.commercial,
-        iDemand: this.demand.industrial,
-        births: this.citizenSummary.birthsLastTick,
-        deaths: this.citizenSummary.deathsLastTick,
-        netMigration: this.citizenSummary.netMigrationLastTick,
+        funds: this.state.funds,
+        taxIncome: this.state.budgetInfo.taxIncome,
+        expenses: this.state.budgetInfo.projectedExpenses,
+        rDemand: this.state.demand.residential,
+        cDemand: this.state.demand.commercial,
+        iDemand: this.state.demand.industrial,
+        births: this.state.citizenSummary.birthsLastTick,
+        deaths: this.state.citizenSummary.deathsLastTick,
+        netMigration: this.state.citizenSummary.netMigrationLastTick,
       })
-      if (this.history.length > 1200) this.history.shift()
+      if (this.state.history.length > 1200) this.state.history.shift()
     }
   }
 
   getState(): GameState {
     return {
-      map: this.map,
+      map: this.state.map,
       time: {
-        tickCount: this.tickCount,
-        month: this.month,
-        year: this.year,
+        tickCount: this.state.tickCount,
+        month: this.state.month,
+        year: this.state.year,
         speed: this.speed,
       },
       population: this.population,
-      funds: this.funds,
-      demand: this.demand,
-      budget: { ...this.budgetInfo, totalFunds: this.funds },
-      powerGrid: this.powerGrid,
-      landValues: this.landValues,
-      pollutionLevel: this.pollutionLevel,
-      crimeLevel: this.crimeLevel,
-      fireCoverage: this.fireCoverage,
-      trafficDensity: this.trafficDensity,
-      activeFires: Array.from(this.fireState.activeFires.keys()),
-      loan: this.loan,
-      loanRepaymentAmount: this.loanRepaymentAmount,
+      funds: this.state.funds,
+      demand: this.state.demand,
+      budget: { ...this.state.budgetInfo, totalFunds: this.state.funds },
+      powerGrid: this.state.powerGrid,
+      landValues: this.state.landValues,
+      pollutionLevel: this.state.pollutionLevel,
+      crimeLevel: this.state.crimeLevel,
+      fireCoverage: this.state.fireCoverage,
+      trafficDensity: this.state.trafficDensity,
+      activeFires: Array.from(this.state.fireState.activeFires.keys()),
+      loan: this.state.loan,
+      loanRepaymentAmount: this.state.loanRepaymentAmount,
       events: this.events,
-      history: this.history,
-      citizens: this.citizenSummary,
+      history: this.state.history,
+      citizens: this.state.citizenSummary,
     }
   }
 
   getDemand() {
-    return this.demand
+    return this.state.demand
   }
 
   getTile(x: number, y: number): TileInfo {
-    const idx = y * this.map.width + x
+    const idx = y * this.state.map.width + x
     return {
-      terrain: this.map.terrain[idx] as TileType,
-      zone: this.map.zones[idx] as ZoneType,
-      infrastructure: this.map.infrastructure[idx]!,
-      connections: this.map.connections[idx]!,
-      elevation: this.map.elevation[idx]!,
-      powered: this.powerGrid[idx] !== 0,
-      hasRoadAccess: hasNearbyRoad(this.map, x, y),
-      landValue: this.landValues[idx]!,
-      crimeLevel: this.crimeLevel[idx]!,
-      fireCoverage: this.fireCoverage[idx]!,
-      pollutionLevel: this.pollutionLevel[idx]!,
-      reputation: this.reputationLayer[idx]!,
+      terrain: this.state.map.terrain[idx] as TileType,
+      zone: this.state.map.zones[idx] as ZoneType,
+      infrastructure: this.state.map.infrastructure[idx]!,
+      connections: this.state.map.connections[idx]!,
+      elevation: this.state.map.elevation[idx]!,
+      powered: this.state.powerGrid[idx] !== 0,
+      hasRoadAccess: hasNearbyRoad(this.state.map, x, y),
+      landValue: this.state.landValues[idx]!,
+      crimeLevel: this.state.crimeLevel[idx]!,
+      fireCoverage: this.state.fireCoverage[idx]!,
+      pollutionLevel: this.state.pollutionLevel[idx]!,
+      reputation: this.state.reputationLayer[idx]!,
     }
   }
 
   placeTile(x: number, y: number, infra: Infrastructure): Result {
-    const { result, cost } = placeTile(this.map, x, y, infra, this.funds, this.bldIdx)
-    this.funds -= cost
+    const { result, cost } = placeTile(this.state.map, x, y, infra, this.state.funds, this.state.bldIdx)
+    this.state.funds -= cost
     if (result.ok) {
-      updateConnections(this.map, x, y)
-      const placedInfra = this.map.infrastructure[y * this.map.width + x]!
+      updateConnections(this.state.map, x, y)
+      const placedInfra = this.state.map.infrastructure[y * this.state.map.width + x]!
       if (placedInfra & Infrastructure.Road) {
-        updateRoadGraph(this.map, this.roadGraph, x, y)
-        markRoutesStale(this.citizenRegistry, y * this.map.width + x)
+        updateRoadGraph(this.state.map, this.state.roadGraph, x, y)
+        markRoutesStale(this.state.citizenRegistry, y * this.state.map.width + x)
       }
     }
     return result
   }
 
   placeZone(x: number, y: number, zone: ZoneType): Result {
-    return placeZone(this.map, x, y, zone, this.bldIdx)
+    return placeZone(this.state.map, x, y, zone, this.state.bldIdx)
   }
 
   upgradeTile(x: number, y: number): Result {
-    const idx = y * this.map.width + x
-    const infra = this.map.infrastructure[idx]!
+    const idx = y * this.state.map.width + x
+    const infra = this.state.map.infrastructure[idx]!
 
     if (!(infra & Infrastructure.Road)) {
       return { ok: false, reason: FailReason.InvalidLocation, detail: 'No road to upgrade' }
@@ -386,45 +289,45 @@ export class Engine {
     }
 
     const cost = COSTS.pavedRoadUpgrade
-    if (this.funds < cost) {
+    if (this.state.funds < cost) {
       return { ok: false, reason: FailReason.InsufficientFunds }
     }
 
-    this.map.infrastructure[idx]! |= Infrastructure.PavedRoad
-    this.funds -= cost
+    this.state.map.infrastructure[idx]! |= Infrastructure.PavedRoad
+    this.state.funds -= cost
     return { ok: true }
   }
 
   bulldoze(x: number, y: number): Result {
     // Read the building before bulldoze so we know the footprint for cleanup
-    const building = this.bldIdx.get(x, y)
+    const building = this.state.bldIdx.get(x, y)
     const def = building ? BUILDING_DEFS[building.defId] : undefined
 
-    const { result, cost } = bulldoze(this.map, x, y, this.funds, this.bldIdx)
-    this.funds -= cost
+    const { result, cost } = bulldoze(this.state.map, x, y, this.state.funds, this.state.bldIdx)
+    this.state.funds -= cost
     if (result.ok) {
-      this.bldIdx = new BuildingIndex(this.map)
+      this.state.bldIdx = new BuildingIndex(this.state.map)
 
       if (building && def) {
         for (let dy = 0; dy < def.size.h; dy++) {
           for (let dx = 0; dx < def.size.w; dx++) {
-            updateConnections(this.map, building.x + dx, building.y + dy)
-            updateRoadGraph(this.map, this.roadGraph, building.x + dx, building.y + dy)
+            updateConnections(this.state.map, building.x + dx, building.y + dy)
+            updateRoadGraph(this.state.map, this.state.roadGraph, building.x + dx, building.y + dy)
           }
         }
         // Batch mark all footprint tiles as stale in a single agent scan
         const staleTiles = new Set<number>()
         for (let dy = 0; dy < def.size.h; dy++) {
           for (let dx = 0; dx < def.size.w; dx++) {
-            staleTiles.add((building.y + dy) * this.map.width + (building.x + dx))
+            staleTiles.add((building.y + dy) * this.state.map.width + (building.x + dx))
           }
         }
-        markRoutesStaleBatch(this.citizenRegistry, staleTiles)
-        removeAgentsForBuilding(this.citizenRegistry, building.id)
+        markRoutesStaleBatch(this.state.citizenRegistry, staleTiles)
+        removeAgentsForBuilding(this.state.citizenRegistry, building.id)
       } else {
-        updateConnections(this.map, x, y)
-        updateRoadGraph(this.map, this.roadGraph, x, y)
-        markRoutesStale(this.citizenRegistry, y * this.map.width + x)
+        updateConnections(this.state.map, x, y)
+        updateRoadGraph(this.state.map, this.state.roadGraph, x, y)
+        markRoutesStale(this.state.citizenRegistry, y * this.state.map.width + x)
       }
     }
     return result
@@ -437,7 +340,7 @@ export class Engine {
     }
 
     // Check funds
-    if (this.funds < def.cost) {
+    if (this.state.funds < def.cost) {
       return { ok: false, reason: FailReason.InsufficientFunds }
     }
 
@@ -446,11 +349,11 @@ export class Engine {
       for (let dx = 0; dx < def.size.w; dx++) {
         const tx = x + dx
         const ty = y + dy
-        if (tx < 0 || ty < 0 || tx >= this.map.width || ty >= this.map.height) {
+        if (tx < 0 || ty < 0 || tx >= this.state.map.width || ty >= this.state.map.height) {
           return { ok: false, reason: FailReason.InvalidLocation, detail: 'Footprint out of bounds' }
         }
-        const idx = ty * this.map.width + tx
-        if (this.map.terrain[idx] === TileType.Water) {
+        const idx = ty * this.state.map.width + tx
+        if (this.state.map.terrain[idx] === TileType.Water) {
           return { ok: false, reason: FailReason.InvalidLocation, detail: 'Cannot build on water' }
         }
       }
@@ -459,7 +362,7 @@ export class Engine {
     // Check overlap with existing buildings using spatial index
     for (let dy = 0; dy < def.size.h; dy++) {
       for (let dx = 0; dx < def.size.w; dx++) {
-        if (this.bldIdx.has(x + dx, y + dy)) {
+        if (this.state.bldIdx.has(x + dx, y + dy)) {
           return { ok: false, reason: FailReason.Occupied }
         }
       }
@@ -467,7 +370,7 @@ export class Engine {
 
     // Create building
     const building: Building = {
-      id: `b${this.nextBuildingId++}`,
+      id: `b${this.state.nextBuildingId++}`,
       defId,
       x,
       y,
@@ -478,15 +381,15 @@ export class Engine {
       residents: 0,
     }
 
-    this.map.buildings.push(building)
-    this.bldIdx = new BuildingIndex(this.map)
-    this.funds -= def.cost
+    this.state.map.buildings.push(building)
+    this.state.bldIdx = new BuildingIndex(this.state.map)
+    this.state.funds -= def.cost
 
     // Clear zones under the building footprint
     for (let dy = 0; dy < def.size.h; dy++) {
       for (let dx = 0; dx < def.size.w; dx++) {
-        const idx = (y + dy) * this.map.width + (x + dx)
-        this.map.zones[idx] = ZoneType.None
+        const idx = (y + dy) * this.state.map.width + (x + dx)
+        this.state.map.zones[idx] = ZoneType.None
       }
     }
 
@@ -494,78 +397,78 @@ export class Engine {
   }
 
   private syncResidentialAgents(): void {
-    for (const b of this.map.buildings) {
+    for (const b of this.state.map.buildings) {
       if (b.state === 'active') {
         const def = BUILDING_DEFS[b.defId]
         if (def && def.category === BuildingCategory.Residential) {
-          syncAgentsForBuilding(this.map, this.citizenRegistry, this.roadGraph, b, this.trafficDensity, this.prng, this.reputationLayer)
+          syncAgentsForBuilding(this.state.map, this.state.citizenRegistry, this.state.roadGraph, b, this.state.trafficDensity, this.state.prng, this.state.reputationLayer)
         }
       }
     }
   }
 
   setTaxRate(rate: number): void {
-    this.taxRate = Math.max(0, Math.min(0.2, rate))
-    this.budgetInfo = calculateBudget(this.map, this.population, this.taxRate, this.landValues, this.funding, this.computeLoanRepayment())
+    this.state.taxRate = Math.max(0, Math.min(0.2, rate))
+    this.state.budgetInfo = calculateBudget(this.state.map, this.population, this.state.taxRate, this.state.landValues, this.state.funding, computeLoanRepayment(this.state))
   }
 
   setFunding(service: 'police' | 'fire' | 'transit', level: number): void {
-    this.funding[service] = Math.max(0, Math.min(100, level))
-    this.budgetInfo = calculateBudget(this.map, this.population, this.taxRate, this.landValues, this.funding, this.computeLoanRepayment())
+    this.state.funding[service] = Math.max(0, Math.min(100, level))
+    this.state.budgetInfo = calculateBudget(this.state.map, this.population, this.state.taxRate, this.state.landValues, this.state.funding, computeLoanRepayment(this.state))
   }
 
   takeLoan(amount: number): Result {
-    if (this.loan !== null) return { ok: false, reason: FailReason.LoanExists }
-    const maxLoanAmount = this.budgetInfo.taxIncome * 48
+    if (this.state.loan !== null) return { ok: false, reason: FailReason.LoanExists }
+    const maxLoanAmount = this.state.budgetInfo.taxIncome * 48
     if (amount < 10_000 || amount > maxLoanAmount) return { ok: false, reason: FailReason.AmountOutOfRange }
     const monthlyPayment = calcMonthlyPayment(amount)
-    this.loan = { principal: amount, remaining: amount, monthlyPayment, termMonths: 120, monthsLeft: 120, interestRate: 0.08 }
-    this.loanRepaymentAmount = monthlyPayment
-    this.funds += amount
+    this.state.loan = { principal: amount, remaining: amount, monthlyPayment, termMonths: 120, monthsLeft: 120, interestRate: 0.08 }
+    this.state.loanRepaymentAmount = monthlyPayment
+    this.state.funds += amount
     return { ok: true }
   }
 
   setLoanRepayment(amount: number): Result {
-    if (this.loan === null) return { ok: false, reason: FailReason.NoActiveLoan }
-    if (amount < this.loan.monthlyPayment || amount > this.loan.remaining) return { ok: false, reason: FailReason.AmountOutOfRange }
-    this.loanRepaymentAmount = amount
+    if (this.state.loan === null) return { ok: false, reason: FailReason.NoActiveLoan }
+    if (amount < this.state.loan.monthlyPayment || amount > this.state.loan.remaining) return { ok: false, reason: FailReason.AmountOutOfRange }
+    this.state.loanRepaymentAmount = amount
     return { ok: true }
   }
 
   serialize(): SaveFile {
     // Convert active fires Map to array of [index, remaining] pairs
-    const activeFires: Array<[number, number]> = Array.from(this.fireState.activeFires.entries())
+    const activeFires: Array<[number, number]> = Array.from(this.state.fireState.activeFires.entries())
 
     return {
       version: 7,
       map: {
-        version: this.map.version,
-        width: this.map.width,
-        height: this.map.height,
-        terrain: Array.from(this.map.terrain) as unknown as Uint8Array,
-        zones: Array.from(this.map.zones) as unknown as Uint8Array,
-        infrastructure: Array.from(this.map.infrastructure) as unknown as Uint16Array,
-        connections: Array.from(this.map.connections) as unknown as Uint8Array,
-        elevation: Array.from(this.map.elevation) as unknown as Uint8Array,
-        buildings: this.map.buildings.map((b) => ({ ...b })),
-        meta: { ...this.map.meta },
+        version: this.state.map.version,
+        width: this.state.map.width,
+        height: this.state.map.height,
+        terrain: Array.from(this.state.map.terrain) as unknown as Uint8Array,
+        zones: Array.from(this.state.map.zones) as unknown as Uint8Array,
+        infrastructure: Array.from(this.state.map.infrastructure) as unknown as Uint16Array,
+        connections: Array.from(this.state.map.connections) as unknown as Uint8Array,
+        elevation: Array.from(this.state.map.elevation) as unknown as Uint8Array,
+        buildings: this.state.map.buildings.map((b) => ({ ...b })),
+        meta: { ...this.state.map.meta },
       },
       state: {
-        funds: this.funds,
+        funds: this.state.funds,
         population: this.population,
-        month: this.month,
-        year: this.year,
-        tickCount: this.tickCount,
-        taxRate: this.taxRate,
-        funding: { ...this.funding },
-        seed: this.prng.getInternalState(),
+        month: this.state.month,
+        year: this.state.year,
+        tickCount: this.state.tickCount,
+        taxRate: this.state.taxRate,
+        funding: { ...this.state.funding },
+        seed: this.state.prng.getInternalState(),
         activeFires,
-        loan: this.loan,
-        loanRepaymentAmount: this.loanRepaymentAmount,
-        history: this.history,
+        loan: this.state.loan,
+        loanRepaymentAmount: this.state.loanRepaymentAmount,
+        history: this.state.history,
         citizens: {
-          samplingRatio: this.citizenRegistry.samplingRatio,
-          agents: this.citizenRegistry.agents.map(a => ({
+          samplingRatio: this.state.citizenRegistry.samplingRatio,
+          agents: this.state.citizenRegistry.agents.map(a => ({
             id: a.id,
             homeBuildingId: a.homeBuildingId,
             homeAccessRoad: a.homeAccessRoad,
@@ -580,7 +483,7 @@ export class Engine {
             wealthTier: a.wealthTier,
           })),
         },
-        reputationLayer: Array.from(this.reputationLayer),
+        reputationLayer: Array.from(this.state.reputationLayer),
       },
       timestamp: new Date().toISOString(),
     }
@@ -609,45 +512,12 @@ export class Engine {
       meta: { ...save.map.meta },
     }
 
-    // Create engine with minimal config (we'll override everything)
-    const engine = new Engine(map, {
-      seed: 0,
-      startingFunds: save.state.funds,
-      startMonth: save.state.month,
-      startYear: save.state.year,
-      taxRate: save.state.taxRate,
-    })
+    const size = map.width * map.height
 
-    // Restore PRNG state
-    engine.prng = PRNG.fromState(save.state.seed)
-
-    // Restore simulation state
-    engine.tickCount = save.state.tickCount
-    engine.funds = save.state.funds
-    engine.funding = {
-      police: save.state.funding.police ?? 100,
-      fire: save.state.funding.fire ?? 100,
-      transit: save.state.funding.transit ?? 100,
-    }
-
-    // Restore active fires
-    const savedFires = save.state.activeFires
-    if (savedFires) {
-      for (const [idx, remaining] of savedFires) {
-        engine.fireState.activeFires.set(idx, remaining)
-      }
-    }
-
-    engine.nextBuildingId = maxPrefixedId(map.buildings, 'b') + 1
-
-    // Restore loan state
-    engine.loan = save.state.loan ?? null
-    engine.loanRepaymentAmount = save.state.loanRepaymentAmount ?? (engine.loan?.monthlyPayment ?? 0)
-    engine.history = save.state.history ?? []
-
-    // Restore citizen registry
+    // Build citizen registry
+    let citizenRegistry
     if (save.state.citizens) {
-      engine.citizenRegistry = {
+      citizenRegistry = {
         samplingRatio: save.state.citizens.samplingRatio,
         agents: save.state.citizens.agents.map(a => ({
           ...a,
@@ -660,37 +530,79 @@ export class Engine {
         })),
       }
     } else {
-      engine.citizenRegistry = createRegistry()
-    }
-    engine.roadGraph = buildRoadGraph(engine.map)
-    engine.citizenSummary = computeCitizenSummary(engine.citizenRegistry)
-
-    if (save.state.reputationLayer) {
-      engine.reputationLayer = new Float32Array(save.state.reputationLayer)
-    } else {
-      engine.reputationLayer.fill(0.5)
+      citizenRegistry = createRegistry()
     }
 
-    if (engine.citizenRegistry.agents.length > 0) {
-      setNextAgentId(maxPrefixedId(engine.citizenRegistry.agents, 'c') + 1)
+    const reputationLayer = save.state.reputationLayer
+      ? new Float32Array(save.state.reputationLayer)
+      : new Float32Array(size).fill(0.5)
+
+    // Build EngineState manually for restore (not via createEngineState)
+    const state: EngineState = {
+      map,
+      prng: PRNG.fromState(save.state.seed),
+      tickCount: save.state.tickCount,
+      month: save.state.month,
+      year: save.state.year,
+      funds: save.state.funds,
+      taxRate: save.state.taxRate,
+      ticksPerMonth: DEFAULTS.ticksPerMonth,
+      monthsPerYear: DEFAULTS.monthsPerYear,
+      demand: { residential: 0, commercial: 0, industrial: 0 },
+      funding: {
+        police: save.state.funding.police ?? 100,
+        fire: save.state.funding.fire ?? 100,
+        transit: save.state.funding.transit ?? 100,
+      },
+      budgetInfo: undefined!,  // will be set below
+      powerGrid: new Uint8Array(size),
+      landValues: new Uint8Array(size),
+      pollutionLevel: new Uint8Array(size),
+      crimeLevel: new Uint8Array(size),
+      fireCoverage: new Uint8Array(size),
+      trafficDensity: new Uint8Array(size),
+      reputationLayer,
+      citizenRegistry,
+      roadGraph: buildRoadGraph(map),
+      citizenSummary: computeCitizenSummary(citizenRegistry),
+      fireState: { activeFires: new Map() },
+      influenceBuffer: new Float32Array(size),
+      pollutionBuffer: new Float32Array(size),
+      bldIdx: new BuildingIndex(map),
+      loan: save.state.loan ?? null,
+      loanRepaymentAmount: save.state.loanRepaymentAmount ?? (save.state.loan?.monthlyPayment ?? 0),
+      history: save.state.history ?? [],
+      nextBuildingId: maxPrefixedId(map.buildings, 'b') + 1,
+    }
+
+    // Restore active fires
+    const savedFires = save.state.activeFires
+    if (savedFires) {
+      for (const [idx, remaining] of savedFires) {
+        state.fireState.activeFires.set(idx, remaining)
+      }
+    }
+
+    if (state.citizenRegistry.agents.length > 0) {
+      setNextAgentId(maxPrefixedId(state.citizenRegistry.agents, 'c') + 1)
     }
 
     // Rebuild derived state
-    propagatePower(engine.map, engine.powerGrid, engine.bldIdx)
-    calculatePollution(engine.map, engine.pollutionLevel, engine.pollutionBuffer)
-    calculateLandValues(engine.map, engine.powerGrid, engine.pollutionLevel, engine.crimeLevel, engine.landValues, engine.bldIdx)
-    calculateCrime(engine.map, engine.landValues, engine.crimeLevel, engine.funding.police, engine.influenceBuffer)
-    calculateFireCoverage(engine.map, engine.fireCoverage, engine.funding.fire, engine.influenceBuffer)
-    engine.demand = calculateDemand(engine.map, engine.taxRate, undefined, engine.citizenSummary)
-    engine.budgetInfo = calculateBudget(
-      engine.map,
-      engine.population,
-      engine.taxRate,
-      engine.landValues,
-      engine.funding,
-      engine.computeLoanRepayment(),
+    propagatePower(state.map, state.powerGrid, state.bldIdx)
+    calculatePollution(state.map, state.pollutionLevel, state.pollutionBuffer)
+    calculateLandValues(state.map, state.powerGrid, state.pollutionLevel, state.crimeLevel, state.landValues, state.bldIdx)
+    calculateCrime(state.map, state.landValues, state.crimeLevel, state.funding.police, state.influenceBuffer)
+    calculateFireCoverage(state.map, state.fireCoverage, state.funding.fire, state.influenceBuffer)
+    state.demand = calculateDemand(state.map, state.taxRate, undefined, state.citizenSummary)
+    state.budgetInfo = calculateBudget(
+      state.map,
+      computeTotalPopulation(state.map),
+      state.taxRate,
+      state.landValues,
+      state.funding,
+      computeLoanRepayment(state),
     )
 
-    return engine
+    return new Engine(state)
   }
 }
