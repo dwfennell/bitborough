@@ -230,6 +230,7 @@ export class Engine {
       // Demographics — aging, deaths, births, migration
       const demoResult = demographicTick(this.citizenRegistry, this.map, this.prng, this.citizenSummary.avgSatisfaction)
       syncBuildingResidents(this.map, this.citizenRegistry)
+      // Second sync: demographicTick changed resident counts, so agent counts need reconciling
       this.syncResidentialAgents()
 
       // Refresh citizen summary with post-demographics data

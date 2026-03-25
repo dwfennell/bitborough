@@ -6,6 +6,7 @@ import { sampleWealthTier, TIER_WEIGHTS, buildTierCountsByBuilding, computeSchel
 import { computeParkNorm } from './reputation.js'
 import type { BuildingIndex } from '../building-index.js'
 import type { PRNG } from '../prng.js'
+import { clamp } from './math.js'
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -271,10 +272,6 @@ export function replanStaleRoutes(registry: CitizenRegistry, map: GameMap, graph
 const WORK_TRIP_WEIGHT = 2
 const COMMERCE_TRIP_WEIGHT = 1
 const MAX_SATISFACTION_COMMUTE = 60  // same as MAX_ROUTE_LENGTH
-
-function clamp(v: number, lo: number, hi: number): number {
-  return Math.max(lo, Math.min(hi, v))
-}
 
 function computeSatisfaction(
   agent: Citizen,

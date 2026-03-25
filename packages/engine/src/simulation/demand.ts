@@ -1,6 +1,7 @@
 import { type GameMap, type DemandInfo, type CitizenSummary, Infrastructure } from '@bitborough/core'
 import { BUILDING_DEFS } from '../buildings-registry.js'
 import { TRAFFIC_CAPACITY } from '../road-graph.js'
+import { clamp } from './math.js'
 
 export const COMMERCIAL_DEMAND_CAPACITY_DIVISOR = 500
 const VACANCY_MIN_POPULATION = 100
@@ -135,6 +136,3 @@ function computeAverageCongestion(map: GameMap, trafficDensity: Uint8Array): num
   return roadCount > 0 ? totalCongestion / roadCount : 0
 }
 
-function clamp(value: number, min: number, max: number): number {
-  return Math.max(min, Math.min(max, value))
-}
