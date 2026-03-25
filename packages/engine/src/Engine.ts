@@ -5,37 +5,25 @@ import {
   type Building,
   type Result,
   type GameEvent,
-  calcMonthlyPayment,
   TileType,
   ZoneType,
   Infrastructure,
-  BuildingCategory,
   FailReason,
   SimSpeed,
   COSTS,
+  calcMonthlyPayment,
 } from '@bitborough/core'
 import { placeTile, placeZone } from './actions/place.js'
 import { bulldoze } from './actions/bulldoze.js'
 import { updateConnections } from './connections.js'
 import { propagatePower } from './simulation/power.js'
-import { calculateDemand } from './simulation/demand.js'
-import { calculateLandValues } from './simulation/land-value.js'
-import { updateZones } from './simulation/zones.js'
 import { calculateBudget } from './simulation/budget.js'
-import { calculateCrime } from './simulation/services/crime.js'
-import { calculateFireCoverage, updateFires } from './simulation/services/fire.js'
 import { updateRoadGraph } from './road-graph.js'
 import {
-  syncAgentsForBuilding, removeAgentsForBuilding,
-  citizenMonthlyTick, computeCitizenSummary, markRoutesStale, markRoutesStaleBatch,
+  removeAgentsForBuilding,
+  markRoutesStale, markRoutesStaleBatch,
   computeTotalPopulation,
-  syncBuildingResidents,
-  type TileLayers,
 } from './simulation/citizens.js'
-import { computeReputation } from './simulation/reputation.js'
-import { calculatePollution } from './simulation/pollution.js'
-import { demographicTick } from './simulation/demographics.js'
-import { updateDensity } from './simulation/density.js'
 import { hasNearbyRoad } from './simulation/road-access.js'
 import { BUILDING_DEFS } from './buildings-registry.js'
 import { BuildingIndex } from './building-index.js'
@@ -47,6 +35,7 @@ import {
   restoreState,
   computeLoanRepayment,
 } from './engine-state.js'
+import { monthlyTick } from './simulation/tick.js'
 
 export type { EngineConfig }
 
@@ -88,122 +77,9 @@ export class Engine {
 
     // Monthly systems
     if (this.state.tickCount % this.state.ticksPerMonth === 0) {
-      // 0. Clear events at start of monthly tick
       this.events = []
-
-      // Rebuild index — buildings may change during monthly simulation
-      this.state.bldIdx = new BuildingIndex(this.state.map)
-      this.state.month++
-      if (this.state.month > this.state.monthsPerYear) {
-        this.state.month = 1
-        this.state.year++
-      }
-
-      this.state.demand = calculateDemand(this.state.map, this.state.taxRate, this.state.trafficDensity, this.state.citizenSummary)
-
-      // Pollution propagation — must run before land values / desirability
-      calculatePollution(this.state.map, this.state.pollutionLevel, this.state.pollutionBuffer)
-
-      // Land values use previous month's crime; crime uses updated land values
-      calculateLandValues(this.state.map, this.state.powerGrid, this.state.pollutionLevel, this.state.crimeLevel, this.state.landValues, this.state.bldIdx)
-      calculateCrime(this.state.map, this.state.landValues, this.state.crimeLevel, this.state.funding.police, this.state.influenceBuffer)
-      calculateFireCoverage(this.state.map, this.state.fireCoverage, this.state.funding.fire, this.state.influenceBuffer)
-      updateFires(this.state.map, this.state.fireState, this.state.fireCoverage, this.state.prng, this.state.bldIdx)
-      computeReputation(this.state.reputationLayer, this.state.map, this.state.crimeLevel, this.state.fireCoverage, this.state.pollutionLevel, this.state.bldIdx)
-      // Citizen monthly tick: replan stale routes, write trafficDensity from agent routes
-      const tileLayers: TileLayers = {
-        crimeLevel: this.state.crimeLevel,
-        fireCoverage: this.state.fireCoverage,
-        pollutionLevel: this.state.pollutionLevel,
-        reputationLayer: this.state.reputationLayer,
-      }
-      citizenMonthlyTick(this.state.citizenRegistry, this.state.map, this.state.roadGraph, this.state.trafficDensity, tileLayers, this.state.bldIdx)
-      this.state.citizenSummary = computeCitizenSummary(this.state.citizenRegistry)
-
-      // Zone development
-      const nextBuildingIdRef = { value: this.state.nextBuildingId }
-      updateZones(this.state.map, this.state.powerGrid, this.state.demand, this.state.prng, nextBuildingIdRef, this.state.bldIdx)
-      this.state.nextBuildingId = nextBuildingIdRef.value
-
-      // Density progression
-      updateDensity(
-        this.state.map,
-        this.state.powerGrid,
-        this.state.demand,
-        this.population,
-        this.state.prng,
-        nextBuildingIdRef,
-        this.state.crimeLevel,
-        this.state.fireCoverage,
-        this.state.pollutionLevel,
-      )
-      this.state.nextBuildingId = nextBuildingIdRef.value
-
-      // Sync citizen agents after zone/density changes
-      this.syncResidentialAgents()
-
-      // Demographics — aging, deaths, births, migration
-      const demoResult = demographicTick(this.state.citizenRegistry, this.state.map, this.state.prng, this.state.citizenSummary.avgSatisfaction)
-      syncBuildingResidents(this.state.map, this.state.citizenRegistry)
-      // Second sync: demographicTick changed resident counts, so agent counts need reconciling
-      this.syncResidentialAgents()
-
-      // Refresh citizen summary with post-demographics data
-      this.state.citizenSummary = computeCitizenSummary(this.state.citizenRegistry)
-      this.state.citizenSummary.birthsLastTick = demoResult.births
-      this.state.citizenSummary.deathsLastTick = demoResult.deaths
-      this.state.citizenSummary.netMigrationLastTick = demoResult.netMigration
-
-      // 1. Compute budget including loan repayment
-      const loanRepayment = computeLoanRepayment(this.state)
-      this.state.budgetInfo = calculateBudget(this.state.map, this.population, this.state.taxRate, this.state.landValues, this.state.funding, loanRepayment)
-
-      // 2. Apply monthly balance (already includes repayment deduction)
-      this.state.funds += this.state.budgetInfo.balance
-
-      // 3. Update loan book (funds already adjusted via balance)
-      if (this.state.loan) {
-        const payment = this.state.budgetInfo.loanRepayment
-        this.state.loan.remaining -= payment
-        this.state.loan.monthsLeft = Math.max(0, this.state.loan.monthsLeft - 1)
-        if (this.state.loan.remaining <= 0) {
-          this.state.loan = null
-          this.state.loanRepaymentAmount = 0
-        }
-      }
-
-      // 4. Emergency loan check
-      if (this.state.funds < 0 && this.state.loan === null) {
-        const baseExpenses = this.state.budgetInfo.maintenanceCosts.total + this.state.budgetInfo.serviceCosts.total
-        const emergencyAmount = Math.max(10_000, -this.state.funds + baseExpenses * 6)
-        const monthlyPayment = calcMonthlyPayment(emergencyAmount)
-        this.state.loan = { principal: emergencyAmount, remaining: emergencyAmount, monthlyPayment, termMonths: 120, monthsLeft: 120, interestRate: 0.08 }
-        this.state.loanRepaymentAmount = monthlyPayment
-        this.state.funds += emergencyAmount
-        this.events.push({ type: 'emergency_loan', amount: emergencyAmount })
-      }
-
-      // 5. Bankruptcy (loan exists but still broke after emergency loan)
-      if (this.state.funds < 0 && this.state.loan !== null) {
-        this.events.push({ type: 'bankruptcy' })
-      }
-
-      // 6. Record monthly snapshot
-      this.state.history.push({
-        month: this.state.month,
-        year: this.state.year,
-        population: this.population,
-        funds: this.state.funds,
-        taxIncome: this.state.budgetInfo.taxIncome,
-        expenses: this.state.budgetInfo.projectedExpenses,
-        rDemand: this.state.demand.residential,
-        cDemand: this.state.demand.commercial,
-        iDemand: this.state.demand.industrial,
-        births: this.state.citizenSummary.birthsLastTick,
-        deaths: this.state.citizenSummary.deathsLastTick,
-        netMigration: this.state.citizenSummary.netMigrationLastTick,
-      })
-      if (this.state.history.length > 1200) this.state.history.shift()
+      const result = monthlyTick(this.state)
+      this.events.push(...result.events)
     }
   }
 
@@ -392,17 +268,6 @@ export class Engine {
     }
 
     return { ok: true }
-  }
-
-  private syncResidentialAgents(): void {
-    for (const b of this.state.map.buildings) {
-      if (b.state === 'active') {
-        const def = BUILDING_DEFS[b.defId]
-        if (def && def.category === BuildingCategory.Residential) {
-          syncAgentsForBuilding(this.state.map, this.state.citizenRegistry, this.state.roadGraph, b, this.state.trafficDensity, this.state.prng, this.state.reputationLayer)
-        }
-      }
-    }
   }
 
   setTaxRate(rate: number): void {
