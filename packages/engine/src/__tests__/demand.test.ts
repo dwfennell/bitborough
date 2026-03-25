@@ -157,6 +157,7 @@ const baseSummary: CitizenSummary = {
   birthsLastTick: 0,
   deathsLastTick: 0,
   netMigrationLastTick: 0,
+  tierCounts: [0, 0, 0],
 }
 
 describe('Citizen demand signals', () => {

@@ -23,6 +23,7 @@ function makeAgent(id: string, buildingId: string, demographics: AgentDemographi
     homeWorkRouteStale: false,
     homeCommerceRouteStale: false,
     satisfaction: 0.7,
+    wealthTier: 2,
     demographics,
   }
 }
