@@ -35,10 +35,10 @@ export function calculateBudget(
     const def = BUILDING_DEFS[building.defId]
     if (!def) continue
     if (building.defId.startsWith('power.')) powerPlantMaintenance += def.maintenanceCost
-    if (building.defId.startsWith('service.police')) policeMaintenance += def.maintenanceCost
+    else if (building.defId.startsWith('service.police')) policeMaintenance += def.maintenanceCost
     else if (building.defId.startsWith('service.fire')) fireMaintenance += def.maintenanceCost
-    else if (building.defId === 'transit.stop') transitStopCount++
     else if (building.defId.startsWith('service.school')) schoolMaintenance += def.maintenanceCost
+    else if (building.defId === 'transit.stop') transitStopCount++
     const footprint = (def.size?.w ?? 1) * (def.size?.h ?? 1)
     footprintTileCount += footprint
   }
