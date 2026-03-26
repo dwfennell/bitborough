@@ -87,7 +87,7 @@ describe('Serialization', () => {
   test('v5 save preserves exact residents values', () => {
     const engine = Engine.create(createTestMap(32), { seed: 1, startingFunds: 10_000 })
     const save = engine.serialize()
-    expect(save.version).toBe(7)
+    expect(save.version).toBe(8)
     const restored = Engine.restore(save)
     for (let i = 0; i < engine.getState().map.buildings.length; i++) {
       expect(restored.getState().map.buildings[i]!.residents).toBe(engine.getState().map.buildings[i]!.residents)
@@ -196,7 +196,7 @@ describe('Serialization', () => {
     const state1 = engine.getState()
     const save = engine.serialize()
 
-    expect(save.version).toBe(7)
+    expect(save.version).toBe(8)
     if (state1.citizens.agentCount > 0) {
       expect(save.state.citizens).toBeDefined()
       expect(save.state.citizens!.agents.length).toBeGreaterThan(0)
@@ -255,7 +255,7 @@ describe('Serialization', () => {
     const state1 = engine.getState()
     const save = engine.serialize()
 
-    expect(save.version).toBe(7)
+    expect(save.version).toBe(8)
 
     const restored = Engine.restore(save)
     const state2 = restored.getState()
@@ -299,7 +299,7 @@ describe('Serialization', () => {
     }
 
     // Version should be current
-    expect(reSerialized.version).toBe(7)
+    expect(reSerialized.version).toBe(8)
   })
 
   test('restore from v5 save defaults demographics to all-working', () => {

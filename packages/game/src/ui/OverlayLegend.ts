@@ -46,6 +46,14 @@ const LEGENDS: Record<Exclude<OverlayType, 'none'>, { title: string; entries: Le
       { color: 'rgba(244, 67, 54, 0.9)', label: 'Gridlock (> 100%)' },
     ],
   },
+  education: {
+    title: 'Education Coverage',
+    entries: [
+      { color: 'rgba(160, 0, 255, 0.65)', label: 'High coverage' },
+      { color: 'rgba(120, 60, 220, 0.55)', label: 'Moderate' },
+      { color: 'rgba(80, 120, 180, 0.5)', label: 'Low coverage' },
+    ],
+  },
 }
 
 export class OverlayLegend {

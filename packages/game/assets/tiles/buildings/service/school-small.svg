@@ -1,0 +1,74 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- Transparent background - terrain renders underneath -->
+
+  <!-- Lot ground with yard grass -->
+  <rect x="8" y="8" width="112" height="112" rx="3" fill="#a0d48a"/>
+
+  <!-- Building shadow (small kiosk) -->
+  <rect x="52" y="48" width="24" height="24" rx="1" fill="#000000" opacity="0.1" transform="translate(3, 3)"/>
+
+  <!-- Main building wall -->
+  <rect x="52" y="48" width="24" height="24" rx="1" fill="#e0d8c8"/>
+
+  <!-- Roof (tan/beige for school) -->
+  <rect x="50" y="46" width="28" height="26" rx="1" fill="#c8a878"/>
+  <!-- Roof dark edge -->
+  <rect x="50" y="46" width="28" height="2" rx="1" fill="#b89860"/>
+
+  <!-- Educational accent stripe on roof (green for learning) -->
+  <rect x="50" y="52" width="28" height="3" fill="#7a9c6a" opacity="0.7"/>
+
+  <!-- School marker badge on roof (book/education symbol shape) -->
+  <circle cx="64" cy="50" r="4" fill="#c8a878" opacity="0.7"/>
+  <circle cx="64" cy="50" r="3.5" fill="none" stroke="#7a9c6a" stroke-width="0.6" opacity="0.6"/>
+  <!-- Simple book/pages inside circle -->
+  <path d="M 62 49 L 62 51 M 64 48.5 L 64 51.5 M 66 49 L 66 51" stroke="#7a9c6a" stroke-width="0.5" opacity="0.6"/>
+
+  <!-- Tiny flagpole on top (green for education) -->
+  <rect x="63.5" y="44" width="1" height="6" fill="#8a6a50" opacity="0.7"/>
+  <!-- Small flag -->
+  <rect x="64.5" y="44" width="4" height="2.5" fill="#7a9c6a" opacity="0.8"/>
+
+  <!-- Main entrance door (front center) -->
+  <rect x="59" y="63" width="5" height="8" rx="0.5" fill="#8a6848"/>
+  <!-- Door handle -->
+  <circle cx="63.5" cy="67" r="0.5" fill="#c0a080" opacity="0.7"/>
+
+  <!-- Classroom window above door -->
+  <rect x="59.5" y="54" width="4" height="3.5" rx="0.3" fill="#a8d0e8" opacity="0.7"/>
+  <rect x="59.5" y="54" width="4" height="3.5" rx="0.3" fill="none" stroke="#6a5040" stroke-width="0.3" opacity="0.5"/>
+  <!-- Window cross panes -->
+  <line x1="61.5" y1="54" x2="61.5" y2="57.5" stroke="#6a5040" stroke-width="0.25" opacity="0.4"/>
+  <line x1="59.5" y1="55.75" x2="63.5" y2="55.75" stroke="#6a5040" stroke-width="0.25" opacity="0.4"/>
+
+  <!-- Side window (left) -->
+  <rect x="47" y="56" width="3.5" height="3.5" rx="0.3" fill="#a8d0e8" opacity="0.7"/>
+  <rect x="47" y="56" width="3.5" height="3.5" rx="0.3" fill="none" stroke="#6a5040" stroke-width="0.3" opacity="0.5"/>
+
+  <!-- Side window (right) -->
+  <rect x="77.5" y="56" width="3.5" height="3.5" rx="0.3" fill="#a8d0e8" opacity="0.7"/>
+  <rect x="77.5" y="56" width="3.5" height="3.5" rx="0.3" fill="none" stroke="#6a5040" stroke-width="0.3" opacity="0.5"/>
+
+  <!-- Educational bush/tree (left side) -->
+  <ellipse cx="35" cy="68" rx="5" ry="4" fill="#78b868" opacity="0.6"/>
+  <ellipse cx="32" cy="65" rx="3" ry="2.5" fill="#90c880" opacity="0.5"/>
+
+  <!-- Educational bush/tree (right side) -->
+  <ellipse cx="95" cy="68" rx="5" ry="4" fill="#78b868" opacity="0.6"/>
+  <ellipse cx="98" cy="65" rx="3" ry="2.5" fill="#90c880" opacity="0.5"/>
+
+  <!-- Name sign on front (school identifier) -->
+  <rect x="48" y="44" width="32" height="2.5" rx="0.3" fill="#c8a878" opacity="0.5"/>
+  <text x="64" y="46" font-size="1.8" fill="#6a5040" text-anchor="middle" opacity="0.7" font-weight="bold">SCHOOL</text>
+
+  <!-- Subtle ground detail line (front walkway) -->
+  <line x1="48" y1="73" x2="80" y2="73" stroke="#8a9a7a" stroke-width="0.5" opacity="0.3"/>
+
+  <!-- Small bench/seating area (outdoor learning) -->
+  <rect x="42" y="82" width="8" height="2" rx="0.3" fill="#a89878" opacity="0.4"/>
+  <line x1="44" y1="82" x2="44" y2="84" stroke="#8a7a6a" stroke-width="0.3" opacity="0.3"/>
+  <line x1="48" y1="82" x2="48" y2="84" stroke="#8a7a6a" stroke-width="0.3" opacity="0.3"/>
+
+  <!-- Information/bulletin board area -->
+  <rect x="78" y="82" width="8" height="6" rx="0.4" fill="#a89878" opacity="0.4"/>
+</svg>

@@ -10,6 +10,8 @@ const RES_SAFETY_WEIGHT = 0.3 // (1 - crimeNorm) × this
 const RES_FIRE_BONUS = 0.15 // flat bonus when fire-covered
 export const RES_PARK_BONUS = 0.25 // flat bonus when park within PARK_RADIUS tiles
 const RES_POLLUTION_PENALTY = 0.3 // pollutionNorm × this, subtracted
+const RES_EDUCATION_BONUS = 0.20
+const EDUCATION_COVERAGE_THRESHOLD = 76 // ≈ 0.3 × 255
 const PARK_RADIUS = 5
 
 // Zone boundary effects
@@ -63,6 +65,7 @@ export function computeDesirability(
   fireCoverage: Uint8Array,
   pollutionLevel: Uint8Array,
   bldIdx?: BuildingIndex,
+  educationCoverage?: Uint8Array,
 ): number {
   const idx = y * map.width + x
 
@@ -71,7 +74,7 @@ export function computeDesirability(
 
   switch (zone) {
     case ZoneType.Residential:
-      return residentialDesirability(x, y, idx, map, crimeLevel, fireCoverage, pollutionLevel, bldIdx)
+      return residentialDesirability(x, y, idx, map, crimeLevel, fireCoverage, pollutionLevel, bldIdx, educationCoverage)
     case ZoneType.Commercial:
       return commercialDesirability(x, y, map, bldIdx)
     case ZoneType.Industrial:
@@ -90,6 +93,7 @@ function residentialDesirability(
   fireCoverage: Uint8Array,
   pollutionLevel: Uint8Array,
   bldIdx?: BuildingIndex,
+  educationCoverage?: Uint8Array,
 ): number {
   const crimeNorm = crimeLevel[idx]! / 255
   const pollNorm = pollutionLevel[idx]! / 255
@@ -98,6 +102,12 @@ function residentialDesirability(
   score += (1 - crimeNorm) * RES_SAFETY_WEIGHT
   if (fireCoverage[idx]) score += RES_FIRE_BONUS
   score += parkDesirabilityBonus(x, y, map, bldIdx)
+  if (educationCoverage) {
+    const eduVal = educationCoverage[idx]!
+    if (eduVal > EDUCATION_COVERAGE_THRESHOLD) {
+      score += RES_EDUCATION_BONUS * (eduVal / 255)
+    }
+  }
   score -= pollNorm * RES_POLLUTION_PENALTY
   score += zoneBoundaryEffect(x, y, map, bldIdx)
 

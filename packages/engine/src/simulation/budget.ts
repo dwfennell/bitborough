@@ -6,7 +6,7 @@ export function calculateBudget(
   population: number,
   taxRate: number,
   landValues: Uint8Array,
-  funding: { police: number; fire: number; transit: number },
+  funding: { police: number; fire: number; transit: number; education: number },
   loanRepayment = 0,
 ): BudgetInfo {
   // Count infrastructure for maintenance
@@ -28,14 +28,16 @@ export function calculateBudget(
   let policeMaintenance = 0
   let fireMaintenance = 0
   let transitStopCount = 0
+  let schoolMaintenance = 0
   let footprintTileCount = 0
 
   for (const building of map.buildings) {
     const def = BUILDING_DEFS[building.defId]
     if (!def) continue
     if (building.defId.startsWith('power.')) powerPlantMaintenance += def.maintenanceCost
-    if (building.defId.startsWith('service.police')) policeMaintenance += def.maintenanceCost
+    else if (building.defId.startsWith('service.police')) policeMaintenance += def.maintenanceCost
     else if (building.defId.startsWith('service.fire')) fireMaintenance += def.maintenanceCost
+    else if (building.defId.startsWith('service.school')) schoolMaintenance += def.maintenanceCost
     else if (building.defId === 'transit.stop') transitStopCount++
     const footprint = (def.size?.w ?? 1) * (def.size?.h ?? 1)
     footprintTileCount += footprint
@@ -75,9 +77,10 @@ export function calculateBudget(
     police: policeMaintenance * (funding.police / 100),
     fire: fireMaintenance * (funding.fire / 100),
     transit: transitStopCount * MAINTENANCE.transitStop * (funding.transit / 100),
+    education: schoolMaintenance * (funding.education / 100),
     total: 0,
   }
-  serviceCosts.total = serviceCosts.police + serviceCosts.fire + serviceCosts.transit
+  serviceCosts.total = serviceCosts.police + serviceCosts.fire + serviceCosts.transit + serviceCosts.education
 
   // Tax income: per-building taxValue scaled by tax rate, plus a population/land-value component
   let totalTaxValue = 0
@@ -117,6 +120,7 @@ export function calculateBudget(
       police: Math.round(serviceCosts.police),
       fire: Math.round(serviceCosts.fire),
       transit: Math.round(serviceCosts.transit),
+      education: Math.round(serviceCosts.education),
       total: Math.round(serviceCosts.total),
     },
     loanRepayment: Math.round(loanRepayment),

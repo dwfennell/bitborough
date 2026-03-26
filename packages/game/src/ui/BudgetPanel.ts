@@ -1,6 +1,6 @@
 import { type GameState, calcMonthlyPayment } from '@bitborough/core'
 
-export type FundingService = 'police' | 'fire' | 'transit'
+export type FundingService = 'police' | 'fire' | 'transit' | 'education'
 
 export class BudgetPanel {
   private el: HTMLElement
@@ -51,6 +51,8 @@ export class BudgetPanel {
           <input type="range" id="police-funding" min="0" max="100" value="100" step="10">
           <label>Fire: <span id="fire-funding-display">100%</span></label>
           <input type="range" id="fire-funding" min="0" max="100" value="100" step="10">
+          <label>Education: <span id="education-funding-display">100%</span></label>
+          <input type="range" id="education-funding" min="0" max="100" value="100" step="10">
         </div>
         <div class="budget-section" id="take-loan-section">
           <h4>Take Loan</h4>
@@ -94,6 +96,7 @@ export class BudgetPanel {
 
     this.bindFundingSlider('police-funding', 'police-funding-display', 'police')
     this.bindFundingSlider('fire-funding', 'fire-funding-display', 'fire')
+    this.bindFundingSlider('education-funding', 'education-funding-display', 'education')
 
     // Loan amount slider
     const loanAmountSlider = this.el.querySelector('#loan-amount-slider') as HTMLInputElement

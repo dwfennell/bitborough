@@ -1,8 +1,8 @@
 import type { GameState } from '@bitborough/core'
 import { Infrastructure } from '@bitborough/core'
-import { landValueToRgba, crimeToRgba, fireCoverageToRgba, trafficToRgba } from './colors.js'
+import { landValueToRgba, crimeToRgba, fireCoverageToRgba, trafficToRgba, educationCoverageToRgba } from './colors.js'
 
-export type OverlayType = 'power' | 'landValue' | 'crime' | 'fire' | 'traffic' | 'none'
+export type OverlayType = 'power' | 'landValue' | 'crime' | 'fire' | 'traffic' | 'education' | 'none'
 
 // Precomputed color lookups (0-255 index → rgba string)
 function buildColorTable(fn: (v: number) => string): string[] {
@@ -15,6 +15,7 @@ const LAND_VALUE_COLORS = buildColorTable(landValueToRgba)
 const CRIME_COLORS = buildColorTable(crimeToRgba)
 const FIRE_COVERAGE_COLORS = buildColorTable(fireCoverageToRgba)
 const TRAFFIC_COLORS = buildColorTable(trafficToRgba)
+const EDUCATION_COVERAGE_COLORS = buildColorTable(educationCoverageToRgba)
 
 const POWER_ON = 'rgba(255, 235, 59, 0.4)'
 const POWER_OFF = 'rgba(100, 100, 100, 0.3)'
@@ -114,6 +115,20 @@ export class OverlayRenderer {
             const v = traffic[idx]!
             if (v === 0) continue
             ctx.fillStyle = TRAFFIC_COLORS[v]!
+            ctx.fillRect(Math.floor((x - cameraX) * posTs), Math.floor((y - cameraY) * posTs), ts, ts)
+          }
+        }
+        break
+      }
+
+      case 'education': {
+        const coverage = state.educationCoverage
+        for (let y = startY; y <= endY; y++) {
+          for (let x = startX; x <= endX; x++) {
+            const idx = y * mapWidth + x
+            const v = coverage[idx]!
+            if (v === 0 || state.map.zones[idx] === 0) continue
+            ctx.fillStyle = EDUCATION_COVERAGE_COLORS[v]!
             ctx.fillRect(Math.floor((x - cameraX) * posTs), Math.floor((y - cameraY) * posTs), ts, ts)
           }
         }

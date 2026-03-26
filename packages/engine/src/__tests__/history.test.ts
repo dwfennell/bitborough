@@ -66,8 +66,8 @@ describe('History collection', () => {
     expect(restored.getState().history).toEqual([])
   })
 
-  test('save version is 7', () => {
+  test('save version is 8', () => {
     const engine = Engine.create(createTestMap(32), { seed: 42 })
-    expect(engine.serialize().version).toBe(7)
+    expect(engine.serialize().version).toBe(8)
   })
 })

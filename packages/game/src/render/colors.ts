@@ -27,6 +27,14 @@ export function fireCoverageToRgba(value: number): string {
   return `rgba(${r}, ${g}, 30, 0.4)`
 }
 
+export function educationCoverageToRgba(value: number): string {
+  const v = value / 255
+  const r = Math.floor(80 + v * 80)
+  const g = Math.floor(120 * (1 - v))
+  const b = Math.floor(180 + v * 75)
+  return `rgba(${r}, ${g}, ${b}, 0.45)`
+}
+
 export function trafficToRgba(value: number): string {
   // value 0-255 maps to congestion 0-2.55 (capacity = 100, so 100/255 ≈ 0.39)
   // Thresholds: <50 green, <80 yellow, <=100 orange, >100 red

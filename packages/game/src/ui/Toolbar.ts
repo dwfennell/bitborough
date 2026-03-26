@@ -79,6 +79,16 @@ const TOOL_ENTRIES: ToolEntry[] = [
     factory: () => new BuildingTool('service.fire'),
   },
   {
+    label: `SmSch ${fmtCost(BUILDING_DEFS['service.school.small']!.cost)}`,
+    key: 'o',
+    factory: () => new BuildingTool('service.school.small'),
+  },
+  {
+    label: `School ${fmtCost(BUILDING_DEFS['service.school']!.cost)}`,
+    key: 'l',
+    factory: () => new BuildingTool('service.school'),
+  },
+  {
     label: `Park ${fmtCost(BUILDING_DEFS['special.park']!.cost)}`,
     key: 'n',
     factory: () => new BuildingTool('special.park'),

@@ -145,6 +145,7 @@ export class Game {
       { label: 'Crime (C)', key: 'c', action: () => this.renderer.toggleOverlay('crime') },
       { label: 'Fire (F)', key: 'f', action: () => this.renderer.toggleOverlay('fire') },
       { label: 'Traffic (T)', key: 't', action: () => this.renderer.toggleOverlay('traffic') },
+      { label: 'Education (J)', key: 'j', action: () => this.renderer.toggleOverlay('education') },
       { label: 'Grid (X)', key: 'x', action: () => this.renderer.toggleGridLines() },
       {
         label: 'Export',
