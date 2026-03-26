@@ -237,8 +237,8 @@ export function educationCoverageToRgba(value: number): string {
 ```
 
 ### Game.ts overlay toggle
-- Key `u` (for ed**u**cation — `e` is taken by zoom controls)
-- `{ label: 'Education (U)', key: 'u', action: () => this.renderer.toggleOverlay('education') }`
+- Key `j` (`e` and `u` are taken by zoom controls and fire substation toolbar)
+- `{ label: 'Education (J)', key: 'j', action: () => this.renderer.toggleOverlay('education') }`
 
 ## Toolbar
 
@@ -251,7 +251,7 @@ In `Toolbar.ts`:
 Add entries for:
 - School (3x3, $500, $75/mo) — provides education coverage, boosts residential desirability and neighborhood reputation
 - Small School (1x1, $80, $15/mo) — smaller coverage, gets 1.5x radius boost when near a full school
-- Education overlay toggle (U key)
+- Education overlay toggle (J key)
 - Education funding slider
 
 ## SVG Tiles
