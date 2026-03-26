@@ -55,7 +55,7 @@ export function monthlyTick(state: EngineState): MonthlyTickResult {
     removeAgentsForBuilding(state.citizenRegistry, buildingId)
   })
   // Reputation after fires — fires can destroy buildings, affecting neighborhood quality
-  computeReputation(state.reputationLayer, state.map, state.crimeLevel, state.fireCoverage, state.pollutionLevel, state.bldIdx)
+  computeReputation(state.reputationLayer, state.map, state.crimeLevel, state.fireCoverage, state.pollutionLevel, state.bldIdx, state.educationCoverage)
 
   // 8. Citizen monthly tick: replan stale routes, write trafficDensity from agent routes
   const tileLayers: TileLayers = {

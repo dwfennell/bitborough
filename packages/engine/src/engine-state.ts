@@ -353,7 +353,7 @@ export function createEngineState(map: GameMap, config: EngineConfig): EngineSta
   rebuildDerivedState(state)
 
   // Reputation must run after rebuildDerivedState
-  computeReputation(state.reputationLayer, state.map, state.crimeLevel, state.fireCoverage, state.pollutionLevel, state.bldIdx)
+  computeReputation(state.reputationLayer, state.map, state.crimeLevel, state.fireCoverage, state.pollutionLevel, state.bldIdx, state.educationCoverage)
 
   // Initialize demand
   state.demand = calculateDemand(state.map, state.taxRate)
