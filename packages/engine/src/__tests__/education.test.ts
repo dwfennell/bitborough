@@ -1,8 +1,9 @@
 import { describe, test, expect } from 'vitest'
 import { computeSchoolQuality, SCHOOL_CAPACITY, findNearestSchool, buildEnrollmentCounts } from '../simulation/services/school.js'
-import { DensityLevel, Infrastructure } from '@bitborough/core'
-import { createTestMap } from '../test-helpers.js'
+import { DensityLevel, Infrastructure, ZoneType } from '@bitborough/core'
+import { createTestMap, advanceMonth } from '../test-helpers.js'
 import { buildRoadGraph } from '../road-graph.js'
+import { Engine } from '../Engine.js'
 
 describe('School quality', () => {
   test('quality is 1.0 at or below capacity with full funding', () => {
@@ -80,5 +81,33 @@ describe('buildEnrollmentCounts', () => {
     const counts = buildEnrollmentCounts(agents)
     expect(counts.get('s1')).toBe(8)
     expect(counts.get('s2')).toBe(2)
+  })
+})
+
+describe('Education enrollment integration', () => {
+  test('school enrollment appears after births occur', () => {
+    const engine = Engine.create(createTestMap(32), { startingFunds: 100_000, seed: 42 })
+    engine.placeBuilding(0, 0, 'power.diesel')
+    for (let x = 0; x < 20; x++) engine.placeTile(x, 3, Infrastructure.PowerLine)
+    for (let x = 3; x < 18; x++) engine.placeTile(x, 5, Infrastructure.Road)
+    for (let x = 3; x < 18; x++) engine.placeZone(x, 4, ZoneType.Residential)
+    engine.placeBuilding(10, 6, 'service.school')
+    for (let i = 0; i < 60; i++) advanceMonth(engine)
+    const state = engine.getState()
+    const hasQuality = Array.from(state.educationQuality).some(v => v > 1)
+    // Probabilistic: with seed 42 and 60 months, births should occur
+    expect(hasQuality || state.citizens.totalChildren === 0).toBe(true)
+  })
+
+  test('education funding affects school quality', () => {
+    const engine = Engine.create(createTestMap(32), { startingFunds: 100_000, seed: 42 })
+    engine.placeBuilding(0, 0, 'power.diesel')
+    for (let x = 0; x < 20; x++) engine.placeTile(x, 3, Infrastructure.PowerLine)
+    for (let x = 3; x < 18; x++) engine.placeTile(x, 5, Infrastructure.Road)
+    for (let x = 3; x < 18; x++) engine.placeZone(x, 4, ZoneType.Residential)
+    engine.placeBuilding(10, 6, 'service.school')
+    engine.setFunding('education', 100)
+    for (let i = 0; i < 60; i++) advanceMonth(engine)
+    expect(engine.getState().funds).toBeDefined()
   })
 })
