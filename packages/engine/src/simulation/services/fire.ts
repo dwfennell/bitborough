@@ -2,7 +2,7 @@ import type { GameMap } from '@bitborough/core'
 import { TileType, Infrastructure } from '@bitborough/core'
 import type { PRNG } from '../../prng.js'
 import type { BuildingIndex } from '../../building-index.js'
-import { buildInfluenceMap } from './influence.js'
+import { buildInfluenceMap, influenceToUint8 } from './influence.js'
 
 const FIRE_BASE_RADIUS = 15
 const FIRE_SMALL_BASE_RADIUS = 6
@@ -26,10 +26,7 @@ export function calculateFireCoverage(
     { defId: 'service.fire.small', baseRadius: FIRE_SMALL_BASE_RADIUS },
   )
 
-  // Convert [0, 1] influence to [0, 255] coverage
-  for (let i = 0; i < influenceBuffer.length; i++) {
-    fireCoverage[i] = Math.min(255, Math.floor(influenceBuffer[i]! * 255))
-  }
+  influenceToUint8(influenceBuffer, fireCoverage)
 }
 
 export function updateFires(

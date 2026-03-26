@@ -36,6 +36,13 @@ function stampRadialInfluence(
  * When `secondary` is provided, small stations also contribute with a smaller
  * base radius, boosted 1.5x when within a large station's coverage.
  */
+/** Convert a [0, 1] float influence buffer to a [0, 255] Uint8Array coverage layer. */
+export function influenceToUint8(src: Float32Array, dst: Uint8Array): void {
+  for (let i = 0; i < src.length; i++) {
+    dst[i] = Math.min(255, Math.floor(src[i]! * 255))
+  }
+}
+
 export function buildInfluenceMap(
   map: GameMap,
   defId: string,
