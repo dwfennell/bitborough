@@ -218,3 +218,46 @@ describe('Sprawl penalty', () => {
     expect(budget.maintenanceCosts.roads).toBe(10)
   })
 })
+
+describe('Education budget', () => {
+  test('school maintenance deducted with education funding', () => {
+    const map = createTestMap(32)
+    map.buildings.push({
+      id: 'b1', defId: 'service.school', x: 14, y: 14,
+      powered: true, density: DensityLevel.Low, age: 0,
+      state: 'active', residents: 0,
+    })
+    const budget = calculateBudget(
+      map, 0, 0.07, new Uint8Array(32 * 32),
+      { police: 100, fire: 100, transit: 100, education: 100 },
+    )
+    expect(budget.serviceCosts.education).toBe(75)
+  })
+
+  test('school maintenance scales with funding', () => {
+    const map = createTestMap(32)
+    map.buildings.push({
+      id: 'b1', defId: 'service.school', x: 14, y: 14,
+      powered: true, density: DensityLevel.Low, age: 0,
+      state: 'active', residents: 0,
+    })
+    const budget = calculateBudget(
+      map, 0, 0.07, new Uint8Array(32 * 32),
+      { police: 100, fire: 100, transit: 100, education: 50 },
+    )
+    expect(budget.serviceCosts.education).toBe(38)
+  })
+
+  test('mixed school + small school maintenance', () => {
+    const map = createTestMap(32)
+    map.buildings.push(
+      { id: 'b1', defId: 'service.school', x: 14, y: 14, powered: true, density: DensityLevel.Low, age: 0, state: 'active' as const, residents: 0 },
+      { id: 'b2', defId: 'service.school.small', x: 5, y: 5, powered: true, density: DensityLevel.Low, age: 0, state: 'active' as const, residents: 0 },
+    )
+    const budget = calculateBudget(
+      map, 0, 0.07, new Uint8Array(32 * 32),
+      { police: 100, fire: 100, transit: 100, education: 100 },
+    )
+    expect(budget.serviceCosts.education).toBe(90)
+  })
+})
