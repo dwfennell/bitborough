@@ -430,10 +430,18 @@ export class Game {
     if (!hover || !tool?.getPreviewColor) return
     if (hover.x < 0 || hover.y < 0 || hover.x >= state.map.width || hover.y >= state.map.height) return
 
-    const screen = this.camera.tileToScreen(hover.x, hover.y)
     const tileSize = this.camera.tileSize * this.camera.zoom
+    const size = tool.getPreviewSize?.() ?? { w: 1, h: 1 }
     this.ctx.fillStyle = tool.getPreviewColor()
-    this.ctx.fillRect(screen.x, screen.y, tileSize, tileSize)
+    for (let dy = 0; dy < size.h; dy++) {
+      for (let dx = 0; dx < size.w; dx++) {
+        const tx = hover.x + dx
+        const ty = hover.y + dy
+        if (tx >= state.map.width || ty >= state.map.height) continue
+        const screen = this.camera.tileToScreen(tx, ty)
+        this.ctx.fillRect(screen.x, screen.y, tileSize, tileSize)
+      }
+    }
   }
 
   destroy(): void {

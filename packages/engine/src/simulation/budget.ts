@@ -25,8 +25,8 @@ export function calculateBudget(
 
   // Count building maintenance from building defs (single source of truth)
   let powerPlantMaintenance = 0
-  let policeStationCount = 0
-  let fireStationCount = 0
+  let policeMaintenance = 0
+  let fireMaintenance = 0
   let transitStopCount = 0
   let footprintTileCount = 0
 
@@ -34,9 +34,9 @@ export function calculateBudget(
     const def = BUILDING_DEFS[building.defId]
     if (!def) continue
     if (building.defId.startsWith('power.')) powerPlantMaintenance += def.maintenanceCost
-    if (building.defId === 'service.police') policeStationCount++
-    if (building.defId === 'service.fire') fireStationCount++
-    if (building.defId === 'transit.stop') transitStopCount++
+    if (building.defId.startsWith('service.police')) policeMaintenance += def.maintenanceCost
+    else if (building.defId.startsWith('service.fire')) fireMaintenance += def.maintenanceCost
+    else if (building.defId === 'transit.stop') transitStopCount++
     const footprint = (def.size?.w ?? 1) * (def.size?.h ?? 1)
     footprintTileCount += footprint
   }
@@ -72,27 +72,32 @@ export function calculateBudget(
 
   // Service costs based on funding level
   const serviceCosts = {
-    police: policeStationCount * MAINTENANCE.policeStation * (funding.police / 100),
-    fire: fireStationCount * MAINTENANCE.fireStation * (funding.fire / 100),
+    police: policeMaintenance * (funding.police / 100),
+    fire: fireMaintenance * (funding.fire / 100),
     transit: transitStopCount * MAINTENANCE.transitStop * (funding.transit / 100),
     total: 0,
   }
   serviceCosts.total = serviceCosts.police + serviceCosts.fire + serviceCosts.transit
 
-  // Tax income: sum taxable value of all zone buildings × taxRate
-  // From PRD: totalPopulation × averageLandValue / 120 × taxRate
+  // Tax income: per-building taxValue scaled by tax rate, plus a population/land-value component
+  let totalTaxValue = 0
   let totalLandValue = 0
   let developedTileCount = 0
   for (const building of map.buildings) {
     const def = BUILDING_DEFS[building.defId]
-    if (!def || def.category === BuildingCategory.Special) continue // only zone buildings
+    if (!def || def.category === BuildingCategory.Special) continue
+    if (building.state === 'active') totalTaxValue += def.taxValue
     const idx = building.y * map.width + building.x
     totalLandValue += landValues[idx]!
     developedTileCount++
   }
 
   const avgLandValue = developedTileCount > 0 ? totalLandValue / developedTileCount : 0
-  const taxIncome = ((population * avgLandValue) / 20) * taxRate
+  // Building tax: direct revenue from developed buildings
+  const buildingTax = totalTaxValue * taxRate
+  // Land tax: population-driven component that scales with city growth
+  const landTax = ((population * avgLandValue) / 40) * taxRate
+  const taxIncome = buildingTax + landTax
 
   const balance = taxIncome - maintenanceCosts.total - serviceCosts.total - loanRepayment
 

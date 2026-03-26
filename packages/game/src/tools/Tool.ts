@@ -10,4 +10,5 @@ export interface Tool {
   onTileClick(x: number, y: number, engine: Engine): Result
   onTileDrag?(x: number, y: number, engine: Engine): Result
   getPreviewColor?(): string
+  getPreviewSize?(): { w: number; h: number }
 }

@@ -1,6 +1,7 @@
 import type { Tool } from './Tool.js'
 import type { Result } from '@bitborough/core'
 import type { Engine } from '@bitborough/engine'
+import { BUILDING_DEFS } from '@bitborough/engine'
 
 export class BuildingTool implements Tool {
   readonly name: string
@@ -17,5 +18,10 @@ export class BuildingTool implements Tool {
 
   getPreviewColor(): string {
     return 'rgba(128, 128, 128, 0.5)'
+  }
+
+  getPreviewSize(): { w: number; h: number } {
+    const def = BUILDING_DEFS[this.defId]
+    return def ? def.size : { w: 1, h: 1 }
   }
 }
