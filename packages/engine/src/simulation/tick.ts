@@ -21,6 +21,7 @@ import {
 import { updateZones } from './zones.js'
 import { updateDensity } from './density.js'
 import { demographicTick } from './demographics.js'
+import { buildEnrollmentCounts } from './services/school.js'
 
 export interface MonthlyTickResult {
   births: number
@@ -30,11 +31,12 @@ export interface MonthlyTickResult {
 }
 
 export function syncResidentialAgents(state: EngineState): void {
+  const enrollmentCounts = buildEnrollmentCounts(state.citizenRegistry.agents)
   for (const b of state.map.buildings) {
     if (b.state === 'active') {
       const def = BUILDING_DEFS[b.defId]
       if (def && def.category === BuildingCategory.Residential) {
-        syncAgentsForBuilding(state.map, state.citizenRegistry, state.roadGraph, b, state.trafficDensity, state.prng, state.reputationLayer)
+        syncAgentsForBuilding(state.map, state.citizenRegistry, state.roadGraph, b, state.trafficDensity, state.prng, state.reputationLayer, enrollmentCounts)
       }
     }
   }
