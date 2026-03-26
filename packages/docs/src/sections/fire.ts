@@ -12,7 +12,7 @@ export const fire: DocSection = {
     '',
     '`Spread Chance = 15% × (1 − Coverage × 0.7)`',
     '',
-    '**Fire Stations** ($300, $50/mo) cover a 15-tile radius (scales with funding, same as police). Tiles with over 50% coverage extinguish fires in 1 month instead of 3–5. When a fire burns out, it **destroys the zone and building** on that tile.',
+    '**Fire Substations** ($60, $12/mo) are small 1×1 units with a 6-tile radius — ideal for early-game coverage. **Fire Stations** ($300, $50/mo) cover a larger 15-tile radius. Substations within a station\'s coverage get a 1.5× range boost (6 → 9 tiles). Tiles with over 50% coverage extinguish fires in 1 month instead of 3–5. When a fire burns out, it **destroys the zone and building** on that tile.',
     '',
     'Water, roads, and empty land act as natural firebreaks — fires cannot spread across them.',
     '',

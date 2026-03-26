@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- Transparent background - terrain renders underneath -->
+
+  <!-- Lot ground (yard) -->
+  <rect x="8" y="8" width="112" height="112" rx="3" fill="#a0d48a"/>
+
+  <!-- Building shadow (offset 3,3) -->
+  <rect x="52" y="42" width="24" height="24" rx="1" fill="#000000" opacity="0.1" transform="translate(3, 3)"/>
+
+  <!-- Main building wall -->
+  <rect x="52" y="42" width="24" height="24" rx="1" fill="#d8d8d0"/>
+
+  <!-- Roof (red for fire station) -->
+  <rect x="50" y="40" width="28" height="26" rx="1" fill="#d08870"/>
+  <!-- Roof dark edge for depth -->
+  <line x1="50" y1="40" x2="78" y2="40" stroke="#c07060" stroke-width="0.5" opacity="0.6"/>
+
+  <!-- Small fire truck garage bay door -->
+  <rect x="56" y="48" width="8" height="12" rx="0.5" fill="#8a6848"/>
+  <!-- Door panel lines -->
+  <line x1="56" y1="52" x2="64" y2="52" stroke="#d08870" stroke-width="0.3" opacity="0.5"/>
+  <line x1="56" y1="56" x2="64" y2="56" stroke="#d08870" stroke-width="0.3" opacity="0.5"/>
+
+  <!-- Small window on side -->
+  <rect x="68" y="50" width="4" height="4" rx="0.3" fill="#a8d0e8" opacity="0.7"/>
+  <rect x="68" y="50" width="4" height="4" rx="0.3" fill="none" stroke="#987868" stroke-width="0.3"/>
+
+  <!-- Red alarm bell/light on roof -->
+  <circle cx="64" cy="38" r="1.5" fill="#c62828"/>
+  <circle cx="64" cy="38" r="1.5" fill="none" stroke="#8a2020" stroke-width="0.3" opacity="0.6"/>
+
+  <!-- Small bush (left side of building) -->
+  <circle cx="46" cy="56" r="3" fill="#8ab048" opacity="0.8"/>
+  <circle cx="44" cy="54" r="2" fill="#9ac858" opacity="0.6"/>
+
+  <!-- Small bush (right side of building) -->
+  <circle cx="82" cy="58" r="2.5" fill="#8ab048" opacity="0.8"/>
+  <circle cx="84" cy="56" r="1.8" fill="#9ac858" opacity="0.6"/>
+</svg>

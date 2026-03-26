@@ -151,6 +151,53 @@ describe('Building placement', () => {
   })
 })
 
+describe('Building placement blocks on infrastructure', () => {
+  test('placing building on road fails with Occupied', () => {
+    const engine = Engine.create(createTestMap(32))
+    engine.placeTile(5, 5, Infrastructure.Road)
+    const result = engine.placeBuilding(5, 5, 'special.park')
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.reason).toBe(FailReason.Occupied)
+  })
+
+  test('placing building on power line fails with Occupied', () => {
+    const engine = Engine.create(createTestMap(32))
+    engine.placeTile(5, 5, Infrastructure.PowerLine)
+    const result = engine.placeBuilding(5, 5, 'special.park')
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.reason).toBe(FailReason.Occupied)
+  })
+
+  test('placing multi-tile building fails if any footprint tile has infrastructure', () => {
+    const engine = Engine.create(createTestMap(32))
+    // Place a road at (6, 6), inside the 3x3 footprint of police at (5, 5)
+    engine.placeTile(6, 6, Infrastructure.Road)
+    const result = engine.placeBuilding(5, 5, 'service.police')
+    expect(result.ok).toBe(false)
+    if (!result.ok) expect(result.reason).toBe(FailReason.Occupied)
+  })
+
+  test('placing building on empty tile still succeeds', () => {
+    const engine = Engine.create(createTestMap(32))
+    const result = engine.placeBuilding(5, 5, 'special.park')
+    expect(result.ok).toBe(true)
+  })
+
+  test('small police kiosk can be placed', () => {
+    const engine = Engine.create(createTestMap(32))
+    const result = engine.placeBuilding(5, 5, 'service.police.small')
+    expect(result.ok).toBe(true)
+    expect(engine.getState().map.buildings.some((b) => b.defId === 'service.police.small')).toBe(true)
+  })
+
+  test('small fire substation can be placed', () => {
+    const engine = Engine.create(createTestMap(32))
+    const result = engine.placeBuilding(5, 5, 'service.fire.small')
+    expect(result.ok).toBe(true)
+    expect(engine.getState().map.buildings.some((b) => b.defId === 'service.fire.small')).toBe(true)
+  })
+})
+
 describe('Building registry', () => {
   test('all zone building defIds are in BUILDING_DEFS', () => {
     expect(BUILDING_DEFS['res.low']).toBeDefined()
@@ -163,7 +210,23 @@ describe('Building registry', () => {
     expect(BUILDING_DEFS['power.nuclear']).toBeDefined()
     expect(BUILDING_DEFS['service.police']).toBeDefined()
     expect(BUILDING_DEFS['service.fire']).toBeDefined()
+    expect(BUILDING_DEFS['service.police.small']).toBeDefined()
+    expect(BUILDING_DEFS['service.fire.small']).toBeDefined()
     expect(BUILDING_DEFS['special.park']).toBeDefined()
+  })
+
+  test('small police kiosk is a 1x1 building with correct cost', () => {
+    const def = BUILDING_DEFS['service.police.small']!
+    expect(def.size).toEqual({ w: 1, h: 1 })
+    expect(def.cost).toBe(50)
+    expect(def.maintenanceCost).toBe(10)
+  })
+
+  test('small fire substation is a 1x1 building with correct cost', () => {
+    const def = BUILDING_DEFS['service.fire.small']!
+    expect(def.size).toEqual({ w: 1, h: 1 })
+    expect(def.cost).toBe(60)
+    expect(def.maintenanceCost).toBe(12)
   })
 })
 

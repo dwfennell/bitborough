@@ -5,6 +5,7 @@ import type { BuildingIndex } from '../../building-index.js'
 import { buildInfluenceMap } from './influence.js'
 
 const FIRE_BASE_RADIUS = 15
+const FIRE_SMALL_BASE_RADIUS = 6
 
 export interface FireState {
   activeFires: Map<number, number> // tile index → ticks remaining
@@ -20,7 +21,10 @@ export function calculateFireCoverage(
   fireFunding: number,
   influenceBuffer: Float32Array,
 ): void {
-  buildInfluenceMap(map, 'service.fire', FIRE_BASE_RADIUS, fireFunding, influenceBuffer)
+  buildInfluenceMap(
+    map, 'service.fire', FIRE_BASE_RADIUS, fireFunding, influenceBuffer,
+    { defId: 'service.fire.small', baseRadius: FIRE_SMALL_BASE_RADIUS },
+  )
 
   // Convert [0, 1] influence to [0, 255] coverage
   for (let i = 0; i < influenceBuffer.length; i++) {
@@ -28,7 +32,14 @@ export function calculateFireCoverage(
   }
 }
 
-export function updateFires(map: GameMap, fireState: FireState, fireCoverage: Uint8Array, prng: PRNG, bldIdx: BuildingIndex): void {
+export function updateFires(
+  map: GameMap,
+  fireState: FireState,
+  fireCoverage: Uint8Array,
+  prng: PRNG,
+  bldIdx: BuildingIndex,
+  onBuildingDestroyed?: (buildingId: string) => void,
+): void {
   const { width, height } = map
 
   // Tick existing fires — collect spread fires separately to avoid
@@ -51,6 +62,7 @@ export function updateFires(map: GameMap, fireState: FireState, fireCoverage: Ui
       if (burned) {
         const bIdx = map.buildings.indexOf(burned)
         if (bIdx !== -1) map.buildings.splice(bIdx, 1)
+        onBuildingDestroyed?.(burned.id)
       }
     } else {
       fireState.activeFires.set(idx, newRemaining)

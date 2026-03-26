@@ -21,7 +21,9 @@ const NAMES: Record<string, string> = {
   'power.diesel': 'Diesel Generator',
   'power.coal': 'Coal Plant',
   'power.nuclear': 'Nuclear Plant',
+  'service.police.small': 'Police Kiosk',
   'service.police': 'Police Station',
+  'service.fire.small': 'Fire Substation',
   'service.fire': 'Fire Station',
   'special.park': 'Park',
 }
@@ -45,8 +47,10 @@ const NOTES: Record<string, string> = {
   'power.diesel': 'Early game power',
   'power.coal': 'Mid-game power',
   'power.nuclear': 'Most efficient',
-  'service.police': '15-tile crime radius',
-  'service.fire': '15-tile fire radius',
+  'service.police.small': '6-tile radius; boosted to 9 near a station',
+  'service.police': '15-tile crime radius; boosts nearby kiosks',
+  'service.fire.small': '6-tile radius; boosted to 9 near a station',
+  'service.fire': '15-tile fire radius; boosts nearby substations',
   'special.park': 'Boosts land value',
 }
 

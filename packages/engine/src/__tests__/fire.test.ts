@@ -4,6 +4,36 @@ import { createTestMap, advanceMonth } from '../test-helpers.js'
 import { Infrastructure, ZoneType } from '@bitborough/core'
 
 describe('Fire system', () => {
+  test('fire destroys building and displaces residents', () => {
+    // Match the integration test setup that reliably produces buildings
+    const engine = Engine.create(createTestMap(64), { startingFunds: 50_000, seed: 42 })
+    engine.placeBuilding(10, 10, 'power.coal')
+    for (let x = 14; x < 28; x++) {
+      engine.placeTile(x, 12, Infrastructure.Road)
+      engine.placeTile(x, 10, Infrastructure.PowerLine)
+      engine.placeZone(x, 11, ZoneType.Residential)
+    }
+
+    // Run 2 years to let buildings develop
+    for (let i = 0; i < 24; i++) advanceMonth(engine)
+
+    const state = engine.getState()
+    const resBefore = state.map.buildings.filter(b => b.defId.startsWith('res.'))
+    expect(resBefore.length).toBeGreaterThan(0)
+
+    const b = resBefore[0]!
+    const idx = b.y * 64 + b.x
+    const popBefore = state.population
+
+    // Set a fire with 1 remaining tick so it burns out next month
+    ;(engine as any).state.fireState.activeFires.set(idx, 1)
+    advanceMonth(engine)
+
+    const after = engine.getState()
+    expect(after.map.buildings.filter(b2 => b2.id === b.id).length).toBe(0)
+    expect(after.population).toBeLessThan(popBefore)
+  })
+
   test('fire coverage exists near fire stations', () => {
     const engine = Engine.create(createTestMap(32), { startingFunds: 100_000 })
     engine.placeBuilding(10, 10, 'service.fire')

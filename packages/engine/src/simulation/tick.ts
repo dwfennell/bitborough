@@ -15,6 +15,7 @@ import {
   computeCitizenSummary,
   computeTotalPopulation,
   syncBuildingResidents,
+  removeAgentsForBuilding,
   type TileLayers,
 } from './citizens.js'
 import { updateZones } from './zones.js'
@@ -50,7 +51,9 @@ export function monthlyTick(state: EngineState): MonthlyTickResult {
 
   rebuildDerivedState(state)
   state.demand = calculateDemand(state.map, state.taxRate, state.trafficDensity, state.citizenSummary)
-  updateFires(state.map, state.fireState, state.fireCoverage, state.prng, state.bldIdx)
+  updateFires(state.map, state.fireState, state.fireCoverage, state.prng, state.bldIdx, (buildingId) => {
+    removeAgentsForBuilding(state.citizenRegistry, buildingId)
+  })
   // Reputation after fires — fires can destroy buildings, affecting neighborhood quality
   computeReputation(state.reputationLayer, state.map, state.crimeLevel, state.fireCoverage, state.pollutionLevel, state.bldIdx)
 

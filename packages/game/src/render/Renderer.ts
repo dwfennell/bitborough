@@ -8,6 +8,8 @@ export class Renderer {
   private tileRenderer: TileRenderer
   private gridLines = true
   private overlayRenderer = new OverlayRenderer()
+  private buildingTiles = new Set<number>()
+  private lastBuildingCount = -1
 
   constructor(
     private ctx: CanvasRenderingContext2D,
@@ -58,6 +60,40 @@ export class Renderer {
       }
     }
 
+    // Grid lines — skip tiles occupied by buildings
+    if (this.gridLines && ts >= 8) {
+      if (map.buildings.length !== this.lastBuildingCount) {
+        this.buildingTiles.clear()
+        for (const building of map.buildings) {
+          const def = BUILDING_DEFS[building.defId]
+          if (!def) continue
+          for (let dy = 0; dy < def.size.h; dy++) {
+            for (let dx = 0; dx < def.size.w; dx++) {
+              this.buildingTiles.add((building.y + dy) * map.width + (building.x + dx))
+            }
+          }
+        }
+        this.lastBuildingCount = map.buildings.length
+      }
+      ctx.strokeStyle = 'rgba(0,0,0,0.15)'
+      ctx.lineWidth = 0.5
+      ctx.beginPath()
+      for (let y = startY; y <= endY; y++) {
+        for (let x = startX; x <= endX; x++) {
+          if (this.buildingTiles.has(y * map.width + x)) continue
+          const sx = Math.floor((x - camera.x) * ts)
+          const sy = Math.floor((y - camera.y) * ts)
+          ctx.moveTo(sx + snappedTs, sy)
+          ctx.lineTo(sx + snappedTs, sy + snappedTs)
+          ctx.moveTo(sx, sy + snappedTs)
+          ctx.lineTo(sx + snappedTs, sy + snappedTs)
+        }
+      }
+      ctx.stroke()
+    } else {
+      this.lastBuildingCount = -1
+    }
+
     // Buildings
     for (const building of map.buildings) {
       const def = BUILDING_DEFS[building.defId]
@@ -74,6 +110,33 @@ export class Renderer {
       this.tileRenderer.drawBuilding(ctx, building, def, sx, sy, snappedTs)
     }
 
+    // Active fires (always visible)
+    if (state.activeFires.length > 0) {
+      const pulse = 0.5 + 0.2 * Math.sin(Date.now() / 200)
+      const fireOuter = `rgba(255, 80, 0, ${pulse})`
+      const fireInner = `rgba(255, 200, 0, ${pulse})`
+      for (const idx of state.activeFires) {
+        const fx = idx % map.width
+        const fy = (idx - fx) / map.width
+        if (fx < startX || fx > endX || fy < startY || fy > endY) continue
+        const sx = Math.floor((fx - camera.x) * ts)
+        const sy = Math.floor((fy - camera.y) * ts)
+        ctx.fillStyle = fireOuter
+        ctx.fillRect(sx, sy, snappedTs, snappedTs)
+        const cx = sx + snappedTs / 2
+        const cy = sy + snappedTs / 2
+        const r = snappedTs * 0.3
+        ctx.fillStyle = fireInner
+        ctx.beginPath()
+        ctx.moveTo(cx, cy - r)
+        ctx.quadraticCurveTo(cx + r, cy - r * 0.3, cx + r * 0.5, cy + r * 0.5)
+        ctx.quadraticCurveTo(cx, cy + r * 0.2, cx, cy + r)
+        ctx.quadraticCurveTo(cx, cy + r * 0.2, cx - r * 0.5, cy + r * 0.5)
+        ctx.quadraticCurveTo(cx - r, cy - r * 0.3, cx, cy - r)
+        ctx.fill()
+      }
+    }
+
     // Overlays (power grid, land value heatmaps)
     this.overlayRenderer.render(ctx, state, {
       ts: snappedTs,
@@ -86,24 +149,6 @@ export class Renderer {
       cameraY: camera.y,
       rawTs: ts,
     })
-
-    // Grid lines (batched single stroke)
-    if (this.gridLines && ts >= 8) {
-      ctx.strokeStyle = 'rgba(0,0,0,0.15)'
-      ctx.lineWidth = 0.5
-      ctx.beginPath()
-      for (let y = bounds.minY; y <= bounds.maxY + 1; y++) {
-        const sy = (y - camera.y) * ts
-        ctx.moveTo(0, sy)
-        ctx.lineTo(camera.viewportWidth, sy)
-      }
-      for (let x = bounds.minX; x <= bounds.maxX + 1; x++) {
-        const sx = (x - camera.x) * ts
-        ctx.moveTo(sx, 0)
-        ctx.lineTo(sx, camera.viewportHeight)
-      }
-      ctx.stroke()
-    }
   }
 
   setGridLines(show: boolean): void {

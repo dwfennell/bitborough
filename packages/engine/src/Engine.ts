@@ -214,7 +214,7 @@ export class Engine {
       return { ok: false, reason: FailReason.InsufficientFunds }
     }
 
-    // Check footprint fits on map, no water, no existing buildings
+    // Check footprint fits on map, no water, no existing buildings or infrastructure
     for (let dy = 0; dy < def.size.h; dy++) {
       for (let dx = 0; dx < def.size.w; dx++) {
         const tx = x + dx
@@ -226,13 +226,10 @@ export class Engine {
         if (this.state.map.terrain[idx] === TileType.Water) {
           return { ok: false, reason: FailReason.InvalidLocation, detail: 'Cannot build on water' }
         }
-      }
-    }
-
-    // Check overlap with existing buildings using spatial index
-    for (let dy = 0; dy < def.size.h; dy++) {
-      for (let dx = 0; dx < def.size.w; dx++) {
-        if (this.state.bldIdx.has(x + dx, y + dy)) {
+        if (this.state.map.infrastructure[idx] !== 0) {
+          return { ok: false, reason: FailReason.Occupied }
+        }
+        if (this.state.bldIdx.has(tx, ty)) {
           return { ok: false, reason: FailReason.Occupied }
         }
       }

@@ -1,13 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
-  <defs>
-    <linearGradient id="asphalt" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#707070"/>
-      <stop offset="100%" stop-color="#686868"/>
-    </linearGradient>
-  </defs>
-
   <!-- Grass base -->
   <rect width="128" height="128" fill="#8cc870"/>
+
+  <!-- Grass texture patches -->
   <ellipse cx="18" cy="18" rx="12" ry="9" fill="#95d07a" opacity="0.4"/>
   <ellipse cx="110" cy="18" rx="11" ry="8" fill="#82c466" opacity="0.35"/>
   <ellipse cx="18" cy="108" rx="12" ry="9" fill="#95d07a" opacity="0.38"/>
@@ -24,62 +19,49 @@
     <path d="M110 18.5 L112 11 L113.5 18.5Z"/>
   </g>
 
-  <!-- Sidewalks -->
-  <!-- East horizontal sidewalks -->
-  <rect x="88" y="40" width="40" height="8" fill="#b0b0a8" opacity="0.6"/>
-  <rect x="88" y="80" width="40" height="8" fill="#b0b0a8" opacity="0.6"/>
-  <!-- South vertical sidewalks -->
-  <rect x="40" y="88" width="8" height="40" fill="#b0b0a8" opacity="0.6"/>
-  <rect x="80" y="88" width="8" height="40" fill="#b0b0a8" opacity="0.6"/>
-  <!-- Outer curve sidewalk (NW quadrant) -->
-  <path d="M88 40 L40 40 Q40 40 40 88 L48 88 Q48 48 88 48Z" fill="#b0b0a8" opacity="0.6"/>
-  <!-- Inner curve sidewalk corner (SE quadrant) -->
-  <rect x="80" y="80" width="8" height="8" fill="#b0b0a8" opacity="0.6"/>
-
-  <!-- Road pavement - E-S curve -->
+  <!-- Dirt road pavement - E-S curve -->
   <!-- Horizontal road (east) -->
-  <rect x="80" y="48" width="48" height="32" fill="url(#asphalt)"/>
+  <rect x="78" y="50" width="50" height="28" fill="#d8c498"/>
   <!-- Vertical road (south) -->
-  <rect x="48" y="80" width="32" height="48" fill="url(#asphalt)"/>
+  <rect x="50" y="78" width="28" height="50" fill="#d8c498"/>
   <!-- Curve fill -->
-  <rect x="48" y="48" width="32" height="32" fill="url(#asphalt)"/>
-  <path d="M80 48 Q48 48 48 80 L80 80Z" fill="url(#asphalt)"/>
+  <rect x="50" y="50" width="28" height="28" fill="#d8c498"/>
+  <path d="M78 50 Q50 50 50 78 L78 78Z" fill="#d8c498"/>
 
-  <!-- Curb lines -->
-  <g stroke="#989898" stroke-width="1.5" opacity="0.5" fill="none">
-    <!-- East outer curbs -->
-    <line x1="88" y1="40" x2="128" y2="40"/>
-    <line x1="88" y1="88" x2="128" y2="88"/>
-    <!-- South outer curbs -->
-    <line x1="40" y1="88" x2="40" y2="128"/>
-    <line x1="88" y1="88" x2="88" y2="128"/>
-    <!-- Outer curve curb (grass side, NW) -->
-    <path d="M88 40 Q40 40 40 88"/>
+  <!-- Rough edges - grass encroachment -->
+  <ellipse cx="80" cy="48" rx="2" ry="2.5" fill="#8cc870" opacity="0.3"/>
+  <ellipse cx="105" cy="55" rx="2.5" ry="2" fill="#8cc870" opacity="0.25"/>
+  <ellipse cx="110" cy="70" rx="2" ry="2.5" fill="#8cc870" opacity="0.3"/>
+  <ellipse cx="52" cy="80" rx="2.5" ry="2" fill="#8cc870" opacity="0.28"/>
+  <ellipse cx="48" cy="100" rx="2" ry="2.5" fill="#8cc870" opacity="0.32"/>
+
+  <!-- Tire track ruts -->
+  <!-- Horizontal section -->
+  <line x1="78" y1="57" x2="128" y2="57" stroke="#c8b480" stroke-width="2" opacity="0.25"/>
+  <line x1="78" y1="65" x2="128" y2="65" stroke="#c8b480" stroke-width="2" opacity="0.25"/>
+  <!-- Vertical section -->
+  <line x1="57" y1="78" x2="57" y2="128" stroke="#c8b480" stroke-width="2" opacity="0.25"/>
+  <line x1="65" y1="78" x2="65" y2="128" stroke="#c8b480" stroke-width="2" opacity="0.25"/>
+
+  <!-- Pebble/gravel texture dots -->
+  <g fill="#c8b480" opacity="0.2">
+    <circle cx="92" cy="56" r="0.6"/>
+    <circle cx="106" cy="70" r="0.5"/>
+    <circle cx="62" cy="92" r="0.6"/>
+    <circle cx="74" cy="106" r="0.5"/>
+    <circle cx="68" cy="68" r="0.5"/>
+    <circle cx="56" cy="100" r="0.6"/>
+    <circle cx="100" cy="60" r="0.5"/>
+    <circle cx="118" cy="68" r="0.6"/>
+    <circle cx="70" cy="118" r="0.5"/>
+    <circle cx="112" cy="74" r="0.6"/>
   </g>
 
-  <!-- Road surface texture -->
-  <g fill="#606060" opacity="0.12">
-    <circle cx="92" cy="56" r="0.8"/>
-    <circle cx="106" cy="70" r="0.7"/>
-    <circle cx="62" cy="92" r="0.9"/>
-    <circle cx="74" cy="106" r="0.7"/>
-    <circle cx="68" cy="68" r="0.8"/>
-    <circle cx="56" cy="100" r="0.7"/>
-    <circle cx="100" cy="60" r="0.8"/>
-    <circle cx="118" cy="68" r="0.7"/>
-    <circle cx="70" cy="118" r="0.6"/>
-    <circle cx="112" cy="74" r="0.7"/>
-  </g>
-
-  <!-- Center lane markings -->
-  <!-- Horizontal (east approach) -->
-  <rect x="88" y="63.25" width="8" height="1.5" rx="0.75" fill="#e8d080" opacity="0.7"/>
-  <rect x="102" y="63.25" width="8" height="1.5" rx="0.75" fill="#e8d080" opacity="0.7"/>
-  <rect x="116" y="63.25" width="8" height="1.5" rx="0.75" fill="#e8d080" opacity="0.7"/>
-  <!-- Vertical (south approach) -->
-  <rect x="63.25" y="88" width="1.5" height="8" rx="0.75" fill="#e8d080" opacity="0.7"/>
-  <rect x="63.25" y="102" width="1.5" height="8" rx="0.75" fill="#e8d080" opacity="0.7"/>
-  <rect x="63.25" y="116" width="1.5" height="8" rx="0.75" fill="#e8d080" opacity="0.7"/>
+  <!-- Dirt patches for variation -->
+  <ellipse cx="85" cy="62" rx="3" ry="3.5" fill="#e8d8b0" opacity="0.3"/>
+  <ellipse cx="62" cy="80" rx="3.5" ry="3" fill="#e8d8b0" opacity="0.25"/>
+  <ellipse cx="60" cy="105" rx="3" ry="2.5" fill="#e8d8b0" opacity="0.28"/>
+  <ellipse cx="92" cy="72" rx="2.5" ry="3" fill="#e8d8b0" opacity="0.25"/>
 
   <!-- Small flowers in grass -->
   <circle cx="20" cy="50" r="1.5" fill="#e8c8d0" opacity="0.6"/>

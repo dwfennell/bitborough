@@ -59,9 +59,19 @@ const TOOL_ENTRIES: ToolEntry[] = [
     factory: () => new BuildingTool('transit.stop'),
   },
   {
+    label: `Kiosk ${fmtCost(BUILDING_DEFS['service.police.small']!.cost)}`,
+    key: 'i',
+    factory: () => new BuildingTool('service.police.small'),
+  },
+  {
     label: `Police ${fmtCost(BUILDING_DEFS['service.police']!.cost)}`,
     key: '9',
     factory: () => new BuildingTool('service.police'),
+  },
+  {
+    label: `SubStn ${fmtCost(BUILDING_DEFS['service.fire.small']!.cost)}`,
+    key: 'u',
+    factory: () => new BuildingTool('service.fire.small'),
   },
   {
     label: `Fire ${fmtCost(BUILDING_DEFS['service.fire']!.cost)}`,

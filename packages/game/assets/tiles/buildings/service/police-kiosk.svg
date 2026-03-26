@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- Transparent background - terrain renders underneath -->
+
+  <!-- Lot ground with yard grass -->
+  <rect x="8" y="8" width="112" height="112" rx="3" fill="#a0d48a"/>
+
+  <!-- Building shadow (small kiosk) -->
+  <rect x="52" y="48" width="24" height="24" rx="1" fill="#000000" opacity="0.1" transform="translate(3, 3)"/>
+
+  <!-- Main building wall -->
+  <rect x="52" y="48" width="24" height="24" rx="1" fill="#d8d8d0"/>
+
+  <!-- Roof (blue for police) -->
+  <rect x="50" y="46" width="28" height="26" rx="1" fill="#90b8d8"/>
+  <!-- Roof dark edge -->
+  <rect x="50" y="46" width="28" height="2" rx="1" fill="#80a8c8"/>
+
+  <!-- Police accent stripe on roof -->
+  <rect x="50" y="52" width="28" height="3" fill="#1565c0" opacity="0.7"/>
+
+  <!-- Small "P" badge on roof -->
+  <circle cx="64" cy="50" r="4" fill="#1565c0" opacity="0.6"/>
+  <circle cx="64" cy="50" r="3.5" fill="none" stroke="#ffffff" stroke-width="0.6" opacity="0.5"/>
+  <text x="64" y="51.5" font-size="3.5" fill="#ffffff" text-anchor="middle" font-weight="bold" opacity="0.7">P</text>
+
+  <!-- Tiny flagpole on top -->
+  <rect x="63.5" y="44" width="1" height="6" fill="#8a6848" opacity="0.7"/>
+  <!-- Small flag -->
+  <rect x="64.5" y="44" width="4" height="2.5" fill="#1565c0" opacity="0.8"/>
+
+  <!-- Door (front center) -->
+  <rect x="59" y="63" width="5" height="8" rx="0.5" fill="#8a6848"/>
+  <!-- Door handle -->
+  <circle cx="63.5" cy="67" r="0.5" fill="#d4af37" opacity="0.6"/>
+
+  <!-- Small window above door -->
+  <rect x="59.5" y="54" width="4" height="3.5" rx="0.3" fill="#a8d0e8" opacity="0.7"/>
+  <rect x="59.5" y="54" width="4" height="3.5" rx="0.3" fill="none" stroke="#987868" stroke-width="0.3" opacity="0.5"/>
+
+  <!-- Small window on right side -->
+  <rect x="70" y="55" width="3.5" height="3.5" rx="0.3" fill="#a8d0e8" opacity="0.7"/>
+  <rect x="70" y="55" width="3.5" height="3.5" rx="0.3" fill="none" stroke="#987868" stroke-width="0.3" opacity="0.5"/>
+
+  <!-- Small decorative bushes (left) -->
+  <ellipse cx="35" cy="68" rx="5" ry="4" fill="#7a9c6a" opacity="0.6"/>
+  <ellipse cx="32" cy="65" rx="3" ry="2.5" fill="#8ab87a" opacity="0.5"/>
+
+  <!-- Small decorative bush (right) -->
+  <ellipse cx="95" cy="68" rx="5" ry="4" fill="#7a9c6a" opacity="0.6"/>
+  <ellipse cx="98" cy="65" rx="3" ry="2.5" fill="#8ab87a" opacity="0.5"/>
+
+  <!-- Subtle ground detail line (front of kiosk) -->
+  <line x1="48" y1="73" x2="76" y2="73" stroke="#8a9a7a" stroke-width="0.5" opacity="0.3"/>
+</svg>

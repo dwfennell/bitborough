@@ -33,7 +33,9 @@ const BUILDING_COLORS: Record<string, string> = {
   'power.diesel': '#8d6e63',
   'power.coal': '#555',
   'power.nuclear': '#7e57c2',
+  'service.police.small': '#4a90d9',
   'service.police': '#1565c0',
+  'service.fire.small': '#e53935',
   'service.fire': '#c62828',
   'special.park': '#66bb6a',
 }
@@ -63,7 +65,9 @@ const BUILDING_SPRITES: Record<string, string> = {
   'power.diesel': '/tiles/power/diesel-generator.svg',
   'power.coal': '/tiles/power/power-plant-coal.svg',
   'power.nuclear': '/tiles/power/power-plant-nuclear.svg',
+  'service.police.small': '/tiles/buildings/service/police-kiosk.svg',
   'service.police': '/tiles/buildings/service/police-station.svg',
+  'service.fire.small': '/tiles/buildings/service/fire-substation.svg',
   'service.fire': '/tiles/buildings/service/fire-station.svg',
   'special.park': '/tiles/buildings/park.svg',
 }
@@ -174,6 +178,10 @@ export class ColorTileRenderer implements TileRenderer {
     const w = def.size.w * tileSize
     const h = def.size.h * tileSize
 
+    // Opaque background covering full footprint so grid lines don't bleed through
+    ctx.fillStyle = '#e8dcc8'
+    ctx.fillRect(screenX, screenY, w, h)
+
     // State-based sprites override normal building sprites
     if (building.state === 'under_construction') {
       const maxDim = Math.max(def.size.w, def.size.h)
@@ -209,9 +217,6 @@ export class ColorTileRenderer implements TileRenderer {
     if (spritePath) {
       const img = this.sprites.get(spritePath)
       if (img) {
-        // Opaque background so terrain doesn't bleed through semi-transparent SVG elements
-        ctx.fillStyle = '#e8dcc8'
-        ctx.fillRect(screenX, screenY, w, h)
         ctx.drawImage(img, screenX, screenY, w, h)
         return
       }
