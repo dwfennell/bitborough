@@ -61,6 +61,7 @@ export interface EngineState {
   crimeLevel: Uint8Array
   fireCoverage: Uint8Array
   trafficDensity: Uint8Array
+  educationQuality: Uint8Array
   reputationLayer: Float32Array
 
   // Citizens
@@ -246,6 +247,7 @@ export function restoreState(save: SaveFile): EngineState {
     crimeLevel: new Uint8Array(size),
     fireCoverage: new Uint8Array(size),
     trafficDensity: new Uint8Array(size),
+    educationQuality: new Uint8Array(size),
     reputationLayer,
     citizenRegistry,
     roadGraph: buildRoadGraph(map),
@@ -306,6 +308,7 @@ export function createEngineState(map: GameMap, config: EngineConfig): EngineSta
   const crimeLevel = new Uint8Array(size)
   const fireCoverage = new Uint8Array(size)
   const trafficDensity = new Uint8Array(size)
+  const educationQuality = new Uint8Array(size)
   const reputationLayer = new Float32Array(size).fill(0.5)
   const fireState = createFireState()
   const influenceBuffer = new Float32Array(size)
@@ -334,6 +337,7 @@ export function createEngineState(map: GameMap, config: EngineConfig): EngineSta
     crimeLevel,
     fireCoverage,
     trafficDensity,
+    educationQuality,
     reputationLayer,
     citizenRegistry,
     roadGraph,

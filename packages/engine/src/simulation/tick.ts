@@ -1,5 +1,6 @@
 import {
   type GameEvent,
+  type Building,
   calcMonthlyPayment,
   BuildingCategory,
 } from '@bitborough/core'
@@ -21,7 +22,7 @@ import {
 import { updateZones } from './zones.js'
 import { updateDensity } from './density.js'
 import { demographicTick } from './demographics.js'
-import { buildEnrollmentCounts } from './services/school.js'
+import { buildEnrollmentCounts, SCHOOL_CAPACITY, computeSchoolQuality } from './services/school.js'
 
 export interface MonthlyTickResult {
   births: number
@@ -99,6 +100,29 @@ export function monthlyTick(state: EngineState): MonthlyTickResult {
   state.citizenSummary.birthsLastTick = demoResult.births
   state.citizenSummary.deathsLastTick = demoResult.deaths
   state.citizenSummary.netMigrationLastTick = demoResult.netMigration
+
+  // Education quality overlay
+  state.educationQuality.fill(0)
+  const overlayEnrollment = buildEnrollmentCounts(state.citizenRegistry.agents)
+  const overlayBuildingById = new Map<string, Building>()
+  for (const b of state.map.buildings) overlayBuildingById.set(b.id, b)
+
+  for (const agent of state.citizenRegistry.agents) {
+    if (agent.demographics.children === 0) continue
+    const building = overlayBuildingById.get(agent.homeBuildingId)
+    if (!building) continue
+    const homeTile = building.y * state.map.width + building.x
+    if (agent.schoolBuildingId === null) {
+      if (state.educationQuality[homeTile] === 0) state.educationQuality[homeTile] = 1
+    } else {
+      const schoolBuilding = overlayBuildingById.get(agent.schoolBuildingId)
+      const capacity = SCHOOL_CAPACITY[schoolBuilding?.defId ?? ''] ?? 0
+      const enrolled = overlayEnrollment.get(agent.schoolBuildingId) ?? 0
+      const quality = computeSchoolQuality(enrolled, capacity, state.funding.education)
+      const encoded = Math.floor(quality * 253) + 2
+      state.educationQuality[homeTile] = Math.max(state.educationQuality[homeTile]!, encoded)
+    }
+  }
 
   // 14. Compute budget including loan repayment
   const population = computeTotalPopulation(state.map)

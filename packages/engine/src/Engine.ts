@@ -99,6 +99,7 @@ export class Engine {
       crimeLevel: this.state.crimeLevel,
       fireCoverage: this.state.fireCoverage,
       trafficDensity: this.state.trafficDensity,
+      educationQuality: this.state.educationQuality,
       activeFires: Array.from(this.state.fireState.activeFires.keys()),
       loan: this.state.loan,
       loanRepaymentAmount: this.state.loanRepaymentAmount,
