@@ -71,11 +71,7 @@ export class Engine {
 
   tick(): void {
     this.state.tickCount++
-
-    // Power propagation runs every tick (uses cached building index)
     propagatePower(this.state.map, this.state.powerGrid, this.state.bldIdx)
-
-    // Monthly systems
     if (this.state.tickCount % this.state.ticksPerMonth === 0) {
       this.events = []
       const result = monthlyTick(this.state)

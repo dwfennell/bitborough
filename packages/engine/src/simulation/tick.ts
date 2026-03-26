@@ -3,15 +3,11 @@ import {
   calcMonthlyPayment,
   BuildingCategory,
 } from '@bitborough/core'
-import { type EngineState, computeLoanRepayment } from '../engine-state.js'
-import { BuildingIndex } from '../building-index.js'
+import { type EngineState, rebuildDerivedState, computeLoanRepayment } from '../engine-state.js'
 import { BUILDING_DEFS } from '../buildings-registry.js'
 import { calculateDemand } from './demand.js'
 import { calculateBudget } from './budget.js'
-import { calculatePollution } from './pollution.js'
-import { calculateLandValues } from './land-value.js'
-import { calculateCrime } from './services/crime.js'
-import { calculateFireCoverage, updateFires } from './services/fire.js'
+import { updateFires } from './services/fire.js'
 import { computeReputation } from './reputation.js'
 import {
   syncAgentsForBuilding,
@@ -46,31 +42,16 @@ export function syncResidentialAgents(state: EngineState): void {
 export function monthlyTick(state: EngineState): MonthlyTickResult {
   const events: GameEvent[] = []
 
-  // 1. Rebuild building index — buildings may change during monthly simulation
-  state.bldIdx = new BuildingIndex(state.map)
-
-  // 2. Advance month/year
   state.month++
   if (state.month > state.monthsPerYear) {
     state.month = 1
     state.year++
   }
 
-  // 3. Calculate demand
+  rebuildDerivedState(state)
   state.demand = calculateDemand(state.map, state.taxRate, state.trafficDensity, state.citizenSummary)
-
-  // 4. Pollution propagation — must run before land values / desirability
-  calculatePollution(state.map, state.pollutionLevel, state.pollutionBuffer)
-
-  // 5. Land values use previous month's crime; crime uses updated land values
-  calculateLandValues(state.map, state.powerGrid, state.pollutionLevel, state.crimeLevel, state.landValues, state.bldIdx)
-  calculateCrime(state.map, state.landValues, state.crimeLevel, state.funding.police, state.influenceBuffer)
-  calculateFireCoverage(state.map, state.fireCoverage, state.funding.fire, state.influenceBuffer)
-
-  // 6. Update fires
   updateFires(state.map, state.fireState, state.fireCoverage, state.prng, state.bldIdx)
-
-  // 7. Compute reputation AFTER fires — critical ordering
+  // Reputation after fires — fires can destroy buildings, affecting neighborhood quality
   computeReputation(state.reputationLayer, state.map, state.crimeLevel, state.fireCoverage, state.pollutionLevel, state.bldIdx)
 
   // 8. Citizen monthly tick: replan stale routes, write trafficDensity from agent routes
@@ -86,9 +67,6 @@ export function monthlyTick(state: EngineState): MonthlyTickResult {
   // 9. Zone development
   const nextBuildingIdRef = { value: state.nextBuildingId }
   updateZones(state.map, state.powerGrid, state.demand, state.prng, nextBuildingIdRef, state.bldIdx)
-  state.nextBuildingId = nextBuildingIdRef.value
-
-  // 10. Density progression
   updateDensity(
     state.map,
     state.powerGrid,

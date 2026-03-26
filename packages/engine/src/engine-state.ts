@@ -263,7 +263,7 @@ export function restoreState(save: SaveFile): EngineState {
     setNextAgentId(maxPrefixedId(state.citizenRegistry.agents, 'c') + 1)
   }
 
-  // Rebuild derived state
+  // Rebuild derived state (reputation is NOT recomputed — it's restored from the save file)
   propagatePower(state.map, state.powerGrid, state.bldIdx)
   rebuildDerivedState(state)
   state.demand = calculateDemand(state.map, state.taxRate, undefined, state.citizenSummary)
