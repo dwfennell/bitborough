@@ -25,6 +25,8 @@ const NAMES: Record<string, string> = {
   'service.police': 'Police Station',
   'service.fire.small': 'Fire Substation',
   'service.fire': 'Fire Station',
+  'service.school.small': 'Small School',
+  'service.school': 'School',
   'special.park': 'Park',
 }
 
@@ -51,6 +53,8 @@ const NOTES: Record<string, string> = {
   'service.police': '15-tile crime radius; boosts nearby kiosks',
   'service.fire.small': '6-tile radius; boosted to 9 near a station',
   'service.fire': '15-tile fire radius; boosts nearby substations',
+  'service.school.small': '5-tile radius; boosted to 7.5 near a school',
+  'service.school': '12-tile education radius; boosts nearby small schools',
   'special.park': 'Boosts land value',
 }
 

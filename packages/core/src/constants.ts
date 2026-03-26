@@ -31,6 +31,8 @@ export const COSTS = {
   park: 10,
   pavedRoadUpgrade: 20, // cost to upgrade one dirt road tile to paved
   transitStop: 500,
+  school: 500,
+  schoolSmall: 80,
 } as const
 
 export const MAINTENANCE = {
@@ -46,6 +48,8 @@ export const MAINTENANCE = {
   fireStation: 50,
   pavedRoadSurcharge: 1, // extra per paved road tile (total: road + surcharge = 2/mo)
   transitStop: 50,
+  school: 75,
+  schoolSmall: 15,
 } as const
 
 export const POWER = {
