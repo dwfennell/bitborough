@@ -27,6 +27,11 @@ function makeTestAgent(id: string, buildingId: string, tier: WealthTier): Citize
     homeCommerceRouteTileSet: new Set(),
     homeWorkRouteStale: false,
     homeCommerceRouteStale: false,
+    schoolBuildingId: null,
+    schoolAccessRoad: null,
+    homeSchoolRoute: [],
+    homeSchoolRouteTileSet: new Set(),
+    homeSchoolRouteStale: false,
     satisfaction: 0.8,
     demographics: { children: 5, working: 40, elderly: 5 },
     wealthTier: tier,
@@ -63,7 +68,6 @@ function makeLayers(size: number): TileLayers {
     fireCoverage: new Uint8Array(size),
     pollutionLevel: new Uint8Array(size),
     reputationLayer: new Float32Array(size).fill(0.5),
-    educationCoverage: new Uint8Array(size),
   }
 }
 
@@ -88,7 +92,7 @@ describe('tier-weighted satisfaction', () => {
 
     layers.crimeLevel[9] = 200 // tile (1,1) = index 9
 
-    citizenMonthlyTick(registry, map, graph, trafficDensity, layers, bldIdx)
+    citizenMonthlyTick(registry, map, graph, trafficDensity, layers, bldIdx, 100)
 
     expect(highAgent.satisfaction).toBeLessThan(lowAgent.satisfaction)
   })
@@ -113,7 +117,7 @@ describe('tier-weighted satisfaction', () => {
       state: 'active', residents: 100, constructionMonthsLeft: 0,
     } as any)
 
-    citizenMonthlyTick(registry, map, graph, trafficDensity, layers, bldIdx)
+    citizenMonthlyTick(registry, map, graph, trafficDensity, layers, bldIdx, 100)
 
     expect(lowAgent.satisfaction).toBeLessThan(highAgent.satisfaction)
   })

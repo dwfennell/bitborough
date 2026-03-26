@@ -1,5 +1,6 @@
 import {
   type GameEvent,
+  type Building,
   calcMonthlyPayment,
   BuildingCategory,
 } from '@bitborough/core'
@@ -21,6 +22,7 @@ import {
 import { updateZones } from './zones.js'
 import { updateDensity } from './density.js'
 import { demographicTick } from './demographics.js'
+import { buildEnrollmentCounts, SCHOOL_CAPACITY, computeSchoolQuality } from './services/school.js'
 
 export interface MonthlyTickResult {
   births: number
@@ -30,11 +32,12 @@ export interface MonthlyTickResult {
 }
 
 export function syncResidentialAgents(state: EngineState): void {
+  const enrollmentCounts = buildEnrollmentCounts(state.citizenRegistry.agents)
   for (const b of state.map.buildings) {
     if (b.state === 'active') {
       const def = BUILDING_DEFS[b.defId]
       if (def && def.category === BuildingCategory.Residential) {
-        syncAgentsForBuilding(state.map, state.citizenRegistry, state.roadGraph, b, state.trafficDensity, state.prng, state.reputationLayer)
+        syncAgentsForBuilding(state.map, state.citizenRegistry, state.roadGraph, b, state.trafficDensity, state.prng, state.reputationLayer, enrollmentCounts)
       }
     }
   }
@@ -55,7 +58,7 @@ export function monthlyTick(state: EngineState): MonthlyTickResult {
     removeAgentsForBuilding(state.citizenRegistry, buildingId)
   })
   // Reputation after fires — fires can destroy buildings, affecting neighborhood quality
-  computeReputation(state.reputationLayer, state.map, state.crimeLevel, state.fireCoverage, state.pollutionLevel, state.bldIdx, state.educationCoverage)
+  computeReputation(state.reputationLayer, state.map, state.crimeLevel, state.fireCoverage, state.pollutionLevel, state.bldIdx)
 
   // 8. Citizen monthly tick: replan stale routes, write trafficDensity from agent routes
   const tileLayers: TileLayers = {
@@ -63,9 +66,8 @@ export function monthlyTick(state: EngineState): MonthlyTickResult {
     fireCoverage: state.fireCoverage,
     pollutionLevel: state.pollutionLevel,
     reputationLayer: state.reputationLayer,
-    educationCoverage: state.educationCoverage,
   }
-  citizenMonthlyTick(state.citizenRegistry, state.map, state.roadGraph, state.trafficDensity, tileLayers, state.bldIdx)
+  citizenMonthlyTick(state.citizenRegistry, state.map, state.roadGraph, state.trafficDensity, tileLayers, state.bldIdx, state.funding.education)
   state.citizenSummary = computeCitizenSummary(state.citizenRegistry)
 
   // 9. Zone development
@@ -81,7 +83,6 @@ export function monthlyTick(state: EngineState): MonthlyTickResult {
     state.crimeLevel,
     state.fireCoverage,
     state.pollutionLevel,
-    state.educationCoverage,
   )
   state.nextBuildingId = nextBuildingIdRef.value
 
@@ -99,6 +100,29 @@ export function monthlyTick(state: EngineState): MonthlyTickResult {
   state.citizenSummary.birthsLastTick = demoResult.births
   state.citizenSummary.deathsLastTick = demoResult.deaths
   state.citizenSummary.netMigrationLastTick = demoResult.netMigration
+
+  // Education quality overlay
+  state.educationQuality.fill(0)
+  const overlayEnrollment = buildEnrollmentCounts(state.citizenRegistry.agents)
+  const overlayBuildingById = new Map<string, Building>()
+  for (const b of state.map.buildings) overlayBuildingById.set(b.id, b)
+
+  for (const agent of state.citizenRegistry.agents) {
+    if (agent.demographics.children === 0) continue
+    const building = overlayBuildingById.get(agent.homeBuildingId)
+    if (!building) continue
+    const homeTile = building.y * state.map.width + building.x
+    if (agent.schoolBuildingId === null) {
+      if (state.educationQuality[homeTile] === 0) state.educationQuality[homeTile] = 1
+    } else {
+      const schoolBuilding = overlayBuildingById.get(agent.schoolBuildingId)
+      const capacity = SCHOOL_CAPACITY[schoolBuilding?.defId ?? ''] ?? 0
+      const enrolled = overlayEnrollment.get(agent.schoolBuildingId) ?? 0
+      const quality = computeSchoolQuality(enrolled, capacity, state.funding.education)
+      const encoded = Math.floor(quality * 253) + 2
+      state.educationQuality[homeTile] = Math.max(state.educationQuality[homeTile]!, encoded)
+    }
+  }
 
   // 14. Compute budget including loan repayment
   const population = computeTotalPopulation(state.map)

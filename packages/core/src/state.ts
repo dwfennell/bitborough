@@ -120,8 +120,8 @@ export interface GameState {
   pollutionLevel: Uint8Array
   crimeLevel: Uint8Array
   fireCoverage: Uint8Array
-  educationCoverage: Uint8Array
   trafficDensity: Uint8Array
+  educationQuality: Uint8Array
   activeFires: number[]
   loan: Loan | null
   loanRepaymentAmount: number
@@ -166,6 +166,9 @@ export interface SaveFile {
         homeWorkRoute: number[]
         homeCommerceRoute: number[]
         satisfaction: number
+        schoolBuildingId?: string | null
+        schoolAccessRoad?: number | null
+        homeSchoolRoute?: number[]
         demographics?: {
           children: number
           working: number

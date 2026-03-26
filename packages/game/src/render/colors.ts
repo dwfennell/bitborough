@@ -27,12 +27,13 @@ export function fireCoverageToRgba(value: number): string {
   return `rgba(${r}, ${g}, 30, 0.4)`
 }
 
-export function educationCoverageToRgba(value: number): string {
-  const v = value / 255
-  const r = Math.floor(80 + v * 80)
-  const g = Math.floor(120 * (1 - v))
-  const b = Math.floor(180 + v * 75)
-  return `rgba(${r}, ${g}, ${b}, 0.45)`
+export function educationQualityToRgba(value: number): string {
+  if (value === 0) return 'rgba(0, 0, 0, 0)'
+  if (value === 1) return 'rgba(128, 128, 128, 0.4)'
+  const quality = (value - 2) / 253
+  const r = Math.floor((1 - quality) * 220)
+  const g = Math.floor(quality * 200)
+  return `rgba(${r}, ${g}, 40, 0.45)`
 }
 
 export function trafficToRgba(value: number): string {

@@ -7,6 +7,7 @@ import { computeParkNorm } from './reputation.js'
 import type { BuildingIndex } from '../building-index.js'
 import type { PRNG } from '../prng.js'
 import { clamp } from './math.js'
+import { findNearestSchool, buildEnrollmentCounts, computeSchoolQuality, SCHOOL_CAPACITY } from './services/school.js'
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -30,6 +31,11 @@ export interface Citizen {
   homeCommerceRouteTileSet: Set<number>
   homeWorkRouteStale: boolean
   homeCommerceRouteStale: boolean
+  schoolBuildingId: string | null
+  schoolAccessRoad: number | null
+  homeSchoolRoute: number[]
+  homeSchoolRouteTileSet: Set<number>
+  homeSchoolRouteStale: boolean
   satisfaction: number
   demographics: AgentDemographics
   wealthTier: WealthTier
@@ -45,7 +51,6 @@ export interface TileLayers {
   fireCoverage: Uint8Array
   pollutionLevel: Uint8Array
   reputationLayer: Float32Array
-  educationCoverage: Uint8Array
 }
 
 export type { CitizenSummary }
@@ -129,6 +134,7 @@ function findNearestBuilding(
 function buildTileSets(agent: Citizen): void {
   agent.homeWorkRouteTileSet = new Set(agent.homeWorkRoute)
   agent.homeCommerceRouteTileSet = new Set(agent.homeCommerceRoute)
+  agent.homeSchoolRouteTileSet = new Set(agent.homeSchoolRoute)
 }
 
 let nextAgentId = 1
@@ -166,6 +172,11 @@ function createAgent(
     homeCommerceRouteTileSet: new Set(),
     homeWorkRouteStale: false,
     homeCommerceRouteStale: false,
+    schoolBuildingId: null,
+    schoolAccessRoad: null,
+    homeSchoolRoute: [],
+    homeSchoolRouteTileSet: new Set(),
+    homeSchoolRouteStale: false,
     satisfaction: 1,
     demographics: { children: 0, working: 50, elderly: 0 },
     wealthTier,
@@ -174,7 +185,7 @@ function createAgent(
   return agent
 }
 
-export function syncAgentsForBuilding(map: GameMap, registry: CitizenRegistry, graph: RoadGraph, building: Building, trafficDensity?: Uint8Array, prng?: PRNG, reputationLayer?: Float32Array): void {
+export function syncAgentsForBuilding(map: GameMap, registry: CitizenRegistry, graph: RoadGraph, building: Building, trafficDensity?: Uint8Array, prng?: PRNG, reputationLayer?: Float32Array, enrollmentCounts?: Map<string, number>): void {
   const homeAccessRoad = resolveAccessRoad(map, building)
   if (homeAccessRoad < 0) return  // building has no road access — no agents
 
@@ -195,6 +206,21 @@ export function syncAgentsForBuilding(map: GameMap, registry: CitizenRegistry, g
       }
       registry.agents.push(createAgent(building.id, homeAccessRoad, jobMatch, commerceMatch, wealthTier))
     }
+    if (enrollmentCounts) {
+      for (let i = 0; i < delta; i++) {
+        const agent = registry.agents[registry.agents.length - delta + i]!
+        if (agent.demographics.children > 0) {
+          const schoolMatch = findNearestSchool(map, graph, homeAccessRoad, enrollmentCounts, trafficDensity)
+          if (schoolMatch) {
+            agent.schoolBuildingId = schoolMatch.buildingId
+            agent.schoolAccessRoad = schoolMatch.accessRoad
+            agent.homeSchoolRoute = schoolMatch.route
+            agent.homeSchoolRouteTileSet = new Set(schoolMatch.route)
+            enrollmentCounts.set(schoolMatch.buildingId, (enrollmentCounts.get(schoolMatch.buildingId) ?? 0) + agent.demographics.children)
+          }
+        }
+      }
+    }
   } else if (delta < 0) {
     // Remove from end
     const toRemove = existing.slice(delta).map(a => a.id)
@@ -205,6 +231,18 @@ export function syncAgentsForBuilding(map: GameMap, registry: CitizenRegistry, g
 
 export function removeAgentsForBuilding(registry: CitizenRegistry, buildingId: string): void {
   registry.agents = registry.agents.filter(a => a.homeBuildingId !== buildingId)
+}
+
+export function clearSchoolEnrollment(registry: CitizenRegistry, schoolBuildingId: string): void {
+  for (const agent of registry.agents) {
+    if (agent.schoolBuildingId === schoolBuildingId) {
+      agent.schoolBuildingId = null
+      agent.schoolAccessRoad = null
+      agent.homeSchoolRoute = []
+      agent.homeSchoolRouteTileSet = new Set()
+      agent.homeSchoolRouteStale = false
+    }
+  }
 }
 
 export function removeOrphanedAgents(registry: CitizenRegistry, validBuildingIds: Set<string>): void {
@@ -223,16 +261,18 @@ export function markRoutesStale(registry: CitizenRegistry, tileIndex: number): v
   for (const agent of registry.agents) {
     if (agent.homeWorkRouteTileSet.has(tileIndex)) agent.homeWorkRouteStale = true
     if (agent.homeCommerceRouteTileSet.has(tileIndex)) agent.homeCommerceRouteStale = true
+    if (agent.homeSchoolRouteTileSet.has(tileIndex)) agent.homeSchoolRouteStale = true
   }
 }
 
 export function markRoutesStaleBatch(registry: CitizenRegistry, tileIndices: Set<number>): void {
   for (const agent of registry.agents) {
-    if (agent.homeWorkRouteStale && agent.homeCommerceRouteStale) continue
+    if (agent.homeWorkRouteStale && agent.homeCommerceRouteStale && agent.homeSchoolRouteStale) continue
     for (const idx of tileIndices) {
       if (!agent.homeWorkRouteStale && agent.homeWorkRouteTileSet.has(idx)) agent.homeWorkRouteStale = true
       if (!agent.homeCommerceRouteStale && agent.homeCommerceRouteTileSet.has(idx)) agent.homeCommerceRouteStale = true
-      if (agent.homeWorkRouteStale && agent.homeCommerceRouteStale) break
+      if (!agent.homeSchoolRouteStale && agent.homeSchoolRouteTileSet.has(idx)) agent.homeSchoolRouteStale = true
+      if (agent.homeWorkRouteStale && agent.homeCommerceRouteStale && agent.homeSchoolRouteStale) break
     }
   }
 }
@@ -274,6 +314,25 @@ export function replanStaleRoutes(registry: CitizenRegistry, map: GameMap, graph
       agent.homeCommerceRouteTileSet = new Set(agent.homeCommerceRoute)
       agent.homeCommerceRouteStale = false
     }
+    if (agent.homeSchoolRouteStale) {
+      if (agent.demographics.children > 0 && agent.schoolAccessRoad !== null) {
+        const route = astar(graph, agent.homeAccessRoad, agent.schoolAccessRoad, map.width, undefined, trafficDensity)
+        if (route) {
+          agent.homeSchoolRoute = route
+          agent.homeSchoolRouteTileSet = new Set(route)
+          agent.homeSchoolRouteStale = false
+        } else {
+          // Direct route failed — clear enrollment, will re-enroll at next sync
+          agent.schoolBuildingId = null
+          agent.schoolAccessRoad = null
+          agent.homeSchoolRoute = []
+          agent.homeSchoolRouteTileSet = new Set()
+          agent.homeSchoolRouteStale = false
+        }
+      } else {
+        agent.homeSchoolRouteStale = false
+      }
+    }
   }
 }
 
@@ -290,6 +349,8 @@ function computeSatisfaction(
   bldIdx: BuildingIndex,
   buildingTierCounts: Map<string, [number, number, number]>,
   buildingById: Map<string, Building>,
+  enrollmentCounts: Map<string, number>,
+  educationFunding: number,
 ): number {
   const w = TIER_WEIGHTS[agent.wealthTier]
   const commuteNorm = clamp(agent.homeWorkRoute.length / MAX_SATISFACTION_COMMUTE, 0, 1)
@@ -297,18 +358,29 @@ function computeSatisfaction(
   const noCommerce = agent.commerceBuildingId === null ? 1 : 0
 
   const building = buildingById.get(agent.homeBuildingId)
-  let crimeNorm = 0, pollNorm = 0, fireNorm = 0, parkNorm = 0, educationNorm = 0
+  let crimeNorm = 0, pollNorm = 0, fireNorm = 0, parkNorm = 0
   if (building) {
     const idx = building.y * map.width + building.x
     crimeNorm = layers.crimeLevel[idx]! / 255
     pollNorm = layers.pollutionLevel[idx]! / 255
     fireNorm = layers.fireCoverage[idx]! / 255
     parkNorm = computeParkNorm(building.x, building.y, map, bldIdx)
-    educationNorm = layers.educationCoverage[idx]! / 255
   }
 
   const tierCounts = buildingTierCounts.get(agent.homeBuildingId) ?? [0, 0, 0]
   const schelling = computeSchellingPenalty(agent.wealthTier, tierCounts)
+
+  const MAX_SCHOOL_COMMUTE = 40
+
+  let educationScore = 0
+  if (agent.schoolBuildingId !== null) {
+    const schoolCommuteNorm = clamp(agent.homeSchoolRoute.length / MAX_SCHOOL_COMMUTE, 0, 1)
+    const schoolBuilding = buildingById.get(agent.schoolBuildingId)
+    const capacity = SCHOOL_CAPACITY[schoolBuilding?.defId ?? ''] ?? 0
+    const enrolled = enrollmentCounts.get(agent.schoolBuildingId) ?? 0
+    const schoolQuality = computeSchoolQuality(enrolled, capacity, educationFunding)
+    educationScore = schoolQuality * (1 - schoolCommuteNorm * 0.5)
+  }
 
   return clamp(
     1.0
@@ -319,11 +391,13 @@ function computeSatisfaction(
     - pollNorm * 0.3 * w.pollution
     + fireNorm * 0.15 * w.fire
     + parkNorm * 0.25 * w.park
-    + educationNorm * 0.15 * w.education
-    - schelling,
+    - schelling
+    + educationScore * 0.15 * w.education,
     0, 1,
   )
 }
+
+const SCHOOL_TRIP_WEIGHT = 1
 
 export function citizenMonthlyTick(
   registry: CitizenRegistry,
@@ -332,9 +406,25 @@ export function citizenMonthlyTick(
   trafficDensity: Uint8Array,
   layers: TileLayers,
   bldIdx: BuildingIndex,
+  educationFunding: number,
 ): void {
   // Pass 1: replan stale routes (traffic-aware)
   replanStaleRoutes(registry, map, graph, trafficDensity)
+
+  // Pass 1b: enroll agents with children who aren't enrolled yet (e.g. after births)
+  const enrollmentCounts = buildEnrollmentCounts(registry.agents)
+  for (const agent of registry.agents) {
+    if (agent.demographics.children > 0 && agent.schoolBuildingId === null) {
+      const schoolMatch = findNearestSchool(map, graph, agent.homeAccessRoad, enrollmentCounts, trafficDensity)
+      if (schoolMatch) {
+        agent.schoolBuildingId = schoolMatch.buildingId
+        agent.schoolAccessRoad = schoolMatch.accessRoad
+        agent.homeSchoolRoute = schoolMatch.route
+        agent.homeSchoolRouteTileSet = new Set(schoolMatch.route)
+        enrollmentCounts.set(schoolMatch.buildingId, (enrollmentCounts.get(schoolMatch.buildingId) ?? 0) + agent.demographics.children)
+      }
+    }
+  }
 
   // Pass 2: traffic contribution
   const size = map.width * map.height
@@ -351,7 +441,10 @@ export function citizenMonthlyTick(
     for (const tileIdx of agent.homeCommerceRoute) {
       rawTraffic[tileIdx]! += COMMERCE_TRIP_WEIGHT
     }
-    agent.satisfaction = computeSatisfaction(agent, map, layers, bldIdx, buildingTierCounts, buildingById)
+    for (const tileIdx of agent.homeSchoolRoute) {
+      rawTraffic[tileIdx]! += SCHOOL_TRIP_WEIGHT
+    }
+    agent.satisfaction = computeSatisfaction(agent, map, layers, bldIdx, buildingTierCounts, buildingById, enrollmentCounts, educationFunding)
   }
 
   // Scale by sampling ratio and write to trafficDensity

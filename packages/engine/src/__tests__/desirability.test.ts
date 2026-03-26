@@ -11,7 +11,6 @@ function makeLayers(size: number) {
     crimeLevel: new Uint8Array(size),
     fireCoverage: new Uint8Array(size),
     pollutionLevel: new Uint8Array(size),
-    educationCoverage: new Uint8Array(size),
   }
 }
 
@@ -366,48 +365,6 @@ describe('zone boundary effects', () => {
       ZoneType.Residential, 5, 5, map, powerGrid, crimeLevel, fireCoverage, pollutionLevel,
     )
     expect(withIndustrial).toBeLessThan(without)
-  })
-})
-
-describe('education bonus', () => {
-  test('education coverage above threshold boosts residential desirability', () => {
-    const map = createTestMap(16)
-    const layers = makeLayers(16 * 16)
-    layers.powerGrid[5 * 16 + 5] = 1
-    map.infrastructure[5 * 16 + 5] = 0b1 // Road
-    layers.educationCoverage[5 * 16 + 5] = 200
-    const withEdu = computeDesirability(
-      ZoneType.Residential, 5, 5, map,
-      layers.powerGrid, layers.crimeLevel, layers.fireCoverage, layers.pollutionLevel,
-      undefined, layers.educationCoverage,
-    )
-    layers.educationCoverage[5 * 16 + 5] = 0
-    const withoutEdu = computeDesirability(
-      ZoneType.Residential, 5, 5, map,
-      layers.powerGrid, layers.crimeLevel, layers.fireCoverage, layers.pollutionLevel,
-      undefined, layers.educationCoverage,
-    )
-    expect(withEdu).toBeGreaterThan(withoutEdu)
-  })
-
-  test('education coverage below threshold adds no bonus', () => {
-    const map = createTestMap(16)
-    const layers = makeLayers(16 * 16)
-    layers.powerGrid[5 * 16 + 5] = 1
-    map.infrastructure[5 * 16 + 5] = 0b1
-    layers.educationCoverage[5 * 16 + 5] = 50
-    const withLowEdu = computeDesirability(
-      ZoneType.Residential, 5, 5, map,
-      layers.powerGrid, layers.crimeLevel, layers.fireCoverage, layers.pollutionLevel,
-      undefined, layers.educationCoverage,
-    )
-    layers.educationCoverage[5 * 16 + 5] = 0
-    const withoutEdu = computeDesirability(
-      ZoneType.Residential, 5, 5, map,
-      layers.powerGrid, layers.crimeLevel, layers.fireCoverage, layers.pollutionLevel,
-      undefined, layers.educationCoverage,
-    )
-    expect(withLowEdu).toBe(withoutEdu)
   })
 })
 

@@ -23,6 +23,7 @@ import {
   removeAgentsForBuilding,
   markRoutesStale, markRoutesStaleBatch,
   computeTotalPopulation,
+  clearSchoolEnrollment,
 } from './simulation/citizens.js'
 import { hasNearbyRoad } from './simulation/road-access.js'
 import { BUILDING_DEFS } from './buildings-registry.js'
@@ -97,8 +98,8 @@ export class Engine {
       pollutionLevel: this.state.pollutionLevel,
       crimeLevel: this.state.crimeLevel,
       fireCoverage: this.state.fireCoverage,
-      educationCoverage: this.state.educationCoverage,
       trafficDensity: this.state.trafficDensity,
+      educationQuality: this.state.educationQuality,
       activeFires: Array.from(this.state.fireState.activeFires.keys()),
       loan: this.state.loan,
       loanRepaymentAmount: this.state.loanRepaymentAmount,
@@ -195,6 +196,9 @@ export class Engine {
         }
         markRoutesStaleBatch(this.state.citizenRegistry, staleTiles)
         removeAgentsForBuilding(this.state.citizenRegistry, building.id)
+        if (building.defId.startsWith('service.school')) {
+          clearSchoolEnrollment(this.state.citizenRegistry, building.id)
+        }
       } else {
         updateConnections(this.state.map, x, y)
         updateRoadGraph(this.state.map, this.state.roadGraph, x, y)
