@@ -160,6 +160,7 @@ export function updateDensity(
   crimeLevel: Uint8Array,
   fireCoverage: Uint8Array,
   pollutionLevel: Uint8Array,
+  educationCoverage?: Uint8Array,
 ): { populationDelta: number } {
   let populationDelta = 0
   const bldIdx = new BuildingIndex(map)
@@ -180,6 +181,7 @@ export function updateDensity(
       fireCoverage,
       pollutionLevel,
       bldIdx,
+      educationCoverage,
     )
     const zoneDemand = getZoneDemand(building.defId, demand)
     const target = def.capacity * Math.max(0, zoneDemand) * desirability

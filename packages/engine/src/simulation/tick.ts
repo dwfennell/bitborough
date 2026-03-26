@@ -80,6 +80,7 @@ export function monthlyTick(state: EngineState): MonthlyTickResult {
     state.crimeLevel,
     state.fireCoverage,
     state.pollutionLevel,
+    state.educationCoverage,
   )
   state.nextBuildingId = nextBuildingIdRef.value
 
