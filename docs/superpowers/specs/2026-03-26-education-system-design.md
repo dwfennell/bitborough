@@ -2,7 +2,9 @@
 
 ## Overview
 
-Add education as a radius-based service system following the police/fire pattern. Schools boost residential desirability (tier-weighted) and feed into neighborhood reputation. Includes tiered buildings (small school + large school), an overlay, budget slider, and SVG tiles.
+Add education as a radius-based service system following the police/fire pattern. Schools boost residential desirability and feed into neighborhood reputation. Includes tiered buildings (small school + large school), an overlay, budget slider, and SVG tiles.
+
+Education also integrates into the citizen satisfaction system via `TIER_WEIGHTS` in `wealth-tiers.ts`, where tier-specific weights (Low=0.6, Mid=1.2, High=1.5) make education matter more to wealthier citizens.
 
 ## Buildings
 
@@ -22,9 +24,9 @@ Two new entries in `buildings-registry.ts`, following the `service.police`/`serv
 
 New constants in `packages/core/src/constants.ts`:
 - `COSTS.school: 500`
-- `COSTS.schoolKiosk: 80`
+- `COSTS.schoolSmall: 80`
 - `MAINTENANCE.school: 75`
-- `MAINTENANCE.schoolKiosk: 15`
+- `MAINTENANCE.schoolSmall: 15`
 
 ## Service Calculation
 
@@ -51,6 +53,8 @@ The existing `buildInfluenceMap` handles:
 - Linear decay from 1.0 at center to 0.0 at effective radius
 - Funding scaling: `effectiveRadius = baseRadius * (funding / 100)`
 - Small school 1.5x radius boost when within large school coverage (influence > 0.3)
+
+`rebuildDerivedState()` is the sole integration point for the coverage calculation. No other call sites needed — it already runs on init, after building placement, and in the monthly tick.
 
 ## Engine State Changes
 
@@ -82,18 +86,11 @@ In `engine-state.ts`:
 
 In `desirability.ts`:
 
+Education adds a **flat bonus** to residential desirability (no tier weighting here — tier-specific behavior is handled separately in the citizen satisfaction system, see below).
+
 ### New constants
 - `RES_EDUCATION_BONUS = 0.20`
 - `EDUCATION_COVERAGE_THRESHOLD = 76` (≈ 0.3 × 255)
-
-### Education tier weights
-```typescript
-const EDUCATION_TIER_WEIGHT: Record<WealthTier, number> = {
-  1: 0.6,   // Low wealth — less attracted by education
-  2: 1.2,   // Mid wealth — attracted
-  3: 1.5,   // High wealth — strongly attracted
-}
-```
 
 ### residentialDesirability changes
 - Add `educationCoverage: Uint8Array` parameter
@@ -103,22 +100,37 @@ const EDUCATION_TIER_WEIGHT: Record<WealthTier, number> = {
     score += RES_EDUCATION_BONUS * (educationCoverage[idx]! / 255)
   }
   ```
-- Note: Tier weighting is applied at a higher level where the wealth tier is known, not inside `residentialDesirability` itself (which doesn't currently know the tier). The tier weight multiplier will be applied where desirability is consumed for tier-specific decisions.
 
 ### computeDesirability changes
 - Add `educationCoverage: Uint8Array` parameter, thread through to `residentialDesirability`
 
-### Tier weighting integration point
-The `EDUCATION_TIER_WEIGHT` multiplier applies where desirability influences wealth-tier-specific outcomes. The exact integration point depends on how `computeDesirability` results are consumed — if desirability is used in a tier-aware context (e.g., `wealth-tiers.ts` tier factor weights), add `education` to the `TIER_WEIGHTS` record. If desirability is consumed as a single scalar, apply the tier weight as a multiplier on the education component before summing.
+### Concrete callers that need the new parameter
+- `updateDensity()` in `density.ts` — calls `computeDesirability`. Add `educationCoverage` to its parameter list.
+- `monthlyTick()` in `tick.ts` — calls `updateDensity()`. Pass `state.educationCoverage` through.
+- Any other callers of `computeDesirability` (search for all usages).
 
-Looking at the existing code: `TIER_WEIGHTS` in `wealth-tiers.ts` already has per-factor weights (crime, pollution, park, fire, commute, jobMatch, commerce). Add `education: 0.6/1.2/1.5` there to keep the pattern consistent, and use it wherever tier-weighted desirability is calculated.
+## Citizen Satisfaction — Tier Weighting
+
+In `wealth-tiers.ts`, the existing `TIER_WEIGHTS` record has per-factor weights for crime, pollution, park, fire, commute, jobMatch, commerce. Add an `education` factor:
+
+```typescript
+TIER_WEIGHTS = {
+  1: { ..., education: 0.6 },   // Low wealth — less affected
+  2: { ..., education: 1.2 },   // Mid wealth — attracted
+  3: { ..., education: 1.5 },   // High wealth — strongly attracted
+}
+```
+
+In `citizens.ts`, `computeSatisfaction()` uses these weights. Add education coverage as a satisfaction factor there, following the same pattern as the existing factors.
+
+This is a **separate integration** from the desirability bonus — desirability controls zone fill/drain rates, while satisfaction affects individual citizen happiness and migration decisions.
 
 ## Reputation Integration
 
 In `reputation.ts`:
 
 ### Weight renormalization
-Add education as a quality factor and renormalize so all weights sum to 1.0:
+Add education as a quality factor. The existing weights are hard-coded and sum to 1.0. Adding education changes all existing weight values (e.g., crime goes from 0.35 to ~0.318). Existing reputation tests will need updated assertions.
 
 ```typescript
 const RAW_CRIME = 0.35
@@ -146,21 +158,31 @@ const QUALITY_EDUCATION_WEIGHT = RAW_EDUCATION / TOTAL
 - Compute `educationNorm = educationCoverage[idx]! / 255` per tile
 - Pass to `computeCurrentQuality`
 
+### Concrete callers
+- `createEngineState()` in `engine-state.ts` (line 349) — pass `state.educationCoverage`
+- `monthlyTick()` in `tick.ts` (line 58) — pass `state.educationCoverage`
+
 ## Budget Integration
 
 In `budget.ts`:
 
 ### Service costs
-- Count `service.school` and `service.school.small` buildings
-- Sum maintenance: `schoolMaintenance * (funding.education / 100)`
-- Add `education: number` to `serviceCosts` in `BudgetInfo`
+The existing building-counting logic uses an `else if` chain with `startsWith()`:
+```typescript
+if (building.defId.startsWith('service.police')) policeMaintenance += ...
+else if (building.defId.startsWith('service.fire')) fireMaintenance += ...
+```
+
+Add a new branch: `else if (building.defId.startsWith('service.school')) schoolMaintenance += def.maintenanceCost`
+
+Then: `education: schoolMaintenance * (funding.education / 100)`
 
 ### BudgetInfo changes (in core `state.ts`)
 - Add `education: number` to `serviceCosts`
 - Add `education: number` to `funding`
 
-### calculateBudget signature
-- Already receives `funding` object — education funding will be included automatically
+### calculateBudget
+- Already receives `funding` object — education funding will be included when the new branch is added
 
 ## Core Type Changes
 
@@ -172,6 +194,28 @@ In `packages/core/src/state.ts`:
 ### BudgetInfo
 - Add `education: number` to `serviceCosts`
 - Add `education: number` to `funding`
+
+## Engine API Changes
+
+In `packages/engine/src/engine.ts`:
+
+### setFunding
+The `service` parameter type is currently `'police' | 'fire' | 'transit'`. Add `'education'` to this union.
+
+### getState
+This method manually maps `EngineState` fields to `GameState` (it's not a spread). Add `educationCoverage: this.state.educationCoverage` to the returned object.
+
+## Budget Panel
+
+In `BudgetPanel.ts`:
+
+### FundingService type
+Currently `type FundingService = 'police' | 'fire' | 'transit'`. Add `'education'`.
+
+### Slider
+- Add education funding slider matching police/fire pattern
+- `bindFundingSlider('education-funding', 'education-funding-display', 'education')`
+- HTML: slider input + display span, same structure as existing sliders
 
 ## Overlay
 
@@ -193,34 +237,28 @@ export function educationCoverageToRgba(value: number): string {
 ```
 
 ### Game.ts overlay toggle
-- Add `{ label: 'Education (E)', key: 'e', action: () => this.renderer.toggleOverlay('education') }`
+- Key `u` (for ed**u**cation — `e` is taken by zoom controls)
+- `{ label: 'Education (U)', key: 'u', action: () => this.renderer.toggleOverlay('education') }`
 
 ## Toolbar
 
 In `Toolbar.ts`:
-- Add "School" entry: `key` TBD (next available number/letter in services group), factory `() => new BuildingTool('service.school')`
-- Add "School Kiosk" entry: factory `() => new BuildingTool('service.school.small')`
-
-## Budget Panel
-
-In `BudgetPanel.ts`:
-- Add education funding slider matching police/fire pattern
-- `bindFundingSlider('education-funding', 'education-funding-display', 'education')`
-- HTML: slider input + display span, same structure as existing sliders
+- Add "School" entry: `key` TBD (next available in services group), factory `() => new BuildingTool('service.school')`
+- Add "Small School" entry: factory `() => new BuildingTool('service.school.small')`
 
 ## In-Game Guide
 
 Add entries for:
-- School (3x3, $500, $75/mo) — provides education coverage, boosts residential desirability especially for mid/high wealth tiers
-- School Kiosk (1x1, $80, $15/mo) — smaller coverage, gets 1.5x radius boost when near a full school
-- Education overlay toggle (E key)
+- School (3x3, $500, $75/mo) — provides education coverage, boosts residential desirability and neighborhood reputation
+- Small School (1x1, $80, $15/mo) — smaller coverage, gets 1.5x radius boost when near a full school
+- Education overlay toggle (U key)
 - Education funding slider
 
 ## SVG Tiles
 
 Two new SVG tiles via tile-generator:
 - `service.school` (3x3) — school building
-- `service.school.small` (1x1) — small school/kiosk
+- `service.school.small` (1x1) — small school
 
 ## Tests
 
@@ -243,27 +281,17 @@ Two new SVG tiles via tile-generator:
 - Education factor contributes to quality score
 - Weights still sum to 1.0 after renormalization
 - Quality score increases with education coverage
+- **Update existing assertions** for changed weight values (crime 0.35→0.318, etc.)
 
 ### Modified: budget.test.ts
 - School maintenance counted in service costs
 - School maintenance scales with education funding
-- Mixed school + kiosk maintenance summed correctly
+- Mixed school + small school maintenance summed correctly
 
-## Call-Site Updates
-
-All callers of modified functions need parameter updates:
-
-### computeDesirability callers
-- Add `educationCoverage` parameter wherever `computeDesirability` is called (zone transitions, density upgrades, etc.)
-
-### computeReputation callers
-- Add `educationCoverage` parameter (called in `tick.ts` monthly tick and `createEngineState`)
-
-### GameState construction
-- Wherever `GameState` is built from `EngineState` (likely in the engine's `getState()` method), include `educationCoverage`
+### Modified: citizens.test.ts (if exists)
+- Education tier weight affects satisfaction differently per wealth tier
 
 ## Out of Scope
-- Education affecting citizen satisfaction directly (beyond reputation)
 - School capacity limits
 - Teacher/staffing mechanics
 - Education level as a persistent citizen attribute
