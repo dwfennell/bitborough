@@ -102,8 +102,11 @@ function residentialDesirability(
   score += (1 - crimeNorm) * RES_SAFETY_WEIGHT
   if (fireCoverage[idx]) score += RES_FIRE_BONUS
   score += parkDesirabilityBonus(x, y, map, bldIdx)
-  if (educationCoverage && educationCoverage[idx]! > EDUCATION_COVERAGE_THRESHOLD) {
-    score += RES_EDUCATION_BONUS * (educationCoverage[idx]! / 255)
+  if (educationCoverage) {
+    const eduVal = educationCoverage[idx]!
+    if (eduVal > EDUCATION_COVERAGE_THRESHOLD) {
+      score += RES_EDUCATION_BONUS * (eduVal / 255)
+    }
   }
   score -= pollNorm * RES_POLLUTION_PENALTY
   score += zoneBoundaryEffect(x, y, map, bldIdx)

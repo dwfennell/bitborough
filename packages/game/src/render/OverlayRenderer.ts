@@ -125,8 +125,9 @@ export class OverlayRenderer {
         const coverage = state.educationCoverage
         for (let y = startY; y <= endY; y++) {
           for (let x = startX; x <= endX; x++) {
-            const v = coverage[y * mapWidth + x]!
-            if (v === 0) continue
+            const idx = y * mapWidth + x
+            const v = coverage[idx]!
+            if (v === 0 || state.map.zones[idx] === 0) continue
             ctx.fillStyle = EDUCATION_COVERAGE_COLORS[v]!
             ctx.fillRect(Math.floor((x - cameraX) * posTs), Math.floor((y - cameraY) * posTs), ts, ts)
           }

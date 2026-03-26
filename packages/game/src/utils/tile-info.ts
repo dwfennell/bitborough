@@ -35,7 +35,11 @@ function describeBuildingName(defId: string): string {
     'power.coal': 'Coal Power Plant',
     'power.nuclear': 'Nuclear Power Plant',
     'service.police': 'Police Station',
+    'service.police.small': 'Police Kiosk',
     'service.fire': 'Fire Station',
+    'service.fire.small': 'Fire Substation',
+    'service.school': 'School',
+    'service.school.small': 'Small School',
     'special.park': 'Park',
   }
   return names[defId] ?? defId
