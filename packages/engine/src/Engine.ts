@@ -97,6 +97,7 @@ export class Engine {
       pollutionLevel: this.state.pollutionLevel,
       crimeLevel: this.state.crimeLevel,
       fireCoverage: this.state.fireCoverage,
+      educationCoverage: this.state.educationCoverage,
       trafficDensity: this.state.trafficDensity,
       activeFires: Array.from(this.state.fireState.activeFires.keys()),
       loan: this.state.loan,
@@ -268,7 +269,7 @@ export class Engine {
     this.state.budgetInfo = calculateBudget(this.state.map, this.population, this.state.taxRate, this.state.landValues, this.state.funding, computeLoanRepayment(this.state))
   }
 
-  setFunding(service: 'police' | 'fire' | 'transit', level: number): void {
+  setFunding(service: 'police' | 'fire' | 'transit' | 'education', level: number): void {
     this.state.funding[service] = Math.max(0, Math.min(100, level))
     this.state.budgetInfo = calculateBudget(this.state.map, this.population, this.state.taxRate, this.state.landValues, this.state.funding, computeLoanRepayment(this.state))
   }
