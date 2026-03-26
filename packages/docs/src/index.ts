@@ -12,6 +12,7 @@ import { budgetTaxes } from './sections/budget-taxes.js'
 import { demand } from './sections/demand.js'
 import { crime } from './sections/crime.js'
 import { fire } from './sections/fire.js'
+import { education } from './sections/education.js'
 import { landValue } from './sections/land-value.js'
 import { timeSimulation } from './sections/time-simulation.js'
 import type { DocSection } from './types.js'
@@ -28,6 +29,7 @@ export const SECTIONS: DocSection[] = [
   demand,
   crime,
   fire,
+  education,
   landValue,
   timeSimulation,
 ]

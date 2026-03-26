@@ -13,6 +13,7 @@ Toggle data overlays to visualize city systems:
 | **C** | *Crime* — Red heatmap showing crime levels |
 | **F** | *Fire* — Green (covered) to red (at risk), orange = active fire |
 | **T** | *Traffic* — Green (light) to red (gridlock) on roads |
+| **J** | *Education* — Blue (low) to purple (high) coverage |
 | **G** | *Grid* — Toggle tile grid lines |
 
 Press the same key again to turn off the overlay.
