@@ -165,6 +165,9 @@ export interface SaveFile {
         homeWorkRoute: number[]
         homeCommerceRoute: number[]
         satisfaction: number
+        schoolBuildingId?: string | null
+        schoolAccessRoad?: number | null
+        homeSchoolRoute?: number[]
         demographics?: {
           children: number
           working: number

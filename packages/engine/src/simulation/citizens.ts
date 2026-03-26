@@ -30,6 +30,11 @@ export interface Citizen {
   homeCommerceRouteTileSet: Set<number>
   homeWorkRouteStale: boolean
   homeCommerceRouteStale: boolean
+  schoolBuildingId: string | null
+  schoolAccessRoad: number | null
+  homeSchoolRoute: number[]
+  homeSchoolRouteTileSet: Set<number>
+  homeSchoolRouteStale: boolean
   satisfaction: number
   demographics: AgentDemographics
   wealthTier: WealthTier
@@ -128,6 +133,7 @@ function findNearestBuilding(
 function buildTileSets(agent: Citizen): void {
   agent.homeWorkRouteTileSet = new Set(agent.homeWorkRoute)
   agent.homeCommerceRouteTileSet = new Set(agent.homeCommerceRoute)
+  agent.homeSchoolRouteTileSet = new Set(agent.homeSchoolRoute)
 }
 
 let nextAgentId = 1
@@ -165,6 +171,11 @@ function createAgent(
     homeCommerceRouteTileSet: new Set(),
     homeWorkRouteStale: false,
     homeCommerceRouteStale: false,
+    schoolBuildingId: null,
+    schoolAccessRoad: null,
+    homeSchoolRoute: [],
+    homeSchoolRouteTileSet: new Set(),
+    homeSchoolRouteStale: false,
     satisfaction: 1,
     demographics: { children: 0, working: 50, elderly: 0 },
     wealthTier,

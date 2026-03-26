@@ -157,6 +157,9 @@ export function serializeState(state: EngineState): SaveFile {
           satisfaction: a.satisfaction,
           demographics: a.demographics,
           wealthTier: a.wealthTier,
+          schoolBuildingId: a.schoolBuildingId,
+          schoolAccessRoad: a.schoolAccessRoad,
+          homeSchoolRoute: a.homeSchoolRoute,
         })),
       },
       reputationLayer: Array.from(state.reputationLayer),
@@ -203,6 +206,11 @@ export function restoreState(save: SaveFile): EngineState {
         homeCommerceRouteStale: false,
         homeWorkRouteTileSet: new Set(a.homeWorkRoute),
         homeCommerceRouteTileSet: new Set(a.homeCommerceRoute),
+        schoolBuildingId: a.schoolBuildingId ?? null,
+        schoolAccessRoad: a.schoolAccessRoad ?? null,
+        homeSchoolRoute: a.homeSchoolRoute ?? [],
+        homeSchoolRouteTileSet: new Set(a.homeSchoolRoute ?? []),
+        homeSchoolRouteStale: false,
       })),
     }
   } else {
