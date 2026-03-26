@@ -17,7 +17,6 @@ function makeTileLayers(map: GameMap): TileLayers {
     fireCoverage: new Uint8Array(size),
     pollutionLevel: new Uint8Array(size),
     reputationLayer: new Float32Array(size).fill(0.5),
-    educationCoverage: new Uint8Array(size),
   }
 }
 

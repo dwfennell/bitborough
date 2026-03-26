@@ -120,7 +120,6 @@ export interface GameState {
   pollutionLevel: Uint8Array
   crimeLevel: Uint8Array
   fireCoverage: Uint8Array
-  educationCoverage: Uint8Array
   trafficDensity: Uint8Array
   activeFires: number[]
   loan: Loan | null

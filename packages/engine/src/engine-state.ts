@@ -23,7 +23,6 @@ import { calculateLandValues } from './simulation/land-value.js'
 import { calculateBudget } from './simulation/budget.js'
 import { calculateCrime } from './simulation/services/crime.js'
 import { calculateFireCoverage, createFireState, type FireState } from './simulation/services/fire.js'
-import { calculateEducationCoverage } from './simulation/services/education.js'
 import { computeReputation } from './simulation/reputation.js'
 import { calculatePollution } from './simulation/pollution.js'
 
@@ -61,7 +60,6 @@ export interface EngineState {
   pollutionLevel: Uint8Array
   crimeLevel: Uint8Array
   fireCoverage: Uint8Array
-  educationCoverage: Uint8Array
   trafficDensity: Uint8Array
   reputationLayer: Float32Array
 
@@ -111,7 +109,6 @@ export function rebuildDerivedState(state: EngineState): void {
   calculateLandValues(state.map, state.powerGrid, state.pollutionLevel, state.crimeLevel, state.landValues, state.bldIdx)
   calculateCrime(state.map, state.landValues, state.crimeLevel, state.funding.police, state.influenceBuffer)
   calculateFireCoverage(state.map, state.fireCoverage, state.funding.fire, state.influenceBuffer)
-  calculateEducationCoverage(state.map, state.educationCoverage, state.funding.education, state.influenceBuffer)
 }
 
 export function serializeState(state: EngineState): SaveFile {
@@ -119,7 +116,7 @@ export function serializeState(state: EngineState): SaveFile {
   const activeFires: Array<[number, number]> = Array.from(state.fireState.activeFires.entries())
 
   return {
-    version: 8,
+    version: 9,
     map: {
       version: state.map.version,
       width: state.map.width,
@@ -240,7 +237,6 @@ export function restoreState(save: SaveFile): EngineState {
     pollutionLevel: new Uint8Array(size),
     crimeLevel: new Uint8Array(size),
     fireCoverage: new Uint8Array(size),
-    educationCoverage: new Uint8Array(size),
     trafficDensity: new Uint8Array(size),
     reputationLayer,
     citizenRegistry,
@@ -301,7 +297,6 @@ export function createEngineState(map: GameMap, config: EngineConfig): EngineSta
   const pollutionLevel = new Uint8Array(size)
   const crimeLevel = new Uint8Array(size)
   const fireCoverage = new Uint8Array(size)
-  const educationCoverage = new Uint8Array(size)
   const trafficDensity = new Uint8Array(size)
   const reputationLayer = new Float32Array(size).fill(0.5)
   const fireState = createFireState()
@@ -330,7 +325,6 @@ export function createEngineState(map: GameMap, config: EngineConfig): EngineSta
     pollutionLevel,
     crimeLevel,
     fireCoverage,
-    educationCoverage,
     trafficDensity,
     reputationLayer,
     citizenRegistry,
@@ -353,7 +347,7 @@ export function createEngineState(map: GameMap, config: EngineConfig): EngineSta
   rebuildDerivedState(state)
 
   // Reputation must run after rebuildDerivedState
-  computeReputation(state.reputationLayer, state.map, state.crimeLevel, state.fireCoverage, state.pollutionLevel, state.bldIdx, state.educationCoverage)
+  computeReputation(state.reputationLayer, state.map, state.crimeLevel, state.fireCoverage, state.pollutionLevel, state.bldIdx)
 
   // Initialize demand
   state.demand = calculateDemand(state.map, state.taxRate)

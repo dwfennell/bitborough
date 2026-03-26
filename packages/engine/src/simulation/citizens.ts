@@ -45,7 +45,6 @@ export interface TileLayers {
   fireCoverage: Uint8Array
   pollutionLevel: Uint8Array
   reputationLayer: Float32Array
-  educationCoverage: Uint8Array
 }
 
 export type { CitizenSummary }
@@ -297,14 +296,13 @@ function computeSatisfaction(
   const noCommerce = agent.commerceBuildingId === null ? 1 : 0
 
   const building = buildingById.get(agent.homeBuildingId)
-  let crimeNorm = 0, pollNorm = 0, fireNorm = 0, parkNorm = 0, educationNorm = 0
+  let crimeNorm = 0, pollNorm = 0, fireNorm = 0, parkNorm = 0
   if (building) {
     const idx = building.y * map.width + building.x
     crimeNorm = layers.crimeLevel[idx]! / 255
     pollNorm = layers.pollutionLevel[idx]! / 255
     fireNorm = layers.fireCoverage[idx]! / 255
     parkNorm = computeParkNorm(building.x, building.y, map, bldIdx)
-    educationNorm = layers.educationCoverage[idx]! / 255
   }
 
   const tierCounts = buildingTierCounts.get(agent.homeBuildingId) ?? [0, 0, 0]
@@ -319,7 +317,6 @@ function computeSatisfaction(
     - pollNorm * 0.3 * w.pollution
     + fireNorm * 0.15 * w.fire
     + parkNorm * 0.25 * w.park
-    + educationNorm * 0.15 * w.education
     - schelling,
     0, 1,
   )

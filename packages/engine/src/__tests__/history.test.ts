@@ -68,6 +68,6 @@ describe('History collection', () => {
 
   test('save version is 8', () => {
     const engine = Engine.create(createTestMap(32), { seed: 42 })
-    expect(engine.serialize().version).toBe(8)
+    expect(engine.serialize().version).toBe(9)
   })
 })

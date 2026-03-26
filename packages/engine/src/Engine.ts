@@ -97,7 +97,6 @@ export class Engine {
       pollutionLevel: this.state.pollutionLevel,
       crimeLevel: this.state.crimeLevel,
       fireCoverage: this.state.fireCoverage,
-      educationCoverage: this.state.educationCoverage,
       trafficDensity: this.state.trafficDensity,
       activeFires: Array.from(this.state.fireState.activeFires.keys()),
       loan: this.state.loan,
