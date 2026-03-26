@@ -92,7 +92,7 @@ describe('tier-weighted satisfaction', () => {
 
     layers.crimeLevel[9] = 200 // tile (1,1) = index 9
 
-    citizenMonthlyTick(registry, map, graph, trafficDensity, layers, bldIdx)
+    citizenMonthlyTick(registry, map, graph, trafficDensity, layers, bldIdx, 100)
 
     expect(highAgent.satisfaction).toBeLessThan(lowAgent.satisfaction)
   })
@@ -117,7 +117,7 @@ describe('tier-weighted satisfaction', () => {
       state: 'active', residents: 100, constructionMonthsLeft: 0,
     } as any)
 
-    citizenMonthlyTick(registry, map, graph, trafficDensity, layers, bldIdx)
+    citizenMonthlyTick(registry, map, graph, trafficDensity, layers, bldIdx, 100)
 
     expect(lowAgent.satisfaction).toBeLessThan(highAgent.satisfaction)
   })

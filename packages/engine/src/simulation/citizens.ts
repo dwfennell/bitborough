@@ -7,7 +7,7 @@ import { computeParkNorm } from './reputation.js'
 import type { BuildingIndex } from '../building-index.js'
 import type { PRNG } from '../prng.js'
 import { clamp } from './math.js'
-import { findNearestSchool, buildEnrollmentCounts } from './services/school.js'
+import { findNearestSchool, buildEnrollmentCounts, computeSchoolQuality, SCHOOL_CAPACITY } from './services/school.js'
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -349,6 +349,8 @@ function computeSatisfaction(
   bldIdx: BuildingIndex,
   buildingTierCounts: Map<string, [number, number, number]>,
   buildingById: Map<string, Building>,
+  enrollmentCounts: Map<string, number>,
+  educationFunding: number,
 ): number {
   const w = TIER_WEIGHTS[agent.wealthTier]
   const commuteNorm = clamp(agent.homeWorkRoute.length / MAX_SATISFACTION_COMMUTE, 0, 1)
@@ -368,6 +370,18 @@ function computeSatisfaction(
   const tierCounts = buildingTierCounts.get(agent.homeBuildingId) ?? [0, 0, 0]
   const schelling = computeSchellingPenalty(agent.wealthTier, tierCounts)
 
+  const MAX_SCHOOL_COMMUTE = 40
+
+  let educationScore = 0
+  if (agent.schoolBuildingId !== null) {
+    const schoolCommuteNorm = clamp(agent.homeSchoolRoute.length / MAX_SCHOOL_COMMUTE, 0, 1)
+    const schoolBuilding = buildingById.get(agent.schoolBuildingId)
+    const capacity = SCHOOL_CAPACITY[schoolBuilding?.defId ?? ''] ?? 0
+    const enrolled = enrollmentCounts.get(agent.schoolBuildingId) ?? 0
+    const schoolQuality = computeSchoolQuality(enrolled, capacity, educationFunding)
+    educationScore = schoolQuality * (1 - schoolCommuteNorm * 0.5)
+  }
+
   return clamp(
     1.0
     - commuteNorm * 0.4 * w.commute
@@ -377,7 +391,8 @@ function computeSatisfaction(
     - pollNorm * 0.3 * w.pollution
     + fireNorm * 0.15 * w.fire
     + parkNorm * 0.25 * w.park
-    - schelling,
+    - schelling
+    + educationScore * 0.15 * w.education,
     0, 1,
   )
 }
@@ -391,6 +406,7 @@ export function citizenMonthlyTick(
   trafficDensity: Uint8Array,
   layers: TileLayers,
   bldIdx: BuildingIndex,
+  educationFunding: number,
 ): void {
   // Pass 1: replan stale routes (traffic-aware)
   replanStaleRoutes(registry, map, graph, trafficDensity)
@@ -428,7 +444,7 @@ export function citizenMonthlyTick(
     for (const tileIdx of agent.homeSchoolRoute) {
       rawTraffic[tileIdx]! += SCHOOL_TRIP_WEIGHT
     }
-    agent.satisfaction = computeSatisfaction(agent, map, layers, bldIdx, buildingTierCounts, buildingById)
+    agent.satisfaction = computeSatisfaction(agent, map, layers, bldIdx, buildingTierCounts, buildingById, enrollmentCounts, educationFunding)
   }
 
   // Scale by sampling ratio and write to trafficDensity

@@ -66,7 +66,7 @@ export function monthlyTick(state: EngineState): MonthlyTickResult {
     pollutionLevel: state.pollutionLevel,
     reputationLayer: state.reputationLayer,
   }
-  citizenMonthlyTick(state.citizenRegistry, state.map, state.roadGraph, state.trafficDensity, tileLayers, state.bldIdx)
+  citizenMonthlyTick(state.citizenRegistry, state.map, state.roadGraph, state.trafficDensity, tileLayers, state.bldIdx, state.funding.education)
   state.citizenSummary = computeCitizenSummary(state.citizenRegistry)
 
   // 9. Zone development
