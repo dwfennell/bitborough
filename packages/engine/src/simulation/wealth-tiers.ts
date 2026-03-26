@@ -7,13 +7,13 @@ export const TIER_DISTRIBUTION: readonly [number, number, number] = [0.30, 0.45,
 // ── Tier weight table ─────────────────────────────────────────────
 export interface TierFactorWeights {
   crime: number; pollution: number; park: number; fire: number
-  commute: number; jobMatch: number; commerce: number
+  commute: number; jobMatch: number; commerce: number; education: number
 }
 
 export const TIER_WEIGHTS: Record<WealthTier, TierFactorWeights> = {
-  1: { crime: 0.8, pollution: 0.7, park: 0.5, fire: 0.8, commute: 1.3, jobMatch: 1.2, commerce: 0.9 },
-  2: { crime: 1.0, pollution: 1.0, park: 1.0, fire: 1.0, commute: 1.0, jobMatch: 1.0, commerce: 1.0 },
-  3: { crime: 1.4, pollution: 1.5, park: 1.3, fire: 1.2, commute: 0.8, jobMatch: 0.9, commerce: 1.1 },
+  1: { crime: 0.8, pollution: 0.7, park: 0.5, fire: 0.8, commute: 1.3, jobMatch: 1.2, commerce: 0.9, education: 0.6 },
+  2: { crime: 1.0, pollution: 1.0, park: 1.0, fire: 1.0, commute: 1.0, jobMatch: 1.0, commerce: 1.0, education: 1.2 },
+  3: { crime: 1.4, pollution: 1.5, park: 1.3, fire: 1.2, commute: 0.8, jobMatch: 0.9, commerce: 1.1, education: 1.5 },
 }
 
 // ── Constants ─────────────────────────────────────────────────────
