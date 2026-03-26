@@ -79,6 +79,7 @@ export interface BudgetInfo {
     police: number
     fire: number
     transit: number
+    education: number
   }
   taxIncome: number
   maintenanceCosts: {
@@ -92,6 +93,7 @@ export interface BudgetInfo {
     police: number
     fire: number
     transit: number
+    education: number
     total: number
   }
   loanRepayment: number
@@ -118,6 +120,7 @@ export interface GameState {
   pollutionLevel: Uint8Array
   crimeLevel: Uint8Array
   fireCoverage: Uint8Array
+  educationCoverage: Uint8Array
   trafficDensity: Uint8Array
   activeFires: number[]
   loan: Loan | null

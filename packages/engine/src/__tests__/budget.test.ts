@@ -107,7 +107,7 @@ describe('Budget system', () => {
   test('loanRepayment is subtracted from balance and added to projectedExpenses', () => {
     const map = createEmptyMap(32, 32, { name: 'test', seed: 0, createdAt: '' })
     const landValues = new Uint8Array(32 * 32)
-    const funding = { police: 100, fire: 100, transit: 100 }
+    const funding = { police: 100, fire: 100, transit: 100, education: 100 }
 
     const withoutLoan = calculateBudget(map, 0, 0.07, landValues, funding, 0)
     const withLoan = calculateBudget(map, 0, 0.07, landValues, funding, 500)
@@ -126,7 +126,7 @@ describe('Sprawl penalty', () => {
   test('low population with many spread-out buildings increases road maintenance', () => {
     const map = createEmptyMap(32, 32, { name: 'test', seed: 0, createdAt: '' })
     const landValues = new Uint8Array(32 * 32)
-    const funding = { police: 100, fire: 100, transit: 100 }
+    const funding = { police: 100, fire: 100, transit: 100, education: 100 }
 
     // Add 20 road tiles for baseline maintenance
     for (let x = 0; x < 20; x++) {
@@ -188,7 +188,7 @@ describe('Sprawl penalty', () => {
   test('high population with dense buildings gets no sprawl penalty', () => {
     const map = createEmptyMap(32, 32, { name: 'test', seed: 0, createdAt: '' })
     const landValues = new Uint8Array(32 * 32)
-    const funding = { police: 100, fire: 100, transit: 100 }
+    const funding = { police: 100, fire: 100, transit: 100, education: 100 }
 
     // Add 10 road tiles
     for (let x = 0; x < 10; x++) {
