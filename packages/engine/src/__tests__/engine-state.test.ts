@@ -1,5 +1,6 @@
 import { describe, test, expect } from 'vitest'
-import { DEFAULTS } from '@bitborough/core'
+import { DEFAULTS, type Loan, type Building } from '@bitborough/core'
+import type { Citizen } from '../simulation/citizens.js'
 import {
   createEngineState,
   rebuildDerivedState,
@@ -9,10 +10,6 @@ import {
   maxPrefixedId,
 } from '../engine-state.js'
 import { createTestMap } from '../test-helpers.js'
-
-// ---------------------------------------------------------------------------
-// maxPrefixedId
-// ---------------------------------------------------------------------------
 
 describe('maxPrefixedId', () => {
   test('returns 0 for empty array', () => {
@@ -25,12 +22,8 @@ describe('maxPrefixedId', () => {
   })
 })
 
-// ---------------------------------------------------------------------------
-// computeLoanRepayment
-// ---------------------------------------------------------------------------
-
 describe('computeLoanRepayment', () => {
-  function makeState(loan: any, loanRepaymentAmount: number) {
+  function makeState(loan: Loan | null, loanRepaymentAmount: number) {
     const map = createTestMap(32)
     const state = createEngineState(map, { seed: 1 })
     state.loan = loan
@@ -55,10 +48,6 @@ describe('computeLoanRepayment', () => {
     expect(computeLoanRepayment(state)).toBe(200)
   })
 })
-
-// ---------------------------------------------------------------------------
-// createEngineState
-// ---------------------------------------------------------------------------
 
 describe('createEngineState', () => {
   test('creates state with correct map dimensions', () => {
@@ -126,35 +115,18 @@ describe('createEngineState', () => {
   })
 })
 
-// ---------------------------------------------------------------------------
-// rebuildDerivedState
-// ---------------------------------------------------------------------------
-
 describe('rebuildDerivedState', () => {
   test('updates bldIdx so a placed building is findable', () => {
     const map = createTestMap(32)
     const state = createEngineState(map, { seed: 1 })
 
-    // Place a building manually after state creation
     map.buildings.push({
-      id: 'b1',
-      defId: 'power.diesel',
-      x: 5,
-      y: 5,
-      state: 'active',
-      residents: 0,
-      powered: false,
-      density: 0,
-      age: 0,
-    } as any)
+      id: 'b1', defId: 'power.diesel', x: 5, y: 5,
+      state: 'active', residents: 0, powered: false, density: 0, age: 0,
+    } as Building)
 
-    // Before rebuild, the index doesn't know about the building
     expect(state.bldIdx.get(5, 5)).toBeUndefined()
-
     rebuildDerivedState(state)
-
-    // After rebuild, the building is findable
-    expect(state.bldIdx.get(5, 5)).toBeDefined()
     expect(state.bldIdx.get(5, 5)!.id).toBe('b1')
   })
 
@@ -173,11 +145,9 @@ describe('rebuildDerivedState', () => {
       powered: false,
       density: 0,
       age: 0,
-    } as any)
+    } as Building)
 
     rebuildDerivedState(state)
-
-    // Tiles near the coal plant should have pollution > 0
     const nearIdx = 10 * 32 + 10
     expect(state.pollutionLevel[nearIdx]).toBeGreaterThan(0)
   })
@@ -186,34 +156,17 @@ describe('rebuildDerivedState', () => {
     const map = createTestMap(32)
     const state = createEngineState(map, { seed: 1 })
 
-    // Before station: all fire coverage should be 0
-    const allZero = Array.from(state.fireCoverage).every((v) => v === 0)
-    expect(allZero).toBe(true)
+    expect(Array.from(state.fireCoverage).every(v => v === 0)).toBe(true)
 
-    // Place a fire station (3x3)
     map.buildings.push({
-      id: 'b1',
-      defId: 'service.fire',
-      x: 10,
-      y: 10,
-      state: 'active',
-      residents: 0,
-      powered: true,
-      density: 0,
-      age: 0,
-    } as any)
+      id: 'b1', defId: 'service.fire', x: 10, y: 10,
+      state: 'active', residents: 0, powered: true, density: 0, age: 0,
+    } as Building)
 
     rebuildDerivedState(state)
-
-    // Tiles near the fire station should have coverage > 0
-    const coverageSum = Array.from(state.fireCoverage).reduce((a, b) => a + b, 0)
-    expect(coverageSum).toBeGreaterThan(0)
+    expect(Array.from(state.fireCoverage).reduce((a, b) => a + b, 0)).toBeGreaterThan(0)
   })
 })
-
-// ---------------------------------------------------------------------------
-// serializeState + restoreState round-trip
-// ---------------------------------------------------------------------------
 
 describe('serializeState + restoreState', () => {
   test('key fields match after round-trip', () => {
@@ -237,25 +190,16 @@ describe('serializeState + restoreState', () => {
     const map = createTestMap(32)
     const state = createEngineState(map, { seed: 1 })
 
-    // Inject a fake agent with wealthTier
     state.citizenRegistry.agents.push({
-      id: 'c1',
-      homeBuildingId: 'b1',
-      homeAccessRoad: 0,
-      workBuildingId: null,
-      workAccessRoad: null,
-      commerceBuildingId: null,
-      commerceAccessRoad: null,
-      homeWorkRoute: [],
-      homeCommerceRoute: [],
-      homeWorkRouteStale: false,
-      homeCommerceRouteStale: false,
-      homeWorkRouteTileSet: new Set(),
-      homeCommerceRouteTileSet: new Set(),
-      satisfaction: 0.8,
-      demographics: { children: 0, working: 50, elderly: 0 },
+      id: 'c1', homeBuildingId: 'b1', homeAccessRoad: 0,
+      workBuildingId: null, workAccessRoad: null,
+      commerceBuildingId: null, commerceAccessRoad: null,
+      homeWorkRoute: [], homeCommerceRoute: [],
+      homeWorkRouteStale: false, homeCommerceRouteStale: false,
+      homeWorkRouteTileSet: new Set(), homeCommerceRouteTileSet: new Set(),
+      satisfaction: 0.8, demographics: { children: 0, working: 50, elderly: 0 },
       wealthTier: 3,
-    } as any)
+    } as Citizen)
 
     const save = serializeState(state)
     const restored = restoreState(save)

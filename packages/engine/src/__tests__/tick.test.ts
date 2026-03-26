@@ -1,12 +1,8 @@
 import { describe, test, expect } from 'vitest'
-import { Infrastructure } from '@bitborough/core'
+import { Infrastructure, type Building } from '@bitborough/core'
 import { createEngineState, rebuildDerivedState } from '../engine-state.js'
 import { monthlyTick, syncResidentialAgents } from '../simulation/tick.js'
 import { createTestMap } from '../test-helpers.js'
-
-// ---------------------------------------------------------------------------
-// monthlyTick
-// ---------------------------------------------------------------------------
 
 describe('monthlyTick', () => {
   test('advances month correctly (month 1 → 2)', () => {
@@ -29,28 +25,19 @@ describe('monthlyTick', () => {
     expect(state.year).toBe(yearBefore + 1)
   })
 
-  test('demand is recalculated (non-zero after tick on a developed map)', () => {
+  test('demand is recalculated after tick', () => {
     const map = createTestMap(32)
     const state = createEngineState(map, { seed: 1 })
 
-    // Manually place a residential building to give the simulation something to work with
     map.buildings.push({
-      id: 'b1',
-      defId: 'res.low',
-      x: 5,
-      y: 5,
-      state: 'active',
-      residents: 10,
-      powered: true,
-      density: 0,
-      age: 0,
-    } as any)
+      id: 'b1', defId: 'res.low', x: 5, y: 5,
+      state: 'active', residents: 10, powered: true, density: 0, age: 0,
+    } as Building)
 
-    const demandBefore = { ...state.demand }
     monthlyTick(state)
 
-    // demand object should be a new reference (recalculated)
-    expect(state.demand).not.toBe(demandBefore)
+    // Residential demand should be positive at default tax rate
+    expect(state.demand.residential).toBeGreaterThan(0)
   })
 
   test('history grows by 1 entry per tick', () => {
@@ -132,36 +119,20 @@ describe('monthlyTick', () => {
   })
 })
 
-// ---------------------------------------------------------------------------
-// syncResidentialAgents
-// ---------------------------------------------------------------------------
-
 describe('syncResidentialAgents', () => {
   test('creates agents for active residential buildings with residents', () => {
     const map = createTestMap(32)
     const state = createEngineState(map, { seed: 1 })
 
-    // Place building at (4, 3) and a road at (4, 4) so resolveAccessRoad succeeds.
-    // residents must be >= samplingRatio (50) so that Math.floor(residents/50) >= 1 agent.
+    // Road adjacent so resolveAccessRoad succeeds; residents >= samplingRatio (50)
     map.infrastructure[4 * map.width + 4] = Infrastructure.Road
     map.buildings.push({
-      id: 'b1',
-      defId: 'res.low',
-      x: 4,
-      y: 3,
-      state: 'active',
-      residents: 50,
-      powered: true,
-      density: 0,
-      age: 0,
-    } as any)
-
-    // Rebuild the index so the building is findable by agents
+      id: 'b1', defId: 'res.low', x: 4, y: 3,
+      state: 'active', residents: 50, powered: true, density: 0, age: 0,
+    } as Building)
     rebuildDerivedState(state)
 
     syncResidentialAgents(state)
-
-    // At least one agent should now exist for the residential building
     expect(state.citizenRegistry.agents.length).toBeGreaterThan(0)
   })
 
@@ -169,21 +140,12 @@ describe('syncResidentialAgents', () => {
     const map = createTestMap(32)
     const state = createEngineState(map, { seed: 1 })
 
-    // Commercial building — no agents should be created
     map.buildings.push({
-      id: 'b1',
-      defId: 'power.diesel',
-      x: 4,
-      y: 3,
-      state: 'active',
-      residents: 0,
-      powered: true,
-      density: 0,
-      age: 0,
-    } as any)
+      id: 'b1', defId: 'power.diesel', x: 4, y: 3,
+      state: 'active', residents: 0, powered: true, density: 0, age: 0,
+    } as Building)
 
     syncResidentialAgents(state)
-
     expect(state.citizenRegistry.agents.length).toBe(0)
   })
 
@@ -192,19 +154,11 @@ describe('syncResidentialAgents', () => {
     const state = createEngineState(map, { seed: 1 })
 
     map.buildings.push({
-      id: 'b1',
-      defId: 'res.low',
-      x: 4,
-      y: 3,
-      state: 'under_construction',
-      residents: 10,
-      powered: false,
-      density: 0,
-      age: 0,
-    } as any)
+      id: 'b1', defId: 'res.low', x: 4, y: 3,
+      state: 'under_construction', residents: 10, powered: false, density: 0, age: 0,
+    } as Building)
 
     syncResidentialAgents(state)
-
     expect(state.citizenRegistry.agents.length).toBe(0)
   })
 })
