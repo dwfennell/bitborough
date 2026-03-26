@@ -37,6 +37,8 @@ const BUILDING_COLORS: Record<string, string> = {
   'service.police': '#1565c0',
   'service.fire.small': '#e53935',
   'service.fire': '#c62828',
+  'service.school.small': '#7b1fa2',
+  'service.school': '#6a1b9a',
   'special.park': '#66bb6a',
 }
 
@@ -69,6 +71,8 @@ const BUILDING_SPRITES: Record<string, string> = {
   'service.police': '/tiles/buildings/service/police-station.svg',
   'service.fire.small': '/tiles/buildings/service/fire-substation.svg',
   'service.fire': '/tiles/buildings/service/fire-station.svg',
+  'service.school.small': '/tiles/buildings/service/school-small.svg',
+  'service.school': '/tiles/buildings/service/school.svg',
   'special.park': '/tiles/buildings/park.svg',
 }
 

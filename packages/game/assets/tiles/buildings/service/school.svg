@@ -1,0 +1,122 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- Transparent background - terrain renders underneath -->
+
+  <!-- Building shadow (3x3 facility) -->
+  <rect x="32" y="30" width="64" height="58" rx="2" fill="#000000" opacity="0.11" transform="translate(3, 3)"/>
+
+  <!-- Lot ground (paved school grounds) -->
+  <rect x="8" y="8" width="112" height="112" rx="3" fill="#b8b8a8"/>
+
+  <!-- Playground area (back/right) -->
+  <rect x="78" y="75" width="38" height="35" rx="2" fill="#d8c498" opacity="0.3"/>
+
+  <!-- Main school building (3x3) -->
+  <rect x="32" y="30" width="64" height="58" rx="2" fill="#e0d8c8"/>
+  <rect x="32" y="30" width="64" height="58" rx="2" fill="#d8c8b8" opacity="0.3"/>
+
+  <!-- Roof (tan/beige for school building) -->
+  <rect x="30" y="28" width="68" height="60" rx="2" fill="#c8a878" opacity="0.8"/>
+  <!-- Roof ridge detail -->
+  <line x1="30" y1="28" x2="98" y2="28" stroke="#b89860" stroke-width="1.5" opacity="0.5"/>
+
+  <!-- Classroom windows - left side of building (large, bright) -->
+  <rect x="37" y="38" width="5" height="5" rx="0.5" fill="#a8d0e8" opacity="0.7"/>
+  <rect x="37" y="38" width="5" height="5" rx="0.5" fill="none" stroke="#6a5040" stroke-width="0.5"/>
+  <line x1="39.5" y1="38" x2="39.5" y2="43" stroke="#6a5040" stroke-width="0.4" opacity="0.5"/>
+  <line x1="37" y1="40.5" x2="42" y2="40.5" stroke="#6a5040" stroke-width="0.4" opacity="0.5"/>
+
+  <rect x="37" y="48" width="5" height="5" rx="0.5" fill="#a8d0e8" opacity="0.7"/>
+  <rect x="37" y="48" width="5" height="5" rx="0.5" fill="none" stroke="#6a5040" stroke-width="0.5"/>
+  <line x1="39.5" y1="48" x2="39.5" y2="53" stroke="#6a5040" stroke-width="0.4" opacity="0.5"/>
+  <line x1="37" y1="50.5" x2="42" y2="50.5" stroke="#6a5040" stroke-width="0.4" opacity="0.5"/>
+
+  <rect x="37" y="58" width="5" height="5" rx="0.5" fill="#a8d0e8" opacity="0.7"/>
+  <rect x="37" y="58" width="5" height="5" rx="0.5" fill="none" stroke="#6a5040" stroke-width="0.5"/>
+  <line x1="39.5" y1="58" x2="39.5" y2="63" stroke="#6a5040" stroke-width="0.4" opacity="0.5"/>
+  <line x1="37" y1="60.5" x2="42" y2="60.5" stroke="#6a5040" stroke-width="0.4" opacity="0.5"/>
+
+  <!-- Classroom windows - right side of building -->
+  <rect x="86" y="38" width="5" height="5" rx="0.5" fill="#a8d0e8" opacity="0.7"/>
+  <rect x="86" y="38" width="5" height="5" rx="0.5" fill="none" stroke="#6a5040" stroke-width="0.5"/>
+  <line x1="88.5" y1="38" x2="88.5" y2="43" stroke="#6a5040" stroke-width="0.4" opacity="0.5"/>
+  <line x1="86" y1="40.5" x2="91" y2="40.5" stroke="#6a5040" stroke-width="0.4" opacity="0.5"/>
+
+  <rect x="86" y="48" width="5" height="5" rx="0.5" fill="#a8d0e8" opacity="0.7"/>
+  <rect x="86" y="48" width="5" height="5" rx="0.5" fill="none" stroke="#6a5040" stroke-width="0.5"/>
+  <line x1="88.5" y1="48" x2="88.5" y2="53" stroke="#6a5040" stroke-width="0.4" opacity="0.5"/>
+  <line x1="86" y1="50.5" x2="91" y2="50.5" stroke="#6a5040" stroke-width="0.4" opacity="0.5"/>
+
+  <rect x="86" y="58" width="5" height="5" rx="0.5" fill="#a8d0e8" opacity="0.7"/>
+  <rect x="86" y="58" width="5" height="5" rx="0.5" fill="none" stroke="#6a5040" stroke-width="0.5"/>
+  <line x1="88.5" y1="58" x2="88.5" y2="63" stroke="#6a5040" stroke-width="0.4" opacity="0.5"/>
+  <line x1="86" y1="60.5" x2="91" y2="60.5" stroke="#6a5040" stroke-width="0.4" opacity="0.5"/>
+
+  <!-- Main entrance (front center, double doors) -->
+  <!-- Left entrance door -->
+  <rect x="57" y="72" width="5" height="12" rx="0.5" fill="#8a6848"/>
+  <circle cx="60.5" cy="78.5" r="0.6" fill="#c0a080"/>
+
+  <!-- Right entrance door -->
+  <rect x="66" y="72" width="5" height="12" rx="0.5" fill="#8a6848"/>
+  <circle cx="69.5" cy="78.5" r="0.6" fill="#c0a080"/>
+
+  <!-- Door transom windows (above doors) -->
+  <rect x="57" y="68" width="5" height="3.5" rx="0.3" fill="#a8d0e8" opacity="0.6"/>
+  <rect x="66" y="68" width="5" height="3.5" rx="0.3" fill="#a8d0e8" opacity="0.6"/>
+
+  <!-- Rooftop flagpole with education flag (flag shape) -->
+  <rect x="63" y="24" width="2" height="10" rx="0.5" fill="#8a8a7a"/>
+  <!-- Flag - green for education/growth -->
+  <rect x="65" y="24" width="10" height="6" rx="0.5" fill="#7a9c6a" opacity="0.8"/>
+
+  <!-- School name sign above entrance -->
+  <rect x="48" y="22" width="32" height="4" rx="0.5" fill="#c8a878" opacity="0.6"/>
+  <text x="64" y="25.5" font-size="2.5" fill="#6a5040" text-anchor="middle" opacity="0.8" font-weight="bold">SCHOOL</text>
+
+  <!-- Bell tower/cupola on roof (educational feature) -->
+  <rect x="60" y="30" width="8" height="8" rx="1" fill="#b89860"/>
+  <!-- Bell opening -->
+  <rect x="62" y="34" width="4" height="3" rx="0.5" fill="#8a6a50" opacity="0.6"/>
+  <!-- Small bell -->
+  <ellipse cx="64" cy="37" rx="2" ry="1.5" fill="#c0a080" opacity="0.7"/>
+
+  <!-- Side entrance door (administrative/staff) -->
+  <rect x="90" y="72" width="4" height="10" rx="0.5" fill="#8a6848"/>
+  <circle cx="92.5" cy="77.5" r="0.5" fill="#c0a080"/>
+
+  <!-- Small window near side door (office) -->
+  <rect x="92" y="60" width="4" height="4" rx="0.4" fill="#a8d0e8" opacity="0.6"/>
+  <rect x="92" y="60" width="4" height="4" rx="0.4" fill="none" stroke="#6a5040" stroke-width="0.4"/>
+
+  <!-- Outdoor equipment/bench area (playground) -->
+  <rect x="82" y="78" width="6" height="6" rx="0.5" fill="#a89878" opacity="0.5"/>
+  <!-- Another equipment element -->
+  <rect x="95" y="85" width="6" height="6" rx="0.5" fill="#a89878" opacity="0.5"/>
+
+  <!-- Flagpole for main flag (corner of lot) -->
+  <rect x="16" y="32" width="1.5" height="14" rx="0.5" fill="#8a8a7a"/>
+  <!-- US/Regional flag -->
+  <rect x="17.5" y="32" width="7" height="4" rx="0.3" fill="#c62828" opacity="0.7"/>
+
+  <!-- Security/information posts (corner lighting) -->
+  <rect x="18" y="50" width="2" height="8" rx="0.5" fill="#8a8a7a" opacity="0.4"/>
+  <circle cx="19" cy="48" r="1.5" fill="#b8a080" opacity="0.5"/>
+
+  <rect x="108" y="50" width="2" height="8" rx="0.5" fill="#8a8a7a" opacity="0.4"/>
+  <circle cx="109" cy="48" r="1.5" fill="#b8a080" opacity="0.5"/>
+
+  <!-- Landscaping - bushes near entrance -->
+  <ellipse cx="50" cy="85" rx="4" ry="3" fill="#78b868" opacity="0.6"/>
+  <ellipse cx="48" cy="82" rx="2.5" ry="2" fill="#90c880" opacity="0.5"/>
+
+  <ellipse cx="78" cy="85" rx="4" ry="3" fill="#78b868" opacity="0.6"/>
+  <ellipse cx="80" cy="82" rx="2.5" ry="2" fill="#90c880" opacity="0.5"/>
+
+  <!-- Wall detail weathering -->
+  <g stroke="#a89080" stroke-width="0.4" opacity="0.12">
+    <line x1="32" y1="50" x2="40" y2="50"/>
+    <line x1="32" y1="60" x2="42" y2="60"/>
+    <line x1="88" y1="50" x2="96" y2="50"/>
+    <line x1="88" y1="60" x2="96" y2="60"/>
+  </g>
+</svg>
