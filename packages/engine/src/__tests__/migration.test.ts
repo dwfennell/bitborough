@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest'
-import { computeAttractiveness, computeMigrationModifier } from '../simulation/migration.js'
+import { computeAttractiveness, computeMigrationModifier, computeMigrantTierDistribution } from '../simulation/migration.js'
 import type { CitizenSummary } from '@bitborough/core'
 import { DensityLevel } from '@bitborough/core'
 import { EMPTY_CITIZEN_SUMMARY } from '../simulation/citizens.js'
@@ -134,5 +134,49 @@ describe('computeMigrationModifier', () => {
 
   test('attractiveness 0.25 gives modifier 0.5', () => {
     expect(computeMigrationModifier(0.25)).toBeCloseTo(0.5)
+  })
+})
+
+describe('computeMigrantTierDistribution', () => {
+  test('attractiveness 0.5 gives baseline distribution', () => {
+    const [low, mid, high] = computeMigrantTierDistribution(0.5)
+    expect(low).toBeCloseTo(0.30)
+    expect(mid).toBeCloseTo(0.45)
+    expect(high).toBeCloseTo(0.25)
+  })
+
+  test('attractiveness 0.0 gives struggling distribution', () => {
+    const [low, mid, high] = computeMigrantTierDistribution(0.0)
+    expect(low).toBeCloseTo(0.50)
+    expect(mid).toBeCloseTo(0.35)
+    expect(high).toBeCloseTo(0.15)
+  })
+
+  test('attractiveness 1.0 gives prosperous distribution', () => {
+    const [low, mid, high] = computeMigrantTierDistribution(1.0)
+    expect(low).toBeCloseTo(0.20)
+    expect(mid).toBeCloseTo(0.40)
+    expect(high).toBeCloseTo(0.40)
+  })
+
+  test('attractiveness 0.25 is halfway between struggling and baseline', () => {
+    const [low, mid, high] = computeMigrantTierDistribution(0.25)
+    expect(low).toBeCloseTo(0.40) // lerp(0.50, 0.30, 0.5)
+    expect(mid).toBeCloseTo(0.40) // lerp(0.35, 0.45, 0.5)
+    expect(high).toBeCloseTo(0.20) // lerp(0.15, 0.25, 0.5)
+  })
+
+  test('attractiveness 0.75 is halfway between baseline and prosperous', () => {
+    const [low, mid, high] = computeMigrantTierDistribution(0.75)
+    expect(low).toBeCloseTo(0.25) // lerp(0.30, 0.20, 0.5)
+    expect(mid).toBeCloseTo(0.425) // lerp(0.45, 0.40, 0.5)
+    expect(high).toBeCloseTo(0.325) // lerp(0.25, 0.40, 0.5)
+  })
+
+  test('distribution always sums to 1.0', () => {
+    for (const a of [0, 0.1, 0.25, 0.4, 0.5, 0.6, 0.75, 0.9, 1.0]) {
+      const dist = computeMigrantTierDistribution(a)
+      expect(dist[0] + dist[1] + dist[2]).toBeCloseTo(1.0)
+    }
   })
 })

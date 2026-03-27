@@ -100,6 +100,31 @@ export function computeAttractiveness(
   return { score, factors }
 }
 
+export const TIER_DIST_STRUGGLING: readonly [number, number, number] = [0.50, 0.35, 0.15]
+export const TIER_DIST_BASELINE: readonly [number, number, number] = [0.30, 0.45, 0.25]
+export const TIER_DIST_PROSPEROUS: readonly [number, number, number] = [0.20, 0.40, 0.40]
+
+function lerpDist(
+  a: readonly [number, number, number],
+  b: readonly [number, number, number],
+  t: number,
+): [number, number, number] {
+  return [
+    a[0] + (b[0] - a[0]) * t,
+    a[1] + (b[1] - a[1]) * t,
+    a[2] + (b[2] - a[2]) * t,
+  ]
+}
+
+export function computeMigrantTierDistribution(attractiveness: number): [number, number, number] {
+  if (attractiveness <= 0.5) {
+    const t = attractiveness / 0.5
+    return lerpDist(TIER_DIST_STRUGGLING, TIER_DIST_BASELINE, t)
+  }
+  const t = (attractiveness - 0.5) / 0.5
+  return lerpDist(TIER_DIST_BASELINE, TIER_DIST_PROSPEROUS, t)
+}
+
 export function computeMigrationModifier(attractiveness: number): number {
   const gap = attractiveness - ATTRACTIVENESS_BASELINE
   return Math.max(MIGRATION_MODIFIER_MIN, Math.min(MIGRATION_MODIFIER_MAX, 1.0 + gap * MIGRATION_SENSITIVITY))
