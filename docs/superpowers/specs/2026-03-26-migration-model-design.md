@@ -29,11 +29,31 @@ attractiveness =
 |--------|--------|---------|
 | `jobMatchRate` | `CitizenSummary.unmatchedJobFraction` | `1 - unmatchedJobFraction` |
 | `avgSatisfaction` | `CitizenSummary.avgSatisfaction` | Direct (already 0–1) |
-| `serviceCoverage` | Police, fire, education coverage layers | Average fraction of residential tiles with non-zero coverage across the three service layers, scaled by respective funding levels |
+| `serviceCoverage` | Police, fire, education layers | See formula below |
 | `taxCompetitiveness` | `state.taxRate` | `clamp(1.0 - (taxRate - 0.07) × 5.0, 0, 1)` — neutral at 7%, zero at 27% |
-| `housingAvailability` | Building occupancy | `clamp(1 - totalResidents / totalCapacity, 0, 1)` — full city = 0, empty = 1 |
+| `housingAvailability` | Building occupancy | `clamp(1 - totalResidents / totalCapacity, 0, 1)` — full city = 0, empty = 1. When `totalCapacity = 0`, defaults to 1.0 |
 
-Service coverage averages police, fire, and education. For each, compute the fraction of residential tiles with coverage > 0 from the existing Uint8Array layers. No new per-tile computation needed.
+**Service coverage formula:**
+
+```
+policeFrac = (residential tiles where crimeLevel < 128) / totalResidentialTiles
+fireFrac   = (residential tiles where fireCoverage > 0) / totalResidentialTiles
+eduFrac    = (residential tiles where educationQuality >= 2) / totalResidentialTiles
+
+serviceCoverage = (
+    policeFrac * (funding.police / 100) +
+    fireFrac   * (funding.fire / 100) +
+    eduFrac    * (funding.education / 100)
+) / 3
+```
+
+Layer semantics: `crimeLevel` is inverted (high = bad), so police coverage is tiles *below* a threshold (128 = half-scale). `fireCoverage` is direct (high = covered). `educationQuality` uses encoded values where 0 = no children present, 1 = children but no school, 2–255 = quality-encoded; tiles with value >= 2 count as having education coverage.
+
+When there are no residential tiles, `serviceCoverage` defaults to 0.5 (neutral).
+
+**Tax double-counting note:** The demand system already uses the same tax formula to reduce building fill targets. Tax intentionally appears in both places — it suppresses *what buildings aim for* (via demand) and *how fast the city grows* (via attractiveness). This makes tax a strong lever, which is correct: overtaxing should visibly hurt.
+
+**Housing availability stabilizer:** This factor acts as a negative-feedback stabilizer — a nearly-full city has low housing availability, which lowers attractiveness, which slows fill, which prevents overshoot. The demand system has a separate vacancy feedback loop that dampens demand when vacancy > 8% (above 100 pop). These two mechanisms are complementary: demand vacancy prevents overbuilding, housing availability prevents overfilling.
 
 ### Output
 
@@ -80,6 +100,8 @@ netMigration = populationAfterAllPasses - populationBeforeDensity + deaths - bir
 
 This captures both fill-rate-driven growth and brain drain departures in one metric, stored on `EngineState` and surfaced via `CitizenSummary.netMigrationLastTick`.
 
+The algebra: the tick sequence is density → demographics (births/deaths) → brain drain. Population changes from all three are interleaved. Adding back deaths and subtracting births isolates the migration-attributable delta. The implementation should snapshot population before the density pass and after the brain drain pass to compute this.
+
 ---
 
 ## Tier-Shifted Immigration
@@ -94,7 +116,21 @@ When the city is growing (net positive migration), the wealth tier distribution 
 | 0.35–0.65 (baseline) | 0.30 | 0.45 | 0.25 |
 | > 0.65 (prosperous) | 0.20 | 0.40 | 0.40 |
 
-Linear interpolation between brackets for smooth transitions.
+Linear interpolation between bracket midpoints for smooth transitions:
+
+```
+Anchor points: 0.0 → STRUGGLING, 0.5 → BASELINE, 1.0 → PROSPEROUS
+
+For attractiveness in [0.0, 0.5]:
+  t = attractiveness / 0.5
+  dist = lerp(STRUGGLING, BASELINE, t)
+
+For attractiveness in [0.5, 1.0]:
+  t = (attractiveness - 0.5) / 0.5
+  dist = lerp(BASELINE, PROSPEROUS, t)
+```
+
+At exactly 0.5, distribution equals BASELINE. At 0.25, it's halfway between STRUGGLING and BASELINE.
 
 ### Integration with Agent Creation
 
@@ -107,7 +143,7 @@ baseWeights = interpolateTierDist(attractiveness)
 
 A prosperous city's high-reputation neighborhoods become strongly tier-3, while low-reputation areas still lean tier-1 — but the overall city mix shifts wealthier.
 
-`sampleWealthTier()` gains an optional `tierDistOverride: [number, number, number]` parameter. When provided, it replaces the hardcoded `TIER_DISTRIBUTION` base weights.
+`sampleWealthTier()` gains an optional `tierDistOverride: [number, number, number]` parameter. When provided, it replaces the hardcoded `TIER_DISTRIBUTION` base weights. The existing reputation modifiers (`(1.5 - reputation)` for tier 1, `(0.5 + reputation)` for tier 3) continue to apply on top of the overridden base weights.
 
 ---
 
@@ -119,7 +155,7 @@ When attractiveness drops below a threshold, a brain drain pass runs after densi
 
 `attractiveness < BRAIN_DRAIN_THRESHOLD (0.4)`
 
-The 0.4–0.5 range is a neutral band — no growth but no loss. Brain drain only starts below 0.4.
+The 0.4–0.5 range is a buffer zone where the city experiences neither brain drain nor accelerated growth. The fill rate modifier at 0.4 is 0.8 (below-baseline but nonzero), so buildings still fill slowly — but no agents are forcibly removed. Brain drain only starts below 0.4.
 
 ### Departure Rate
 
@@ -128,7 +164,9 @@ drainGap = BRAIN_DRAIN_THRESHOLD - attractiveness    // 0 to 0.4
 departureRate = drainGap × BRAIN_DRAIN_RATE × totalPopulation
 ```
 
-With `BRAIN_DRAIN_RATE = 0.04`, a city at attractiveness 0.2 (gap of 0.2) loses `0.2 × 0.04 × pop = 0.8%` of population per month. Capped at `MAX_MONTHLY_DRAIN_RATE = 0.03` (3% of population).
+With `BRAIN_DRAIN_RATE = 0.04`, a city at attractiveness 0.2 (gap of 0.2) loses `0.2 × 0.04 × pop = 0.8%` of population per month. Capped at `MAX_MONTHLY_DRAIN_RATE = 0.016` (1.6% of population — matches worst-case uncapped rate at attractiveness 0.0).
+
+Brain drain is disabled when `totalPopulation < BRAIN_DRAIN_MIN_POP (100)`. Small cities shouldn't experience punitive tier-3 departures — the mechanic is designed for mid-to-late game feedback.
 
 ### Tier Ordering
 
@@ -136,7 +174,9 @@ Departures are selected from agents sorted by:
 1. **Tier 3 first**, then tier 2, then tier 1
 2. Within each tier, **lowest satisfaction first**
 
-Collect all agents, sort by `(tier DESC, satisfaction ASC)`, remove from the front of the list until the departure count is met. Removed agents reduce their building's `residents` count by `samplingRatio` per agent.
+Collect all agents, sort by `(tier DESC, satisfaction ASC)`, remove from the front of the list until the departure count is met.
+
+**Removal mechanics:** Brain drain decrements `building.residents` directly (by `samplingRatio` per removed agent), then the subsequent agent sync pass in the tick reconciles agent counts. Brain drain does NOT remove agents itself — it only adjusts `building.residents` downward, and agent sync handles the actual agent removal. This keeps the agent lifecycle in one place.
 
 ---
 
@@ -234,11 +274,29 @@ Old saves default:
 **`packages/engine/src/simulation/migration.ts`**
 
 ```typescript
-computeAttractiveness(summary, state): { score, factors }
-computeMigrationModifier(attractiveness): number
-computeMigrantTierDistribution(attractiveness): [number, number, number]
-applyBrainDrain(attractiveness, registry, map, prng): { departures: number }
+computeAttractiveness(
+  summary: CitizenSummary,
+  map: GameMap,
+  taxRate: number,
+  funding: { police: number, fire: number, education: number },
+  crimeLevel: Uint8Array,
+  fireCoverage: Uint8Array,
+  educationQuality: Uint8Array
+): { score: number, factors: AttractivenessFactors }
+
+computeMigrationModifier(attractiveness: number): number
+
+computeMigrantTierDistribution(attractiveness: number): [number, number, number]
+
+applyBrainDrain(
+  attractiveness: number,
+  registry: CitizenRegistry,
+  map: GameMap,
+  prng: PRNG
+): { departures: number, buildingDeltas: Map<string, number> }
 ```
+
+`applyBrainDrain` returns a map of building ID → resident count decrements. The caller applies these to `building.residents` before the subsequent agent sync pass.
 
 ### Modified Files
 
@@ -247,7 +305,9 @@ applyBrainDrain(attractiveness, registry, map, prng): { departures: number }
 | `simulation/density.ts` — `updateDensity()` | Accept `migrationModifier` param, multiply into fill rate |
 | `simulation/demographics.ts` — `demographicTick()` | Remove immigration/emigration blocks, keep aging/births/deaths |
 | `simulation/wealth-tiers.ts` — `sampleWealthTier()` | Accept optional `tierDistOverride` from migration tier shift |
-| `simulation/tick.ts` — `monthlyTick()` | Add attractiveness computation, pass modifier to density, add brain drain pass |
+| `simulation/citizens.ts` — `syncAgentsForBuilding()` | Thread `tierDistOverride` through to `sampleWealthTier()` calls |
+| `simulation/citizens.ts` — `syncResidentialAgents()` | Accept and pass `tierDistOverride` to `syncAgentsForBuilding()` |
+| `simulation/tick.ts` — `monthlyTick()` | Add attractiveness computation, pass modifier to density, compute tier dist, thread to agent sync, add brain drain pass |
 | `engine-state.ts` | Add `cityAttractiveness` and `attractivenessFactors` fields, init defaults |
 | `Engine.ts` | Expose new fields in `GameState` |
 | `packages/core/src/state.ts` | Add `AttractivenessFactors` type, add fields to `GameState` |
@@ -271,7 +331,8 @@ Covers: attractiveness computation from factor inputs, migration modifier clampi
 | `MIGRATION_MODIFIER_MAX` | 1.5 | Cap — prevents runaway growth |
 | `BRAIN_DRAIN_THRESHOLD` | 0.4 | Emigration starts below this; 0.4–0.5 is neutral band |
 | `BRAIN_DRAIN_RATE` | 0.04 | Departure count = gap × rate × population |
-| `MAX_MONTHLY_DRAIN_RATE` | 0.03 | Cap at 3% of population per month |
+| `MAX_MONTHLY_DRAIN_RATE` | 0.016 | Cap at 1.6% of population per month (matches worst-case uncapped rate) |
+| `BRAIN_DRAIN_MIN_POP` | 100 | Disable brain drain below this population |
 | `TIER_DIST_STRUGGLING` | `[0.50, 0.35, 0.15]` | At attractiveness < 0.35 |
 | `TIER_DIST_BASELINE` | `[0.30, 0.45, 0.25]` | At attractiveness 0.35–0.65 |
 | `TIER_DIST_PROSPEROUS` | `[0.20, 0.40, 0.40]` | At attractiveness > 0.65 |
