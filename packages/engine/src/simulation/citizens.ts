@@ -185,6 +185,18 @@ function createAgent(
   return agent
 }
 
+function enrollAgentInSchool(
+  agent: Citizen,
+  schoolMatch: { buildingId: string; accessRoad: number; route: number[] },
+  enrollmentCounts: Map<string, number>,
+): void {
+  agent.schoolBuildingId = schoolMatch.buildingId
+  agent.schoolAccessRoad = schoolMatch.accessRoad
+  agent.homeSchoolRoute = schoolMatch.route
+  agent.homeSchoolRouteTileSet = new Set(schoolMatch.route)
+  enrollmentCounts.set(schoolMatch.buildingId, (enrollmentCounts.get(schoolMatch.buildingId) ?? 0) + agent.demographics.children)
+}
+
 export function syncAgentsForBuilding(map: GameMap, registry: CitizenRegistry, graph: RoadGraph, building: Building, trafficDensity?: Uint8Array, prng?: PRNG, reputationLayer?: Float32Array, enrollmentCounts?: Map<string, number>): void {
   const homeAccessRoad = resolveAccessRoad(map, building)
   if (homeAccessRoad < 0) return  // building has no road access — no agents
@@ -207,16 +219,12 @@ export function syncAgentsForBuilding(map: GameMap, registry: CitizenRegistry, g
       registry.agents.push(createAgent(building.id, homeAccessRoad, jobMatch, commerceMatch, wealthTier))
     }
     if (enrollmentCounts) {
-      for (let i = 0; i < delta; i++) {
-        const agent = registry.agents[registry.agents.length - delta + i]!
-        if (agent.demographics.children > 0) {
-          const schoolMatch = findNearestSchool(map, graph, homeAccessRoad, enrollmentCounts, trafficDensity)
-          if (schoolMatch) {
-            agent.schoolBuildingId = schoolMatch.buildingId
-            agent.schoolAccessRoad = schoolMatch.accessRoad
-            agent.homeSchoolRoute = schoolMatch.route
-            agent.homeSchoolRouteTileSet = new Set(schoolMatch.route)
-            enrollmentCounts.set(schoolMatch.buildingId, (enrollmentCounts.get(schoolMatch.buildingId) ?? 0) + agent.demographics.children)
+      const schoolMatch = findNearestSchool(map, graph, homeAccessRoad, enrollmentCounts, trafficDensity)
+      if (schoolMatch) {
+        for (let i = 0; i < delta; i++) {
+          const agent = registry.agents[registry.agents.length - delta + i]!
+          if (agent.demographics.children > 0) {
+            enrollAgentInSchool(agent, schoolMatch, enrollmentCounts)
           }
         }
       }
@@ -417,11 +425,7 @@ export function citizenMonthlyTick(
     if (agent.demographics.children > 0 && agent.schoolBuildingId === null) {
       const schoolMatch = findNearestSchool(map, graph, agent.homeAccessRoad, enrollmentCounts, trafficDensity)
       if (schoolMatch) {
-        agent.schoolBuildingId = schoolMatch.buildingId
-        agent.schoolAccessRoad = schoolMatch.accessRoad
-        agent.homeSchoolRoute = schoolMatch.route
-        agent.homeSchoolRouteTileSet = new Set(schoolMatch.route)
-        enrollmentCounts.set(schoolMatch.buildingId, (enrollmentCounts.get(schoolMatch.buildingId) ?? 0) + agent.demographics.children)
+        enrollAgentInSchool(agent, schoolMatch, enrollmentCounts)
       }
     }
   }

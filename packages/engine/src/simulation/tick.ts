@@ -106,6 +106,16 @@ export function monthlyTick(state: EngineState): MonthlyTickResult {
   const overlayBuildingById = new Map<string, Building>()
   for (const b of state.map.buildings) overlayBuildingById.set(b.id, b)
 
+  // Precompute encoded quality per school (avoids recomputing per agent)
+  const schoolQualityCache = new Map<string, number>()
+  for (const [schoolId, enrolled] of enrollmentCounts) {
+    const schoolBuilding = overlayBuildingById.get(schoolId)
+    const capacity = SCHOOL_CAPACITY[schoolBuilding?.defId ?? ''] ?? 0
+    if (capacity === 0) continue
+    const quality = computeSchoolQuality(enrolled, capacity, state.funding.education)
+    schoolQualityCache.set(schoolId, Math.floor(quality * 253) + 2)
+  }
+
   for (const agent of state.citizenRegistry.agents) {
     if (agent.demographics.children === 0) continue
     const building = overlayBuildingById.get(agent.homeBuildingId)
@@ -114,11 +124,7 @@ export function monthlyTick(state: EngineState): MonthlyTickResult {
     if (agent.schoolBuildingId === null) {
       if (state.educationQuality[homeTile] === 0) state.educationQuality[homeTile] = 1
     } else {
-      const schoolBuilding = overlayBuildingById.get(agent.schoolBuildingId)
-      const capacity = SCHOOL_CAPACITY[schoolBuilding?.defId ?? ''] ?? 0
-      const enrolled = enrollmentCounts.get(agent.schoolBuildingId) ?? 0
-      const quality = computeSchoolQuality(enrolled, capacity, state.funding.education)
-      const encoded = Math.floor(quality * 253) + 2
+      const encoded = schoolQualityCache.get(agent.schoolBuildingId) ?? 2
       state.educationQuality[homeTile] = Math.max(state.educationQuality[homeTile]!, encoded)
     }
   }
