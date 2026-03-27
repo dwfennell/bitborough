@@ -14,14 +14,18 @@ const BUILDING_MAP: Record<string, string> = {
   nuclear: 'power.nuclear',
   transit: 'transit.stop',
   police:  'service.police',
+  policekiosk: 'service.police.small',
   fire:    'service.fire',
+  firestation: 'service.fire.small',
+  school:  'service.school',
+  schoolsmall: 'service.school.small',
   park:    'special.park',
 }
 
 export function placeCommand(program: Command) {
   program
     .command('place <type> <x> <y>')
-    .description('place infrastructure or building (types: road, powerline, pave, diesel, coal, nuclear, transit, police, fire, park)')
+    .description('place infrastructure or building (types: road, powerline, pave, diesel, coal, nuclear, transit, police, policekiosk, fire, firestation, school, schoolsmall, park)')
     .option('--file <path>', 'game file', 'game.json')
     .action((type, x, y, opts) => {
       const engine = loadEngine(opts.file)
