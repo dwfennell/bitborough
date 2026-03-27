@@ -1573,6 +1573,53 @@ describe('variable construction time', () => {
   })
 })
 
+describe('migration modifier', () => {
+  function setupFillableMap() {
+    const map = createTestMap(32)
+    const x = 10
+    const y = 10
+    map.infrastructure[y * map.width + x] = Infrastructure.Road
+    map.zones[y * map.width + x] = ZoneType.Residential
+    map.buildings.push({
+      id: 'b1', defId: 'res.low', x, y,
+      powered: true, density: DensityLevel.Low, age: 0, state: 'active', residents: 0,
+    })
+    const size = map.width * map.height
+    const powerGrid = new Uint8Array(size)
+    powerGrid[y * map.width + x] = 1
+    const crime = new Uint8Array(size)
+    const fire = new Uint8Array(size)
+    const poll = new Uint8Array(size)
+    return { map, powerGrid, crime, fire, poll }
+  }
+
+  test('higher migration modifier fills building faster', () => {
+    const a = setupFillableMap()
+    const b = setupFillableMap()
+    const demand = { residential: 1.0, commercial: 1.0, industrial: 1.0 }
+
+    for (let i = 0; i < 10; i++) {
+      updateDensity(a.map, a.powerGrid, demand, 5000, new PRNG(1), { value: 100 }, a.crime, a.fire, a.poll, 1.5)
+    }
+    for (let i = 0; i < 10; i++) {
+      updateDensity(b.map, b.powerGrid, demand, 5000, new PRNG(1), { value: 100 }, b.crime, b.fire, b.poll, 0.5)
+    }
+
+    expect(a.map.buildings[0]!.residents).toBeGreaterThan(b.map.buildings[0]!.residents)
+  })
+
+  test('default modifier (1.0) preserves existing behavior', () => {
+    const a = setupFillableMap()
+    const b = setupFillableMap()
+    const demand = { residential: 1.0, commercial: 1.0, industrial: 1.0 }
+
+    updateDensity(a.map, a.powerGrid, demand, 5000, new PRNG(1), { value: 100 }, a.crime, a.fire, a.poll, 1.0)
+    updateDensity(b.map, b.powerGrid, demand, 5000, new PRNG(1), { value: 100 }, b.crime, b.fire, b.poll)
+
+    expect(a.map.buildings[0]!.residents).toBe(b.map.buildings[0]!.residents)
+  })
+})
+
 describe('density in Engine.tick()', () => {
   test('engine runs density update without errors over 10 years', () => {
     const engine = Engine.create(createTestMap(32), { seed: 99, startingFunds: 999_999 })
