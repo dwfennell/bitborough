@@ -104,7 +104,7 @@ export function monthlyTick(state: EngineState): MonthlyTickResult {
   syncResidentialAgents(state, enrollmentCounts)
 
   // 12. Demographics — aging, deaths, births, migration
-  const demoResult = demographicTick(state.citizenRegistry, state.map, state.prng, state.citizenSummary.avgSatisfaction)
+  const demoResult = demographicTick(state.citizenRegistry, state.map, state.prng)
   syncBuildingResidents(state.map, state.citizenRegistry)
   // Second sync: demographicTick changed resident counts, so agent counts need reconciling
   // Enrollment counts unchanged by demographics — reuse
