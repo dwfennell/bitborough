@@ -137,6 +137,60 @@ export class Renderer {
       }
     }
 
+    // Unpowered building indicator (flashing lightning bolt)
+    {
+      const pulse = 0.4 + 0.3 * Math.sin(Date.now() / 400)
+      for (const building of map.buildings) {
+        const def = BUILDING_DEFS[building.defId]
+        if (!def || !def.powerRequired) continue
+        // Check if anchor tile is powered
+        const bIdx = building.y * map.width + building.x
+        if (state.powerGrid[bIdx]) continue
+        if (
+          building.x + def.size.w < startX ||
+          building.x > endX ||
+          building.y + def.size.h < startY ||
+          building.y > endY
+        )
+          continue
+        // Draw indicator centered on the building footprint
+        const bx = Math.floor((building.x - camera.x) * ts)
+        const by = Math.floor((building.y - camera.y) * ts)
+        const bw = def.size.w * snappedTs
+        const bh = def.size.h * snappedTs
+        const cx = bx + bw / 2
+        const cy = by + bh / 2
+        const s = Math.min(bw, bh) * 0.35
+
+        // Background circle
+        ctx.fillStyle = `rgba(0, 0, 0, ${pulse * 0.5})`
+        ctx.beginPath()
+        ctx.arc(cx, cy, s * 1.1, 0, Math.PI * 2)
+        ctx.fill()
+
+        // Lightning bolt
+        ctx.fillStyle = `rgba(255, 220, 50, ${pulse})`
+        ctx.beginPath()
+        ctx.moveTo(cx - s * 0.15, cy - s * 0.7)
+        ctx.lineTo(cx + s * 0.35, cy - s * 0.7)
+        ctx.lineTo(cx + s * 0.05, cy - s * 0.05)
+        ctx.lineTo(cx + s * 0.3, cy - s * 0.05)
+        ctx.lineTo(cx - s * 0.2, cy + s * 0.7)
+        ctx.lineTo(cx - s * 0.05, cy + s * 0.05)
+        ctx.lineTo(cx - s * 0.35, cy + s * 0.05)
+        ctx.closePath()
+        ctx.fill()
+
+        // Slash through it (diagonal red line)
+        ctx.strokeStyle = `rgba(255, 60, 60, ${pulse})`
+        ctx.lineWidth = Math.max(1.5, s * 0.15)
+        ctx.beginPath()
+        ctx.moveTo(cx - s * 0.6, cy - s * 0.6)
+        ctx.lineTo(cx + s * 0.6, cy + s * 0.6)
+        ctx.stroke()
+      }
+    }
+
     // Overlays (power grid, land value heatmaps)
     this.overlayRenderer.render(ctx, state, {
       ts: snappedTs,
