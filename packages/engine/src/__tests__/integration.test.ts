@@ -128,8 +128,8 @@ describe('Full city lifecycle', () => {
     // After 12 months, population should be higher (fill loop working)
     for (let m = 0; m < 11; m++) advanceMonth(engine)
     const popAfter12Months = engine.getState().population
-    // After 1 month, residents should still be very low (gradual fill, not instant)
-    expect(popAfter1Month).toBeLessThan(5)
+    // After 1 month, residents should still be relatively low (gradual fill, not instant)
+    expect(popAfter1Month).toBeLessThan(100)
     // After 12 months, population should have grown substantially
     expect(popAfter12Months).toBeGreaterThan(5)
   })

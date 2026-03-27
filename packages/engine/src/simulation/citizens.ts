@@ -70,7 +70,7 @@ export const EMPTY_CITIZEN_SUMMARY: CitizenSummary = {
   tierCounts: [0, 0, 0],
 }
 
-export const DEFAULT_SAMPLING_RATIO = 5
+export const DEFAULT_SAMPLING_RATIO = 50
 
 // ── Access Road ──────────────────────────────────────────────────────────────
 
@@ -202,7 +202,9 @@ export function syncAgentsForBuilding(map: GameMap, registry: CitizenRegistry, g
   if (homeAccessRoad < 0) return  // building has no road access — no agents
 
   const existing = registry.agents.filter(a => a.homeBuildingId === building.id)
-  const needed = Math.floor(building.residents / registry.samplingRatio)
+  const needed = building.residents > 0
+    ? Math.max(1, Math.floor(building.residents / registry.samplingRatio))
+    : 0
   const delta = needed - existing.length
 
   if (delta > 0) {

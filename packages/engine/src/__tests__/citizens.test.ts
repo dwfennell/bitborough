@@ -63,7 +63,7 @@ describe('Agent spawning', () => {
   test('createRegistry returns empty registry with default ratio', () => {
     const registry = createRegistry()
     expect(registry.agents).toHaveLength(0)
-    expect(registry.samplingRatio).toBe(5)
+    expect(registry.samplingRatio).toBe(50)
   })
 
   test('syncAgentsForBuilding spawns agents proportional to residents', () => {
@@ -76,8 +76,20 @@ describe('Agent spawning', () => {
     building.residents = 100
     map.buildings = [building]
     syncAgentsForBuilding(map, registry, graph, building)
-    // 100 / 5 = 20 agents
-    expect(registry.agents.filter(a => a.homeBuildingId === building.id)).toHaveLength(20)
+    // 100 / 50 = 2 agents
+    expect(registry.agents.filter(a => a.homeBuildingId === building.id)).toHaveLength(2)
+  })
+
+  test('syncAgentsForBuilding creates at least 1 agent for any occupied building', () => {
+    const map = createTestMap(8)
+    for (let x = 0; x < 8; x++) map.infrastructure[x] = Infrastructure.Road
+    const graph = buildRoadGraph(map)
+    const registry = createRegistry()
+    const building = makeBuilding(2, 1, 1, 1)
+    building.residents = 3 // below sampling ratio of 50
+    map.buildings = [building]
+    syncAgentsForBuilding(map, registry, graph, building)
+    expect(registry.agents).toHaveLength(1)
   })
 
   test('syncAgentsForBuilding removes agents when residents shrink', () => {
@@ -89,10 +101,10 @@ describe('Agent spawning', () => {
     building.residents = 100
     map.buildings = [building]
     syncAgentsForBuilding(map, registry, graph, building)
-    expect(registry.agents).toHaveLength(20)
+    expect(registry.agents).toHaveLength(2)
     building.residents = 50
     syncAgentsForBuilding(map, registry, graph, building)
-    expect(registry.agents).toHaveLength(10)
+    expect(registry.agents).toHaveLength(1)
   })
 
   test('removeAgentsForBuilding clears all agents for that building', () => {
