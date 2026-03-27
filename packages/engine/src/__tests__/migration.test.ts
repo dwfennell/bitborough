@@ -1,9 +1,11 @@
 import { describe, test, expect } from 'vitest'
-import { computeAttractiveness, computeMigrationModifier, computeMigrantTierDistribution } from '../simulation/migration.js'
+import { computeAttractiveness, computeMigrationModifier, computeMigrantTierDistribution, applyBrainDrain, BRAIN_DRAIN_THRESHOLD, BRAIN_DRAIN_MIN_POP } from '../simulation/migration.js'
 import type { CitizenSummary } from '@bitborough/core'
 import { DensityLevel } from '@bitborough/core'
-import { EMPTY_CITIZEN_SUMMARY } from '../simulation/citizens.js'
+import { createRegistry, EMPTY_CITIZEN_SUMMARY } from '../simulation/citizens.js'
+import type { Citizen } from '../simulation/citizens.js'
 import { createTestMap } from '../test-helpers.js'
+import { PRNG } from '../prng.js'
 
 function makeSummary(overrides: Partial<CitizenSummary> = {}): CitizenSummary {
   return { ...EMPTY_CITIZEN_SUMMARY, ...overrides }
@@ -178,5 +180,103 @@ describe('computeMigrantTierDistribution', () => {
       const dist = computeMigrantTierDistribution(a)
       expect(dist[0] + dist[1] + dist[2]).toBeCloseTo(1.0)
     }
+  })
+})
+
+function makeBrainDrainAgent(id: string, buildingId: string, tier: 1 | 2 | 3, satisfaction: number): Citizen {
+  return {
+    id,
+    homeBuildingId: buildingId,
+    workBuildingId: null,
+    commerceBuildingId: null,
+    schoolBuildingId: null,
+    homeAccessRoad: 0,
+    workAccessRoad: null,
+    commerceAccessRoad: null,
+    schoolAccessRoad: null,
+    homeWorkRoute: [],
+    homeCommerceRoute: [],
+    homeSchoolRoute: [],
+    homeWorkRouteTileSet: new Set(),
+    homeCommerceRouteTileSet: new Set(),
+    homeSchoolRouteTileSet: new Set(),
+    homeWorkRouteStale: false,
+    homeCommerceRouteStale: false,
+    homeSchoolRouteStale: false,
+    satisfaction,
+    wealthTier: tier,
+    demographics: { children: 0, working: 50, elderly: 0 },
+  }
+}
+
+describe('applyBrainDrain', () => {
+  test('no drain when attractiveness >= threshold', () => {
+    const registry = createRegistry()
+    registry.agents.push(makeBrainDrainAgent('c1', 'b1', 3, 0.5))
+    const map = createTestMap(8)
+    map.buildings.push({
+      id: 'b1', defId: 'res.low', x: 0, y: 0,
+      powered: true, density: DensityLevel.Low, age: 0, state: 'active', residents: 500,
+    })
+    const result = applyBrainDrain(0.5, registry, map, new PRNG(42))
+    expect(result.departures).toBe(0)
+    expect(result.buildingDeltas.size).toBe(0)
+  })
+
+  test('no drain when population below minimum', () => {
+    const registry = createRegistry()
+    registry.agents.push(makeBrainDrainAgent('c1', 'b1', 3, 0.3))
+    const map = createTestMap(8)
+    map.buildings.push({
+      id: 'b1', defId: 'res.low', x: 0, y: 0,
+      powered: true, density: DensityLevel.Low, age: 0, state: 'active', residents: 50,
+    })
+    const result = applyBrainDrain(0.2, registry, map, new PRNG(42))
+    expect(result.departures).toBe(0)
+  })
+
+  test('tier 3 agents depart before tier 2 and tier 1', () => {
+    const registry = createRegistry()
+    registry.agents.push(makeBrainDrainAgent('c1', 'b1', 1, 0.3))
+    registry.agents.push(makeBrainDrainAgent('c2', 'b1', 2, 0.3))
+    registry.agents.push(makeBrainDrainAgent('c3', 'b1', 3, 0.3))
+    const map = createTestMap(8)
+    map.buildings.push({
+      id: 'b1', defId: 'res.med', x: 0, y: 0,
+      powered: true, density: DensityLevel.Medium, age: 0, state: 'active', residents: 500,
+    })
+    const result = applyBrainDrain(0.1, registry, map, new PRNG(42))
+    expect(result.departures).toBeGreaterThan(0)
+    const delta = result.buildingDeltas.get('b1') ?? 0
+    expect(delta).toBeLessThan(0)
+  })
+
+  test('within same tier, lowest satisfaction departs first', () => {
+    const registry = createRegistry()
+    const happy = makeBrainDrainAgent('c1', 'b1', 3, 0.8)
+    const unhappy = makeBrainDrainAgent('c2', 'b1', 3, 0.1)
+    registry.agents.push(happy, unhappy)
+    const map = createTestMap(8)
+    map.buildings.push({
+      id: 'b1', defId: 'res.med', x: 0, y: 0,
+      powered: true, density: DensityLevel.Medium, age: 0, state: 'active', residents: 500,
+    })
+    const result = applyBrainDrain(0.35, registry, map, new PRNG(42))
+    expect(result.departures).toBeGreaterThan(0)
+  })
+
+  test('departure rate is capped', () => {
+    const registry = createRegistry()
+    for (let i = 0; i < 20; i++) {
+      registry.agents.push(makeBrainDrainAgent(`c${i}`, 'b1', 3, 0.1))
+    }
+    const map = createTestMap(8)
+    map.buildings.push({
+      id: 'b1', defId: 'res.high', x: 0, y: 0,
+      powered: true, density: DensityLevel.High, age: 0, state: 'active', residents: 5000,
+    })
+    const result = applyBrainDrain(0.0, registry, map, new PRNG(42))
+    // Max drain: 0.016 * 5000 = 80 residents
+    expect(result.departures).toBeLessThanOrEqual(80)
   })
 })

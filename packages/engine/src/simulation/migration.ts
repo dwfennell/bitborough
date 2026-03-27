@@ -1,6 +1,8 @@
 import type { CitizenSummary, GameMap } from '@bitborough/core'
 import { BuildingCategory } from '@bitborough/core'
 import { BUILDING_DEFS } from '../buildings-registry.js'
+import type { CitizenRegistry } from './citizens.js'
+import { PRNG } from '../prng.js'
 
 // --- Constants ---
 export const ATTRACTIVENESS_BASELINE = 0.5
@@ -128,4 +130,63 @@ export function computeMigrantTierDistribution(attractiveness: number): [number,
 export function computeMigrationModifier(attractiveness: number): number {
   const gap = attractiveness - ATTRACTIVENESS_BASELINE
   return Math.max(MIGRATION_MODIFIER_MIN, Math.min(MIGRATION_MODIFIER_MAX, 1.0 + gap * MIGRATION_SENSITIVITY))
+}
+
+// --- Brain Drain ---
+
+export const BRAIN_DRAIN_THRESHOLD = 0.4
+export const BRAIN_DRAIN_RATE = 0.04
+export const MAX_MONTHLY_DRAIN_RATE = 0.016
+export const BRAIN_DRAIN_MIN_POP = 100
+
+export function applyBrainDrain(
+  attractiveness: number,
+  registry: CitizenRegistry,
+  map: GameMap,
+  prng: PRNG,
+): { departures: number; buildingDeltas: Map<string, number> } {
+  const buildingDeltas = new Map<string, number>()
+
+  if (attractiveness >= BRAIN_DRAIN_THRESHOLD) {
+    return { departures: 0, buildingDeltas }
+  }
+
+  // Compute total population from residential buildings
+  let totalPopulation = 0
+  for (const b of map.buildings) {
+    if (b.state === 'active') {
+      const def = BUILDING_DEFS[b.defId]
+      if (def && def.category === BuildingCategory.Residential) {
+        totalPopulation += b.residents
+      }
+    }
+  }
+
+  if (totalPopulation < BRAIN_DRAIN_MIN_POP) {
+    return { departures: 0, buildingDeltas }
+  }
+
+  const drainGap = BRAIN_DRAIN_THRESHOLD - attractiveness
+  const rawRate = drainGap * BRAIN_DRAIN_RATE
+  const cappedRate = Math.min(rawRate, MAX_MONTHLY_DRAIN_RATE)
+  const rawDepartures = cappedRate * totalPopulation
+  let departureTarget = Math.floor(rawDepartures) + (prng.next() < (rawDepartures % 1) ? 1 : 0)
+
+  // Sort: tier DESC, satisfaction ASC
+  const sorted = [...registry.agents].sort((a, b) => {
+    if (b.wealthTier !== a.wealthTier) return b.wealthTier - a.wealthTier
+    return a.satisfaction - b.satisfaction
+  })
+
+  let departures = 0
+  for (const agent of sorted) {
+    if (departureTarget <= 0) break
+    const amount = Math.min(departureTarget, registry.samplingRatio)
+    const prev = buildingDeltas.get(agent.homeBuildingId) ?? 0
+    buildingDeltas.set(agent.homeBuildingId, prev - amount)
+    departureTarget -= amount
+    departures += amount
+  }
+
+  return { departures, buildingDeltas }
 }
