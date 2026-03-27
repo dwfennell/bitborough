@@ -70,7 +70,7 @@ export const EMPTY_CITIZEN_SUMMARY: CitizenSummary = {
   tierCounts: [0, 0, 0],
 }
 
-export const DEFAULT_SAMPLING_RATIO = 50
+export const DEFAULT_SAMPLING_RATIO = 10
 
 // ── Access Road ──────────────────────────────────────────────────────────────
 
