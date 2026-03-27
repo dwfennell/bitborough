@@ -86,6 +86,17 @@ describe('sampleWealthTier', () => {
     expect(f3).toBeGreaterThan(0.34)
     expect(f1).toBeLessThan(0.20)
   })
+
+  test('tierDistOverride replaces base distribution', () => {
+    const prng = new PRNG(42)
+    // Override: 100% tier 3
+    const counts = [0, 0, 0]
+    for (let i = 0; i < 100; i++) {
+      const tier = sampleWealthTier(prng, 0.5, [0, 0, 1.0])
+      counts[tier - 1]++
+    }
+    expect(counts[2]).toBe(100)
+  })
 })
 
 describe('computeSchellingPenalty', () => {

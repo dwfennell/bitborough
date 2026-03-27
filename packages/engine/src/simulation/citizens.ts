@@ -214,10 +214,11 @@ export interface SyncAgentOptions {
   reputationLayer?: Float32Array
   enrollmentCounts?: Map<string, number>
   agentIndex?: Map<string, Citizen[]>
+  tierDistOverride?: readonly [number, number, number]
 }
 
 export function syncAgentsForBuilding(map: GameMap, registry: CitizenRegistry, graph: RoadGraph, building: Building, opts: SyncAgentOptions = {}): void {
-  const { trafficDensity, prng, reputationLayer, enrollmentCounts, agentIndex } = opts
+  const { trafficDensity, prng, reputationLayer, enrollmentCounts, agentIndex, tierDistOverride } = opts
   const homeAccessRoad = resolveAccessRoad(map, building)
   if (homeAccessRoad < 0) return  // building has no road access — no agents
 
@@ -239,7 +240,7 @@ export function syncAgentsForBuilding(map: GameMap, registry: CitizenRegistry, g
       let wealthTier: WealthTier = 2
       if (prng) {
         const reputation = reputationLayer ? (reputationLayer[homeTileIdx] ?? 0.5) : 0.5
-        wealthTier = sampleWealthTier(prng, reputation)
+        wealthTier = sampleWealthTier(prng, reputation, tierDistOverride)
       }
       registry.agents.push(createAgent(building.id, homeAccessRoad, jobMatch, commerceMatch, wealthTier, residentsPerAgent))
     }

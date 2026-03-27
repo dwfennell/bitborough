@@ -32,7 +32,11 @@ export interface MonthlyTickResult {
   events: GameEvent[]
 }
 
-export function syncResidentialAgents(state: EngineState, enrollmentCounts?: Map<string, number>): void {
+export function syncResidentialAgents(
+  state: EngineState,
+  enrollmentCounts?: Map<string, number>,
+  tierDistOverride?: readonly [number, number, number],
+): void {
   const ec = enrollmentCounts ?? buildEnrollmentCounts(state.citizenRegistry.agents)
   const agentIndex = buildAgentsByBuilding(state.citizenRegistry.agents)
   const opts = {
@@ -41,6 +45,7 @@ export function syncResidentialAgents(state: EngineState, enrollmentCounts?: Map
     reputationLayer: state.reputationLayer,
     enrollmentCounts: ec,
     agentIndex,
+    tierDistOverride,
   }
   for (const b of state.map.buildings) {
     if (b.state === 'active') {

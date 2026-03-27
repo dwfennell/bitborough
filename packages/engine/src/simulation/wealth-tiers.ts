@@ -23,10 +23,15 @@ export const HOMOGENEITY_THRESHOLD = 0.25
 export const TIER_LABELS: readonly [string, string, string] = ['Low', 'Mid', 'High']
 
 // ── Tier sampling ─────────────────────────────────────────────────
-export function sampleWealthTier(prng: PRNG, reputation: number): WealthTier {
-  const w1 = TIER_DISTRIBUTION[0] * (1.5 - reputation)
-  const w2 = TIER_DISTRIBUTION[1]
-  const w3 = TIER_DISTRIBUTION[2] * (0.5 + reputation)
+export function sampleWealthTier(
+  prng: PRNG,
+  reputation: number,
+  tierDistOverride?: readonly [number, number, number],
+): WealthTier {
+  const base = tierDistOverride ?? TIER_DISTRIBUTION
+  const w1 = base[0] * (1.5 - reputation)
+  const w2 = base[1]
+  const w3 = base[2] * (0.5 + reputation)
   const sum = w1 + w2 + w3
   const r = prng.next() * sum
   if (r < w1) return 1
