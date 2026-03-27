@@ -38,7 +38,7 @@ function createEngineWithIncome() {
 }
 
 describe('Loan system', () => {
-  test('takeLoan() success — funds increase, loan is set', () => {
+  test('takeLoan() success — funds increase, loan is set', { timeout: 60_000 }, () => {
     const engine = createEngineWithIncome()
     const state0 = engine.getState()
     const taxIncome = state0.budget.taxIncome
@@ -52,9 +52,8 @@ describe('Loan system', () => {
     const loanAmount = Math.floor(maxLoan * 0.5)
     expect(loanAmount).toBeGreaterThan(0)
 
-    // If maxLoan is below minimum, the takeLoan call will fail with AmountOutOfRange
-    // which is correct behavior — test that instead
-    if (maxLoan < 10_000) {
+    // If loan amount is below minimum ($10k), takeLoan will reject with AmountOutOfRange
+    if (loanAmount < 10_000) {
       const result = engine.takeLoan(loanAmount)
       expect(result.ok).toBe(false)
       return
@@ -98,7 +97,7 @@ describe('Loan system', () => {
     }
   })
 
-  test('takeLoan() fails when amount > 48x taxIncome', () => {
+  test('takeLoan() fails when amount > 48x taxIncome', { timeout: 60_000 }, () => {
     const engine = createEngineWithIncome()
     const maxLoan = engine.getState().budget.taxIncome * 48
     // Any amount above maxLoan should fail

@@ -156,6 +156,7 @@ function createAgent(
   jobMatch: RouteMatch,
   commerceMatch: RouteMatch,
   wealthTier: WealthTier,
+  representedResidents: number = DEFAULT_SAMPLING_RATIO,
 ): Citizen {
   const id = `c${nextAgentId++}`
   const agent: Citizen = {
@@ -178,7 +179,7 @@ function createAgent(
     homeSchoolRouteTileSet: new Set(),
     homeSchoolRouteStale: false,
     satisfaction: 1,
-    demographics: { children: 0, working: 50, elderly: 0 },
+    demographics: { children: 0, working: representedResidents, elderly: 0 },
     wealthTier,
   }
   buildTileSets(agent)
@@ -212,13 +213,16 @@ export function syncAgentsForBuilding(map: GameMap, registry: CitizenRegistry, g
     const jobMatch = findNearestBuilding(map, graph, homeAccessRoad, d => d.jobs > 0, trafficDensity)
     const commerceMatch = findNearestBuilding(map, graph, homeAccessRoad, d => d.category === BuildingCategory.Commercial, trafficDensity)
     const homeTileIdx = building.y * map.width + building.x
+    const residentsPerAgent = needed === 1 && building.residents < registry.samplingRatio
+      ? building.residents
+      : registry.samplingRatio
     for (let i = 0; i < delta; i++) {
       let wealthTier: WealthTier = 2
       if (prng) {
         const reputation = reputationLayer ? (reputationLayer[homeTileIdx] ?? 0.5) : 0.5
         wealthTier = sampleWealthTier(prng, reputation)
       }
-      registry.agents.push(createAgent(building.id, homeAccessRoad, jobMatch, commerceMatch, wealthTier))
+      registry.agents.push(createAgent(building.id, homeAccessRoad, jobMatch, commerceMatch, wealthTier, residentsPerAgent))
     }
     if (enrollmentCounts) {
       const schoolMatch = findNearestSchool(map, graph, homeAccessRoad, enrollmentCounts, trafficDensity)
