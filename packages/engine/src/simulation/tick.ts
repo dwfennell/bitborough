@@ -32,14 +32,21 @@ export interface MonthlyTickResult {
   events: GameEvent[]
 }
 
-export function syncResidentialAgents(state: EngineState): void {
-  const enrollmentCounts = buildEnrollmentCounts(state.citizenRegistry.agents)
+export function syncResidentialAgents(state: EngineState, enrollmentCounts?: Map<string, number>): void {
+  const ec = enrollmentCounts ?? buildEnrollmentCounts(state.citizenRegistry.agents)
   const agentIndex = buildAgentsByBuilding(state.citizenRegistry.agents)
+  const opts = {
+    trafficDensity: state.trafficDensity,
+    prng: state.prng,
+    reputationLayer: state.reputationLayer,
+    enrollmentCounts: ec,
+    agentIndex,
+  }
   for (const b of state.map.buildings) {
     if (b.state === 'active') {
       const def = BUILDING_DEFS[b.defId]
       if (def && def.category === BuildingCategory.Residential) {
-        syncAgentsForBuilding(state.map, state.citizenRegistry, state.roadGraph, b, state.trafficDensity, state.prng, state.reputationLayer, enrollmentCounts, agentIndex)
+        syncAgentsForBuilding(state.map, state.citizenRegistry, state.roadGraph, b, opts)
       }
     }
   }
@@ -88,14 +95,15 @@ export function monthlyTick(state: EngineState): MonthlyTickResult {
   )
   state.nextBuildingId = nextBuildingIdRef.value
 
-  // 11. Sync citizen agents after zone/density changes
-  syncResidentialAgents(state)
+  // 11. Sync citizen agents after zone/density changes (reuse enrollment counts from citizen tick)
+  syncResidentialAgents(state, enrollmentCounts)
 
   // 12. Demographics — aging, deaths, births, migration
   const demoResult = demographicTick(state.citizenRegistry, state.map, state.prng, state.citizenSummary.avgSatisfaction)
   syncBuildingResidents(state.map, state.citizenRegistry)
   // Second sync: demographicTick changed resident counts, so agent counts need reconciling
-  syncResidentialAgents(state)
+  // Enrollment counts unchanged by demographics — reuse
+  syncResidentialAgents(state, enrollmentCounts)
 
   // 13. Refresh citizen summary with post-demographics data
   state.citizenSummary = computeCitizenSummary(state.citizenRegistry)

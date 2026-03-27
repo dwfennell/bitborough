@@ -208,7 +208,16 @@ export function buildAgentsByBuilding(agents: ReadonlyArray<Citizen>): Map<strin
   return map
 }
 
-export function syncAgentsForBuilding(map: GameMap, registry: CitizenRegistry, graph: RoadGraph, building: Building, trafficDensity?: Uint8Array, prng?: PRNG, reputationLayer?: Float32Array, enrollmentCounts?: Map<string, number>, agentIndex?: Map<string, Citizen[]>): void {
+export interface SyncAgentOptions {
+  trafficDensity?: Uint8Array
+  prng?: PRNG
+  reputationLayer?: Float32Array
+  enrollmentCounts?: Map<string, number>
+  agentIndex?: Map<string, Citizen[]>
+}
+
+export function syncAgentsForBuilding(map: GameMap, registry: CitizenRegistry, graph: RoadGraph, building: Building, opts: SyncAgentOptions = {}): void {
+  const { trafficDensity, prng, reputationLayer, enrollmentCounts, agentIndex } = opts
   const homeAccessRoad = resolveAccessRoad(map, building)
   if (homeAccessRoad < 0) return  // building has no road access — no agents
 
