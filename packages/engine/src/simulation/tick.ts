@@ -105,7 +105,7 @@ export function monthlyTick(state: EngineState): MonthlyTickResult {
     state.map,
     state.powerGrid,
     state.demand,
-    computeTotalPopulation(state.map),
+    popBeforeDensity,
     state.prng,
     nextBuildingIdRef,
     state.crimeLevel,
@@ -126,10 +126,14 @@ export function monthlyTick(state: EngineState): MonthlyTickResult {
   syncResidentialAgents(state, enrollmentCounts, tierDistOverride)
 
   // Brain drain pass
-  const brainDrainResult = applyBrainDrain(attractiveness, state.citizenRegistry, state.map, state.prng)
+  const popForDrain = computeTotalPopulation(state.map)
+  const brainDrainResult = applyBrainDrain(attractiveness, state.citizenRegistry, popForDrain, state.prng)
+
+  // Shared building lookup — used by brain drain delta application and education overlay
+  const buildingById = new Map<string, Building>()
+  for (const b of state.map.buildings) buildingById.set(b.id, b)
+
   if (brainDrainResult.departures > 0) {
-    const buildingById = new Map<string, Building>()
-    for (const b of state.map.buildings) buildingById.set(b.id, b)
     for (const [buildingId, delta] of brainDrainResult.buildingDeltas) {
       const building = buildingById.get(buildingId)
       if (building) {
@@ -149,13 +153,11 @@ export function monthlyTick(state: EngineState): MonthlyTickResult {
 
   // Education quality overlay (reuses enrollmentCounts from citizenMonthlyTick)
   state.educationQuality.fill(0)
-  const overlayBuildingById = new Map<string, Building>()
-  for (const b of state.map.buildings) overlayBuildingById.set(b.id, b)
 
   // Precompute encoded quality per school (avoids recomputing per agent)
   const schoolQualityCache = new Map<string, number>()
   for (const [schoolId, enrolled] of enrollmentCounts) {
-    const schoolBuilding = overlayBuildingById.get(schoolId)
+    const schoolBuilding = buildingById.get(schoolId)
     const capacity = SCHOOL_CAPACITY[schoolBuilding?.defId ?? ''] ?? 0
     if (capacity === 0) continue
     const quality = computeSchoolQuality(enrolled, capacity, state.funding.education)
@@ -164,7 +166,7 @@ export function monthlyTick(state: EngineState): MonthlyTickResult {
 
   for (const agent of state.citizenRegistry.agents) {
     if (agent.demographics.children === 0) continue
-    const building = overlayBuildingById.get(agent.homeBuildingId)
+    const building = buildingById.get(agent.homeBuildingId)
     if (!building) continue
     const homeTile = building.y * state.map.width + building.x
     if (agent.schoolBuildingId === null) {

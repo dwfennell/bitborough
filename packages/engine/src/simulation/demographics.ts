@@ -14,7 +14,7 @@ export interface DemographicResult {
 }
 
 /** Stochastic rounding: floor(n*p) + probabilistic remainder. O(1) per call. */
-function stochasticCount(n: number, p: number, prng: PRNG): number {
+export function stochasticCount(n: number, p: number, prng: PRNG): number {
   const expected = n * p
   return Math.floor(expected) + (prng.next() < (expected % 1) ? 1 : 0)
 }

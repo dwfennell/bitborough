@@ -214,12 +214,7 @@ describe('applyBrainDrain', () => {
   test('no drain when attractiveness >= threshold', () => {
     const registry = createRegistry()
     registry.agents.push(makeBrainDrainAgent('c1', 'b1', 3, 0.5))
-    const map = createTestMap(8)
-    map.buildings.push({
-      id: 'b1', defId: 'res.low', x: 0, y: 0,
-      powered: true, density: DensityLevel.Low, age: 0, state: 'active', residents: 500,
-    })
-    const result = applyBrainDrain(0.5, registry, map, new PRNG(42))
+    const result = applyBrainDrain(0.5, registry, 500, new PRNG(42))
     expect(result.departures).toBe(0)
     expect(result.buildingDeltas.size).toBe(0)
   })
@@ -227,12 +222,7 @@ describe('applyBrainDrain', () => {
   test('no drain when population below minimum', () => {
     const registry = createRegistry()
     registry.agents.push(makeBrainDrainAgent('c1', 'b1', 3, 0.3))
-    const map = createTestMap(8)
-    map.buildings.push({
-      id: 'b1', defId: 'res.low', x: 0, y: 0,
-      powered: true, density: DensityLevel.Low, age: 0, state: 'active', residents: 50,
-    })
-    const result = applyBrainDrain(0.2, registry, map, new PRNG(42))
+    const result = applyBrainDrain(0.2, registry, 50, new PRNG(42))
     expect(result.departures).toBe(0)
   })
 
@@ -241,12 +231,7 @@ describe('applyBrainDrain', () => {
     registry.agents.push(makeBrainDrainAgent('c1', 'b1', 1, 0.3))
     registry.agents.push(makeBrainDrainAgent('c2', 'b1', 2, 0.3))
     registry.agents.push(makeBrainDrainAgent('c3', 'b1', 3, 0.3))
-    const map = createTestMap(8)
-    map.buildings.push({
-      id: 'b1', defId: 'res.med', x: 0, y: 0,
-      powered: true, density: DensityLevel.Medium, age: 0, state: 'active', residents: 500,
-    })
-    const result = applyBrainDrain(0.1, registry, map, new PRNG(42))
+    const result = applyBrainDrain(0.1, registry, 500, new PRNG(42))
     expect(result.departures).toBeGreaterThan(0)
     const delta = result.buildingDeltas.get('b1') ?? 0
     expect(delta).toBeLessThan(0)
@@ -257,12 +242,7 @@ describe('applyBrainDrain', () => {
     const happy = makeBrainDrainAgent('c1', 'b1', 3, 0.8)
     const unhappy = makeBrainDrainAgent('c2', 'b1', 3, 0.1)
     registry.agents.push(happy, unhappy)
-    const map = createTestMap(8)
-    map.buildings.push({
-      id: 'b1', defId: 'res.med', x: 0, y: 0,
-      powered: true, density: DensityLevel.Medium, age: 0, state: 'active', residents: 500,
-    })
-    const result = applyBrainDrain(0.35, registry, map, new PRNG(42))
+    const result = applyBrainDrain(0.35, registry, 500, new PRNG(42))
     expect(result.departures).toBeGreaterThan(0)
   })
 
@@ -271,12 +251,7 @@ describe('applyBrainDrain', () => {
     for (let i = 0; i < 20; i++) {
       registry.agents.push(makeBrainDrainAgent(`c${i}`, 'b1', 3, 0.1))
     }
-    const map = createTestMap(8)
-    map.buildings.push({
-      id: 'b1', defId: 'res.high', x: 0, y: 0,
-      powered: true, density: DensityLevel.High, age: 0, state: 'active', residents: 5000,
-    })
-    const result = applyBrainDrain(0.0, registry, map, new PRNG(42))
+    const result = applyBrainDrain(0.0, registry, 5000, new PRNG(42))
     // Max drain: 0.016 * 5000 = 80 residents
     expect(result.departures).toBeLessThanOrEqual(80)
   })
