@@ -50,9 +50,9 @@ export function updateFires(
     const newRemaining = remaining - 1 - ticksToExtinguish
 
     if (newRemaining <= 0) {
-      // Fire burns out — destroy zone and any building on it
+      // Fire burns out — destroy building but preserve zoning so new
+      // buildings can regrow in the area.
       fireState.activeFires.delete(idx)
-      map.zones[idx] = 0
       const fx = idx % width
       const fy = Math.floor(idx / width)
       const burned = bldIdx.get(fx, fy)
