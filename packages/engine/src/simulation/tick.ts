@@ -67,7 +67,7 @@ export function monthlyTick(state: EngineState): MonthlyTickResult {
     pollutionLevel: state.pollutionLevel,
     reputationLayer: state.reputationLayer,
   }
-  citizenMonthlyTick(state.citizenRegistry, state.map, state.roadGraph, state.trafficDensity, tileLayers, state.bldIdx, state.funding.education)
+  const enrollmentCounts = citizenMonthlyTick(state.citizenRegistry, state.map, state.roadGraph, state.trafficDensity, tileLayers, state.bldIdx, state.funding.education)
   state.citizenSummary = computeCitizenSummary(state.citizenRegistry)
 
   // 9. Zone development
@@ -101,9 +101,8 @@ export function monthlyTick(state: EngineState): MonthlyTickResult {
   state.citizenSummary.deathsLastTick = demoResult.deaths
   state.citizenSummary.netMigrationLastTick = demoResult.netMigration
 
-  // Education quality overlay
+  // Education quality overlay (reuses enrollmentCounts from citizenMonthlyTick)
   state.educationQuality.fill(0)
-  const overlayEnrollment = buildEnrollmentCounts(state.citizenRegistry.agents)
   const overlayBuildingById = new Map<string, Building>()
   for (const b of state.map.buildings) overlayBuildingById.set(b.id, b)
 
@@ -117,7 +116,7 @@ export function monthlyTick(state: EngineState): MonthlyTickResult {
     } else {
       const schoolBuilding = overlayBuildingById.get(agent.schoolBuildingId)
       const capacity = SCHOOL_CAPACITY[schoolBuilding?.defId ?? ''] ?? 0
-      const enrolled = overlayEnrollment.get(agent.schoolBuildingId) ?? 0
+      const enrolled = enrollmentCounts.get(agent.schoolBuildingId) ?? 0
       const quality = computeSchoolQuality(enrolled, capacity, state.funding.education)
       const encoded = Math.floor(quality * 253) + 2
       state.educationQuality[homeTile] = Math.max(state.educationQuality[homeTile]!, encoded)

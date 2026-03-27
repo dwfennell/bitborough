@@ -407,7 +407,7 @@ export function citizenMonthlyTick(
   layers: TileLayers,
   bldIdx: BuildingIndex,
   educationFunding: number,
-): void {
+): Map<string, number> {
   // Pass 1: replan stale routes (traffic-aware)
   replanStaleRoutes(registry, map, graph, trafficDensity)
 
@@ -452,6 +452,7 @@ export function citizenMonthlyTick(
   for (let i = 0; i < size; i++) {
     trafficDensity[i] = Math.min(255, Math.floor(rawTraffic[i]! * registry.samplingRatio))
   }
+  return enrollmentCounts
 }
 
 export function computeCitizenSummary(registry: CitizenRegistry): CitizenSummary {

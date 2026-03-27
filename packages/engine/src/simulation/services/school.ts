@@ -1,8 +1,8 @@
 import type { GameMap } from '@bitborough/core'
-import { Infrastructure } from '@bitborough/core'
 import { BUILDING_DEFS } from '../../buildings-registry.js'
 import type { RoadGraph } from '../../road-graph.js'
 import { astar } from '../../road-graph.js'
+import { resolveAccessRoad } from '../citizens.js'
 
 export const SCHOOL_CAPACITY: Record<string, number> = {
   'service.school': 300,
@@ -10,27 +10,6 @@ export const SCHOOL_CAPACITY: Record<string, number> = {
 }
 
 export const SCHOOL_OVER_CAPACITY_RATIO = 1.2
-
-const FOOTPRINT_DX = [0, 1, 0, -1] as const
-const FOOTPRINT_DY = [-1, 0, 1, 0] as const
-
-function resolveSchoolAccessRoad(map: GameMap, x: number, y: number, w: number, h: number): number {
-  const { width, height } = map
-  for (let dy = 0; dy < h; dy++) {
-    for (let dx = 0; dx < w; dx++) {
-      const fx = x + dx
-      const fy = y + dy
-      for (let dir = 0; dir < 4; dir++) {
-        const nx = fx + FOOTPRINT_DX[dir]!
-        const ny = fy + FOOTPRINT_DY[dir]!
-        if (nx < 0 || ny < 0 || nx >= width || ny >= height) continue
-        const nIdx = ny * width + nx
-        if (map.infrastructure[nIdx]! & Infrastructure.Road) return nIdx
-      }
-    }
-  }
-  return -1
-}
 
 export function buildEnrollmentCounts(
   agents: ReadonlyArray<{ schoolBuildingId: string | null; demographics: { children: number } }>,
@@ -57,11 +36,7 @@ export function findNearestSchool(
     if (capacity === undefined) continue
     const enrolled = enrollmentCounts.get(building.id) ?? 0
     if (enrolled >= capacity * SCHOOL_OVER_CAPACITY_RATIO) continue
-    const def = BUILDING_DEFS[building.defId]
-    if (!def) continue
-    const w = def.size.w
-    const h = def.size.h
-    const access = resolveSchoolAccessRoad(map, building.x, building.y, w, h)
+    const access = resolveAccessRoad(map, building)
     if (access < 0) continue
     const route = astar(graph, fromRoad, access, map.width, undefined, trafficDensity)
     if (!route) continue
