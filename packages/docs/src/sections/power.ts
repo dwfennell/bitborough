@@ -14,6 +14,8 @@ Buildings and zones need electricity to function. Power propagates from plants t
 
 **Power Lines** — $5 each, $0.50/mo maintenance. Bridge gaps between your plant and developed areas.
 
+Buildings without power show a **flashing lightning bolt** indicator on the map, making it easy to spot gaps in your grid.
+
 **Efficiency comparison:**
 
 | Plant | Cost/tile | Maint./tile | Pollution |
