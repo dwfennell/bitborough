@@ -17,6 +17,7 @@ export {
   type MonthlySnapshot,
   type CitizenSummary,
   type WealthTier,
+  type AttractivenessFactors,
   calcMonthlyPayment,
 } from './state.js'
 export { DEFAULTS, COSTS, MAINTENANCE, POWER } from './constants.js'

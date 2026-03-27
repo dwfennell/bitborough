@@ -4,6 +4,7 @@ import {
   type Loan,
   type MonthlySnapshot,
   type CitizenSummary,
+  type AttractivenessFactors,
   type SaveFile,
   DEFAULTS,
 } from '@bitborough/core'
@@ -85,6 +86,10 @@ export interface EngineState {
 
   // History
   history: MonthlySnapshot[]
+
+  // Migration
+  cityAttractiveness: number
+  attractivenessFactors: AttractivenessFactors
 
   // Building ID counter
   nextBuildingId: number
@@ -259,6 +264,14 @@ export function restoreState(save: SaveFile): EngineState {
     loan: save.state.loan ?? null,
     loanRepaymentAmount: save.state.loanRepaymentAmount ?? (save.state.loan?.monthlyPayment ?? 0),
     history: save.state.history ?? [],
+    cityAttractiveness: 0.5,
+    attractivenessFactors: {
+      jobMatchRate: 0.5,
+      avgSatisfaction: 0.5,
+      serviceCoverage: 0.5,
+      taxCompetitiveness: 0.5,
+      housingAvailability: 0.5,
+    },
     nextBuildingId: maxPrefixedId(map.buildings, 'b') + 1,
   }
 
@@ -349,6 +362,14 @@ export function createEngineState(map: GameMap, config: EngineConfig): EngineSta
     loan: null,
     loanRepaymentAmount: 0,
     history: [],
+    cityAttractiveness: 0.5,
+    attractivenessFactors: {
+      jobMatchRate: 0.5,
+      avgSatisfaction: 0.5,
+      serviceCoverage: 0.5,
+      taxCompetitiveness: 0.5,
+      housingAvailability: 0.5,
+    },
     nextBuildingId: 1,
   }
 

@@ -23,6 +23,7 @@ import {
 import { updateZones } from './zones.js'
 import { updateDensity } from './density.js'
 import { demographicTick } from './demographics.js'
+import { computeAttractiveness, computeMigrationModifier, computeMigrantTierDistribution, applyBrainDrain } from './migration.js'
 import { buildEnrollmentCounts, SCHOOL_CAPACITY, computeSchoolQuality } from './services/school.js'
 
 export interface MonthlyTickResult {
@@ -68,6 +69,18 @@ export function monthlyTick(state: EngineState): MonthlyTickResult {
 
   rebuildDerivedState(state)
   state.demand = calculateDemand(state.map, state.taxRate, state.trafficDensity, state.citizenSummary)
+
+  // Compute city attractiveness
+  const { score: attractiveness, factors: attractivenessFactors } = computeAttractiveness(
+    state.citizenSummary, state.map, state.taxRate,
+    { police: state.funding.police, fire: state.funding.fire, education: state.funding.education },
+    state.crimeLevel, state.fireCoverage, state.educationQuality,
+  )
+  state.cityAttractiveness = attractiveness
+  state.attractivenessFactors = attractivenessFactors
+  const migrationModifier = computeMigrationModifier(attractiveness)
+  const tierDistOverride = computeMigrantTierDistribution(attractiveness)
+
   updateFires(state.map, state.fireState, state.fireCoverage, state.prng, state.bldIdx, (buildingId) => {
     removeAgentsForBuilding(state.citizenRegistry, buildingId)
   })
@@ -87,6 +100,7 @@ export function monthlyTick(state: EngineState): MonthlyTickResult {
   // 9. Zone development
   const nextBuildingIdRef = { value: state.nextBuildingId }
   updateZones(state.map, state.powerGrid, state.demand, state.prng, nextBuildingIdRef, state.bldIdx)
+  const popBeforeDensity = computeTotalPopulation(state.map)
   updateDensity(
     state.map,
     state.powerGrid,
@@ -97,24 +111,41 @@ export function monthlyTick(state: EngineState): MonthlyTickResult {
     state.crimeLevel,
     state.fireCoverage,
     state.pollutionLevel,
+    migrationModifier,
   )
   state.nextBuildingId = nextBuildingIdRef.value
 
   // 11. Sync citizen agents after zone/density changes (reuse enrollment counts from citizen tick)
-  syncResidentialAgents(state, enrollmentCounts)
+  syncResidentialAgents(state, enrollmentCounts, tierDistOverride)
 
   // 12. Demographics — aging, deaths, births, migration
   const demoResult = demographicTick(state.citizenRegistry, state.map, state.prng)
   syncBuildingResidents(state.map, state.citizenRegistry)
   // Second sync: demographicTick changed resident counts, so agent counts need reconciling
   // Enrollment counts unchanged by demographics — reuse
-  syncResidentialAgents(state, enrollmentCounts)
+  syncResidentialAgents(state, enrollmentCounts, tierDistOverride)
+
+  // Brain drain pass
+  const brainDrainResult = applyBrainDrain(attractiveness, state.citizenRegistry, state.map, state.prng)
+  if (brainDrainResult.departures > 0) {
+    const buildingById = new Map<string, Building>()
+    for (const b of state.map.buildings) buildingById.set(b.id, b)
+    for (const [buildingId, delta] of brainDrainResult.buildingDeltas) {
+      const building = buildingById.get(buildingId)
+      if (building) {
+        building.residents = Math.max(0, building.residents + delta)
+      }
+    }
+    syncResidentialAgents(state, enrollmentCounts, tierDistOverride)
+  }
 
   // 13. Refresh citizen summary with post-demographics data
+  const popAfterAll = computeTotalPopulation(state.map)
   state.citizenSummary = computeCitizenSummary(state.citizenRegistry)
   state.citizenSummary.birthsLastTick = demoResult.births
   state.citizenSummary.deathsLastTick = demoResult.deaths
-  state.citizenSummary.netMigrationLastTick = demoResult.netMigration
+  state.citizenSummary.netMigrationLastTick =
+    popAfterAll - popBeforeDensity + demoResult.deaths - demoResult.births
 
   // Education quality overlay (reuses enrollmentCounts from citizenMonthlyTick)
   state.educationQuality.fill(0)
@@ -199,7 +230,7 @@ export function monthlyTick(state: EngineState): MonthlyTickResult {
   return {
     births: demoResult.births,
     deaths: demoResult.deaths,
-    netMigration: demoResult.netMigration,
+    netMigration: state.citizenSummary.netMigrationLastTick,
     events,
   }
 }

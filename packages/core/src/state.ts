@@ -103,6 +103,14 @@ export interface BudgetInfo {
   projectedBalance: number
 }
 
+export interface AttractivenessFactors {
+  jobMatchRate: number
+  avgSatisfaction: number
+  serviceCoverage: number
+  taxCompetitiveness: number
+  housingAvailability: number
+}
+
 export interface GameState {
   map: GameMap
   time: {
@@ -128,6 +136,9 @@ export interface GameState {
   events: GameEvent[]
   history: MonthlySnapshot[]
   citizens: CitizenSummary
+  cityAttractiveness: number
+  attractivenessFactors: AttractivenessFactors
+  netMigration: number
 }
 
 /** Compute the fixed monthly payment for an amortized loan. */

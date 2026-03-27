@@ -106,6 +106,9 @@ export class Engine {
       events: this.events,
       history: this.state.history,
       citizens: this.state.citizenSummary,
+      cityAttractiveness: this.state.cityAttractiveness,
+      attractivenessFactors: this.state.attractivenessFactors,
+      netMigration: this.state.citizenSummary.netMigrationLastTick,
     }
   }
 
