@@ -160,6 +160,7 @@ export function updateDensity(
   crimeLevel: Uint8Array,
   fireCoverage: Uint8Array,
   pollutionLevel: Uint8Array,
+  migrationModifier = 1.0,
 ): { populationDelta: number } {
   let populationDelta = 0
   const bldIdx = new BuildingIndex(map)
@@ -186,7 +187,7 @@ export function updateDensity(
 
     const before = building.residents
     const occupancyRatio = def.capacity > 0 ? building.residents / def.capacity : 0
-    const effectiveFillRate = FILL_RATE * (1 - occupancyRatio)
+    const effectiveFillRate = FILL_RATE * (1 - occupancyRatio) * migrationModifier
     const rate = target > building.residents ? effectiveFillRate : DRAIN_RATE
     building.residents = Math.max(0, Math.min(def.capacity, building.residents + (target - building.residents) * rate))
 
