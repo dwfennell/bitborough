@@ -1,11 +1,12 @@
 import { describe, test, expect } from 'vitest'
 import { computeAttractiveness, computeMigrationModifier, computeMigrantTierDistribution, applyBrainDrain, BRAIN_DRAIN_THRESHOLD, BRAIN_DRAIN_MIN_POP } from '../simulation/migration.js'
 import type { CitizenSummary } from '@bitborough/core'
-import { DensityLevel } from '@bitborough/core'
+import { DensityLevel, Infrastructure, ZoneType } from '@bitborough/core'
 import { createRegistry, EMPTY_CITIZEN_SUMMARY } from '../simulation/citizens.js'
 import type { Citizen } from '../simulation/citizens.js'
-import { createTestMap } from '../test-helpers.js'
+import { createTestMap, advanceYear } from '../test-helpers.js'
 import { PRNG } from '../prng.js'
+import { Engine } from '../Engine.js'
 
 function makeSummary(overrides: Partial<CitizenSummary> = {}): CitizenSummary {
   return { ...EMPTY_CITIZEN_SUMMARY, ...overrides }
@@ -278,5 +279,65 @@ describe('applyBrainDrain', () => {
     const result = applyBrainDrain(0.0, registry, map, new PRNG(42))
     // Max drain: 0.016 * 5000 = 80 residents
     expect(result.departures).toBeLessThanOrEqual(80)
+  })
+})
+
+// ---------------------------------------------------------------------------
+// Integration tests — full Engine loop
+// ---------------------------------------------------------------------------
+
+function createCityEngine(taxRate = 0.07) {
+  const engine = Engine.create(createTestMap(64), { seed: 42, startingFunds: 50_000 })
+  // Power plant (diesel per project convention) — 2x2 at (10,10)
+  engine.placeBuilding(10, 10, 'power.diesel')
+  // Power lines connecting plant to zones (bridge from x=12)
+  for (let x = 12; x < 28; x++) engine.placeTile(x, 10, Infrastructure.PowerLine)
+  // Road at y=12
+  for (let x = 12; x < 28; x++) engine.placeTile(x, 12, Infrastructure.Road)
+  // Residential zones at y=11 (adjacent to power lines and road)
+  for (let x = 12; x < 28; x++) engine.placeZone(x, 11, ZoneType.Residential)
+  // Commercial zones at y=13 (below road, for jobs)
+  for (let x = 12; x < 28; x++) engine.placeZone(x, 13, ZoneType.Commercial)
+  // Industrial zones at y=14
+  for (let x = 12; x < 18; x++) engine.placeZone(x, 14, ZoneType.Industrial)
+  engine.setTaxRate(taxRate)
+  return engine
+}
+
+describe('migration integration', () => {
+  test('low-tax city grows faster than high-tax city', () => {
+    const lowTax = createCityEngine(0.07)
+    const highTax = createCityEngine(0.20)
+
+    for (let i = 0; i < 3; i++) {
+      advanceYear(lowTax)
+      advanceYear(highTax)
+    }
+
+    expect(lowTax.getState().population).toBeGreaterThan(highTax.getState().population)
+  })
+
+  test('attractiveness and netMigration are exposed in game state', () => {
+    const engine = createCityEngine()
+    advanceYear(engine)
+    const state = engine.getState()
+    expect(state.cityAttractiveness).toBeGreaterThanOrEqual(0)
+    expect(state.cityAttractiveness).toBeLessThanOrEqual(1)
+    expect(state.attractivenessFactors).toBeDefined()
+    expect(state.attractivenessFactors.jobMatchRate).toBeGreaterThanOrEqual(0)
+    expect(typeof state.netMigration).toBe('number')
+  })
+
+  test('attractiveness factors breakdown sums correctly', () => {
+    const engine = createCityEngine()
+    advanceYear(engine)
+    const { attractivenessFactors: f, cityAttractiveness } = engine.getState()
+    const expectedScore =
+      f.jobMatchRate * 0.30 +
+      f.avgSatisfaction * 0.25 +
+      f.serviceCoverage * 0.20 +
+      f.taxCompetitiveness * 0.15 +
+      f.housingAvailability * 0.10
+    expect(cityAttractiveness).toBeCloseTo(expectedScore, 2)
   })
 })
