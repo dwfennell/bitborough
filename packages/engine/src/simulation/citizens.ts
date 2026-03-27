@@ -198,11 +198,21 @@ function enrollAgentInSchool(
   enrollmentCounts.set(schoolMatch.buildingId, (enrollmentCounts.get(schoolMatch.buildingId) ?? 0) + agent.demographics.children)
 }
 
-export function syncAgentsForBuilding(map: GameMap, registry: CitizenRegistry, graph: RoadGraph, building: Building, trafficDensity?: Uint8Array, prng?: PRNG, reputationLayer?: Float32Array, enrollmentCounts?: Map<string, number>): void {
+export function buildAgentsByBuilding(agents: ReadonlyArray<Citizen>): Map<string, Citizen[]> {
+  const map = new Map<string, Citizen[]>()
+  for (const a of agents) {
+    let list = map.get(a.homeBuildingId)
+    if (!list) { list = []; map.set(a.homeBuildingId, list) }
+    list.push(a)
+  }
+  return map
+}
+
+export function syncAgentsForBuilding(map: GameMap, registry: CitizenRegistry, graph: RoadGraph, building: Building, trafficDensity?: Uint8Array, prng?: PRNG, reputationLayer?: Float32Array, enrollmentCounts?: Map<string, number>, agentIndex?: Map<string, Citizen[]>): void {
   const homeAccessRoad = resolveAccessRoad(map, building)
   if (homeAccessRoad < 0) return  // building has no road access — no agents
 
-  const existing = registry.agents.filter(a => a.homeBuildingId === building.id)
+  const existing = agentIndex ? (agentIndex.get(building.id) ?? []) : registry.agents.filter(a => a.homeBuildingId === building.id)
   const needed = building.residents > 0
     ? Math.max(1, Math.floor(building.residents / registry.samplingRatio))
     : 0
@@ -445,14 +455,18 @@ export function citizenMonthlyTick(
   for (const b of map.buildings) buildingById.set(b.id, b)
 
   for (const agent of registry.agents) {
+    // Weight traffic by how many residents this agent represents
+    const d = agent.demographics
+    const representedPop = d.children + d.working + d.elderly
+    const trafficScale = representedPop / registry.samplingRatio
     for (const tileIdx of agent.homeWorkRoute) {
-      rawTraffic[tileIdx]! += WORK_TRIP_WEIGHT
+      rawTraffic[tileIdx]! += WORK_TRIP_WEIGHT * trafficScale
     }
     for (const tileIdx of agent.homeCommerceRoute) {
-      rawTraffic[tileIdx]! += COMMERCE_TRIP_WEIGHT
+      rawTraffic[tileIdx]! += COMMERCE_TRIP_WEIGHT * trafficScale
     }
     for (const tileIdx of agent.homeSchoolRoute) {
-      rawTraffic[tileIdx]! += SCHOOL_TRIP_WEIGHT
+      rawTraffic[tileIdx]! += SCHOOL_TRIP_WEIGHT * trafficScale
     }
     agent.satisfaction = computeSatisfaction(agent, map, layers, bldIdx, buildingTierCounts, buildingById, enrollmentCounts, educationFunding)
   }

@@ -12,6 +12,7 @@ import { updateFires } from './services/fire.js'
 import { computeReputation } from './reputation.js'
 import {
   syncAgentsForBuilding,
+  buildAgentsByBuilding,
   citizenMonthlyTick,
   computeCitizenSummary,
   computeTotalPopulation,
@@ -33,11 +34,12 @@ export interface MonthlyTickResult {
 
 export function syncResidentialAgents(state: EngineState): void {
   const enrollmentCounts = buildEnrollmentCounts(state.citizenRegistry.agents)
+  const agentIndex = buildAgentsByBuilding(state.citizenRegistry.agents)
   for (const b of state.map.buildings) {
     if (b.state === 'active') {
       const def = BUILDING_DEFS[b.defId]
       if (def && def.category === BuildingCategory.Residential) {
-        syncAgentsForBuilding(state.map, state.citizenRegistry, state.roadGraph, b, state.trafficDensity, state.prng, state.reputationLayer, enrollmentCounts)
+        syncAgentsForBuilding(state.map, state.citizenRegistry, state.roadGraph, b, state.trafficDensity, state.prng, state.reputationLayer, enrollmentCounts, agentIndex)
       }
     }
   }
