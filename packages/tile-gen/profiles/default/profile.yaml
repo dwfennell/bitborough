@@ -1,0 +1,104 @@
+name: default
+description: Impressionist orthographic tiles for Bitborough — soft, painterly, warm natural palette
+
+defaults:
+  iterations: 5
+  viewBox: "0 0 128 128"
+  tileSize: 128
+
+criteria:
+  palette:
+    threshold: 7
+    enabled: true
+  structural_correctness:
+    threshold: 8
+    enabled: true
+  scale_fidelity:
+    threshold: 7
+    enabled: true
+  layer_ordering:
+    threshold: 7
+    enabled: true
+  seamless_tiling:
+    threshold: 7
+    enabled: true
+  style_consistency:
+    threshold: 7
+    enabled: true
+  aesthetics:
+    threshold: 7
+    enabled: true
+    guidance: |
+      Impressionist style. Soft, painterly feel. Warm natural palette.
+      Should evoke the charm of a small town seen from above.
+      Penalize: harsh lines, flat fills, overly geometric, "clipart" feel.
+  prompt_fidelity:
+    threshold: 7
+    enabled: true
+
+palette:
+  grass-base: "#8cc870"
+  grass-light: "#95d07a"
+  grass-mid: "#82c466"
+  grass-highlight: "#a0da88"
+  grass-soft: "#9ad680"
+  grass-dark: "#6aaa50"
+  grass-deep: "#78b868"
+  yard: "#a0d48a"
+  bush-dark: "#78b868"
+  bush-light: "#90c880"
+  bush-mid: "#88c070"
+  tree-dark: "#60a850"
+  tree-mid: "#78b868"
+  tree-light: "#90c880"
+  water-base-1: "#88c8e8"
+  water-base-2: "#78b8d8"
+  water-deep: "#6aaccf"
+  water-caustic: "#a8ddf0"
+  water-ripple: "#a0d8f0"
+  water-ripple-2: "#b0e0f4"
+  water-sparkle: "#d0eef8"
+  dirt-base: "#d8c498"
+  dirt-dark: "#c8b480"
+  dirt-light: "#e8d8b0"
+  path: "#c8b898"
+  asphalt-1: "#707070"
+  asphalt-2: "#686868"
+  asphalt-grain: "#606060"
+  asphalt-dark: "#585858"
+  asphalt-mid: "#626262"
+  curb: "#989898"
+  marking-yellow: "#e8d080"
+  marking-white: "#e0e0e0"
+  res-roof: "#d08870"
+  res-roof-line: "#c07060"
+  res-roof-tex: "#c07860"
+  res-wall: "#e8c8b0"
+  res-wall-shade: "#e0b89a"
+  window-glass: "#a8d0e8"
+  window-frame: "#987868"
+  door: "#8a6848"
+  door-knob: "#c0a080"
+  chimney: "#a08070"
+  chimney-cap: "#8a7060"
+  smoke: "#d0d0d0"
+  com-roof: "#90b8d8"
+  com-roof-dark: "#80a8c8"
+  com-roof-light: "#b0d0e8"
+  com-wall: "#d8d8d0"
+  ind-roof: "#a8a898"
+  ind-roof-dark: "#989880"
+  ind-roof-light: "#c0c0b0"
+  ind-metal: "#8a8878"
+  ind-rust: "#b09070"
+  power-yellow: "#e8d080"
+  power-dark: "#d8c070"
+  flower-pink: "#e8c8d0"
+  flower-pink-2: "#d8a8b8"
+  flower-pink-3: "#d8b8c0"
+  flower-rose: "#e8a8b8"
+  flower-yellow: "#e8d8a0"
+  mailbox: "#6088c0"
+  mailbox-top: "#5078b0"
+  shadow: "#000000"
+  manhole-line: "#555555"
