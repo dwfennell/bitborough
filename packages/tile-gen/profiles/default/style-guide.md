@@ -1,6 +1,6 @@
-# Bitborough Tile Style Guide
+# Bitborough Tile Style Guide — v2
 
-Read this file before authoring any SVG tile. Follow these rules exactly for visual consistency.
+Read this file before authoring any SVG tile. Follow these rules for visual consistency. The goal is tiles that are **pleasant to look at** — charming, detailed, and alive. Every tile should feel like a tiny world worth zooming into.
 
 ## Canvas
 
@@ -8,6 +8,15 @@ Read this file before authoring any SVG tile. Follow these rules exactly for vis
 - Target raster size: 128x128 PNG
 - Perspective: pure top-down (bird's eye)
 - Light source: top-left (shadows cast down-right)
+- Background: transparent — terrain renders underneath building tiles
+
+## Design Philosophy
+
+**Warm, impressionist, inviting.** Tiles should evoke the charm of a beloved small town seen from above. Think Miyazaki backgrounds meets SimCity — organic shapes, soft colors, lived-in details. Every building should look like someone lives or works there.
+
+**Detail density matters.** The difference between a lackluster tile and a charming one is the small touches: a bicycle leaning against a fence, flower boxes under windows, a cat on a rooftop, smoke curling from a chimney. Aim for **150-200 SVG elements per building tile** (current tiles average 60-90 and feel sparse).
+
+**Organic over geometric.** Use rounded corners, overlapping shapes, and slight irregularity. Perfectly aligned grid-like layouts feel sterile. Offset elements slightly, vary sizes, let shapes overlap naturally.
 
 ## Color Palette
 
@@ -113,167 +122,105 @@ Use ONLY these colors. Do not invent new hex values.
 | `mailbox-top`    | `#5078b0` | Mailbox cap                |
 | `shadow`         | `#000000` | Building shadow (use 0.1 opacity) |
 | `manhole-line`   | `#555555` | Manhole cross lines        |
+| `fence-wood`     | `#b09878` | Wooden fence posts/rails   |
+| `fence-light`    | `#c8b898` | Fence highlight            |
+| `metal-light`    | `#b8b8a8` | Light metal (bike frames, poles) |
+| `fabric-warm`    | `#d8a888` | Awnings, clotheslines      |
 
 ## World Scale
 
 **1 tile = 128px = 32 meters (~105 feet).** 1px = 0.25 meters (25cm).
 
-All structural dimensions derive from this scale. Use this table as the reference when sizing anything.
-
 | Thing              | Real size   | Tile pixels | Notes                           |
 |--------------------|-------------|-------------|---------------------------------|
 | 2-lane road        | 8m wide     | 32px        | Standard residential street     |
 | Sidewalk           | 2m wide     | 8px         | One on each side of road        |
-| Road + sidewalks   | 12m total   | 48px        | Full right-of-way               |
-| Lane marking       | 0.15m wide  | 1.5px       | Center line, edge lines         |
 | Small house        | 10x8m       | 40x32px     | Typical 1-story residential     |
 | Medium house       | 12x10m      | 48x40px     | Larger residential              |
 | Small shop         | 10x12m      | 40x48px     | Street-front retail             |
 | Factory building   | 18x22m      | 72x88px     | Large industrial footprint      |
-| Power plant        | 24x24m      | 96x96px     | Multi-tile (2x2) building       |
 | Tree canopy        | 5-7m        | 20-28px     | Round blob from above           |
 | Bush               | 1.5-2m      | 6-8px       | Small landscaping               |
 | Car (top-down)     | 4.5x2m      | 18x8px      | Parked car in lot               |
-| Fence/wall segment | 0.3m wide   | 1.5px       | Property boundary               |
+| Bicycle            | 1.8x0.6m    | 7x2.5px     | Leaning or parked               |
 | Door               | 1x2m        | 4x8px       | Visible on wall face below roof |
 | Window             | 1.2x1.2m    | 5x5px       | Small square from above         |
+| Window box         | 1.2x0.4m    | 5x1.5px     | Below each window               |
 | Chimney            | 1x1m        | 4x4px       | On rooftop                      |
-| Mailbox            | 0.3x0.3m    | 1.5x1.5px   | Tiny yard detail                |
+| Fence post         | 0.1x0.1m    | 1x1px       | At regular intervals            |
+| Fence rail         | varies      | 1px stroke  | Between posts                   |
 | Flower/plant       | 0.3-0.5m    | 1.5-2px     | Yard accent                     |
-| Yard (front/back)  | variable    | remaining   | Space around building           |
+| Streetlight        | 0.3m pole   | 1.5px wide  | 8-10px tall with 2px head       |
 
 ### Scale Integrity Rules
 
-- **Buildings must not fill the tile.** A small house is ~40x32px in a 128px tile — roughly 30% of tile width. The rest is yard, setback, and breathing room.
-- **Roads are narrow relative to tiles.** A 2-lane road is 32px (25% of tile). With sidewalks, 48px (37.5%).
-- **Details must be proportional.** A window is not 10px (2.5m) — it's 5px (1.2m). A door is 4x8px, not 8x12px.
-- **Trees are medium-sized features.** A tree canopy is 20-28px — smaller than a house, larger than a bush.
-- **When in doubt, measure against the scale table.** If a chimney looks as wide as a door, something is wrong.
+- **Buildings must not fill the tile.** A small house is ~40x32px in a 128px tile. The rest is yard, setback, and breathing room.
+- **Details must be proportional.** A window is 5px, a door is 4x8px. Don't make them larger.
+- **When in doubt, measure against the scale table.**
 
-## Structural Constants
+## Architectural Detail Standards
 
-### Road Geometry
-- Pavement width: **32px** (centered in tile: x=48 to x=80)
-- Sidewalk width: **8px** each side (x=40 to x=48 left, x=80 to x=88 right)
-- Full right-of-way: **48px** (x=40 to x=88)
-- Curb line width: **1.5px**
-- Lane marking width: **1.5px**
-- Lane dash length: **8px**, gap: **6px**
-- Lane dash rx: **0.75px** (rounded ends)
-- Stop line width: **1.5px**
-- Road center line: at **x=64** (vertical) or **y=64** (horizontal)
+### Windows (5x5px) — REQUIRED DETAIL
+Every window should have:
+1. Glass fill: `window-glass` at 0.8 opacity
+2. Frame: `window-frame` stroke at 0.6px
+3. Mullion cross: vertical + horizontal lines at 0.4px, 0.6 opacity
+4. **Window box** (on at least half the windows): 5x1.5px rect below window, `bush-dark` at 0.5 opacity, with 2-3 tiny flower circles (1px radius) in pink/yellow
 
-### Building Geometry (Small Residential)
-- Lot margin: **8px** from tile edge (lot fills 8,8 to 120,120)
-- Lot corner radius: **3px**
-- House footprint: **~40x32px**, centered horizontally in lot, offset toward top
-- Roof overhang: **3px** beyond walls on each side
-- Roof corner radius: **2px**
-- Wall corner radius: **2px**
-- Shadow offset: **translate(3, 3)**
-- Shadow opacity: **0.1**
-- Shadow corner radius: **2px**
+### Doors (4x8px) — REQUIRED DETAIL
+Every door should have:
+1. Base fill: `door` color
+2. Panel lines: 2 horizontal lines at 0.3px, 0.2 opacity (suggests 3-panel door)
+3. Knob: 0.6px circle in `door-knob`
+4. **Threshold shadow**: 4x1px rect below door, `shadow` at 0.08 opacity
+5. **Step/welcome mat**: 5x2px rect below threshold, `path` at 0.3 opacity
 
-### Windows
-- Size: **5x5px** (1.2m square)
-- Corner radius: **0.5px**
-- Glass fill: `window-glass` at **0.8 opacity**
-- Frame stroke: `window-frame` at **0.6px**
-- Mullion cross: `window-frame` at **0.4px, 0.6 opacity**
+### Roofs — REQUIRED DETAIL
+Every roof should have:
+1. Main fill with color appropriate to building type
+2. Ridge line: 2px stroke at 0.5 opacity
+3. Shingle texture: 4-5 horizontal lines at 0.5px, 0.2 opacity
+4. **Gutter line**: thin stroke (0.5px) along the bottom edge of roof, slightly darker than roof
+5. **Roof variation**: at least one detail beyond flat color — a vent (2x2px circle), a skylight (3x4px lighter rect), or a second ridge angle
 
-### Doors
-- Size: **4x8px** (1m x 2m)
-- Corner radius: **0.5px**
-- Knob radius: **0.6px**
+### Chimneys — REQUIRED DETAIL
+1. Body: 4x4px rect
+2. Cap: 6x2px rect (1px overhang each side)
+3. **Smoke**: always include 1-2 curving bezier wisps, `smoke` color at 0.25-0.35 opacity
+4. Smoke should curl and drift — use Q (quadratic) curves with gentle S-shape
 
-### Chimney
-- Size: **4x4px** (1m x 1m)
-- Cap overhang: **1px** each side (6x2px cap)
+## Charm Elements
 
-### Trees
-- Canopy: **20-28px** diameter ellipse/circle
-- Shadow: offset **(2, 2)** at 0.08 opacity
-- Use 2-3 overlapping circles for organic shape
+These are what make tiles feel alive. **Every building tile MUST include at least 5 charm elements** from this list (in addition to the architectural detail above):
 
-### Bushes
-- Size: rx=**3-4**, ry=**2.5-3.5** (about 6-8px across)
-- Two overlapping ellipses as before but at corrected scale
+### Yard & Garden
+- **Flower clusters**: groups of 3-5 tiny circles (1-2px), mix pink/yellow/rose colors, scattered naturally
+- **Bushes**: pairs of overlapping ellipses (dark behind, light in front), at least 2-3 per building
+- **Trees**: 3-4 overlapping circles of varying size and opacity, with shadow underneath. **Vary tree shapes** — not all identical
+- **Garden path**: curved or winding path from door to edge, `path` color at 0.4 opacity
+- **Garden bed**: oval area near building with denser flower clusters
+- **Potted plants**: small circle on porch/entrance area
 
-## Detail Rules
+### Props & Furniture
+- **Bicycle**: two small circles (wheels, 1.5px radius) connected by frame lines, leaning against building or fence
+- **Clothesline**: two thin posts (1px wide) with 2-3 curved lines between them (fabric shapes)
+- **Outdoor chair/bench**: small rect (4x3px) with back line, in yard or patio area
+- **Grill/BBQ**: small dark circle (2px) with smoke wisp, in backyard
+- **Stepping stones**: 3-4 small circles (2-3px) in a path through grass
+- **Bird bath**: small circle (3px) with lighter inner circle, in garden
 
-### Opacity Ranges
-- Texture patches (grass, water depth): **0.15 - 0.5**
-- Grass blades: **0.4 - 0.5**
-- Flowers: **0.5 - 0.7**
-- Curbs: **0.5**
-- Lane markings: **0.7**
-- Stop lines: **0.6**
-- Building shadows: **0.1**
-- Roof shingle lines: **0.25**
-- Smoke wisps: **0.3**
-- Bushes: **0.6 - 0.7**
-- Water ripples: **0.3 - 0.4**
-- Water sparkles: **0.45 - 0.6**
+### Building Accessories
+- **Fence sections**: thin posts (1px) at regular intervals along lot edge, connected by horizontal rail strokes
+- **Mailbox**: small rect (1.5x3px) near lot entrance with `mailbox` color
+- **Streetlight**: narrow pole (1.5px wide, 10px tall) with circular head (2px), placed at lot corner
+- **Satellite dish**: tiny circle (2px) on roof edge, gray
+- **AC unit** (commercial): circle with cross stroke on roof
 
-### Stroke Widths
-- Roof ridge line: **2px**
-- Roof shingle lines: **0.5px**
-- Wave ripple (primary): **1px**
-- Wave ripple (secondary): **0.7px**
-- Window frame: **0.8px**
-- Window mullion: **0.5px**
-- Smoke wisp: **1.5px**
-- Manhole cross: **0.5px**
-
-### Texture Density
-- Grass patches per tile: **7-10** light ellipses + **3** dark ellipses
-- Grass blade clusters: **3-4** clusters of **2-3** blades each
-- Flowers per grass tile: **3-5** tiny circles
-- Road grain dots: **10-14** per tile
-- Water ripple lines: **4** primary + **4** secondary
-- Water sparkles: **4-5** dots
-- Roof shingle lines: **4** horizontal lines, evenly spaced
-
-### Charm Details (small delightful touches)
-- Residential: chimney with smoke wisp, mailbox, bushes, flowers, garden path
-- Commercial: rooftop AC unit, signage rectangle, parking lines
-- Industrial: smoke stacks, pipes, loading bay rectangle
-- Roads: manhole cover at intersections, texture grain
-- Terrain: flower clusters, grass blade groups, organic patch shapes
-
-## Shape Vocabulary
-
-### Bushes
-Two overlapping ellipses: larger darker one behind, smaller lighter one in front.
-- Back: rx=3-4, ry=2.5-3.5, `bush-dark` at 0.7
-- Front: rx=2-3, ry=2-2.5, `bush-light` at 0.6
-- Offset front ellipse **(-1.5, -1.5)** from back
-
-### Grass Blade Cluster
-Group of 2-3 thin triangles, each ~8px tall, ~4px base.
-- Pattern: `M[x] [y+8] L[x+2] [y] L[x+4] [y+8]Z`
-- Fill: `grass-dark` or `grass-deep`
-- Slight x-offset between blades for natural look
-
-### Flowers
-1-2 circles, r=1.2-2px, slightly offset from each other.
-- Use `flower-pink`, `flower-rose`, or `flower-yellow`
-
-### Chimney Smoke
-Single quadratic bezier path, no fill, stroke only.
-- Pattern: `M[x] [y] Q[x+2] [y-6] [x-1] [y-12] Q[x-3] [y-18] [x] [y-22]`
-- Gentle S-curve, stroke-linecap="round"
-
-### Water Ripples
-Quadratic bezier curves with gentle 3px amplitude sine wave.
-- Pattern: `M[x1] [y] Q[x2] [y-3] [x3] [y] Q[x4] [y+3] [x5] [y]`
-- Span 50-70px wide
-
-### Manhole Cover
-Two concentric circles with X cross.
-- Outer: r=3, `asphalt-dark` at 0.5
-- Inner: r=2, `asphalt-mid` at 0.4
-- Cross: 3px diagonal lines, `manhole-line` at 0.5px stroke, 0.4 opacity
+### Life & Movement
+- **Parked cars**: include at least 1 car for residential, 2-3 for commercial. Cars should have windshield detail (lighter rect) and vary in color
+- **Smoke/steam**: from chimneys, industrial stacks, or kitchen vents. Use curving bezier paths
+- **Pets**: optional — a small oval (3x2px) on a porch or yard suggests a resting cat or dog
+- **Puddle**: small blue-tinted ellipse (4x2px) in a driveway or path after rain (water-base-1 at 0.2 opacity)
 
 ## Layer Order (back to front)
 
@@ -283,37 +230,50 @@ Two concentric circles with X cross.
 4. Infrastructure (road surface, curbs)
 5. Markings (lane dashes, stop lines)
 6. Small infrastructure details (manhole)
-7. Building shadow
-8. Lot ground
-9. Paths/walkways
-10. Walls
-11. Roof
-12. Roof details (ridge, shingles)
-13. Chimney
-14. Exposed wall elements (windows, doors — below roof line)
-15. Yard details (bushes, flowers, mailbox)
-16. Atmospheric (smoke wisps)
+7. **Fence/boundary elements**
+8. Building shadow
+9. Lot ground
+10. Paths/walkways/stepping stones
+11. Walls
+12. Roof
+13. Roof details (ridge, shingles, vents, skylights, gutter)
+14. Chimney
+15. Exposed wall elements (windows with boxes, doors with thresholds)
+16. **Props & furniture** (bikes, chairs, grills, bird baths)
+17. Yard details (bushes, flowers, mailbox, streetlight)
+18. **Pets/life details**
+19. Atmospheric (smoke wisps, steam)
+
+## Texture Density
+
+- Grass patches per tile: **10-14** light ellipses + **4-5** dark ellipses
+- Grass blade clusters: **4-6** clusters of **2-3** blades each
+- Flowers per building tile: **8-15** tiny circles in **3-5** clusters
+- Flowers per grass tile: **5-8** tiny circles
+- Roof shingle lines: **4-5** horizontal lines, evenly spaced
+- Road grain dots: **12-16** per tile
+- Water ripple lines: **5** primary + **5** secondary
+- Window boxes: on **at least half** of all windows
+- Charm props per building: **minimum 5** distinct elements
 
 ## SVG Conventions
 
 - Always `xmlns="http://www.w3.org/2000/svg"`
 - Gradients go in `<defs>` — use sparingly (terrain base, road asphalt, water only)
-- Gradient IDs must be unique per file (prefix with tile type: `grassBase`, `waterBase`, `asphalt`)
-- No `<text>` elements
+- Gradient IDs must be unique per file (prefix with tile type: `grassBase`, `waterBase`)
 - No external references or `<use>` across files
 - Each SVG is fully self-contained
 - All strokes use `stroke-linecap="round"` unless rectangular (curbs, stop lines)
 - No pure black fills — use `shadow` color at low opacity only for shadows
 - Comment each visual layer group for readability
+- Use `<g>` groups with comments to organize layers: `<!-- Yard details -->`, `<!-- Charm props -->`
 
 ## Seamless Tiling Rules
 
-- Terrain tiles (grass, water, dirt, sand): elements touching edges must be placed so they tile seamlessly with copies of themselves
+- Terrain tiles: elements touching edges must tile seamlessly with copies of themselves
 - Avoid placing prominent features (flowers, blade clusters) within 4px of edges
-- Road tiles: pavement extends to tile edge at x=48-80 (vertical) or y=48-80 (horizontal); sidewalks at x=40-48 and x=80-88
-- Road curbs and sidewalk edges align exactly at tile boundaries
-- Lane dashes must start/end at consistent positions from tile edge (start 4px in, 8px dash, 6px gap repeating)
 - Building tiles: buildings should not touch tile edges — lot margin ensures this
+- Fence elements at lot boundary should align to consistent positions near edges
 
 ## Connection Tile Naming
 
@@ -324,7 +284,6 @@ Road files: `road-NESW.svg` where each letter is `0` or `1`.
 - W = connection exits west edge
 
 Examples:
-- `road-0000.svg` = isolated road pad (dead end circle)
 - `road-1010.svg` = straight north-south
 - `road-0110.svg` = east-south curve
 - `road-1111.svg` = 4-way intersection

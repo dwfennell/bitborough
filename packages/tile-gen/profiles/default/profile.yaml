@@ -29,9 +29,11 @@ criteria:
     threshold: 7
     enabled: true
     guidance: |
-      Impressionist style. Soft, painterly feel. Warm natural palette.
-      Should evoke the charm of a small town seen from above.
-      Penalize: harsh lines, flat fills, overly geometric, "clipart" feel.
+      Warm, impressionist, inviting. Think Miyazaki backgrounds meets SimCity.
+      Tiles should feel alive — someone lives here, works here, walks their dog here.
+      Every building needs at least 5 charm elements (bikes, flower boxes, pets, furniture).
+      Penalize: sparse/empty yards, sterile geometry, flat lifeless fills, missing details,
+      tiles that feel like technical drawings rather than charming scenes.
   prompt_fidelity:
     threshold: 7
     enabled: true
@@ -102,3 +104,7 @@ palette:
   mailbox-top: "#5078b0"
   shadow: "#000000"
   manhole-line: "#555555"
+  fence-wood: "#b09878"
+  fence-light: "#c8b898"
+  metal-light: "#b8b8a8"
+  fabric-warm: "#d8a888"
