@@ -1,5 +1,10 @@
 import { describe, test, expect } from 'vitest'
-import { computeSchoolQuality, SCHOOL_CAPACITY, findNearestSchool, buildEnrollmentCounts } from '../simulation/services/school.js'
+import {
+  computeSchoolQuality,
+  SCHOOL_CAPACITY,
+  findNearestSchool,
+  buildEnrollmentCounts,
+} from '../simulation/services/school.js'
 import { DensityLevel, Infrastructure, ZoneType } from '@bitborough/core'
 import { createTestMap, advanceMonth } from '../test-helpers.js'
 import { buildRoadGraph } from '../road-graph.js'
@@ -94,7 +99,7 @@ describe('Education enrollment integration', () => {
     engine.placeBuilding(10, 6, 'service.school')
     for (let i = 0; i < 60; i++) advanceMonth(engine)
     const state = engine.getState()
-    const hasQuality = Array.from(state.educationQuality).some(v => v > 1)
+    const hasQuality = Array.from(state.educationQuality).some((v) => v > 1)
     // Probabilistic: with seed 42 and 60 months, births should occur
     expect(hasQuality || state.citizens.totalChildren === 0).toBe(true)
   })

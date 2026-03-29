@@ -14,7 +14,7 @@ const PARK_RADIUS = 5
 
 // Zone boundary effects
 const ZONE_BOUNDARY_RADIUS = 3
-const COM_ADJACENCY_BONUS = 0.10
+const COM_ADJACENCY_BONUS = 0.1
 const IND_ADJACENCY_PENALTY = 0.15
 
 function zoneBoundaryEffect(x: number, y: number, map: GameMap, bldIdx?: BuildingIndex): number {
@@ -110,7 +110,6 @@ function commercialDesirability(x: number, y: number, map: GameMap, bldIdx?: Bui
   if (hasResidentialDensity(x, y, map, bldIdx)) score += COM_RESIDENTIAL_BONUS
   return clamp(score, 0, 1)
 }
-
 
 export function parkDesirabilityBonus(x: number, y: number, map: GameMap, bldIdx?: BuildingIndex): number {
   let best = 0

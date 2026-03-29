@@ -1,6 +1,5 @@
-import { TileType, ZoneType, Infrastructure, type GameState } from '@bitborough/core'
+import { TileType, ZoneType, Infrastructure, type GameState, type TileInfo } from '@bitborough/core'
 import { BUILDING_DEFS } from '@bitborough/engine'
-import type { TileInfo } from '@bitborough/engine'
 
 export interface TileDescription {
   position: { x: number; y: number }

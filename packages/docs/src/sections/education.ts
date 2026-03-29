@@ -10,7 +10,7 @@ export const education: DocSection = {
     '',
     'School **quality** depends on two factors: funding level (set in the Budget panel) and occupancy. A school at 100% capacity with full funding has quality 1.0. At 120% capacity, quality drops to 0.5. Cutting funding reduces quality further.',
     '',
-    'Resident satisfaction from education depends on both the school\'s quality and the commute distance. Build schools close to residential areas for the best effect.',
+    "Resident satisfaction from education depends on both the school's quality and the commute distance. Build schools close to residential areas for the best effect.",
     '',
     'Use the **Education overlay (J)** to see enrollment status: green = good quality, yellow = moderate, red = poor, gray = children with no school access.',
   ].join('\n'),

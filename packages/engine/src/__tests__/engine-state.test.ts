@@ -37,13 +37,27 @@ describe('computeLoanRepayment', () => {
   })
 
   test('returns monthlyPayment when remaining > monthlyPayment', () => {
-    const loan = { principal: 50_000, remaining: 40_000, monthlyPayment: 500, termMonths: 120, monthsLeft: 80, interestRate: 0.08 }
+    const loan = {
+      principal: 50_000,
+      remaining: 40_000,
+      monthlyPayment: 500,
+      termMonths: 120,
+      monthsLeft: 80,
+      interestRate: 0.08,
+    }
     const state = makeState(loan, 500)
     expect(computeLoanRepayment(state)).toBe(500)
   })
 
   test('returns remaining when remaining < monthlyPayment (final payment)', () => {
-    const loan = { principal: 50_000, remaining: 200, monthlyPayment: 500, termMonths: 120, monthsLeft: 1, interestRate: 0.08 }
+    const loan = {
+      principal: 50_000,
+      remaining: 200,
+      monthlyPayment: 500,
+      termMonths: 120,
+      monthsLeft: 1,
+      interestRate: 0.08,
+    }
     const state = makeState(loan, 500)
     expect(computeLoanRepayment(state)).toBe(200)
   })
@@ -121,8 +135,15 @@ describe('rebuildDerivedState', () => {
     const state = createEngineState(map, { seed: 1 })
 
     map.buildings.push({
-      id: 'b1', defId: 'power.diesel', x: 5, y: 5,
-      state: 'active', residents: 0, powered: false, density: 0, age: 0,
+      id: 'b1',
+      defId: 'power.diesel',
+      x: 5,
+      y: 5,
+      state: 'active',
+      residents: 0,
+      powered: false,
+      density: 0,
+      age: 0,
     } as Building)
 
     expect(state.bldIdx.get(5, 5)).toBeUndefined()
@@ -156,11 +177,18 @@ describe('rebuildDerivedState', () => {
     const map = createTestMap(32)
     const state = createEngineState(map, { seed: 1 })
 
-    expect(Array.from(state.fireCoverage).every(v => v === 0)).toBe(true)
+    expect(Array.from(state.fireCoverage).every((v) => v === 0)).toBe(true)
 
     map.buildings.push({
-      id: 'b1', defId: 'service.fire', x: 10, y: 10,
-      state: 'active', residents: 0, powered: true, density: 0, age: 0,
+      id: 'b1',
+      defId: 'service.fire',
+      x: 10,
+      y: 10,
+      state: 'active',
+      residents: 0,
+      powered: true,
+      density: 0,
+      age: 0,
     } as Building)
 
     rebuildDerivedState(state)
@@ -191,13 +219,26 @@ describe('serializeState + restoreState', () => {
     const state = createEngineState(map, { seed: 1 })
 
     state.citizenRegistry.agents.push({
-      id: 'c1', homeBuildingId: 'b1', homeAccessRoad: 0,
-      workBuildingId: null, workAccessRoad: null,
-      commerceBuildingId: null, commerceAccessRoad: null,
-      homeWorkRoute: [], homeCommerceRoute: [],
-      homeWorkRouteStale: false, homeCommerceRouteStale: false,
-      homeWorkRouteTileSet: new Set(), homeCommerceRouteTileSet: new Set(),
-      satisfaction: 0.8, demographics: { children: 0, working: 50, elderly: 0 },
+      id: 'c1',
+      homeBuildingId: 'b1',
+      homeAccessRoad: 0,
+      workBuildingId: null,
+      workAccessRoad: null,
+      commerceBuildingId: null,
+      commerceAccessRoad: null,
+      homeWorkRoute: [],
+      homeCommerceRoute: [],
+      homeWorkRouteStale: false,
+      homeCommerceRouteStale: false,
+      homeWorkRouteTileSet: new Set(),
+      homeCommerceRouteTileSet: new Set(),
+      schoolBuildingId: null,
+      schoolAccessRoad: null,
+      homeSchoolRoute: [],
+      homeSchoolRouteTileSet: new Set(),
+      homeSchoolRouteStale: false,
+      satisfaction: 0.8,
+      demographics: { children: 0, working: 50, elderly: 0 },
       wealthTier: 3,
     } as Citizen)
 
@@ -252,9 +293,18 @@ describe('serializeState + restoreState', () => {
     const state = createEngineState(map, { seed: 1 })
 
     state.history.push({
-      month: 3, year: 1902, population: 500, funds: 8_000,
-      taxIncome: 200, expenses: 100, rDemand: 0.5, cDemand: 0.3, iDemand: 0.2,
-      births: 1, deaths: 0, netMigration: 5,
+      month: 3,
+      year: 1902,
+      population: 500,
+      funds: 8_000,
+      taxIncome: 200,
+      expenses: 100,
+      rDemand: 0.5,
+      cDemand: 0.3,
+      iDemand: 0.2,
+      births: 1,
+      deaths: 0,
+      netMigration: 5,
     })
 
     const save = serializeState(state)

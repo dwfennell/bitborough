@@ -1,13 +1,7 @@
 import { Infrastructure } from '@bitborough/core'
 import type { GameMap } from '@bitborough/core'
 
-export function hasNearbyInfra(
-  map: GameMap,
-  x: number,
-  y: number,
-  flag: Infrastructure,
-  range = 3,
-): boolean {
+export function hasNearbyInfra(map: GameMap, x: number, y: number, flag: Infrastructure, range = 3): boolean {
   for (let dy = -range; dy <= range; dy++) {
     for (let dx = -range; dx <= range; dx++) {
       if (Math.abs(dx) + Math.abs(dy) > range) continue

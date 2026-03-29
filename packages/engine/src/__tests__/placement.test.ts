@@ -272,7 +272,12 @@ describe('Bulldoze', () => {
     expect(engine.getState().map.buildings.length).toBe(0)
 
     // All footprint tiles cleared
-    for (const [x, y] of [[5, 5], [6, 5], [5, 6], [6, 6]]) {
+    for (const [x, y] of [
+      [5, 5],
+      [6, 5],
+      [5, 6],
+      [6, 6],
+    ] as [number, number][]) {
       const tile = engine.getTile(x, y)
       expect(tile.infrastructure).toBe(0)
       expect(tile.zone).toBe(0)

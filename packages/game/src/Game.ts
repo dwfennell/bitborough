@@ -396,7 +396,6 @@ export class Game {
           this.ticksSinceSave = 0
         }
       }
-
     }
 
     if (this.engine) {

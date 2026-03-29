@@ -7,8 +7,15 @@ describe('BuildingIndex', () => {
   test('get returns building at origin tile', () => {
     const map = createTestMap(32)
     map.buildings.push({
-      id: 'b1', defId: 'res.low', x: 5, y: 5, powered: false,
-      density: DensityLevel.Low, age: 0, state: 'active', residents: 0,
+      id: 'b1',
+      defId: 'res.low',
+      x: 5,
+      y: 5,
+      powered: false,
+      density: DensityLevel.Low,
+      age: 0,
+      state: 'active',
+      residents: 0,
     })
     const idx = new BuildingIndex(map)
     expect(idx.get(5, 5)?.id).toBe('b1')
@@ -17,8 +24,15 @@ describe('BuildingIndex', () => {
   test('get returns building for non-origin footprint tile', () => {
     const map = createTestMap(32)
     map.buildings.push({
-      id: 'b1', defId: 'power.diesel', x: 5, y: 5, powered: false,
-      density: DensityLevel.Low, age: 0, state: 'active', residents: 0,
+      id: 'b1',
+      defId: 'power.diesel',
+      x: 5,
+      y: 5,
+      powered: false,
+      density: DensityLevel.Low,
+      age: 0,
+      state: 'active',
+      residents: 0,
     })
     const idx = new BuildingIndex(map)
     // power.diesel is 2x2 — all footprint tiles should return the building
@@ -37,8 +51,15 @@ describe('BuildingIndex', () => {
   test('has returns true for occupied tile', () => {
     const map = createTestMap(32)
     map.buildings.push({
-      id: 'b1', defId: 'res.low', x: 5, y: 5, powered: false,
-      density: DensityLevel.Low, age: 0, state: 'active', residents: 0,
+      id: 'b1',
+      defId: 'res.low',
+      x: 5,
+      y: 5,
+      powered: false,
+      density: DensityLevel.Low,
+      age: 0,
+      state: 'active',
+      residents: 0,
     })
     const idx = new BuildingIndex(map)
     expect(idx.has(5, 5)).toBe(true)
@@ -48,8 +69,15 @@ describe('BuildingIndex', () => {
   test('hasIdx works with linear index', () => {
     const map = createTestMap(32)
     map.buildings.push({
-      id: 'b1', defId: 'res.low', x: 5, y: 5, powered: false,
-      density: DensityLevel.Low, age: 0, state: 'active', residents: 0,
+      id: 'b1',
+      defId: 'res.low',
+      x: 5,
+      y: 5,
+      powered: false,
+      density: DensityLevel.Low,
+      age: 0,
+      state: 'active',
+      residents: 0,
     })
     const idx = new BuildingIndex(map)
     expect(idx.hasIdx(5 * 32 + 5)).toBe(true)

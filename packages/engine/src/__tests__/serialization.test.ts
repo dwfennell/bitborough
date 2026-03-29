@@ -223,8 +223,38 @@ describe('Serialization', () => {
     // Inject agents with high IDs to simulate a save with existing citizens
     const registry = (engine as any).state.citizenRegistry
     registry.agents.push(
-      { id: 'c10', homeBuildingId: 'b1', workBuildingId: null, commerceBuildingId: null, homeAccessRoad: 0, workAccessRoad: null, commerceAccessRoad: null, homeWorkRoute: [], homeCommerceRoute: [], homeWorkRouteStale: false, homeCommerceRouteStale: false, homeWorkRouteTileSet: new Set(), homeCommerceRouteTileSet: new Set(), satisfaction: 0.5 },
-      { id: 'c20', homeBuildingId: 'b1', workBuildingId: null, commerceBuildingId: null, homeAccessRoad: 0, workAccessRoad: null, commerceAccessRoad: null, homeWorkRoute: [], homeCommerceRoute: [], homeWorkRouteStale: false, homeCommerceRouteStale: false, homeWorkRouteTileSet: new Set(), homeCommerceRouteTileSet: new Set(), satisfaction: 0.5 },
+      {
+        id: 'c10',
+        homeBuildingId: 'b1',
+        workBuildingId: null,
+        commerceBuildingId: null,
+        homeAccessRoad: 0,
+        workAccessRoad: null,
+        commerceAccessRoad: null,
+        homeWorkRoute: [],
+        homeCommerceRoute: [],
+        homeWorkRouteStale: false,
+        homeCommerceRouteStale: false,
+        homeWorkRouteTileSet: new Set(),
+        homeCommerceRouteTileSet: new Set(),
+        satisfaction: 0.5,
+      },
+      {
+        id: 'c20',
+        homeBuildingId: 'b1',
+        workBuildingId: null,
+        commerceBuildingId: null,
+        homeAccessRoad: 0,
+        workAccessRoad: null,
+        commerceAccessRoad: null,
+        homeWorkRoute: [],
+        homeCommerceRoute: [],
+        homeWorkRouteStale: false,
+        homeCommerceRouteStale: false,
+        homeWorkRouteTileSet: new Set(),
+        homeCommerceRouteTileSet: new Set(),
+        satisfaction: 0.5,
+      },
     )
 
     const save = engine.serialize()
@@ -307,7 +337,7 @@ describe('Serialization', () => {
     const save = engine.serialize()
     const v5Save = { ...save, version: 5 as const }
     if (v5Save.state.citizens) {
-      v5Save.state.citizens.agents = v5Save.state.citizens.agents.map(a => {
+      v5Save.state.citizens.agents = v5Save.state.citizens.agents.map((a) => {
         const { demographics: _d, ...rest } = a as any
         void _d
         return rest

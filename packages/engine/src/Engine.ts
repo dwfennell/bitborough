@@ -2,9 +2,9 @@ import {
   type GameMap,
   type GameState,
   type SaveFile,
-  type Building,
   type Result,
   type GameEvent,
+  type TileInfo,
   TileType,
   ZoneType,
   Infrastructure,
@@ -15,13 +15,15 @@ import {
 } from '@bitborough/core'
 import { placeTile, placeZone } from './actions/place.js'
 import { bulldoze } from './actions/bulldoze.js'
+import { placeBuilding as placeBuildingAction } from './actions/place-building.js'
 import { updateConnections } from './connections.js'
 import { propagatePower } from './simulation/power.js'
 import { calculateBudget } from './simulation/budget.js'
 import { updateRoadGraph } from './road-graph.js'
 import {
   removeAgentsForBuilding,
-  markRoutesStale, markRoutesStaleBatch,
+  markRoutesStale,
+  markRoutesStaleBatch,
   computeTotalPopulation,
   clearSchoolEnrollment,
 } from './simulation/citizens.js'
@@ -39,28 +41,16 @@ import {
 import { monthlyTick } from './simulation/tick.js'
 
 export type { EngineConfig }
-
-export interface TileInfo {
-  terrain: TileType
-  zone: ZoneType
-  infrastructure: number
-  connections: number
-  elevation: number
-  powered: boolean
-  hasRoadAccess: boolean
-  landValue: number
-  crimeLevel: number
-  fireCoverage: number
-  pollutionLevel: number
-  reputation: number
-}
+export type { TileInfo }
 
 export class Engine {
   private state: EngineState
   private speed: SimSpeed = SimSpeed.Normal
   private events: GameEvent[] = []
 
-  private get population(): number { return computeTotalPopulation(this.state.map) }
+  private get population(): number {
+    return computeTotalPopulation(this.state.map)
+  }
 
   private constructor(state: EngineState) {
     this.state = state
@@ -212,73 +202,47 @@ export class Engine {
   }
 
   placeBuilding(x: number, y: number, defId: string): Result {
-    const def = BUILDING_DEFS[defId]
-    if (!def) {
-      return { ok: false, reason: FailReason.InvalidLocation, detail: `Unknown building: ${defId}` }
-    }
-
-    // Check funds
-    if (this.state.funds < def.cost) {
-      return { ok: false, reason: FailReason.InsufficientFunds }
-    }
-
-    // Check footprint fits on map, no water, no existing buildings or infrastructure
-    for (let dy = 0; dy < def.size.h; dy++) {
-      for (let dx = 0; dx < def.size.w; dx++) {
-        const tx = x + dx
-        const ty = y + dy
-        if (tx < 0 || ty < 0 || tx >= this.state.map.width || ty >= this.state.map.height) {
-          return { ok: false, reason: FailReason.InvalidLocation, detail: 'Footprint out of bounds' }
-        }
-        const idx = ty * this.state.map.width + tx
-        if (this.state.map.terrain[idx] === TileType.Water) {
-          return { ok: false, reason: FailReason.InvalidLocation, detail: 'Cannot build on water' }
-        }
-        if (this.state.map.infrastructure[idx] !== 0) {
-          return { ok: false, reason: FailReason.Occupied }
-        }
-        if (this.state.bldIdx.has(tx, ty)) {
-          return { ok: false, reason: FailReason.Occupied }
-        }
-      }
-    }
-
-    // Create building
-    const building: Building = {
-      id: `b${this.state.nextBuildingId++}`,
-      defId,
+    const { result, cost } = placeBuildingAction(
+      this.state.map,
       x,
       y,
-      powered: false,
-      density: def.density,
-      age: 0,
-      state: 'active',
-      residents: 0,
+      defId,
+      this.state.funds,
+      this.state.bldIdx,
+      this.state.nextBuildingId,
+    )
+
+    if (result.ok) {
+      this.state.nextBuildingId++
+      this.state.bldIdx = new BuildingIndex(this.state.map)
+      this.state.funds -= cost
     }
 
-    this.state.map.buildings.push(building)
-    this.state.bldIdx = new BuildingIndex(this.state.map)
-    this.state.funds -= def.cost
-
-    // Clear zones under the building footprint
-    for (let dy = 0; dy < def.size.h; dy++) {
-      for (let dx = 0; dx < def.size.w; dx++) {
-        const idx = (y + dy) * this.state.map.width + (x + dx)
-        this.state.map.zones[idx] = ZoneType.None
-      }
-    }
-
-    return { ok: true }
+    return result
   }
 
   setTaxRate(rate: number): void {
     this.state.taxRate = Math.max(0, Math.min(0.2, rate))
-    this.state.budgetInfo = calculateBudget(this.state.map, this.population, this.state.taxRate, this.state.landValues, this.state.funding, computeLoanRepayment(this.state))
+    this.state.budgetInfo = calculateBudget(
+      this.state.map,
+      this.population,
+      this.state.taxRate,
+      this.state.landValues,
+      this.state.funding,
+      computeLoanRepayment(this.state),
+    )
   }
 
   setFunding(service: 'police' | 'fire' | 'transit' | 'education', level: number): void {
     this.state.funding[service] = Math.max(0, Math.min(100, level))
-    this.state.budgetInfo = calculateBudget(this.state.map, this.population, this.state.taxRate, this.state.landValues, this.state.funding, computeLoanRepayment(this.state))
+    this.state.budgetInfo = calculateBudget(
+      this.state.map,
+      this.population,
+      this.state.taxRate,
+      this.state.landValues,
+      this.state.funding,
+      computeLoanRepayment(this.state),
+    )
   }
 
   takeLoan(amount: number): Result {
@@ -286,7 +250,14 @@ export class Engine {
     const maxLoanAmount = this.state.budgetInfo.taxIncome * 48
     if (amount < 10_000 || amount > maxLoanAmount) return { ok: false, reason: FailReason.AmountOutOfRange }
     const monthlyPayment = calcMonthlyPayment(amount)
-    this.state.loan = { principal: amount, remaining: amount, monthlyPayment, termMonths: 120, monthsLeft: 120, interestRate: 0.08 }
+    this.state.loan = {
+      principal: amount,
+      remaining: amount,
+      monthlyPayment,
+      termMonths: 120,
+      monthsLeft: 120,
+      interestRate: 0.08,
+    }
     this.state.loanRepaymentAmount = monthlyPayment
     this.state.funds += amount
     return { ok: true }
@@ -294,7 +265,8 @@ export class Engine {
 
   setLoanRepayment(amount: number): Result {
     if (this.state.loan === null) return { ok: false, reason: FailReason.NoActiveLoan }
-    if (amount < this.state.loan.monthlyPayment || amount > this.state.loan.remaining) return { ok: false, reason: FailReason.AmountOutOfRange }
+    if (amount < this.state.loan.monthlyPayment || amount > this.state.loan.remaining)
+      return { ok: false, reason: FailReason.AmountOutOfRange }
     this.state.loanRepaymentAmount = amount
     return { ok: true }
   }

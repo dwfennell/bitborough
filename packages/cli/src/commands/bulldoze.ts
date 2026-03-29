@@ -17,6 +17,7 @@ export function bulldozeCommand(program: Command) {
         reason: result.ok ? undefined : FailReason[(result as { ok: false; reason: FailReason }).reason],
         funds: engine.getState().funds,
       }
-      if (result.ok) out(response); else outErr(response)
+      if (result.ok) out(response)
+      else outErr(response)
     })
 }

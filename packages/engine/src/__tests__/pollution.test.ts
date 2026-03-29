@@ -1,8 +1,6 @@
 import { describe, test, expect } from 'vitest'
-import { createTestMap } from '../test-helpers.js'
-import { BUILDING_DEFS } from '../buildings-registry.js'
+import { createTestMap, makeBuilding } from '../test-helpers.js'
 import { calculatePollution } from '../simulation/pollution.js'
-import type { Building } from '@bitborough/core'
 
 function makePollutionLevel(map: { width: number; height: number }): Uint8Array {
   return new Uint8Array(map.width * map.height)
@@ -10,22 +8,6 @@ function makePollutionLevel(map: { width: number; height: number }): Uint8Array 
 
 function makeScratchBuffer(map: { width: number; height: number }): Float32Array {
   return new Float32Array(map.width * map.height)
-}
-
-function makeBuilding(defId: string, x: number, y: number, overrides?: Partial<Building>): Building {
-  const def = BUILDING_DEFS[defId]!
-  return {
-    id: 'b1',
-    defId,
-    x,
-    y,
-    density: def.density,
-    state: 'active',
-    residents: 0,
-    age: 0,
-    powered: true,
-    ...overrides,
-  }
 }
 
 describe('calculatePollution', () => {

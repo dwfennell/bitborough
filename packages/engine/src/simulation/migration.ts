@@ -2,18 +2,17 @@ import type { CitizenSummary, GameMap, AttractivenessFactors } from '@bitborough
 import { BuildingCategory } from '@bitborough/core'
 import { BUILDING_DEFS } from '../buildings-registry.js'
 import type { CitizenRegistry } from './citizens.js'
-import { computeTotalPopulation } from './citizens.js'
 import { PRNG } from '../prng.js'
 import { stochasticCount } from './demographics.js'
 
 // --- Constants ---
 export const ATTRACTIVENESS_BASELINE = 0.5
 export const ATTRACTIVENESS_WEIGHTS = {
-  jobs: 0.30,
+  jobs: 0.3,
   satisfaction: 0.25,
-  services: 0.20,
+  services: 0.2,
   tax: 0.15,
-  housing: 0.10,
+  housing: 0.1,
 } as const
 
 export const MIGRATION_SENSITIVITY = 2.0
@@ -65,18 +64,13 @@ export function computeAttractiveness(
     const policeFrac = policeCount / resBuildingCount
     const fireFrac = fireCount / resBuildingCount
     const eduFrac = eduCount / resBuildingCount
-    serviceCoverage = (
-      policeFrac * (funding.police / 100) +
-      fireFrac * (funding.fire / 100) +
-      eduFrac * (funding.education / 100)
-    ) / 3
+    serviceCoverage =
+      (policeFrac * (funding.police / 100) + fireFrac * (funding.fire / 100) + eduFrac * (funding.education / 100)) / 3
   }
 
   const taxCompetitiveness = Math.max(0, Math.min(1, 1.0 - (taxRate - TAX_NEUTRAL_RATE) * 5.0))
 
-  const housingAvailability = totalCapacity === 0
-    ? 1.0
-    : Math.max(0, Math.min(1, 1 - totalResidents / totalCapacity))
+  const housingAvailability = totalCapacity === 0 ? 1.0 : Math.max(0, Math.min(1, 1 - totalResidents / totalCapacity))
 
   const factors: AttractivenessFactors = {
     jobMatchRate,
@@ -87,31 +81,31 @@ export function computeAttractiveness(
   }
 
   const w = ATTRACTIVENESS_WEIGHTS
-  const score = Math.max(0, Math.min(1,
-    jobMatchRate * w.jobs +
-    avgSatisfaction * w.satisfaction +
-    serviceCoverage * w.services +
-    taxCompetitiveness * w.tax +
-    housingAvailability * w.housing,
-  ))
+  const score = Math.max(
+    0,
+    Math.min(
+      1,
+      jobMatchRate * w.jobs +
+        avgSatisfaction * w.satisfaction +
+        serviceCoverage * w.services +
+        taxCompetitiveness * w.tax +
+        housingAvailability * w.housing,
+    ),
+  )
 
   return { score, factors }
 }
 
-export const TIER_DIST_STRUGGLING: readonly [number, number, number] = [0.50, 0.35, 0.15]
-export const TIER_DIST_BASELINE: readonly [number, number, number] = [0.30, 0.45, 0.25]
-export const TIER_DIST_PROSPEROUS: readonly [number, number, number] = [0.20, 0.40, 0.40]
+export const TIER_DIST_STRUGGLING: readonly [number, number, number] = [0.5, 0.35, 0.15]
+export const TIER_DIST_BASELINE: readonly [number, number, number] = [0.3, 0.45, 0.25]
+export const TIER_DIST_PROSPEROUS: readonly [number, number, number] = [0.2, 0.4, 0.4]
 
 function lerpDist(
   a: readonly [number, number, number],
   b: readonly [number, number, number],
   t: number,
 ): [number, number, number] {
-  return [
-    a[0] + (b[0] - a[0]) * t,
-    a[1] + (b[1] - a[1]) * t,
-    a[2] + (b[2] - a[2]) * t,
-  ]
+  return [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t]
 }
 
 export function computeMigrantTierDistribution(attractiveness: number): [number, number, number] {

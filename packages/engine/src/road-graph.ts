@@ -39,7 +39,7 @@ function edgeCost(tile: number, trafficDensity?: Uint8Array): number {
   if (!trafficDensity) return 1
   const v = trafficDensity[tile]!
   const vc = v / TRAFFIC_CAPACITY
-  return 1 + 0.15 * vc * vc * vc * vc  // BPR: 1 + 0.15 * (v/c)^4
+  return 1 + 0.15 * vc * vc * vc * vc // BPR: 1 + 0.15 * (v/c)^4
 }
 
 /** A* on road graph. Returns path (inclusive of start and goal) or null if unreachable. */
@@ -67,16 +67,19 @@ export function astar(
     let bestF = Infinity
     for (const n of open) {
       const f = fScore.get(n) ?? Infinity
-      if (f < bestF) { bestF = f; current = n }
+      if (f < bestF) {
+        bestF = f
+        current = n
+      }
     }
     if (current === goal) return reconstructPath(cameFrom, current)
 
     open.delete(current)
     const g = gScore.get(current) ?? Infinity
 
-    for (const neighbor of (graph.get(current) ?? [])) {
+    for (const neighbor of graph.get(current) ?? []) {
       const tentativeG = g + edgeCost(neighbor, trafficDensity)
-      if (tentativeG > maxLength) continue  // path would exceed limit
+      if (tentativeG > maxLength) continue // path would exceed limit
       if (tentativeG < (gScore.get(neighbor) ?? Infinity)) {
         cameFrom.set(neighbor, current)
         gScore.set(neighbor, tentativeG)

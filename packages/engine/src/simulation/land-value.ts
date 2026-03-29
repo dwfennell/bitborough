@@ -83,4 +83,3 @@ function parkBonus(_map: GameMap, x: number, y: number, bldIdx: BuildingIndex): 
   }
   return bonus
 }
-

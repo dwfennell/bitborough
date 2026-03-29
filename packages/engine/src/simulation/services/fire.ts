@@ -21,10 +21,10 @@ export function calculateFireCoverage(
   fireFunding: number,
   influenceBuffer: Float32Array,
 ): void {
-  buildInfluenceMap(
-    map, 'service.fire', FIRE_BASE_RADIUS, fireFunding, influenceBuffer,
-    { defId: 'service.fire.small', baseRadius: FIRE_SMALL_BASE_RADIUS },
-  )
+  buildInfluenceMap(map, 'service.fire', FIRE_BASE_RADIUS, fireFunding, influenceBuffer, {
+    defId: 'service.fire.small',
+    baseRadius: FIRE_SMALL_BASE_RADIUS,
+  })
 
   influenceToUint8(influenceBuffer, fireCoverage)
 }

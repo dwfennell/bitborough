@@ -86,8 +86,13 @@ describe('tier-weighted satisfaction', () => {
     registry.agents.push(lowAgent, highAgent)
 
     map.buildings.push({
-      id: 'b1', defId: 'res.low', x: 1, y: 1,
-      state: 'active', residents: 100, constructionMonthsLeft: 0,
+      id: 'b1',
+      defId: 'res.low',
+      x: 1,
+      y: 1,
+      state: 'active',
+      residents: 100,
+      constructionMonthsLeft: 0,
     } as any)
 
     layers.crimeLevel[9] = 200 // tile (1,1) = index 9
@@ -113,8 +118,13 @@ describe('tier-weighted satisfaction', () => {
     registry.agents.push(lowAgent, highAgent)
 
     map.buildings.push({
-      id: 'b1', defId: 'res.low', x: 1, y: 1,
-      state: 'active', residents: 100, constructionMonthsLeft: 0,
+      id: 'b1',
+      defId: 'res.low',
+      x: 1,
+      y: 1,
+      state: 'active',
+      residents: 100,
+      constructionMonthsLeft: 0,
     } as any)
 
     citizenMonthlyTick(registry, map, graph, trafficDensity, layers, bldIdx, 100)

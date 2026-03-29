@@ -9,14 +9,18 @@ const QUALITY_CRIME_WEIGHT = 0.35
 const QUALITY_POLLUTION_WEIGHT = 0.25
 const QUALITY_FIRE_WEIGHT = 0.15
 const QUALITY_PARK_WEIGHT = 0.15
-const QUALITY_OCCUPANCY_WEIGHT = 0.10
+const QUALITY_OCCUPANCY_WEIGHT = 0.1
 
 const OCCUPANCY_SEARCH_RADIUS = 5
 const OCCUPANCY_HEALTH_THRESHOLD = 0.7
 
 /** @internal — exported for testing only */
 export function computeCurrentQuality(
-  crimeNorm: number, pollNorm: number, fireNorm: number, parkNorm: number, occupancyHealth: number,
+  crimeNorm: number,
+  pollNorm: number,
+  fireNorm: number,
+  parkNorm: number,
+  occupancyHealth: number,
 ): number {
   return (
     (1 - crimeNorm) * QUALITY_CRIME_WEIGHT +

@@ -1,7 +1,6 @@
 import { describe, test, expect } from 'vitest'
 import { TileType, ZoneType, Infrastructure } from '@bitborough/core'
-import type { GameState } from '@bitborough/core'
-import type { TileInfo } from '@bitborough/engine'
+import type { GameState, TileInfo } from '@bitborough/core'
 import { describeInfrastructure, describeTile } from '../utils/tile-info.js'
 import { hexToRgb, landValueToRgba } from '../render/colors.js'
 import { fillMinimapBuffer, TERRAIN_RGB, ZONE_RGB } from '../render/minimap-buffer.js'
@@ -68,6 +67,12 @@ describe('describeTile', () => {
       connections: 0,
       elevation: 0,
       powered: false,
+      hasRoadAccess: false,
+      landValue: 0,
+      crimeLevel: 0,
+      fireCoverage: 0,
+      pollutionLevel: 0,
+      reputation: 0,
     }
     const state = makeState(10, new Array(10).fill(0))
     const desc = describeTile(tile, 3, 0, state)
@@ -88,6 +93,12 @@ describe('describeTile', () => {
       connections: 0,
       elevation: 0,
       powered: true,
+      hasRoadAccess: true,
+      landValue: 0,
+      crimeLevel: 0,
+      fireCoverage: 0,
+      pollutionLevel: 0,
+      reputation: 0,
     }
     const landValues = new Array(20).fill(0)
     landValues[12] = 150

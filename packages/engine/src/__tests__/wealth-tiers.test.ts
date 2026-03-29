@@ -53,8 +53,8 @@ describe('sampleWealthTier', () => {
       const tier = sampleWealthTier(prng, 0.5)
       counts[tier - 1]!++
     }
-    const [f1, f2, f3] = counts.map(c => c / N)
-    expect(f1).toBeCloseTo(0.30, 1)
+    const [f1, f2, f3] = counts.map((c) => c / N)
+    expect(f1).toBeCloseTo(0.3, 1)
     expect(f2).toBeCloseTo(0.45, 1)
     expect(f3).toBeCloseTo(0.25, 1)
   })
@@ -69,7 +69,7 @@ describe('sampleWealthTier', () => {
     }
     const f1 = counts[0]! / N
     const f3 = counts[2]! / N
-    expect(f1).toBeGreaterThan(0.40)
+    expect(f1).toBeGreaterThan(0.4)
     expect(f3).toBeLessThan(0.16)
   })
 
@@ -84,7 +84,7 @@ describe('sampleWealthTier', () => {
     const f1 = counts[0]! / N
     const f3 = counts[2]! / N
     expect(f3).toBeGreaterThan(0.34)
-    expect(f1).toBeLessThan(0.20)
+    expect(f1).toBeLessThan(0.2)
   })
 
   test('tierDistOverride replaces base distribution', () => {
@@ -93,7 +93,7 @@ describe('sampleWealthTier', () => {
     const counts = [0, 0, 0]
     for (let i = 0; i < 100; i++) {
       const tier = sampleWealthTier(prng, 0.5, [0, 0, 1.0])
-      counts[tier - 1]++
+      counts[tier - 1]!++
     }
     expect(counts[2]).toBe(100)
   })

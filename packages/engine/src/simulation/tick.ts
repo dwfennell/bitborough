@@ -1,9 +1,4 @@
-import {
-  type GameEvent,
-  type Building,
-  calcMonthlyPayment,
-  BuildingCategory,
-} from '@bitborough/core'
+import { type GameEvent, calcMonthlyPayment, BuildingCategory } from '@bitborough/core'
 import { type EngineState, rebuildDerivedState, computeLoanRepayment } from '../engine-state.js'
 import { BUILDING_DEFS } from '../buildings-registry.js'
 import { calculateDemand } from './demand.js'
@@ -23,7 +18,12 @@ import {
 import { updateZones } from './zones.js'
 import { updateDensity } from './density.js'
 import { demographicTick } from './demographics.js'
-import { computeAttractiveness, computeMigrationModifier, computeMigrantTierDistribution, applyBrainDrain } from './migration.js'
+import {
+  computeAttractiveness,
+  computeMigrationModifier,
+  computeMigrantTierDistribution,
+  applyBrainDrain,
+} from './migration.js'
 import { buildEnrollmentCounts, SCHOOL_CAPACITY, computeSchoolQuality } from './services/school.js'
 
 export interface MonthlyTickResult {
@@ -72,9 +72,13 @@ export function monthlyTick(state: EngineState): MonthlyTickResult {
 
   // Compute city attractiveness
   const { score: attractiveness, factors: attractivenessFactors } = computeAttractiveness(
-    state.citizenSummary, state.map, state.taxRate,
+    state.citizenSummary,
+    state.map,
+    state.taxRate,
     { police: state.funding.police, fire: state.funding.fire, education: state.funding.education },
-    state.crimeLevel, state.fireCoverage, state.educationQuality,
+    state.crimeLevel,
+    state.fireCoverage,
+    state.educationQuality,
   )
   state.cityAttractiveness = attractiveness
   state.attractivenessFactors = attractivenessFactors
@@ -85,7 +89,14 @@ export function monthlyTick(state: EngineState): MonthlyTickResult {
     removeAgentsForBuilding(state.citizenRegistry, buildingId)
   })
   // Reputation after fires — fires can destroy buildings, affecting neighborhood quality
-  computeReputation(state.reputationLayer, state.map, state.crimeLevel, state.fireCoverage, state.pollutionLevel, state.bldIdx)
+  computeReputation(
+    state.reputationLayer,
+    state.map,
+    state.crimeLevel,
+    state.fireCoverage,
+    state.pollutionLevel,
+    state.bldIdx,
+  )
 
   // 8. Citizen monthly tick: replan stale routes, write trafficDensity from agent routes
   const tileLayers: TileLayers = {
@@ -94,7 +105,15 @@ export function monthlyTick(state: EngineState): MonthlyTickResult {
     pollutionLevel: state.pollutionLevel,
     reputationLayer: state.reputationLayer,
   }
-  const enrollmentCounts = citizenMonthlyTick(state.citizenRegistry, state.map, state.roadGraph, state.trafficDensity, tileLayers, state.bldIdx, state.funding.education)
+  const { enrollmentCounts, buildingById } = citizenMonthlyTick(
+    state.citizenRegistry,
+    state.map,
+    state.roadGraph,
+    state.trafficDensity,
+    tileLayers,
+    state.bldIdx,
+    state.funding.education,
+  )
   state.citizenSummary = computeCitizenSummary(state.citizenRegistry)
 
   // 9. Zone development
@@ -129,10 +148,6 @@ export function monthlyTick(state: EngineState): MonthlyTickResult {
   const popForDrain = computeTotalPopulation(state.map)
   const brainDrainResult = applyBrainDrain(attractiveness, state.citizenRegistry, popForDrain, state.prng)
 
-  // Shared building lookup — used by brain drain delta application and education overlay
-  const buildingById = new Map<string, Building>()
-  for (const b of state.map.buildings) buildingById.set(b.id, b)
-
   if (brainDrainResult.departures > 0) {
     for (const [buildingId, delta] of brainDrainResult.buildingDeltas) {
       const building = buildingById.get(buildingId)
@@ -148,8 +163,7 @@ export function monthlyTick(state: EngineState): MonthlyTickResult {
   state.citizenSummary = computeCitizenSummary(state.citizenRegistry)
   state.citizenSummary.birthsLastTick = demoResult.births
   state.citizenSummary.deathsLastTick = demoResult.deaths
-  state.citizenSummary.netMigrationLastTick =
-    popAfterAll - popBeforeDensity + demoResult.deaths - demoResult.births
+  state.citizenSummary.netMigrationLastTick = popAfterAll - popBeforeDensity + demoResult.deaths - demoResult.births
 
   // Education quality overlay (reuses enrollmentCounts from citizenMonthlyTick)
   state.educationQuality.fill(0)
@@ -180,7 +194,14 @@ export function monthlyTick(state: EngineState): MonthlyTickResult {
   // 14. Compute budget including loan repayment
   const population = computeTotalPopulation(state.map)
   const loanRepayment = computeLoanRepayment(state)
-  state.budgetInfo = calculateBudget(state.map, population, state.taxRate, state.landValues, state.funding, loanRepayment)
+  state.budgetInfo = calculateBudget(
+    state.map,
+    population,
+    state.taxRate,
+    state.landValues,
+    state.funding,
+    loanRepayment,
+  )
 
   // Apply monthly balance (already includes repayment deduction)
   state.funds += state.budgetInfo.balance
@@ -201,7 +222,14 @@ export function monthlyTick(state: EngineState): MonthlyTickResult {
     const baseExpenses = state.budgetInfo.maintenanceCosts.total + state.budgetInfo.serviceCosts.total
     const emergencyAmount = Math.max(10_000, -state.funds + baseExpenses * 6)
     const monthlyPayment = calcMonthlyPayment(emergencyAmount)
-    state.loan = { principal: emergencyAmount, remaining: emergencyAmount, monthlyPayment, termMonths: 120, monthsLeft: 120, interestRate: 0.08 }
+    state.loan = {
+      principal: emergencyAmount,
+      remaining: emergencyAmount,
+      monthlyPayment,
+      termMonths: 120,
+      monthsLeft: 120,
+      interestRate: 0.08,
+    }
     state.loanRepaymentAmount = monthlyPayment
     state.funds += emergencyAmount
     events.push({ type: 'emergency_loan', amount: emergencyAmount })

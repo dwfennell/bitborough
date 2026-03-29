@@ -18,7 +18,7 @@ describe('History collection', () => {
 
   test('snapshot contains correct month and year', () => {
     const engine = Engine.create(createTestMap(32), { seed: 42 })
-    advanceMonth(engine)  // month increments then snapshot captured: month=2, year=1900
+    advanceMonth(engine) // month increments then snapshot captured: month=2, year=1900
     const snap = engine.getState().history[0]!
     expect(snap.month).toBe(2)
     expect(snap.year).toBe(1900)

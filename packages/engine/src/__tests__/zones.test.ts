@@ -92,7 +92,14 @@ describe('updateZones unit', () => {
     // Force development by running many times (probability 0.12 per tick)
     let populationDelta = 0
     for (let i = 0; i < 100; i++) {
-      const result = updateZones(map, powerGrid, { residential: 1.0, commercial: 1.0, industrial: 1.0 }, prng, nextId, new BuildingIndex(map))
+      const result = updateZones(
+        map,
+        powerGrid,
+        { residential: 1.0, commercial: 1.0, industrial: 1.0 },
+        prng,
+        nextId,
+        new BuildingIndex(map),
+      )
       populationDelta += result.populationDelta
       if (map.buildings.some((b) => b.x === 5 && b.y === 5)) break
     }

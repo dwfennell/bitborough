@@ -2,6 +2,13 @@ import { type GameMap, Infrastructure, ZoneType, POWER } from '@bitborough/core'
 import { BUILDING_DEFS } from '../buildings-registry.js'
 import type { BuildingIndex } from '../building-index.js'
 
+/** Maps power-plant defIds to their tile capacity (from core POWER constants). */
+const POWER_CAPACITY: Record<string, number> = {
+  'power.diesel': POWER.dieselCapacity,
+  'power.coal': POWER.coalCapacity,
+  'power.nuclear': POWER.nuclearCapacity,
+}
+
 interface PowerPlant {
   x: number
   y: number
@@ -29,14 +36,7 @@ function findPowerPlants(map: GameMap): PowerPlant[] {
     const def = BUILDING_DEFS[building.defId]
     if (!def) continue
 
-    let capacity = 0
-    if (building.defId === 'power.diesel') {
-      capacity = POWER.dieselCapacity
-    } else if (building.defId === 'power.coal') {
-      capacity = POWER.coalCapacity
-    } else if (building.defId === 'power.nuclear') {
-      capacity = POWER.nuclearCapacity
-    }
+    const capacity = POWER_CAPACITY[building.defId] ?? 0
 
     if (capacity > 0) {
       plants.push({

@@ -42,12 +42,7 @@ describe('Infrastructure bit flags', () => {
   })
 
   test('flags are distinct powers of 2', () => {
-    const flags = [
-      Infrastructure.Road,
-      Infrastructure.PowerLine,
-      Infrastructure.Rail,
-      Infrastructure.PavedRoad,
-    ]
+    const flags = [Infrastructure.Road, Infrastructure.PowerLine, Infrastructure.Rail, Infrastructure.PavedRoad]
     for (let i = 0; i < flags.length; i++) {
       for (let j = i + 1; j < flags.length; j++) {
         expect(flags[i]! & flags[j]!).toBe(0)

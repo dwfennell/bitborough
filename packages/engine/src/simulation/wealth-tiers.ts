@@ -2,12 +2,18 @@ import type { WealthTier } from '@bitborough/core'
 import type { PRNG } from '../prng.js'
 
 // ── Tier distribution ─────────────────────────────────────────────
-export const TIER_DISTRIBUTION: readonly [number, number, number] = [0.30, 0.45, 0.25]
+export const TIER_DISTRIBUTION: readonly [number, number, number] = [0.3, 0.45, 0.25]
 
 // ── Tier weight table ─────────────────────────────────────────────
 export interface TierFactorWeights {
-  crime: number; pollution: number; park: number; fire: number
-  commute: number; jobMatch: number; commerce: number; education: number
+  crime: number
+  pollution: number
+  park: number
+  fire: number
+  commute: number
+  jobMatch: number
+  commerce: number
+  education: number
 }
 
 export const TIER_WEIGHTS: Record<WealthTier, TierFactorWeights> = {
@@ -46,16 +52,16 @@ export function buildTierCountsByBuilding(
   const map = new Map<string, [number, number, number]>()
   for (const a of agents) {
     let counts = map.get(a.homeBuildingId)
-    if (!counts) { counts = [0, 0, 0]; map.set(a.homeBuildingId, counts) }
-    counts[a.wealthTier - 1]! ++
+    if (!counts) {
+      counts = [0, 0, 0]
+      map.set(a.homeBuildingId, counts)
+    }
+    counts[a.wealthTier - 1]!++
   }
   return map
 }
 
-export function computeSchellingPenalty(
-  agentTier: WealthTier,
-  buildingTierCounts: [number, number, number],
-): number {
+export function computeSchellingPenalty(agentTier: WealthTier, buildingTierCounts: [number, number, number]): number {
   const total = buildingTierCounts[0] + buildingTierCounts[1] + buildingTierCounts[2]
   if (total <= 1) return 0
   const sameTierFraction = buildingTierCounts[agentTier - 1]! / total

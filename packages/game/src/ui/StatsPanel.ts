@@ -4,8 +4,8 @@ interface ChartDef {
   title: string
   getValue: (s: MonthlySnapshot) => number
   color: string | ((last: number) => string)
-  yMin?: number   // fixed min (demand charts use -1)
-  yMax?: number   // fixed max (demand charts use 1)
+  yMin?: number // fixed min (demand charts use -1)
+  yMax?: number // fixed max (demand charts use 1)
   secondSeries?: { getValue: (s: MonthlySnapshot) => number; color: string }
 }
 
@@ -54,9 +54,9 @@ const PANEL_H = 400
 const COLS = 2
 const ROWS = 3
 const PAD = 8
-const HEADER_H = 40  // panel header height
-const CHART_W = Math.floor((PANEL_W - PAD * (COLS + 1)) / COLS)  // ~220
-const CHART_H = Math.floor((PANEL_H - HEADER_H - PAD * (ROWS + 1)) / ROWS)  // ~100 (40px header)
+const HEADER_H = 40 // panel header height
+const CHART_W = Math.floor((PANEL_W - PAD * (COLS + 1)) / COLS) // ~220
+const CHART_H = Math.floor((PANEL_H - HEADER_H - PAD * (ROWS + 1)) / ROWS) // ~100 (40px header)
 
 export class StatsPanel {
   private el: HTMLElement
@@ -190,7 +190,7 @@ export class StatsPanel {
         if (v < seriesMin) seriesMin = v
         if (v > seriesMax) seriesMax = v
       }
-      yMin = Math.min(0, seriesMin)      // always include 0; extend down if negative
+      yMin = Math.min(0, seriesMin) // always include 0; extend down if negative
       yMax = seriesMax > 0 ? seriesMax * 1.1 : 1
     }
 

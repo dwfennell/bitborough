@@ -18,7 +18,7 @@ describe('Fire system', () => {
     for (let i = 0; i < 24; i++) advanceMonth(engine)
 
     const state = engine.getState()
-    const resBefore = state.map.buildings.filter(b => b.defId.startsWith('res.'))
+    const resBefore = state.map.buildings.filter((b) => b.defId.startsWith('res.'))
     expect(resBefore.length).toBeGreaterThan(0)
 
     const b = resBefore[0]!
@@ -30,7 +30,7 @@ describe('Fire system', () => {
     advanceMonth(engine)
 
     const after = engine.getState()
-    expect(after.map.buildings.filter(b2 => b2.id === b.id).length).toBe(0)
+    expect(after.map.buildings.filter((b2) => b2.id === b.id).length).toBe(0)
     expect(after.population).toBeLessThan(popBefore)
   })
 
@@ -47,7 +47,7 @@ describe('Fire system', () => {
     for (let i = 0; i < 24; i++) advanceMonth(engine)
 
     const state = engine.getState()
-    const resBefore = state.map.buildings.filter(b => b.defId.startsWith('res.'))
+    const resBefore = state.map.buildings.filter((b) => b.defId.startsWith('res.'))
     expect(resBefore.length).toBeGreaterThan(0)
 
     const b = resBefore[0]!
@@ -59,7 +59,7 @@ describe('Fire system', () => {
 
     // Building should be destroyed but zoning should remain
     const after = engine.getState()
-    expect(after.map.buildings.filter(b2 => b2.id === b.id).length).toBe(0)
+    expect(after.map.buildings.filter((b2) => b2.id === b.id).length).toBe(0)
     expect(after.map.zones[idx]).toBe(ZoneType.Residential)
   })
 

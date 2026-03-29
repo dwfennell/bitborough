@@ -1,20 +1,19 @@
-import { type GameMap, type Building, type BuildingDef, type CitizenSummary, type WealthTier, Infrastructure, BuildingCategory } from '@bitborough/core'
+import {
+  type GameMap,
+  type Building,
+  type CitizenSummary,
+  type WealthTier,
+  Infrastructure,
+  BuildingCategory,
+} from '@bitborough/core'
 import { BUILDING_DEFS } from '../buildings-registry.js'
-import type { RoadGraph } from '../road-graph.js'
-import { astar } from '../road-graph.js'
-import { sampleWealthTier, TIER_WEIGHTS, buildTierCountsByBuilding, computeSchellingPenalty } from './wealth-tiers.js'
-import { computeParkNorm } from './reputation.js'
-import type { BuildingIndex } from '../building-index.js'
-import type { PRNG } from '../prng.js'
-import { clamp } from './math.js'
-import { findNearestSchool, buildEnrollmentCounts, computeSchoolQuality, SCHOOL_CAPACITY } from './services/school.js'
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
 export interface AgentDemographics {
-  children: number    // ages 0-17
-  working: number     // ages 18-64
-  elderly: number     // ages 65+
+  children: number // ages 0-17
+  working: number // ages 18-64
+  elderly: number // ages 65+
 }
 
 export interface Citizen {
@@ -106,388 +105,7 @@ export function createRegistry(samplingRatio = DEFAULT_SAMPLING_RATIO): CitizenR
   return { agents: [], samplingRatio }
 }
 
-// ── Assign ───────────────────────────────────────────────────────────────────
-
-function findNearestBuilding(
-  map: GameMap,
-  graph: RoadGraph,
-  fromRoad: number,
-  filter: (def: BuildingDef) => boolean,
-  trafficDensity?: Uint8Array,
-): { buildingId: string; accessRoad: number; route: number[] } | null {
-  let best: { buildingId: string; accessRoad: number; route: number[] } | null = null
-  for (const building of map.buildings) {
-    if (building.state !== 'active') continue
-    const def = BUILDING_DEFS[building.defId]
-    if (!def || !filter(def)) continue
-    const access = resolveAccessRoad(map, building)
-    if (access < 0) continue
-    const route = astar(graph, fromRoad, access, map.width, undefined, trafficDensity)
-    if (!route) continue
-    if (!best || route.length < best.route.length) {
-      best = { buildingId: building.id, accessRoad: access, route }
-    }
-  }
-  return best
-}
-
-function buildTileSets(agent: Citizen): void {
-  agent.homeWorkRouteTileSet = new Set(agent.homeWorkRoute)
-  agent.homeCommerceRouteTileSet = new Set(agent.homeCommerceRoute)
-  agent.homeSchoolRouteTileSet = new Set(agent.homeSchoolRoute)
-}
-
-let nextAgentId = 1
-
-export function setNextAgentId(id: number): void {
-  nextAgentId = id
-}
-
-/** @internal — exposed for testing only */
-export function getNextAgentId(): number {
-  return nextAgentId
-}
-
-type RouteMatch = { buildingId: string; accessRoad: number; route: number[] } | null
-
-function createAgent(
-  homeBuildingId: string,
-  homeAccessRoad: number,
-  jobMatch: RouteMatch,
-  commerceMatch: RouteMatch,
-  wealthTier: WealthTier,
-  representedResidents: number = DEFAULT_SAMPLING_RATIO,
-): Citizen {
-  const id = `c${nextAgentId++}`
-  const agent: Citizen = {
-    id,
-    homeBuildingId,
-    workBuildingId: jobMatch?.buildingId ?? null,
-    commerceBuildingId: commerceMatch?.buildingId ?? null,
-    homeAccessRoad,
-    workAccessRoad: jobMatch?.accessRoad ?? null,
-    commerceAccessRoad: commerceMatch?.accessRoad ?? null,
-    homeWorkRoute: jobMatch?.route ?? [],
-    homeCommerceRoute: commerceMatch?.route ?? [],
-    homeWorkRouteTileSet: new Set(),
-    homeCommerceRouteTileSet: new Set(),
-    homeWorkRouteStale: false,
-    homeCommerceRouteStale: false,
-    schoolBuildingId: null,
-    schoolAccessRoad: null,
-    homeSchoolRoute: [],
-    homeSchoolRouteTileSet: new Set(),
-    homeSchoolRouteStale: false,
-    satisfaction: 1,
-    demographics: { children: 0, working: representedResidents, elderly: 0 },
-    wealthTier,
-  }
-  buildTileSets(agent)
-  return agent
-}
-
-function enrollAgentInSchool(
-  agent: Citizen,
-  schoolMatch: { buildingId: string; accessRoad: number; route: number[] },
-  enrollmentCounts: Map<string, number>,
-): void {
-  agent.schoolBuildingId = schoolMatch.buildingId
-  agent.schoolAccessRoad = schoolMatch.accessRoad
-  agent.homeSchoolRoute = schoolMatch.route
-  agent.homeSchoolRouteTileSet = new Set(schoolMatch.route)
-  enrollmentCounts.set(schoolMatch.buildingId, (enrollmentCounts.get(schoolMatch.buildingId) ?? 0) + agent.demographics.children)
-}
-
-export function buildAgentsByBuilding(agents: ReadonlyArray<Citizen>): Map<string, Citizen[]> {
-  const map = new Map<string, Citizen[]>()
-  for (const a of agents) {
-    let list = map.get(a.homeBuildingId)
-    if (!list) { list = []; map.set(a.homeBuildingId, list) }
-    list.push(a)
-  }
-  return map
-}
-
-export interface SyncAgentOptions {
-  trafficDensity?: Uint8Array
-  prng?: PRNG
-  reputationLayer?: Float32Array
-  enrollmentCounts?: Map<string, number>
-  agentIndex?: Map<string, Citizen[]>
-  tierDistOverride?: readonly [number, number, number]
-}
-
-export function syncAgentsForBuilding(map: GameMap, registry: CitizenRegistry, graph: RoadGraph, building: Building, opts: SyncAgentOptions = {}): void {
-  const { trafficDensity, prng, reputationLayer, enrollmentCounts, agentIndex, tierDistOverride } = opts
-  const homeAccessRoad = resolveAccessRoad(map, building)
-  if (homeAccessRoad < 0) return  // building has no road access — no agents
-
-  const existing = agentIndex ? (agentIndex.get(building.id) ?? []) : registry.agents.filter(a => a.homeBuildingId === building.id)
-  const needed = building.residents > 0
-    ? Math.max(1, Math.floor(building.residents / registry.samplingRatio))
-    : 0
-  const delta = needed - existing.length
-
-  if (delta > 0) {
-    // Compute route matches once — all agents from this building share the same access road
-    const jobMatch = findNearestBuilding(map, graph, homeAccessRoad, d => d.jobs > 0, trafficDensity)
-    const commerceMatch = findNearestBuilding(map, graph, homeAccessRoad, d => d.category === BuildingCategory.Commercial, trafficDensity)
-    const homeTileIdx = building.y * map.width + building.x
-    const residentsPerAgent = needed === 1 && building.residents < registry.samplingRatio
-      ? building.residents
-      : registry.samplingRatio
-    for (let i = 0; i < delta; i++) {
-      let wealthTier: WealthTier = 2
-      if (prng) {
-        const reputation = reputationLayer ? (reputationLayer[homeTileIdx] ?? 0.5) : 0.5
-        wealthTier = sampleWealthTier(prng, reputation, tierDistOverride)
-      }
-      registry.agents.push(createAgent(building.id, homeAccessRoad, jobMatch, commerceMatch, wealthTier, residentsPerAgent))
-    }
-    if (enrollmentCounts) {
-      const schoolMatch = findNearestSchool(map, graph, homeAccessRoad, enrollmentCounts, trafficDensity)
-      if (schoolMatch) {
-        for (let i = 0; i < delta; i++) {
-          const agent = registry.agents[registry.agents.length - delta + i]!
-          if (agent.demographics.children > 0) {
-            enrollAgentInSchool(agent, schoolMatch, enrollmentCounts)
-          }
-        }
-      }
-    }
-  } else if (delta < 0) {
-    // Remove from end
-    const toRemove = existing.slice(delta).map(a => a.id)
-    const removeSet = new Set(toRemove)
-    registry.agents = registry.agents.filter(a => !removeSet.has(a.id))
-  }
-}
-
-export function removeAgentsForBuilding(registry: CitizenRegistry, buildingId: string): void {
-  registry.agents = registry.agents.filter(a => a.homeBuildingId !== buildingId)
-}
-
-export function clearSchoolEnrollment(registry: CitizenRegistry, schoolBuildingId: string): void {
-  for (const agent of registry.agents) {
-    if (agent.schoolBuildingId === schoolBuildingId) {
-      agent.schoolBuildingId = null
-      agent.schoolAccessRoad = null
-      agent.homeSchoolRoute = []
-      agent.homeSchoolRouteTileSet = new Set()
-      agent.homeSchoolRouteStale = false
-    }
-  }
-}
-
-export function removeOrphanedAgents(registry: CitizenRegistry, validBuildingIds: Set<string>): void {
-  const orphanedIds = new Set<string>()
-  for (const agent of registry.agents) {
-    if (!validBuildingIds.has(agent.homeBuildingId)) {
-      orphanedIds.add(agent.homeBuildingId)
-    }
-  }
-  for (const id of orphanedIds) {
-    removeAgentsForBuilding(registry, id)
-  }
-}
-
-export function markRoutesStale(registry: CitizenRegistry, tileIndex: number): void {
-  for (const agent of registry.agents) {
-    if (agent.homeWorkRouteTileSet.has(tileIndex)) agent.homeWorkRouteStale = true
-    if (agent.homeCommerceRouteTileSet.has(tileIndex)) agent.homeCommerceRouteStale = true
-    if (agent.homeSchoolRouteTileSet.has(tileIndex)) agent.homeSchoolRouteStale = true
-  }
-}
-
-export function markRoutesStaleBatch(registry: CitizenRegistry, tileIndices: Set<number>): void {
-  for (const agent of registry.agents) {
-    if (agent.homeWorkRouteStale && agent.homeCommerceRouteStale && agent.homeSchoolRouteStale) continue
-    for (const idx of tileIndices) {
-      if (!agent.homeWorkRouteStale && agent.homeWorkRouteTileSet.has(idx)) agent.homeWorkRouteStale = true
-      if (!agent.homeCommerceRouteStale && agent.homeCommerceRouteTileSet.has(idx)) agent.homeCommerceRouteStale = true
-      if (!agent.homeSchoolRouteStale && agent.homeSchoolRouteTileSet.has(idx)) agent.homeSchoolRouteStale = true
-      if (agent.homeWorkRouteStale && agent.homeCommerceRouteStale && agent.homeSchoolRouteStale) break
-    }
-  }
-}
-
-function replanRoute(
-  agent: Citizen,
-  map: GameMap,
-  graph: RoadGraph,
-  currentAccessRoad: number | null,
-  filter: (def: BuildingDef) => boolean,
-  trafficDensity?: Uint8Array,
-): { buildingId: string | null; accessRoad: number | null; route: number[] } {
-  if (currentAccessRoad !== null) {
-    const route = astar(graph, agent.homeAccessRoad, currentAccessRoad, map.width, undefined, trafficDensity)
-    if (route) return { buildingId: null, accessRoad: currentAccessRoad, route }
-  }
-  const match = findNearestBuilding(map, graph, agent.homeAccessRoad, filter, trafficDensity)
-  if (match) return { buildingId: match.buildingId, accessRoad: match.accessRoad, route: match.route }
-  return { buildingId: null, accessRoad: null, route: [] }
-}
-
-export function replanStaleRoutes(registry: CitizenRegistry, map: GameMap, graph: RoadGraph, trafficDensity?: Uint8Array): void {
-  for (const agent of registry.agents) {
-    if (agent.homeWorkRouteStale) {
-      const result = replanRoute(agent, map, graph, agent.workAccessRoad, d => d.jobs > 0, trafficDensity)
-      if (result.buildingId !== null) agent.workBuildingId = result.buildingId
-      agent.workAccessRoad = result.accessRoad
-      agent.homeWorkRoute = result.route
-      if (result.accessRoad === null) agent.workBuildingId = null
-      agent.homeWorkRouteTileSet = new Set(agent.homeWorkRoute)
-      agent.homeWorkRouteStale = false
-    }
-    if (agent.homeCommerceRouteStale) {
-      const result = replanRoute(agent, map, graph, agent.commerceAccessRoad, d => d.category === BuildingCategory.Commercial, trafficDensity)
-      if (result.buildingId !== null) agent.commerceBuildingId = result.buildingId
-      agent.commerceAccessRoad = result.accessRoad
-      agent.homeCommerceRoute = result.route
-      if (result.accessRoad === null) agent.commerceBuildingId = null
-      agent.homeCommerceRouteTileSet = new Set(agent.homeCommerceRoute)
-      agent.homeCommerceRouteStale = false
-    }
-    if (agent.homeSchoolRouteStale) {
-      if (agent.demographics.children > 0 && agent.schoolAccessRoad !== null) {
-        const route = astar(graph, agent.homeAccessRoad, agent.schoolAccessRoad, map.width, undefined, trafficDensity)
-        if (route) {
-          agent.homeSchoolRoute = route
-          agent.homeSchoolRouteTileSet = new Set(route)
-          agent.homeSchoolRouteStale = false
-        } else {
-          // Direct route failed — clear enrollment, will re-enroll at next sync
-          agent.schoolBuildingId = null
-          agent.schoolAccessRoad = null
-          agent.homeSchoolRoute = []
-          agent.homeSchoolRouteTileSet = new Set()
-          agent.homeSchoolRouteStale = false
-        }
-      } else {
-        agent.homeSchoolRouteStale = false
-      }
-    }
-  }
-}
-
-// ── Monthly tick ──────────────────────────────────────────────────────────────
-
-const WORK_TRIP_WEIGHT = 2
-const COMMERCE_TRIP_WEIGHT = 1
-const MAX_SATISFACTION_COMMUTE = 60
-
-function computeSatisfaction(
-  agent: Citizen,
-  map: GameMap,
-  layers: TileLayers,
-  bldIdx: BuildingIndex,
-  buildingTierCounts: Map<string, [number, number, number]>,
-  buildingById: Map<string, Building>,
-  enrollmentCounts: Map<string, number>,
-  educationFunding: number,
-): number {
-  const w = TIER_WEIGHTS[agent.wealthTier]
-  const commuteNorm = clamp(agent.homeWorkRoute.length / MAX_SATISFACTION_COMMUTE, 0, 1)
-  const jobless = agent.workBuildingId === null ? 1 : 0
-  const noCommerce = agent.commerceBuildingId === null ? 1 : 0
-
-  const building = buildingById.get(agent.homeBuildingId)
-  let crimeNorm = 0, pollNorm = 0, fireNorm = 0, parkNorm = 0
-  if (building) {
-    const idx = building.y * map.width + building.x
-    crimeNorm = layers.crimeLevel[idx]! / 255
-    pollNorm = layers.pollutionLevel[idx]! / 255
-    fireNorm = layers.fireCoverage[idx]! / 255
-    parkNorm = computeParkNorm(building.x, building.y, map, bldIdx)
-  }
-
-  const tierCounts = buildingTierCounts.get(agent.homeBuildingId) ?? [0, 0, 0]
-  const schelling = computeSchellingPenalty(agent.wealthTier, tierCounts)
-
-  const MAX_SCHOOL_COMMUTE = 40
-
-  let educationScore = 0
-  if (agent.schoolBuildingId !== null) {
-    const schoolCommuteNorm = clamp(agent.homeSchoolRoute.length / MAX_SCHOOL_COMMUTE, 0, 1)
-    const schoolBuilding = buildingById.get(agent.schoolBuildingId)
-    const capacity = SCHOOL_CAPACITY[schoolBuilding?.defId ?? ''] ?? 0
-    const enrolled = enrollmentCounts.get(agent.schoolBuildingId) ?? 0
-    const schoolQuality = computeSchoolQuality(enrolled, capacity, educationFunding)
-    educationScore = schoolQuality * (1 - schoolCommuteNorm * 0.5)
-  }
-
-  return clamp(
-    1.0
-    - commuteNorm * 0.4 * w.commute
-    - jobless * 0.5 * w.jobMatch
-    - noCommerce * 0.3 * w.commerce
-    - crimeNorm * 0.3 * w.crime
-    - pollNorm * 0.3 * w.pollution
-    + fireNorm * 0.15 * w.fire
-    + parkNorm * 0.25 * w.park
-    - schelling
-    + educationScore * 0.15 * w.education,
-    0, 1,
-  )
-}
-
-const SCHOOL_TRIP_WEIGHT = 1
-
-export function citizenMonthlyTick(
-  registry: CitizenRegistry,
-  map: GameMap,
-  graph: RoadGraph,
-  trafficDensity: Uint8Array,
-  layers: TileLayers,
-  bldIdx: BuildingIndex,
-  educationFunding: number,
-): Map<string, number> {
-  // Pass 1: replan stale routes (traffic-aware)
-  replanStaleRoutes(registry, map, graph, trafficDensity)
-
-  // Pass 1b: enroll agents with children who aren't enrolled yet (e.g. after births)
-  const enrollmentCounts = buildEnrollmentCounts(registry.agents)
-  for (const agent of registry.agents) {
-    if (agent.demographics.children > 0 && agent.schoolBuildingId === null) {
-      const schoolMatch = findNearestSchool(map, graph, agent.homeAccessRoad, enrollmentCounts, trafficDensity)
-      if (schoolMatch) {
-        enrollAgentInSchool(agent, schoolMatch, enrollmentCounts)
-      }
-    }
-  }
-
-  // Pass 2: traffic contribution
-  const size = map.width * map.height
-  const rawTraffic = new Float64Array(size)
-
-  const buildingTierCounts = buildTierCountsByBuilding(registry.agents)
-  const buildingById = new Map<string, Building>()
-  for (const b of map.buildings) buildingById.set(b.id, b)
-
-  for (const agent of registry.agents) {
-    // Weight traffic by how many residents this agent represents
-    const d = agent.demographics
-    const representedPop = d.children + d.working + d.elderly
-    const trafficScale = representedPop / registry.samplingRatio
-    for (const tileIdx of agent.homeWorkRoute) {
-      rawTraffic[tileIdx]! += WORK_TRIP_WEIGHT * trafficScale
-    }
-    for (const tileIdx of agent.homeCommerceRoute) {
-      rawTraffic[tileIdx]! += COMMERCE_TRIP_WEIGHT * trafficScale
-    }
-    for (const tileIdx of agent.homeSchoolRoute) {
-      rawTraffic[tileIdx]! += SCHOOL_TRIP_WEIGHT * trafficScale
-    }
-    agent.satisfaction = computeSatisfaction(agent, map, layers, bldIdx, buildingTierCounts, buildingById, enrollmentCounts, educationFunding)
-  }
-
-  // Scale by sampling ratio and write to trafficDensity
-  trafficDensity.fill(0)
-  for (let i = 0; i < size; i++) {
-    trafficDensity[i] = Math.min(255, Math.floor(rawTraffic[i]! * registry.samplingRatio))
-  }
-  return enrollmentCounts
-}
+// ── Population aggregation ───────────────────────────────────────────────────
 
 export function computeCitizenSummary(registry: CitizenRegistry): CitizenSummary {
   const { agents } = registry
@@ -510,7 +128,7 @@ export function computeCitizenSummary(registry: CitizenRegistry): CitizenSummary
     totalChildren += agent.demographics.children
     totalWorking += agent.demographics.working
     totalElderly += agent.demographics.elderly
-    tierCounts[agent.wealthTier - 1]! ++
+    tierCounts[agent.wealthTier - 1]!++
   }
 
   return {
@@ -529,9 +147,7 @@ export function computeCitizenSummary(registry: CitizenRegistry): CitizenSummary
   }
 }
 
-/** Sync each residential building's `residents` from the sum of its agents' demographics.
- *  Only updates buildings that have at least one agent; buildings below the sampling
- *  threshold keep their fill-system residents value. */
+/** Sync each residential building's `residents` from the sum of its agents' demographics. */
 export function syncBuildingResidents(map: GameMap, registry: CitizenRegistry): void {
   const popByBuilding = new Map<string, number>()
   for (const agent of registry.agents) {
@@ -558,3 +174,23 @@ export function computeTotalPopulation(map: GameMap): number {
   }
   return total
 }
+
+// ── Re-exports from split modules ────────────────────────────────────────────
+// Keeps existing import paths working without changes to callers.
+
+export {
+  setNextAgentId,
+  getNextAgentId,
+  findNearestBuilding,
+  buildAgentsByBuilding,
+  type SyncAgentOptions,
+  syncAgentsForBuilding,
+  removeAgentsForBuilding,
+  clearSchoolEnrollment,
+  removeOrphanedAgents,
+  markRoutesStale,
+  markRoutesStaleBatch,
+  replanStaleRoutes,
+} from './citizen-sync.js'
+
+export { citizenMonthlyTick } from './citizen-tick.js'

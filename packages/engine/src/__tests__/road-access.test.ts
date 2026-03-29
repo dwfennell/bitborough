@@ -37,13 +37,13 @@ describe('hasNearbyRoad (direct)', () => {
   test('returns true when road is within range', () => {
     const map = createTestMap(16)
     map.infrastructure[8 * 16 + 8] = Infrastructure.Road
-    expect(hasNearbyRoad(map, 8, 11)).toBe(true)  // 3 tiles away (Manhattan)
+    expect(hasNearbyRoad(map, 8, 11)).toBe(true) // 3 tiles away (Manhattan)
   })
 
   test('returns false when road is beyond range', () => {
     const map = createTestMap(16)
     map.infrastructure[8 * 16 + 8] = Infrastructure.Road
-    expect(hasNearbyRoad(map, 8, 12)).toBe(false)  // 4 tiles away
+    expect(hasNearbyRoad(map, 8, 12)).toBe(false) // 4 tiles away
   })
 
   test('returns false when no road exists', () => {
@@ -62,13 +62,13 @@ describe('hasNearbyPavedRoad (direct)', () => {
   test('returns true when paved road is within range', () => {
     const map = createTestMap(16)
     map.infrastructure[8 * 16 + 8] = Infrastructure.PavedRoad
-    expect(hasNearbyPavedRoad(map, 8, 11)).toBe(true)  // 3 tiles away (Manhattan)
+    expect(hasNearbyPavedRoad(map, 8, 11)).toBe(true) // 3 tiles away (Manhattan)
   })
 
   test('returns false when paved road is beyond range', () => {
     const map = createTestMap(16)
     map.infrastructure[8 * 16 + 8] = Infrastructure.PavedRoad
-    expect(hasNearbyPavedRoad(map, 8, 12)).toBe(false)  // 4 tiles away
+    expect(hasNearbyPavedRoad(map, 8, 12)).toBe(false) // 4 tiles away
   })
 
   test('returns false when no paved road exists', () => {

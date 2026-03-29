@@ -13,10 +13,10 @@ export function calculateCrime(
 ): void {
   const size = map.width * map.height
 
-  buildInfluenceMap(
-    map, 'service.police', POLICE_BASE_RADIUS, policeFunding, influenceBuffer,
-    { defId: 'service.police.small', baseRadius: POLICE_SMALL_BASE_RADIUS },
-  )
+  buildInfluenceMap(map, 'service.police', POLICE_BASE_RADIUS, policeFunding, influenceBuffer, {
+    defId: 'service.police.small',
+    baseRadius: POLICE_SMALL_BASE_RADIUS,
+  })
 
   // Scaled-down Micropolis formula — our land values are 0-65, not 0-255
   for (let i = 0; i < size; i++) {

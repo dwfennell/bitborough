@@ -30,8 +30,15 @@ describe('monthlyTick', () => {
     const state = createEngineState(map, { seed: 1 })
 
     map.buildings.push({
-      id: 'b1', defId: 'res.low', x: 5, y: 5,
-      state: 'active', residents: 10, powered: true, density: 0, age: 0,
+      id: 'b1',
+      defId: 'res.low',
+      x: 5,
+      y: 5,
+      state: 'active',
+      residents: 10,
+      powered: true,
+      density: 0,
+      age: 0,
     } as Building)
 
     monthlyTick(state)
@@ -57,9 +64,18 @@ describe('monthlyTick', () => {
     // Pre-fill history with 1200 entries
     for (let i = 0; i < 1200; i++) {
       state.history.push({
-        month: 1, year: 1900, population: 0, funds: 5000,
-        taxIncome: 0, expenses: 0, rDemand: 0, cDemand: 0, iDemand: 0,
-        births: 0, deaths: 0, netMigration: 0,
+        month: 1,
+        year: 1900,
+        population: 0,
+        funds: 5000,
+        taxIncome: 0,
+        expenses: 0,
+        rDemand: 0,
+        cDemand: 0,
+        iDemand: 0,
+        births: 0,
+        deaths: 0,
+        netMigration: 0,
       })
     }
 
@@ -127,8 +143,15 @@ describe('syncResidentialAgents', () => {
     // Road adjacent so resolveAccessRoad succeeds; residents >= samplingRatio (50)
     map.infrastructure[4 * map.width + 4] = Infrastructure.Road
     map.buildings.push({
-      id: 'b1', defId: 'res.low', x: 4, y: 3,
-      state: 'active', residents: 50, powered: true, density: 0, age: 0,
+      id: 'b1',
+      defId: 'res.low',
+      x: 4,
+      y: 3,
+      state: 'active',
+      residents: 50,
+      powered: true,
+      density: 0,
+      age: 0,
     } as Building)
     rebuildDerivedState(state)
 
@@ -141,8 +164,15 @@ describe('syncResidentialAgents', () => {
     const state = createEngineState(map, { seed: 1 })
 
     map.buildings.push({
-      id: 'b1', defId: 'power.diesel', x: 4, y: 3,
-      state: 'active', residents: 0, powered: true, density: 0, age: 0,
+      id: 'b1',
+      defId: 'power.diesel',
+      x: 4,
+      y: 3,
+      state: 'active',
+      residents: 0,
+      powered: true,
+      density: 0,
+      age: 0,
     } as Building)
 
     syncResidentialAgents(state)
@@ -154,8 +184,15 @@ describe('syncResidentialAgents', () => {
     const state = createEngineState(map, { seed: 1 })
 
     map.buildings.push({
-      id: 'b1', defId: 'res.low', x: 4, y: 3,
-      state: 'under_construction', residents: 10, powered: false, density: 0, age: 0,
+      id: 'b1',
+      defId: 'res.low',
+      x: 4,
+      y: 3,
+      state: 'under_construction',
+      residents: 10,
+      powered: false,
+      density: 0,
+      age: 0,
     } as Building)
 
     syncResidentialAgents(state)

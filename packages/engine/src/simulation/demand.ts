@@ -36,7 +36,12 @@ function sumResidentialResidents(map: GameMap): number {
  * - Industrial: base 0.3 with dampened tax sensitivity
  * - Congestion: average road congestion > 0.8 suppresses all demand
  */
-export function calculateDemand(map: GameMap, taxRate: number, trafficDensity?: Uint8Array, citizens?: CitizenSummary): DemandInfo {
+export function calculateDemand(
+  map: GameMap,
+  taxRate: number,
+  trafficDensity?: Uint8Array,
+  citizens?: CitizenSummary,
+): DemandInfo {
   const taxModifier = 1.0 - (taxRate - 0.07) * 5.0
 
   // Residential demand:
@@ -69,7 +74,7 @@ export function calculateDemand(map: GameMap, taxRate: number, trafficDensity?: 
   if (citizens && citizens.agentCount > 0) {
     // Long commute suppresses residential demand (max -0.3 penalty at 60 tiles)
     if (citizens.avgCommuteLengthTiles > 30) {
-      const penalty = Math.min(0.3, (citizens.avgCommuteLengthTiles - 30) / 30 * 0.3)
+      const penalty = Math.min(0.3, ((citizens.avgCommuteLengthTiles - 30) / 30) * 0.3)
       rDemand -= penalty
     }
 
@@ -131,4 +136,3 @@ function computeAverageCongestion(map: GameMap, trafficDensity: Uint8Array): num
 
   return roadCount > 0 ? totalCongestion / roadCount : 0
 }
-

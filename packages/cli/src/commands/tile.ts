@@ -12,7 +12,8 @@ export function tileCommand(program: Command) {
     .option('--file <path>', 'game file', 'game.json')
     .action((x, y, opts) => {
       const engine = loadEngine(opts.file)
-      const tx = parseInt(x), ty = parseInt(y)
+      const tx = parseInt(x),
+        ty = parseInt(y)
       const state = engine.getState()
       if (isNaN(tx) || isNaN(ty) || tx < 0 || ty < 0 || tx >= state.map.width || ty >= state.map.height) {
         outErr({ ok: false, error: `Coordinates (${tx},${ty}) out of bounds` })
@@ -24,7 +25,8 @@ export function tileCommand(program: Command) {
       })
       const def = building ? BUILDING_DEFS[building.defId] : undefined
       out({
-        x: tx, y: ty,
+        x: tx,
+        y: ty,
         terrain: TileType[info.terrain],
         zone: info.zone !== ZoneType.None ? ZoneType[info.zone] : null,
         infra: infraFlags(info.infrastructure),
@@ -35,12 +37,14 @@ export function tileCommand(program: Command) {
         fireCoverage: info.fireCoverage,
         pollutionLevel: info.pollutionLevel,
         reputation: Math.round(info.reputation * 1000) / 1000,
-        building: building ? {
-          id: building.defId,
-          state: building.state,
-          residents: building.residents,
-          capacity: def?.capacity ?? 0,
-        } : null,
+        building: building
+          ? {
+              id: building.defId,
+              state: building.state,
+              residents: building.residents,
+              capacity: def?.capacity ?? 0,
+            }
+          : null,
       })
     })
 }

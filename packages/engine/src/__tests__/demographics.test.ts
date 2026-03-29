@@ -4,7 +4,7 @@ import { createTestMap } from '../test-helpers.js'
 import { createRegistry } from '../simulation/citizens.js'
 import type { Citizen, AgentDemographics } from '../simulation/citizens.js'
 import { PRNG } from '../prng.js'
-import { DensityLevel } from '@bitborough/core'
+import { type Building, DensityLevel } from '@bitborough/core'
 
 function makeAgent(id: string, buildingId: string, demographics: AgentDemographics): Citizen {
   return {
@@ -21,6 +21,11 @@ function makeAgent(id: string, buildingId: string, demographics: AgentDemographi
     homeCommerceRouteTileSet: new Set(),
     homeWorkRouteStale: false,
     homeCommerceRouteStale: false,
+    schoolBuildingId: null,
+    schoolAccessRoad: null,
+    homeSchoolRoute: [],
+    homeSchoolRouteTileSet: new Set(),
+    homeSchoolRouteStale: false,
     satisfaction: 0.7,
     wealthTier: 2,
     demographics,
@@ -136,9 +141,16 @@ describe('Demographics — migration removed', () => {
     const agent = makeAgent('c1', 'b1', { children: 0, working: 50, elderly: 0 })
     registry.agents.push(agent)
     const map = createTestMap(8)
-    const building = {
-      id: 'b1', defId: 'res.med', x: 0, y: 0,
-      powered: true, density: DensityLevel.Medium, age: 0, state: 'active', residents: 50,
+    const building: Building = {
+      id: 'b1',
+      defId: 'res.med',
+      x: 0,
+      y: 0,
+      powered: true,
+      density: DensityLevel.Medium,
+      age: 0,
+      state: 'active',
+      residents: 50,
     }
     map.buildings = [building]
     const prng = new PRNG(42)

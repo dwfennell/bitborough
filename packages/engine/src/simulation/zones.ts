@@ -53,8 +53,7 @@ export function updateZones(
   return { populationDelta: 0 }
 }
 
-
-function getZoneDemand(zone: ZoneType, demand: DemandInfo): number {
+export function getZoneDemand(zone: ZoneType, demand: DemandInfo): number {
   switch (zone) {
     case ZoneType.Residential:
       return demand.residential

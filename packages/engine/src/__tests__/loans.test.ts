@@ -1,63 +1,22 @@
 import { describe, test, expect } from 'vitest'
 import { Engine } from '../Engine.js'
-import { createTestMap, advanceMonth, advanceYear } from '../test-helpers.js'
-import { FailReason, Infrastructure, ZoneType } from '@bitborough/core'
-
-/**
- * Create an engine with enough population and land value to produce
- * meaningful taxIncome. Uses a 64x64 map with zones and advances 20 years.
- */
-function createEngineWithIncome() {
-  const engine = Engine.create(createTestMap(64), { seed: 42, startingFunds: 2_000_000 })
-  // Power plant at (0,0)
-  engine.placeBuilding(0, 0, 'power.coal')
-  // Power line from plant edge down to zones
-  for (let y = 4; y <= 5; y++) {
-    engine.placeTile(3, y, Infrastructure.PowerLine)
-  }
-  // Large grid of zones with roads and power
-  for (let row = 0; row < 10; row++) {
-    const baseY = 5 + row * 3
-    if (baseY + 2 >= 64) break
-    for (let x = 3; x < 50; x++) {
-      if (x >= 64) break
-      engine.placeTile(x, baseY, Infrastructure.PowerLine)
-      engine.placeTile(x, baseY + 2, Infrastructure.Road)
-      if (row < 6) {
-        engine.placeZone(x, baseY + 1, ZoneType.Residential)
-      } else if (row < 8) {
-        engine.placeZone(x, baseY + 1, ZoneType.Commercial)
-      } else {
-        engine.placeZone(x, baseY + 1, ZoneType.Industrial)
-      }
-    }
-  }
-  // Advance 20 years so zones fully develop
-  for (let i = 0; i < 20; i++) advanceYear(engine)
-  return engine
-}
+import { createTestMap, advanceMonth, createDevelopedCity } from '../test-helpers.js'
+import { FailReason, Infrastructure } from '@bitborough/core'
 
 describe('Loan system', () => {
   test('takeLoan() success — funds increase, loan is set', { timeout: 60_000 }, () => {
-    const engine = createEngineWithIncome()
+    const engine = createDevelopedCity()
     const state0 = engine.getState()
     const taxIncome = state0.budget.taxIncome
     expect(taxIncome).toBeGreaterThan(0)
+    // With $50M starting funds, no emergency loan should have been triggered
     expect(state0.loan).toBeNull()
 
     const fundsBefore = state0.funds
     const maxLoan = taxIncome * 48
-    // Use whatever amount is valid (between 10_000 and maxLoan, or the maxLoan if < 10_000)
-    // The actual amount doesn't matter for testing the mechanics
     const loanAmount = Math.floor(maxLoan * 0.5)
-    expect(loanAmount).toBeGreaterThan(0)
-
-    // If loan amount is below minimum ($10k), takeLoan will reject with AmountOutOfRange
-    if (loanAmount < 10_000) {
-      const result = engine.takeLoan(loanAmount)
-      expect(result.ok).toBe(false)
-      return
-    }
+    // taxIncome should be high enough for a meaningful loan
+    expect(loanAmount).toBeGreaterThanOrEqual(10_000)
 
     const result = engine.takeLoan(loanAmount)
     expect(result.ok).toBe(true)
@@ -98,9 +57,12 @@ describe('Loan system', () => {
   })
 
   test('takeLoan() fails when amount > 48x taxIncome', { timeout: 60_000 }, () => {
-    const engine = createEngineWithIncome()
-    const maxLoan = engine.getState().budget.taxIncome * 48
-    // Any amount above maxLoan should fail
+    const engine = createDevelopedCity()
+    const state0 = engine.getState()
+    expect(state0.loan).toBeNull()
+    const maxLoan = state0.budget.taxIncome * 48
+    // Ensure maxLoan is above minimum so we test the upper bound, not the lower
+    expect(maxLoan).toBeGreaterThanOrEqual(10_000)
     const result = engine.takeLoan(maxLoan + 1)
     expect(result.ok).toBe(false)
     if (!result.ok) {

@@ -1,4 +1,4 @@
-import { describe, test, expect } from 'vitest'
+import { describe, test, it, expect } from 'vitest'
 import { Infrastructure, BuildingCategory, DensityLevel, ZoneType, Building } from '@bitborough/core'
 import { BUILDING_DEFS } from '../buildings-registry.js'
 import { createTestMap } from '../test-helpers.js'
@@ -528,9 +528,16 @@ describe('derelict buildings', () => {
   it('tickDerelict subtracts actual residents, not capacity', () => {
     const map = createTestMap(32)
     const building: Building = {
-      id: 'b1', defId: 'res.med', x: 5, y: 5, powered: true,
-      density: DensityLevel.Medium, age: 10, state: 'derelict',
-      residents: 3, derelictMonths: 5,
+      id: 'b1',
+      defId: 'res.med',
+      x: 5,
+      y: 5,
+      powered: true,
+      density: DensityLevel.Medium,
+      age: 10,
+      state: 'derelict',
+      residents: 3,
+      derelictMonths: 5,
     }
     map.buildings.push(building)
     const delta = tickDerelict(map, building)
@@ -1487,13 +1494,27 @@ describe('variable construction time', () => {
     }
     // Transit stop for medium→high gate
     map.buildings.push({
-      id: 'ts', defId: 'transit.stop', x: 12, y: 10,
-      powered: true, density: DensityLevel.Low, age: 0, state: 'active', residents: 0,
+      id: 'ts',
+      defId: 'transit.stop',
+      x: 12,
+      y: 10,
+      powered: true,
+      density: DensityLevel.Low,
+      age: 0,
+      state: 'active',
+      residents: 0,
     })
     // Main building: res.med at high occupancy
     map.buildings.push({
-      id: 'b1', defId: 'res.med', x: 10, y: 10,
-      powered: true, density: DensityLevel.Medium, age: 5, state: 'active', residents: 90,
+      id: 'b1',
+      defId: 'res.med',
+      x: 10,
+      y: 10,
+      powered: true,
+      density: DensityLevel.Medium,
+      age: 5,
+      state: 'active',
+      residents: 90,
     })
     // Fill neighbourhood with medium density for critical mass
     const range = 3
@@ -1503,8 +1524,15 @@ describe('variable construction time', () => {
         if (dx === 0 && dy === 0) continue
         if (Math.abs(dx) + Math.abs(dy) > range) continue
         map.buildings.push({
-          id: `m${id++}`, defId: 'res.med', x: 10 + dx, y: 10 + dy,
-          powered: true, density: DensityLevel.Medium, age: 0, state: 'active', residents: 90,
+          id: `m${id++}`,
+          defId: 'res.med',
+          x: 10 + dx,
+          y: 10 + dy,
+          powered: true,
+          density: DensityLevel.Medium,
+          age: 0,
+          state: 'active',
+          residents: 90,
         })
       }
     }
@@ -1547,8 +1575,15 @@ describe('variable construction time', () => {
       map.infrastructure[5 * map.width + x] = Infrastructure.Road | Infrastructure.PavedRoad
       map.zones[5 * map.width + x] = ZoneType.Residential
       map.buildings.push({
-        id: `b${dx}`, defId: 'res.low', x, y: 5,
-        powered: true, density: DensityLevel.Low, age: 0, state: 'active', residents: 9,
+        id: `b${dx}`,
+        defId: 'res.low',
+        x,
+        y: 5,
+        powered: true,
+        density: DensityLevel.Low,
+        age: 0,
+        state: 'active',
+        residents: 9,
       })
     }
     const powerGrid = new Uint8Array(map.width * map.height)
@@ -1563,7 +1598,9 @@ describe('variable construction time', () => {
         if (b.state === 'active') b.residents = 9
       }
       updateDensity(map, powerGrid, demand, 5000, prng, { value: 100 }, empty, empty, empty)
-      const uc = map.buildings.find((b) => b.state === 'under_construction' && b.upgradingToDefId?.startsWith('res.med'))
+      const uc = map.buildings.find(
+        (b) => b.state === 'under_construction' && b.upgradingToDefId?.startsWith('res.med'),
+      )
       if (uc) {
         expect(uc.constructionMonthsRemaining).toBe(2)
         found = true
@@ -1581,8 +1618,15 @@ describe('migration modifier', () => {
     map.infrastructure[y * map.width + x] = Infrastructure.Road
     map.zones[y * map.width + x] = ZoneType.Residential
     map.buildings.push({
-      id: 'b1', defId: 'res.low', x, y,
-      powered: true, density: DensityLevel.Low, age: 0, state: 'active', residents: 0,
+      id: 'b1',
+      defId: 'res.low',
+      x,
+      y,
+      powered: true,
+      density: DensityLevel.Low,
+      age: 0,
+      state: 'active',
+      residents: 0,
     })
     const size = map.width * map.height
     const powerGrid = new Uint8Array(size)

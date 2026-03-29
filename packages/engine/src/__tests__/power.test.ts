@@ -101,6 +101,8 @@ describe('Power propagation', () => {
         powered: false,
         density: DensityLevel.Low,
         age: 0,
+        state: 'active',
+        residents: 0,
       })
     }
 
@@ -116,6 +118,8 @@ describe('Power propagation', () => {
         powered: false,
         density: DensityLevel.Low,
         age: 0,
+        state: 'active',
+        residents: 0,
       })
     }
 

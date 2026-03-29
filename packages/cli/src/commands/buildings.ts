@@ -12,14 +12,19 @@ export function buildingsCommand(program: Command) {
     .action((opts) => {
       const engine = loadEngine(opts.file)
       const state = engine.getState()
-      out(state.map.buildings.map((b: Building) => {
-        const def = BUILDING_DEFS[b.defId]
-        return {
-          x: b.x, y: b.y, id: b.defId, state: b.state,
-          residents: Math.round(b.residents),
-          capacity: def?.capacity ?? 0,
-          jobs: def?.jobs ?? 0,
-        }
-      }))
+      out(
+        state.map.buildings.map((b: Building) => {
+          const def = BUILDING_DEFS[b.defId]
+          return {
+            x: b.x,
+            y: b.y,
+            id: b.defId,
+            state: b.state,
+            residents: Math.round(b.residents),
+            capacity: def?.capacity ?? 0,
+            jobs: def?.jobs ?? 0,
+          }
+        }),
+      )
     })
 }

@@ -219,23 +219,51 @@ describe('Vacancy rate feedback', () => {
   test('high vacancy dampens residential demand when population exceeds gate', () => {
     const map = createTestMap(32)
     map.buildings.push({
-      id: 'r1', defId: 'res.med', x: 0, y: 0,
-      density: DensityLevel.Medium, state: 'active', residents: 110, age: 0, powered: true,
+      id: 'r1',
+      defId: 'res.med',
+      x: 0,
+      y: 0,
+      density: DensityLevel.Medium,
+      state: 'active',
+      residents: 110,
+      age: 0,
+      powered: true,
     })
     map.buildings.push({
-      id: 'r2', defId: 'res.med', x: 2, y: 0,
-      density: DensityLevel.Medium, state: 'active', residents: 0, age: 0, powered: true,
+      id: 'r2',
+      defId: 'res.med',
+      x: 2,
+      y: 0,
+      density: DensityLevel.Medium,
+      state: 'active',
+      residents: 0,
+      age: 0,
+      powered: true,
     })
     const withVacancy = calculateDemand(map, 0.07)
 
     const mapFull = createTestMap(32)
     mapFull.buildings.push({
-      id: 'r1', defId: 'res.med', x: 0, y: 0,
-      density: DensityLevel.Medium, state: 'active', residents: 100, age: 0, powered: true,
+      id: 'r1',
+      defId: 'res.med',
+      x: 0,
+      y: 0,
+      density: DensityLevel.Medium,
+      state: 'active',
+      residents: 100,
+      age: 0,
+      powered: true,
     })
     mapFull.buildings.push({
-      id: 'r2', defId: 'res.med', x: 2, y: 0,
-      density: DensityLevel.Medium, state: 'active', residents: 100, age: 0, powered: true,
+      id: 'r2',
+      defId: 'res.med',
+      x: 2,
+      y: 0,
+      density: DensityLevel.Medium,
+      state: 'active',
+      residents: 100,
+      age: 0,
+      powered: true,
     })
     const withFullOccupancy = calculateDemand(mapFull, 0.07)
 
@@ -246,8 +274,15 @@ describe('Vacancy rate feedback', () => {
     const map = createTestMap(32)
     for (let x = 0; x < 5; x++) {
       map.buildings.push({
-        id: `r${x}`, defId: 'res.low', x, y: 0,
-        density: DensityLevel.Low, state: 'active', residents: 0, age: 0, powered: true,
+        id: `r${x}`,
+        defId: 'res.low',
+        x,
+        y: 0,
+        density: DensityLevel.Low,
+        state: 'active',
+        residents: 0,
+        age: 0,
+        powered: true,
       })
     }
     const demand = calculateDemand(map, 0.07)
@@ -259,8 +294,15 @@ describe('Vacancy rate feedback', () => {
     const map = createTestMap(32)
     for (let x = 0; x < 10; x++) {
       map.buildings.push({
-        id: `r${x}`, defId: 'res.low', x, y: 0,
-        density: DensityLevel.Low, state: 'active', residents: 9.5, age: 0, powered: true,
+        id: `r${x}`,
+        defId: 'res.low',
+        x,
+        y: 0,
+        density: DensityLevel.Low,
+        state: 'active',
+        residents: 9.5,
+        age: 0,
+        powered: true,
       })
     }
     const withLowVacancy = calculateDemand(map, 0.07)
@@ -268,8 +310,15 @@ describe('Vacancy rate feedback', () => {
     const mapFull = createTestMap(32)
     for (let x = 0; x < 10; x++) {
       mapFull.buildings.push({
-        id: `r${x}`, defId: 'res.low', x, y: 0,
-        density: DensityLevel.Low, state: 'active', residents: 10, age: 0, powered: true,
+        id: `r${x}`,
+        defId: 'res.low',
+        x,
+        y: 0,
+        density: DensityLevel.Low,
+        state: 'active',
+        residents: 10,
+        age: 0,
+        powered: true,
       })
     }
     const withFullOccupancy = calculateDemand(mapFull, 0.07)

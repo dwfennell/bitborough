@@ -16,7 +16,7 @@ export interface DemographicResult {
 /** Stochastic rounding: floor(n*p) + probabilistic remainder. O(1) per call. */
 export function stochasticCount(n: number, p: number, prng: PRNG): number {
   const expected = n * p
-  return Math.floor(expected) + (prng.next() < (expected % 1) ? 1 : 0)
+  return Math.floor(expected) + (prng.next() < expected % 1 ? 1 : 0)
 }
 
 function removeEmptyAgents(registry: CitizenRegistry): void {
@@ -28,11 +28,7 @@ function removeEmptyAgents(registry: CitizenRegistry): void {
   }
 }
 
-export function demographicTick(
-  registry: CitizenRegistry,
-  map: GameMap,
-  prng: PRNG,
-): DemographicResult {
+export function demographicTick(registry: CitizenRegistry, map: GameMap, prng: PRNG): DemographicResult {
   let births = 0
   let deaths = 0
 

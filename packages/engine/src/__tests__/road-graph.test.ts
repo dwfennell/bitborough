@@ -21,7 +21,7 @@ describe('RoadGraph', () => {
   test('two adjacent road tiles are neighbors', () => {
     const map = createTestMap(8)
     map.infrastructure[0] = Infrastructure.Road
-    map.infrastructure[1] = Infrastructure.Road  // (1,0)
+    map.infrastructure[1] = Infrastructure.Road // (1,0)
     const graph = buildRoadGraph(map)
     expect(graph.get(0)).toContain(1)
     expect(graph.get(1)).toContain(0)
@@ -100,14 +100,14 @@ describe('astar', () => {
     // Road row at y=0: 0,1,2,3 and row y=1: 0,1,2,3 but NOT (1,0)
     // So going 0→3 must go via y=1
     // Layout (4-wide): indices 0..3 = y=0, 4..7 = y=1
-    map.infrastructure[0] = Infrastructure.Road  // (0,0)
+    map.infrastructure[0] = Infrastructure.Road // (0,0)
     // (1,0) index=1 is blocked (not road)
-    map.infrastructure[2] = Infrastructure.Road  // (2,0)
-    map.infrastructure[3] = Infrastructure.Road  // (3,0)
-    map.infrastructure[4] = Infrastructure.Road  // (0,1)
-    map.infrastructure[5] = Infrastructure.Road  // (1,1)
-    map.infrastructure[6] = Infrastructure.Road  // (2,1)
-    map.infrastructure[7] = Infrastructure.Road  // (3,1)
+    map.infrastructure[2] = Infrastructure.Road // (2,0)
+    map.infrastructure[3] = Infrastructure.Road // (3,0)
+    map.infrastructure[4] = Infrastructure.Road // (0,1)
+    map.infrastructure[5] = Infrastructure.Road // (1,1)
+    map.infrastructure[6] = Infrastructure.Road // (2,1)
+    map.infrastructure[7] = Infrastructure.Road // (3,1)
     const graph = buildRoadGraph(map)
     const path = astar(graph, 0, 3, map.width)
     // Should route via y=1: 0→4→5→6→7→3 or 0→4→5→6→2→3
@@ -119,7 +119,7 @@ describe('astar', () => {
   test('returns null when no path exists', () => {
     const map = createTestMap(8)
     map.infrastructure[0] = Infrastructure.Road
-    map.infrastructure[7] = Infrastructure.Road  // disconnected
+    map.infrastructure[7] = Infrastructure.Road // disconnected
     const graph = buildRoadGraph(map)
     expect(astar(graph, 0, 7, map.width)).toBeNull()
   })
@@ -172,7 +172,7 @@ describe('astar', () => {
     const congestedPath = astar(graph, 0, 3, map.width, undefined, trafficDensity)
     expect(congestedPath).not.toBeNull()
     // The path should go through row 1 (indices 8-11)
-    expect(congestedPath!.some(t => t >= 8 && t <= 11)).toBe(true)
+    expect(congestedPath!.some((t) => t >= 8 && t <= 11)).toBe(true)
     expect(congestedPath![0]).toBe(0)
     expect(congestedPath![congestedPath!.length - 1]).toBe(3)
   })

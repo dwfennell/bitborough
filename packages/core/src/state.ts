@@ -1,4 +1,21 @@
 import type { GameMap } from './map.js'
+import type { TileType } from './tiles.js'
+import type { ZoneType } from './zones.js'
+
+export interface TileInfo {
+  terrain: TileType
+  zone: ZoneType
+  infrastructure: number
+  connections: number
+  elevation: number
+  powered: boolean
+  hasRoadAccess: boolean
+  landValue: number
+  crimeLevel: number
+  fireCoverage: number
+  pollutionLevel: number
+  reputation: number
+}
 
 export type WealthTier = 1 | 2 | 3 // 1=Low, 2=Mid, 3=High
 
@@ -40,13 +57,13 @@ export interface MonthlySnapshot {
   year: number
   population: number
   funds: number
-  taxIncome: number   // budgetInfo.taxIncome
-  expenses: number    // budgetInfo.projectedExpenses (projected, not actual charged amount)
-  rDemand: number     // demand.residential, -1..1
-  cDemand: number     // demand.commercial, -1..1
-  iDemand: number     // demand.industrial, -1..1
-  births: number       // absolute count this month
-  deaths: number       // absolute count this month
+  taxIncome: number // budgetInfo.taxIncome
+  expenses: number // budgetInfo.projectedExpenses (projected, not actual charged amount)
+  rDemand: number // demand.residential, -1..1
+  cDemand: number // demand.commercial, -1..1
+  iDemand: number // demand.industrial, -1..1
+  births: number // absolute count this month
+  deaths: number // absolute count this month
   netMigration: number // absolute count this month
 }
 
@@ -145,7 +162,7 @@ export interface GameState {
 export function calcMonthlyPayment(principal: number, annualRate = 0.08, termMonths = 120): number {
   const r = annualRate / 12
   if (r === 0) return principal / termMonths
-  return principal * r / (1 - Math.pow(1 + r, -termMonths))
+  return (principal * r) / (1 - Math.pow(1 + r, -termMonths))
 }
 
 export interface SaveFile {
@@ -163,7 +180,7 @@ export interface SaveFile {
     activeFires?: Array<[number, number]>
     loan?: Loan | null
     loanRepaymentAmount?: number
-    history?: MonthlySnapshot[]   // optional for backwards compatibility; [] if absent
+    history?: MonthlySnapshot[] // optional for backwards compatibility; [] if absent
     citizens?: {
       samplingRatio: number
       agents: Array<{

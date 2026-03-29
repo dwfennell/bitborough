@@ -13,7 +13,9 @@ import { buildRoadGraph, type RoadGraph } from './road-graph.js'
 import { BuildingIndex } from './building-index.js'
 import { BUILDING_DEFS } from './buildings-registry.js'
 import {
-  createRegistry, computeTotalPopulation, computeCitizenSummary,
+  createRegistry,
+  computeTotalPopulation,
+  computeCitizenSummary,
   setNextAgentId,
   type CitizenRegistry,
   EMPTY_CITIZEN_SUMMARY,
@@ -112,7 +114,14 @@ export function computeLoanRepayment(state: EngineState): number {
 export function rebuildDerivedState(state: EngineState): void {
   state.bldIdx = new BuildingIndex(state.map)
   calculatePollution(state.map, state.pollutionLevel, state.pollutionBuffer)
-  calculateLandValues(state.map, state.powerGrid, state.pollutionLevel, state.crimeLevel, state.landValues, state.bldIdx)
+  calculateLandValues(
+    state.map,
+    state.powerGrid,
+    state.pollutionLevel,
+    state.crimeLevel,
+    state.landValues,
+    state.bldIdx,
+  )
   calculateCrime(state.map, state.landValues, state.crimeLevel, state.funding.police, state.influenceBuffer)
   calculateFireCoverage(state.map, state.fireCoverage, state.funding.fire, state.influenceBuffer)
 }
@@ -150,7 +159,7 @@ export function serializeState(state: EngineState): SaveFile {
       history: state.history,
       citizens: {
         samplingRatio: state.citizenRegistry.samplingRatio,
-        agents: state.citizenRegistry.agents.map(a => ({
+        agents: state.citizenRegistry.agents.map((a) => ({
           id: a.id,
           homeBuildingId: a.homeBuildingId,
           homeAccessRoad: a.homeAccessRoad,
@@ -204,7 +213,7 @@ export function restoreState(save: SaveFile): EngineState {
   if (save.state.citizens) {
     citizenRegistry = {
       samplingRatio: save.state.citizens.samplingRatio,
-      agents: save.state.citizens.agents.map(a => ({
+      agents: save.state.citizens.agents.map((a) => ({
         ...a,
         demographics: a.demographics ?? { children: 0, working: 50, elderly: 0 },
         wealthTier: a.wealthTier ?? 2,
@@ -245,7 +254,7 @@ export function restoreState(save: SaveFile): EngineState {
       transit: save.state.funding.transit ?? 100,
       education: save.state.funding.education ?? 100,
     },
-    budgetInfo: undefined!,  // will be set below
+    budgetInfo: undefined!, // will be set below
     powerGrid: new Uint8Array(size),
     landValues: new Uint8Array(size),
     pollutionLevel: new Uint8Array(size),
@@ -262,7 +271,7 @@ export function restoreState(save: SaveFile): EngineState {
     pollutionBuffer: new Float32Array(size),
     bldIdx: new BuildingIndex(map),
     loan: save.state.loan ?? null,
-    loanRepaymentAmount: save.state.loanRepaymentAmount ?? (save.state.loan?.monthlyPayment ?? 0),
+    loanRepaymentAmount: save.state.loanRepaymentAmount ?? save.state.loan?.monthlyPayment ?? 0,
     history: save.state.history ?? [],
     cityAttractiveness: 0.5,
     attractivenessFactors: {
@@ -343,7 +352,7 @@ export function createEngineState(map: GameMap, config: EngineConfig): EngineSta
     monthsPerYear,
     demand: { residential: 0, commercial: 0, industrial: 0 },
     funding: { police: 100, fire: 100, transit: 100, education: 100 },
-    budgetInfo: undefined!,  // will be set below
+    budgetInfo: undefined!, // will be set below
     powerGrid,
     landValues,
     pollutionLevel,
@@ -380,13 +389,26 @@ export function createEngineState(map: GameMap, config: EngineConfig): EngineSta
   rebuildDerivedState(state)
 
   // Reputation must run after rebuildDerivedState
-  computeReputation(state.reputationLayer, state.map, state.crimeLevel, state.fireCoverage, state.pollutionLevel, state.bldIdx)
+  computeReputation(
+    state.reputationLayer,
+    state.map,
+    state.crimeLevel,
+    state.fireCoverage,
+    state.pollutionLevel,
+    state.bldIdx,
+  )
 
   // Initialize demand
   state.demand = calculateDemand(state.map, state.taxRate)
 
   // Initialize budget
-  state.budgetInfo = calculateBudget(state.map, computeTotalPopulation(state.map), state.taxRate, state.landValues, state.funding)
+  state.budgetInfo = calculateBudget(
+    state.map,
+    computeTotalPopulation(state.map),
+    state.taxRate,
+    state.landValues,
+    state.funding,
+  )
 
   return state
 }

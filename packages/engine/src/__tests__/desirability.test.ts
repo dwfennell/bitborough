@@ -138,7 +138,7 @@ describe('residential desirability', () => {
     const d = computeDesirability(ZoneType.Residential, 5, 5, map, powerGrid, crimeLevel, fireCoverage, pollutionLevel)
     // park at dist 2: bonus = 0.25 * (1 - 2/5) = 0.15
     // 0.30 + 0.30 + 0.15 + 0.15 = 0.90
-    expect(d).toBeCloseTo(0.90, 2)
+    expect(d).toBeCloseTo(0.9, 2)
   })
 
   test('max pollution penalises (result ≥ 0)', () => {
@@ -187,8 +187,14 @@ describe('residential desirability', () => {
       })
       const bldIdx = new BuildingIndex(map)
       return computeDesirability(
-        ZoneType.Residential, tx, ty, map,
-        layers.powerGrid, layers.crimeLevel, layers.fireCoverage, layers.pollutionLevel,
+        ZoneType.Residential,
+        tx,
+        ty,
+        map,
+        layers.powerGrid,
+        layers.crimeLevel,
+        layers.fireCoverage,
+        layers.pollutionLevel,
         bldIdx,
       )
     }
@@ -333,11 +339,26 @@ describe('zone boundary effects', () => {
     const bldIdx = new BuildingIndex(map)
 
     const withCommercial = computeDesirability(
-      ZoneType.Residential, 5, 5, map, powerGrid, crimeLevel, fireCoverage, pollutionLevel, bldIdx,
+      ZoneType.Residential,
+      5,
+      5,
+      map,
+      powerGrid,
+      crimeLevel,
+      fireCoverage,
+      pollutionLevel,
+      bldIdx,
     )
     // Without bldIdx, zoneBoundaryEffect returns 0
     const without = computeDesirability(
-      ZoneType.Residential, 5, 5, map, powerGrid, crimeLevel, fireCoverage, pollutionLevel,
+      ZoneType.Residential,
+      5,
+      5,
+      map,
+      powerGrid,
+      crimeLevel,
+      fireCoverage,
+      pollutionLevel,
     )
     expect(withCommercial).toBeGreaterThan(without)
   })
@@ -359,10 +380,25 @@ describe('zone boundary effects', () => {
     const bldIdx = new BuildingIndex(map)
 
     const withIndustrial = computeDesirability(
-      ZoneType.Residential, 5, 5, map, powerGrid, crimeLevel, fireCoverage, pollutionLevel, bldIdx,
+      ZoneType.Residential,
+      5,
+      5,
+      map,
+      powerGrid,
+      crimeLevel,
+      fireCoverage,
+      pollutionLevel,
+      bldIdx,
     )
     const without = computeDesirability(
-      ZoneType.Residential, 5, 5, map, powerGrid, crimeLevel, fireCoverage, pollutionLevel,
+      ZoneType.Residential,
+      5,
+      5,
+      map,
+      powerGrid,
+      crimeLevel,
+      fireCoverage,
+      pollutionLevel,
     )
     expect(withIndustrial).toBeLessThan(without)
   })

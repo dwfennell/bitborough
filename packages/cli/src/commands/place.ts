@@ -4,35 +4,41 @@ import { loadEngine, saveEngine } from '../state.js'
 import { out, outErr } from '../output.js'
 
 const INFRA_MAP: Record<string, Infrastructure> = {
-  road:      Infrastructure.Road,
+  road: Infrastructure.Road,
   powerline: Infrastructure.PowerLine,
 }
 
 const BUILDING_MAP: Record<string, string> = {
-  diesel:  'power.diesel',
-  coal:    'power.coal',
+  diesel: 'power.diesel',
+  coal: 'power.coal',
   nuclear: 'power.nuclear',
   transit: 'transit.stop',
-  police:  'service.police',
+  police: 'service.police',
   policekiosk: 'service.police.small',
-  fire:    'service.fire',
-  firestation: 'service.fire.small',
-  school:  'service.school',
+  fire: 'service.fire',
+  firesubstation: 'service.fire.small',
+  school: 'service.school',
   schoolsmall: 'service.school.small',
-  park:    'special.park',
+  park: 'special.park',
 }
 
 export function placeCommand(program: Command) {
   program
     .command('place <type> <x> <y>')
-    .description('place infrastructure or building (types: road, powerline, pave, diesel, coal, nuclear, transit, police, policekiosk, fire, firestation, school, schoolsmall, park)')
+    .description(
+      'place infrastructure or building (types: road, powerline, pave, diesel, coal, nuclear, transit, police, policekiosk, fire, firesubstation, school, schoolsmall, park)',
+    )
     .option('--file <path>', 'game file', 'game.json')
     .action((type, x, y, opts) => {
       const engine = loadEngine(opts.file)
-      const tx = parseInt(x), ty = parseInt(y)
+      const tx = parseInt(x),
+        ty = parseInt(y)
 
       if (!(type in INFRA_MAP) && type !== 'pave' && !(type in BUILDING_MAP)) {
-        outErr({ ok: false, error: `Unknown type: ${type}. Valid: road, powerline, pave, ${Object.keys(BUILDING_MAP).join(', ')}` })
+        return outErr({
+          ok: false,
+          error: `Unknown type: ${type}. Valid: road, powerline, pave, ${Object.keys(BUILDING_MAP).join(', ')}`,
+        })
       }
 
       let result: { ok: boolean; reason?: unknown; detail?: string }
@@ -52,6 +58,7 @@ export function placeCommand(program: Command) {
         detail: (result as { detail?: string }).detail,
         funds: engine.getState().funds,
       }
-      if (result.ok) out(response); else outErr(response)
+      if (result.ok) out(response)
+      else outErr(response)
     })
 }

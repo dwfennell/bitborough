@@ -11,7 +11,13 @@ function clearTile(map: GameMap, idx: number): void {
   }
 }
 
-export function bulldoze(map: GameMap, x: number, y: number, funds: number, bldIdx: BuildingIndex): { result: Result; cost: number } {
+export function bulldoze(
+  map: GameMap,
+  x: number,
+  y: number,
+  funds: number,
+  bldIdx: BuildingIndex,
+): { result: Result; cost: number } {
   if (x < 0 || y < 0 || x >= map.width || y >= map.height) {
     return { result: { ok: false, reason: FailReason.InvalidLocation }, cost: 0 }
   }

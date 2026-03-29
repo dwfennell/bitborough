@@ -1,12 +1,16 @@
 import { describe, test, expect } from 'vitest'
-import { computeAttractiveness, computeMigrationModifier, computeMigrantTierDistribution, applyBrainDrain, BRAIN_DRAIN_THRESHOLD, BRAIN_DRAIN_MIN_POP } from '../simulation/migration.js'
+import {
+  computeAttractiveness,
+  computeMigrationModifier,
+  computeMigrantTierDistribution,
+  applyBrainDrain,
+} from '../simulation/migration.js'
 import type { CitizenSummary } from '@bitborough/core'
-import { DensityLevel, Infrastructure, ZoneType } from '@bitborough/core'
+import { DensityLevel } from '@bitborough/core'
 import { createRegistry, EMPTY_CITIZEN_SUMMARY } from '../simulation/citizens.js'
 import type { Citizen } from '../simulation/citizens.js'
-import { createTestMap, advanceYear } from '../test-helpers.js'
+import { createTestMap, createDevelopedCity } from '../test-helpers.js'
 import { PRNG } from '../prng.js'
-import { Engine } from '../Engine.js'
 
 function makeSummary(overrides: Partial<CitizenSummary> = {}): CitizenSummary {
   return { ...EMPTY_CITIZEN_SUMMARY, ...overrides }
@@ -17,8 +21,15 @@ describe('computeAttractiveness', () => {
     const map = createTestMap(8)
     // res.low has capacity 10; 2 residents = 80% vacancy = high housing availability
     map.buildings.push({
-      id: 'b1', defId: 'res.low', x: 1, y: 1,
-      powered: true, density: DensityLevel.Low, age: 0, state: 'active', residents: 2,
+      id: 'b1',
+      defId: 'res.low',
+      x: 1,
+      y: 1,
+      powered: true,
+      density: DensityLevel.Low,
+      age: 0,
+      state: 'active',
+      residents: 2,
     })
     const summary = makeSummary({
       avgSatisfaction: 1.0,
@@ -29,7 +40,15 @@ describe('computeAttractiveness', () => {
     const educationQuality = new Uint8Array(64).fill(100) // full education coverage (>=2)
     const funding = { police: 100, fire: 100, education: 100 }
 
-    const { score, factors } = computeAttractiveness(summary, map, 0.07, funding, crimeLevel, fireCoverage, educationQuality)
+    const { score, factors } = computeAttractiveness(
+      summary,
+      map,
+      0.07,
+      funding,
+      crimeLevel,
+      fireCoverage,
+      educationQuality,
+    )
     expect(score).toBeGreaterThan(0.85)
     expect(factors.jobMatchRate).toBeCloseTo(1.0)
     expect(factors.avgSatisfaction).toBeCloseTo(1.0)
@@ -40,8 +59,15 @@ describe('computeAttractiveness', () => {
   test('terrible city scores near 0', () => {
     const map = createTestMap(8)
     map.buildings.push({
-      id: 'b1', defId: 'res.low', x: 1, y: 1,
-      powered: true, density: DensityLevel.Low, age: 0, state: 'active', residents: 10,
+      id: 'b1',
+      defId: 'res.low',
+      x: 1,
+      y: 1,
+      powered: true,
+      density: DensityLevel.Low,
+      age: 0,
+      state: 'active',
+      residents: 10,
     })
     const summary = makeSummary({
       avgSatisfaction: 0,
@@ -60,9 +86,13 @@ describe('computeAttractiveness', () => {
     const map = createTestMap(8)
     const summary = makeSummary({ avgSatisfaction: 0.5, unmatchedJobFraction: 0 })
     const { factors } = computeAttractiveness(
-      summary, map, 0.07,
+      summary,
+      map,
+      0.07,
       { police: 100, fire: 100, education: 100 },
-      new Uint8Array(64), new Uint8Array(64), new Uint8Array(64),
+      new Uint8Array(64),
+      new Uint8Array(64),
+      new Uint8Array(64),
     )
     expect(factors.serviceCoverage).toBeCloseTo(0.5)
   })
@@ -71,9 +101,13 @@ describe('computeAttractiveness', () => {
     const map = createTestMap(8)
     const summary = makeSummary()
     const { factors } = computeAttractiveness(
-      summary, map, 0.07,
+      summary,
+      map,
+      0.07,
       { police: 100, fire: 100, education: 100 },
-      new Uint8Array(64), new Uint8Array(64), new Uint8Array(64),
+      new Uint8Array(64),
+      new Uint8Array(64),
+      new Uint8Array(64),
     )
     expect(factors.housingAvailability).toBeCloseTo(1.0)
   })
@@ -82,9 +116,13 @@ describe('computeAttractiveness', () => {
     const map = createTestMap(8)
     const summary = makeSummary()
     const { factors } = computeAttractiveness(
-      summary, map, 0.07,
+      summary,
+      map,
+      0.07,
       { police: 100, fire: 100, education: 100 },
-      new Uint8Array(64), new Uint8Array(64), new Uint8Array(64),
+      new Uint8Array(64),
+      new Uint8Array(64),
+      new Uint8Array(64),
     )
     expect(factors.taxCompetitiveness).toBeCloseTo(1.0)
   })
@@ -93,9 +131,13 @@ describe('computeAttractiveness', () => {
     const map = createTestMap(8)
     const summary = makeSummary()
     const { factors } = computeAttractiveness(
-      summary, map, 0.27,
+      summary,
+      map,
+      0.27,
       { police: 100, fire: 100, education: 100 },
-      new Uint8Array(64), new Uint8Array(64), new Uint8Array(64),
+      new Uint8Array(64),
+      new Uint8Array(64),
+      new Uint8Array(64),
     )
     expect(factors.taxCompetitiveness).toBeCloseTo(0)
   })
@@ -103,16 +145,39 @@ describe('computeAttractiveness', () => {
   test('funding scales service coverage', () => {
     const map = createTestMap(8)
     map.buildings.push({
-      id: 'b1', defId: 'res.low', x: 1, y: 1,
-      powered: true, density: DensityLevel.Low, age: 0, state: 'active', residents: 5,
+      id: 'b1',
+      defId: 'res.low',
+      x: 1,
+      y: 1,
+      powered: true,
+      density: DensityLevel.Low,
+      age: 0,
+      state: 'active',
+      residents: 5,
     })
     const crimeLevel = new Uint8Array(64).fill(0)
     const fireCoverage = new Uint8Array(64).fill(255)
     const educationQuality = new Uint8Array(64).fill(100)
     const summary = makeSummary()
 
-    const fullFunding = computeAttractiveness(summary, map, 0.07, { police: 100, fire: 100, education: 100 }, crimeLevel, fireCoverage, educationQuality)
-    const halfFunding = computeAttractiveness(summary, map, 0.07, { police: 50, fire: 50, education: 50 }, crimeLevel, fireCoverage, educationQuality)
+    const fullFunding = computeAttractiveness(
+      summary,
+      map,
+      0.07,
+      { police: 100, fire: 100, education: 100 },
+      crimeLevel,
+      fireCoverage,
+      educationQuality,
+    )
+    const halfFunding = computeAttractiveness(
+      summary,
+      map,
+      0.07,
+      { police: 50, fire: 50, education: 50 },
+      crimeLevel,
+      fireCoverage,
+      educationQuality,
+    )
 
     expect(fullFunding.factors.serviceCoverage).toBeGreaterThan(halfFunding.factors.serviceCoverage)
   })
@@ -143,30 +208,30 @@ describe('computeMigrationModifier', () => {
 describe('computeMigrantTierDistribution', () => {
   test('attractiveness 0.5 gives baseline distribution', () => {
     const [low, mid, high] = computeMigrantTierDistribution(0.5)
-    expect(low).toBeCloseTo(0.30)
+    expect(low).toBeCloseTo(0.3)
     expect(mid).toBeCloseTo(0.45)
     expect(high).toBeCloseTo(0.25)
   })
 
   test('attractiveness 0.0 gives struggling distribution', () => {
     const [low, mid, high] = computeMigrantTierDistribution(0.0)
-    expect(low).toBeCloseTo(0.50)
+    expect(low).toBeCloseTo(0.5)
     expect(mid).toBeCloseTo(0.35)
     expect(high).toBeCloseTo(0.15)
   })
 
   test('attractiveness 1.0 gives prosperous distribution', () => {
     const [low, mid, high] = computeMigrantTierDistribution(1.0)
-    expect(low).toBeCloseTo(0.20)
-    expect(mid).toBeCloseTo(0.40)
-    expect(high).toBeCloseTo(0.40)
+    expect(low).toBeCloseTo(0.2)
+    expect(mid).toBeCloseTo(0.4)
+    expect(high).toBeCloseTo(0.4)
   })
 
   test('attractiveness 0.25 is halfway between struggling and baseline', () => {
     const [low, mid, high] = computeMigrantTierDistribution(0.25)
-    expect(low).toBeCloseTo(0.40) // lerp(0.50, 0.30, 0.5)
-    expect(mid).toBeCloseTo(0.40) // lerp(0.35, 0.45, 0.5)
-    expect(high).toBeCloseTo(0.20) // lerp(0.15, 0.25, 0.5)
+    expect(low).toBeCloseTo(0.4) // lerp(0.50, 0.30, 0.5)
+    expect(mid).toBeCloseTo(0.4) // lerp(0.35, 0.45, 0.5)
+    expect(high).toBeCloseTo(0.2) // lerp(0.15, 0.25, 0.5)
   })
 
   test('attractiveness 0.75 is halfway between baseline and prosperous', () => {
@@ -261,40 +326,16 @@ describe('applyBrainDrain', () => {
 // Integration tests — full Engine loop
 // ---------------------------------------------------------------------------
 
-function createCityEngine(taxRate = 0.07) {
-  const engine = Engine.create(createTestMap(64), { seed: 42, startingFunds: 50_000 })
-  // Power plant (diesel per project convention) — 2x2 at (10,10)
-  engine.placeBuilding(10, 10, 'power.diesel')
-  // Power lines connecting plant to zones (bridge from x=12)
-  for (let x = 12; x < 28; x++) engine.placeTile(x, 10, Infrastructure.PowerLine)
-  // Road at y=12
-  for (let x = 12; x < 28; x++) engine.placeTile(x, 12, Infrastructure.Road)
-  // Residential zones at y=11 (adjacent to power lines and road)
-  for (let x = 12; x < 28; x++) engine.placeZone(x, 11, ZoneType.Residential)
-  // Commercial zones at y=13 (below road, for jobs)
-  for (let x = 12; x < 28; x++) engine.placeZone(x, 13, ZoneType.Commercial)
-  // Industrial zones at y=14
-  for (let x = 12; x < 18; x++) engine.placeZone(x, 14, ZoneType.Industrial)
-  engine.setTaxRate(taxRate)
-  return engine
-}
-
 describe('migration integration', () => {
   test('low-tax city grows faster than high-tax city', () => {
-    const lowTax = createCityEngine(0.07)
-    const highTax = createCityEngine(0.20)
-
-    for (let i = 0; i < 3; i++) {
-      advanceYear(lowTax)
-      advanceYear(highTax)
-    }
+    const lowTax = createDevelopedCity({ startingFunds: 50_000, years: 3, taxRate: 0.07 })
+    const highTax = createDevelopedCity({ startingFunds: 50_000, years: 3, taxRate: 0.2 })
 
     expect(lowTax.getState().population).toBeGreaterThan(highTax.getState().population)
   })
 
   test('attractiveness and netMigration are exposed in game state', () => {
-    const engine = createCityEngine()
-    advanceYear(engine)
+    const engine = createDevelopedCity({ startingFunds: 50_000, years: 1 })
     const state = engine.getState()
     expect(state.cityAttractiveness).toBeGreaterThanOrEqual(0)
     expect(state.cityAttractiveness).toBeLessThanOrEqual(1)
@@ -304,15 +345,14 @@ describe('migration integration', () => {
   })
 
   test('attractiveness factors breakdown sums correctly', () => {
-    const engine = createCityEngine()
-    advanceYear(engine)
+    const engine = createDevelopedCity({ startingFunds: 50_000, years: 1 })
     const { attractivenessFactors: f, cityAttractiveness } = engine.getState()
     const expectedScore =
-      f.jobMatchRate * 0.30 +
+      f.jobMatchRate * 0.3 +
       f.avgSatisfaction * 0.25 +
-      f.serviceCoverage * 0.20 +
+      f.serviceCoverage * 0.2 +
       f.taxCompetitiveness * 0.15 +
-      f.housingAvailability * 0.10
+      f.housingAvailability * 0.1
     expect(cityAttractiveness).toBeCloseTo(expectedScore, 2)
   })
 })

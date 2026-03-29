@@ -4,9 +4,7 @@ import { loadEngine, saveEngine } from '../state.js'
 import { out, outErr } from '../output.js'
 
 export function loanCommand(program: Command) {
-  const cmd = program
-    .command('loan')
-    .description('loan management')
+  const cmd = program.command('loan').description('loan management')
 
   cmd
     .command('take <amount>')
@@ -23,7 +21,8 @@ export function loanCommand(program: Command) {
         funds: s.funds,
         loan: s.loan,
       }
-      if (result.ok) out(response); else outErr(response)
+      if (result.ok) out(response)
+      else outErr(response)
     })
 
   cmd
@@ -40,7 +39,8 @@ export function loanCommand(program: Command) {
         reason: result.ok ? undefined : FailReason[(result as { reason: FailReason }).reason],
         loanRepaymentAmount: s.loanRepaymentAmount,
       }
-      if (result.ok) out(response); else outErr(response)
+      if (result.ok) out(response)
+      else outErr(response)
     })
 
   cmd

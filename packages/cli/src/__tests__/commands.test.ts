@@ -1,5 +1,5 @@
 import { describe, test, expect, afterEach } from 'vitest'
-import { unlinkSync, existsSync } from 'fs'
+import { unlinkSync, existsSync, readFileSync } from 'fs'
 import { spawnSync } from 'child_process'
 import { resolve, dirname } from 'path'
 import { fileURLToPath } from 'url'
@@ -70,7 +70,10 @@ describe('bitt new', () => {
   test('creates a game file and returns ok with expected fields', () => {
     const file = tempFile()
     try {
-      const result = bitt(['new', '--seed', '42', '--size', '32', '--preset', 'plains'], file) as Record<string, unknown>
+      const result = bitt(['new', '--seed', '42', '--size', '32', '--preset', 'plains'], file) as Record<
+        string,
+        unknown
+      >
       expect(result.ok).toBe(true)
       expect(result.seed).toBe(42)
       expect(result.size).toBe(32)
@@ -296,7 +299,7 @@ describe('bug regressions', () => {
       const result = bitt(['place', 'road', '10', '10'], file) as Record<string, unknown>
       expect(result.ok).toBe(false)
       expect(typeof result.reason).toBe('string')
-      expect(result.reason).not.toMatch(/^\d+$/)  // must not be a bare number
+      expect(result.reason).not.toMatch(/^\d+$/) // must not be a bare number
     } finally {
       if (existsSync(file)) unlinkSync(file)
     }
@@ -360,5 +363,128 @@ describe('bitt docs', () => {
     expect(typeof rows[0]!.id).toBe('string')
     expect(typeof rows[0]!.cost).toBe('number')
     expect(typeof rows[0]!.maintenanceCost).toBe('number')
+  })
+})
+
+// ---------------------------------------------------------------------------
+// Tax command tests
+// ---------------------------------------------------------------------------
+
+describe('bitt tax', () => {
+  test('sets the tax rate and returns ok with the new rate', () => {
+    const file = tempFile()
+    try {
+      bitt(['new', '--seed', '42', '--size', '32', '--preset', 'plains'], file)
+      const result = bitt(['tax', '8'], file) as Record<string, unknown>
+      expect(result.ok).toBe(true)
+      expect(result.taxRate).toBe('8.0%')
+      expect(typeof result.taxIncome).toBe('number')
+      expect(typeof result.projectedBalance).toBe('number')
+    } finally {
+      if (existsSync(file)) unlinkSync(file)
+    }
+  })
+
+  test('with no rate argument returns an error (no JSON output)', () => {
+    const file = tempFile()
+    try {
+      bitt(['new', '--seed', '42', '--size', '32', '--preset', 'plains'], file)
+      // Commander exits with error to stderr when required arg is missing; no JSON on stdout
+      const result = spawnSync('npx', ['tsx', INDEX, 'tax', '--file', file], {
+        encoding: 'utf-8',
+        timeout: 15000,
+      })
+      expect(result.status).not.toBe(0)
+    } finally {
+      if (existsSync(file)) unlinkSync(file)
+    }
+  })
+
+  test('rate is clamped to max 20%', () => {
+    const file = tempFile()
+    try {
+      bitt(['new', '--seed', '42', '--size', '32', '--preset', 'plains'], file)
+      const result = bitt(['tax', '50'], file) as Record<string, unknown>
+      expect(result.ok).toBe(true)
+      // Engine clamps 0.5 to 0.2, so output should be 20.0%
+      expect(result.taxRate).toBe('20.0%')
+    } finally {
+      if (existsSync(file)) unlinkSync(file)
+    }
+  })
+})
+
+// ---------------------------------------------------------------------------
+// Funding command tests
+// ---------------------------------------------------------------------------
+
+describe('bitt funding', () => {
+  test('sets police funding and returns ok', () => {
+    const file = tempFile()
+    try {
+      bitt(['new', '--seed', '42', '--size', '32', '--preset', 'plains'], file)
+      const result = bitt(['funding', 'police', '50'], file) as Record<string, unknown>
+      expect(result.ok).toBe(true)
+      expect(result.service).toBe('police')
+      expect(result.level).toBe(50)
+      expect(typeof result.serviceCosts).toBe('number')
+    } finally {
+      if (existsSync(file)) unlinkSync(file)
+    }
+  })
+
+  test('returns error for invalid service', () => {
+    const file = tempFile()
+    try {
+      bitt(['new', '--seed', '42', '--size', '32', '--preset', 'plains'], file)
+      const result = bitt(['funding', 'garbage', '50'], file) as Record<string, unknown>
+      expect(result.ok).toBe(false)
+      expect(typeof result.error).toBe('string')
+    } finally {
+      if (existsSync(file)) unlinkSync(file)
+    }
+  })
+
+  test('funding level is clamped to 100', () => {
+    const file = tempFile()
+    try {
+      bitt(['new', '--seed', '42', '--size', '32', '--preset', 'plains'], file)
+      bitt(['funding', 'police', '200'], file)
+      // Verify the engine state has clamped funding to 100 by reading the save file
+      const save = JSON.parse(readFileSync(file, 'utf-8')) as { state: { funding: { police: number } } }
+      expect(save.state.funding.police).toBe(100)
+    } finally {
+      if (existsSync(file)) unlinkSync(file)
+    }
+  })
+})
+
+// ---------------------------------------------------------------------------
+// Loan command tests
+// ---------------------------------------------------------------------------
+
+describe('bitt loan', () => {
+  test('status on a fresh game returns no active loan', () => {
+    const file = tempFile()
+    try {
+      bitt(['new', '--seed', '42', '--size', '32', '--preset', 'plains'], file)
+      const result = bitt(['loan', 'status'], file) as Record<string, unknown>
+      expect(result.loan).toBeNull()
+      expect(result.loanRepaymentAmount).toBe(0)
+    } finally {
+      if (existsSync(file)) unlinkSync(file)
+    }
+  })
+
+  test('take with amount below minimum returns error', () => {
+    const file = tempFile()
+    try {
+      bitt(['new', '--seed', '42', '--size', '32', '--preset', 'plains'], file)
+      const result = bitt(['loan', 'take', '100'], file) as Record<string, unknown>
+      expect(result.ok).toBe(false)
+      expect(result.reason).toBe('AmountOutOfRange')
+    } finally {
+      if (existsSync(file)) unlinkSync(file)
+    }
   })
 })

@@ -1,5 +1,4 @@
-import type { GameState } from '@bitborough/core'
-import type { TileInfo } from '@bitborough/engine'
+import type { GameState, TileInfo } from '@bitborough/core'
 import { describeTile } from '../utils/tile-info.js'
 
 export class QueryPanel {

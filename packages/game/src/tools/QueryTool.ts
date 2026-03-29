@@ -1,6 +1,7 @@
 import type { Tool } from './Tool.js'
 import type { Result } from '@bitborough/core'
-import { type Engine, type TileInfo } from '@bitborough/engine'
+import type { TileInfo } from '@bitborough/core'
+import type { Engine } from '@bitborough/engine'
 
 export class QueryTool implements Tool {
   readonly name = 'Query'

@@ -6,4 +6,8 @@ export { BUILDING_DEFS } from './buildings-registry.js'
 export { BuildingIndex } from './building-index.js'
 export { computeDesirability } from './simulation/desirability.js'
 export { neighbourhoodAvgOccupancy } from './simulation/density.js'
-export { computeAttractiveness, computeMigrationModifier, computeMigrantTierDistribution } from './simulation/migration.js'
+export {
+  computeAttractiveness,
+  computeMigrationModifier,
+  computeMigrantTierDistribution,
+} from './simulation/migration.js'
