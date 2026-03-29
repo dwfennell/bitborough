@@ -4,7 +4,7 @@ export const roadsTraffic: DocSection = {
   id: 'roads-traffic',
   title: 'Roads & Traffic',
   body: [
-    '**Dirt roads** ($10 each, $1/mo maintenance) are basic unpaved paths that connect your zones and enable development.',
+    '**Dirt roads** ($10 each, $0.50/mo maintenance) are basic unpaved paths that connect your zones and enable development.',
     '',
     '**Paved roads** ($20 upgrade) add sidewalks and lane markings. Required for density upgrades from Low → Medium. Pave roads in your core city districts to enable growth.',
     '',

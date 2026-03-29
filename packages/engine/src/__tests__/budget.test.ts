@@ -14,9 +14,9 @@ describe('Budget system', () => {
     const afterConstruction = engine.getState().funds
     advanceYear(engine) // 48 ticks = 12 months
     const afterYear = engine.getState().funds
-    // $1/tile/month × 10 tiles × 12 months = $120
+    // $0.50/tile/month × 10 tiles × 12 months = $60
     // (no tax income since no developed zones)
-    expect(afterYear).toBe(afterConstruction - 120)
+    expect(afterYear).toBe(afterConstruction - 60)
   })
 
   test('power plant maintenance deducted monthly', () => {
@@ -77,9 +77,9 @@ describe('Budget system', () => {
     engine.placeBuilding(0, 0, 'power.coal')
     advanceYear(engine)
     const budget = engine.getState().budget
-    expect(budget.maintenanceCosts.roads).toBe(10) // 10 roads × $1
+    expect(budget.maintenanceCosts.roads).toBe(5) // 10 roads × $0.50
     expect(budget.maintenanceCosts.powerPlants).toBe(60) // 1 coal × $60
-    expect(budget.maintenanceCosts.total).toBe(70)
+    expect(budget.maintenanceCosts.total).toBe(65)
   })
 
   test('insufficient funds blocks construction in austerity', () => {
@@ -164,15 +164,22 @@ describe('Sprawl penalty', () => {
     // Add many buildings to get high footprint:
     for (let i = 0; i < 50; i++) {
       map.buildings.push({
-        id: `extra${i}`, defId: 'res.low', x: i % 30, y: 7 + Math.floor(i / 30),
-        density: DensityLevel.Low, state: 'active', residents: 0, age: 0, powered: true,
+        id: `extra${i}`,
+        defId: 'res.low',
+        x: i % 30,
+        y: 7 + Math.floor(i / 30),
+        density: DensityLevel.Low,
+        state: 'active',
+        residents: 0,
+        age: 0,
+        powered: true,
       })
     }
     // footprint = 10 (original) + 50 = 60
     // pop=5000: threshold=0.06, ratio=60/5000=0.012 → no penalty
     // pop=500:  threshold=0.15, ratio=60/500=0.12 → no penalty (0.12 < 0.15)
     // pop=200:  threshold=0.30, ratio=60/200=0.30 → borderline
-    // pop=100:  threshold=0.55, ratio=60/100=0.60 → penalty! multiplier=1+(0.60-0.55)*4=1.20
+    // pop=100:  threshold=0.55, ratio=60/100=0.60 → penalty! multiplier=1+(0.60-0.55)*2=1.10
     // But pop=100 is above SPRAWL_MIN_POPULATION=50 ✓
     const sprawlBudget = calculateBudget(map, 100, 0.07, landValues, funding)
 
@@ -181,8 +188,8 @@ describe('Sprawl penalty', () => {
 
     // Road maintenance should be higher with sprawl
     expect(sprawlBudget.maintenanceCosts.roads).toBeGreaterThan(denseBudget.maintenanceCosts.roads)
-    // Power line maintenance should also be higher with sprawl
-    expect(sprawlBudget.maintenanceCosts.powerLines).toBeGreaterThan(denseBudget.maintenanceCosts.powerLines)
+    // Power line maintenance should also be at least as high with sprawl
+    expect(sprawlBudget.maintenanceCosts.powerLines).toBeGreaterThanOrEqual(denseBudget.maintenanceCosts.powerLines)
   })
 
   test('high population with dense buildings gets no sprawl penalty', () => {
@@ -214,8 +221,8 @@ describe('Sprawl penalty', () => {
     // 0.005 < 0.05 threshold → no penalty
     const budget = calculateBudget(map, 1000, 0.07, landValues, funding)
 
-    // Road maintenance should be exactly roadCount * MAINTENANCE.road = 10 * 1 = 10
-    expect(budget.maintenanceCosts.roads).toBe(10)
+    // Road maintenance should be exactly roadCount * MAINTENANCE.road = 10 * 0.50 = 5
+    expect(budget.maintenanceCosts.roads).toBe(5)
   })
 })
 
@@ -223,41 +230,79 @@ describe('Education budget', () => {
   test('school maintenance deducted with education funding', () => {
     const map = createTestMap(32)
     map.buildings.push({
-      id: 'b1', defId: 'service.school', x: 14, y: 14,
-      powered: true, density: DensityLevel.Low, age: 0,
-      state: 'active', residents: 0,
+      id: 'b1',
+      defId: 'service.school',
+      x: 14,
+      y: 14,
+      powered: true,
+      density: DensityLevel.Low,
+      age: 0,
+      state: 'active',
+      residents: 0,
     })
-    const budget = calculateBudget(
-      map, 0, 0.07, new Uint8Array(32 * 32),
-      { police: 100, fire: 100, transit: 100, education: 100 },
-    )
+    const budget = calculateBudget(map, 0, 0.07, new Uint8Array(32 * 32), {
+      police: 100,
+      fire: 100,
+      transit: 100,
+      education: 100,
+    })
     expect(budget.serviceCosts.education).toBe(75)
   })
 
   test('school maintenance scales with funding', () => {
     const map = createTestMap(32)
     map.buildings.push({
-      id: 'b1', defId: 'service.school', x: 14, y: 14,
-      powered: true, density: DensityLevel.Low, age: 0,
-      state: 'active', residents: 0,
+      id: 'b1',
+      defId: 'service.school',
+      x: 14,
+      y: 14,
+      powered: true,
+      density: DensityLevel.Low,
+      age: 0,
+      state: 'active',
+      residents: 0,
     })
-    const budget = calculateBudget(
-      map, 0, 0.07, new Uint8Array(32 * 32),
-      { police: 100, fire: 100, transit: 100, education: 50 },
-    )
+    const budget = calculateBudget(map, 0, 0.07, new Uint8Array(32 * 32), {
+      police: 100,
+      fire: 100,
+      transit: 100,
+      education: 50,
+    })
     expect(budget.serviceCosts.education).toBe(38)
   })
 
   test('mixed school + small school maintenance', () => {
     const map = createTestMap(32)
     map.buildings.push(
-      { id: 'b1', defId: 'service.school', x: 14, y: 14, powered: true, density: DensityLevel.Low, age: 0, state: 'active' as const, residents: 0 },
-      { id: 'b2', defId: 'service.school.small', x: 5, y: 5, powered: true, density: DensityLevel.Low, age: 0, state: 'active' as const, residents: 0 },
+      {
+        id: 'b1',
+        defId: 'service.school',
+        x: 14,
+        y: 14,
+        powered: true,
+        density: DensityLevel.Low,
+        age: 0,
+        state: 'active' as const,
+        residents: 0,
+      },
+      {
+        id: 'b2',
+        defId: 'service.school.small',
+        x: 5,
+        y: 5,
+        powered: true,
+        density: DensityLevel.Low,
+        age: 0,
+        state: 'active' as const,
+        residents: 0,
+      },
     )
-    const budget = calculateBudget(
-      map, 0, 0.07, new Uint8Array(32 * 32),
-      { police: 100, fire: 100, transit: 100, education: 100 },
-    )
+    const budget = calculateBudget(map, 0, 0.07, new Uint8Array(32 * 32), {
+      police: 100,
+      fire: 100,
+      transit: 100,
+      education: 100,
+    })
     expect(budget.serviceCosts.education).toBe(90)
   })
 })

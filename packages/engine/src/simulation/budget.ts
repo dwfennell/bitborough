@@ -58,18 +58,18 @@ export function calculateBudget(
   // converging to 0.05 as population grows past ~1000.
   const SPRAWL_BASE_THRESHOLD = 0.05
   const SPRAWL_MIN_POPULATION = 50
-  const effectiveThreshold = population < SPRAWL_MIN_POPULATION
-    ? Infinity // no sprawl penalty for tiny cities
-    : SPRAWL_BASE_THRESHOLD + 50 / population
+  const effectiveThreshold =
+    population < SPRAWL_MIN_POPULATION
+      ? Infinity // no sprawl penalty for tiny cities
+      : SPRAWL_BASE_THRESHOLD + 50 / population
   const sprawlRatio = population > 0 ? footprintTileCount / population : 0
-  const sprawlMultiplier = sprawlRatio > effectiveThreshold
-    ? 1 + (sprawlRatio - effectiveThreshold) * 4
-    : 1.0
+  const sprawlMultiplier = sprawlRatio > effectiveThreshold ? 1 + (sprawlRatio - effectiveThreshold) * 2 : 1.0
 
   if (sprawlMultiplier > 1) {
     maintenanceCosts.roads = Math.round(maintenanceCosts.roads * sprawlMultiplier)
     maintenanceCosts.powerLines = Math.round(maintenanceCosts.powerLines * sprawlMultiplier)
-    maintenanceCosts.total = maintenanceCosts.roads + maintenanceCosts.rails + maintenanceCosts.powerLines + maintenanceCosts.powerPlants
+    maintenanceCosts.total =
+      maintenanceCosts.roads + maintenanceCosts.rails + maintenanceCosts.powerLines + maintenanceCosts.powerPlants
   }
 
   // Service costs based on funding level

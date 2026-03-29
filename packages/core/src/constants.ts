@@ -36,7 +36,7 @@ export const COSTS = {
 } as const
 
 export const MAINTENANCE = {
-  road: 1,
+  road: 0.5,
   rail: 1.5,
   powerLine: 0.5,
   dieselGenerator: 15,
@@ -46,7 +46,7 @@ export const MAINTENANCE = {
   policeStation: 50,
   fireSubstation: 12,
   fireStation: 50,
-  pavedRoadSurcharge: 1, // extra per paved road tile (total: road + surcharge = 2/mo)
+  pavedRoadSurcharge: 0.5, // extra per paved road tile (total: road + surcharge = 1/mo)
   transitStop: 50,
   school: 75,
   schoolSmall: 15,
