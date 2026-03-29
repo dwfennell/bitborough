@@ -1,18 +1,30 @@
 # Environment and Resilience Milestone
 
-Five features that give environmental systems real gameplay weight: pollution that matters, parks that fight it, noise that shapes neighborhoods, floods that punish careless development, and building codes that let the player invest in resilience.
+> **Status:** ACTIVE — 1 of 5 features implemented.
+>
+> | Feature | Status | Notes |
+> |---------|--------|-------|
+> | 1. Pollution Propagation | DONE | `simulation/pollution.ts` — linear decay from building footprint, runs monthly |
+> | 2. Parks as Pollution Sinks | TODO | |
+> | 3. Noise Layer | TODO | |
+> | 4. Flooding Risk | TODO | |
+> | 5. Building Codes Policy | TODO | |
+>
+> **Stale references:** The research documents cited below (`research/environment-and-sustainability.md`, `research/disaster-and-resilience.md`) were never created.
 
-Implements roadmap items 1.1 (Pollution Propagation), 1.12 (Parks as Pollution Sinks), 3.18 (Noise Layer), 3.15 (Stormwater / Flooding), and 4.43 (Building Code Policies). Research sources: `research/environment-and-sustainability.md`, `research/disaster-and-resilience.md`.
+Five features that give environmental systems real gameplay weight: pollution that matters, parks that fight it, noise that shapes neighborhoods, floods that punish careless development, and building codes that let the player invest in resilience.
 
 ---
 
-## 1. Pollution Propagation
+## 1. Pollution Propagation (DONE)
+
+> Implemented in `simulation/pollution.ts`. Runs monthly via `rebuildDerivedState()`. Uses `Float32Array` scratch buffer, clamps to `Uint8Array`.
 
 **Unblocks:** Parks as Pollution Sinks, Noise Layer (pattern reuse), and indirectly Flooding (impervious surface accounting).
 
 ### Gameplay Purpose
 
-Industrial buildings and fossil-fuel power plants already define `pollutionRadius` and `pollutionAmount` on their `BuildingDef`, and the engine already allocates a `pollutionLevel: Uint8Array` that feeds into `calculateLandValues` (penalty of `value -= pollutionLevel[idx] * 0.5`) and `computeDesirability` (residential penalty of `pollNorm * 0.3`). But the array is never written to, so pollution has zero gameplay effect today. Wiring it up makes industrial placement a real tradeoff: jobs and tax revenue versus depressed residential land values and desirability nearby.
+Industrial buildings and fossil-fuel power plants define `pollutionRadius` and `pollutionAmount` on their `BuildingDef`. The `pollutionLevel: Uint8Array` feeds into `calculateLandValues` and `computeDesirability`. Pollution propagation makes industrial placement a real tradeoff: jobs and tax revenue versus depressed residential land values and desirability nearby.
 
 ### Data Model Changes
 

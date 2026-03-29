@@ -1,16 +1,19 @@
 # Citizen Simulation Depth — Feature Plan
 
+> **Status:** ACTIVE — 3 of 4 features implemented. Only Population Milestones remains.
+>
+> | Feature | Status | Notes |
+> |---------|--------|-------|
+> | 1. Wealth Tiers | DONE | `simulation/wealth-tiers.ts` — tier assignment, tier-weighted satisfaction, reputation layer |
+> | 2. Education Service | DONE | Evolved from radius-based (as specced below) to enrollment-based model. See `simulation/school.ts` and `simulation/citizens.ts` for enrollment routing. Two building sizes: `service.school` (3x3) and `service.school.small` (1x1). |
+> | 3. Migration Model | DONE | `simulation/migration.ts` — attractiveness scoring, migration modifier, brain drain, tier distribution shifts |
+> | 4. Population Milestones | TODO | Building unlock gating not yet implemented |
+
 ## Overview
 
 This milestone extends the existing citizen agent system with four interlocking features that add economic differentiation, population dynamics, a new service building, and progression gating. Together they transform the flat population model into one where citizens have economic identities, the city competes for migrants, education shapes desirability, and growth unlocks new capabilities.
 
-**Current state:** Citizens are homogeneous agents with a home, a job route, a commerce route, and a scalar satisfaction score. Population growth is driven entirely by the RCI demand signal flowing into `FILL_RATE`. There is no wealth differentiation, no explicit migration model, no education service, and no population-gated unlocks.
-
-**Research sources:**
-- `research/population-and-demographics.md` -- migration (Harris-Todaro), wealth stratification, logistic growth
-- `research/social-dynamics-and-segregation.md` -- Schelling model, Tiebout sorting, tier-weighted preferences
-- `research/housing.md` -- filtering theory, affordability thresholds
-- `research/mechanics-roadmap.md` -- items 2.5 (wealth tiers), 2.6 (migration), 2.2 (education), and the Citizen Depth dependency chain in section 7
+**Note:** The research documents referenced below were never created. The designs were informed by the research concepts described but the standalone research library does not exist.
 
 ---
 

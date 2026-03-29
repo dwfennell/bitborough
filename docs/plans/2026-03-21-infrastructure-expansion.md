@@ -1,5 +1,11 @@
 # Infrastructure Expansion Milestone — Design
 
+> **Status:** DRAFT — Detailed design complete but not yet implemented. Needs review against current codebase state before implementation.
+>
+> **Stale references:** The research documents cited below (`research/utilities-and-infrastructure.md`, `research/transportation-and-traffic.md`) were never created. The designs were informed by the research concepts described but the standalone research library does not exist.
+>
+> **Codebase drift:** This plan was written when the save format was at version 5. The current save version is **7** (added citizens, demographics, wealth tiers, reputation, education). Infrastructure enum currently uses bits 0 (Road), 1 (PowerLine), 2 (Rail), 4 (PavedRoad). Bits 3, 5-15 are available.
+
 ## Overview
 
 Three interconnected infrastructure features that deepen the simulation's mid-game and create long-term city management challenges:
@@ -9,14 +15,6 @@ Three interconnected infrastructure features that deepen the simulation's mid-ga
 3. **Infrastructure Aging** — All placed infrastructure and buildings track condition over time. Quadratic decay raises maintenance costs and eventually causes failures.
 
 Together these form a cohesive milestone: water/sewer gives the player a new system to build and manage, road hierarchy gives them strategic choices about transportation investment, and aging ensures that all infrastructure demands ongoing attention rather than being fire-and-forget.
-
-### Research Sources
-
-| Feature | Primary Research | Roadmap Items |
-|---------|-----------------|---------------|
-| Water/Sewer | `research/utilities-and-infrastructure.md` (Water Supply, Wastewater and Sewer, Application to Bitborough) | 2.9 |
-| Road Hierarchy | `research/transportation-and-traffic.md` (Road Hierarchy, Congestion Modeling, Application to Bitborough) | 2.1 |
-| Infrastructure Aging | `research/utilities-and-infrastructure.md` (Infrastructure Lifecycle, Infrastructure Costs) | 2.10 |
 
 ### Dependency Order
 
@@ -446,9 +444,9 @@ All three features add data to `GameMap` and `GameState`:
 - `waterGrid`, `sewerGrid` in game state (derived, not saved — recomputed on load like `powerGrid`)
 - New `Infrastructure` enum values (backward compatible — old saves have 0 in new bit positions)
 - New building defs (backward compatible — old saves never reference them)
-- Save file version bump from 5 to 6
+- Save file version bump required (current version is **7**)
 
-Migration for v5 saves: initialize `infrastructureAge` to all zeros (existing infrastructure starts as "new"). This is generous to the player but avoids a jarring mass-failure event on loading an old save.
+Migration for older saves: initialize `infrastructureAge` to all zeros (existing infrastructure starts as "new"). This is generous to the player but avoids a jarring mass-failure event on loading an old save.
 
 ### Budget Display
 

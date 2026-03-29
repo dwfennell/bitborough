@@ -1,5 +1,11 @@
 # Economy Depth Milestone — Design
 
+> **Status:** DRAFT — Detailed design, not yet implemented.
+>
+> **Stale references:** The research documents cited below (`research/municipal-finance.md`, `research/economy-and-employment.md`) were never created.
+>
+> **Codebase drift:** The budget formula has evolved since this plan was written. Tax income now uses a two-component formula: `buildingTax` (from `def.taxValue * taxRate`) + `landTax` (from `population * avgLandValue / 40 * taxRate`). The "Current Code" section below shows the old single-formula version. The loan system currently uses a single `Loan` interface, not bonds.
+
 ## Overview
 
 Five interconnected features that transform Bitborough's budget from a flat population-times-average formula into a spatially-aware fiscal simulation. Together they reward intentional city design: dense mixed-use districts generate visible tax surpluses, sprawling residential zones drain the treasury, bonds unlock capital investment, clustering pays off, and impact fees make growth partially self-funding.
