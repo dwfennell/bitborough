@@ -26,16 +26,26 @@ criteria:
     threshold: 7
     enabled: true
   aesthetics:
-    threshold: 7
+    threshold: 8
     enabled: true
     guidance: |
-      Warm, impressionist, inviting. Think Miyazaki backgrounds meets SimCity.
-      Tiles should feel alive — someone lives here, works here, walks their dog here.
-      Every building needs at least 5 charm elements (bikes, flower boxes, pets, furniture).
-      Penalize: sparse/empty yards, sterile geometry, flat lifeless fills, missing details,
-      tiles that feel like technical drawings rather than charming scenes.
+      Every element must have a reason to exist. Ask "why is this here?" — if no answer, cut it.
+      3-4 deliberate story elements that work together beat 10 random scattered props.
+
+      Score harshly on:
+      - COMPOSITION: Building must NOT be dead-center. Asymmetric layout with distinct zones
+        (front yard, driveway, garden). Negative space is good — not every pixel needs filling.
+      - INTENTIONALITY: Each prop should tell you something about who lives/works here.
+        A vegetable garden + wheelbarrow = story. Random flowers + random bike + random bench = noise.
+      - VISIBILITY: Every element must be visible at 128px. Minimum opacity 0.3 for
+        intentional elements. No invisible grass patches filling empty space.
+      - RESTRAINT: Fences are optional and partial (never a full perimeter). Grass texture
+        patches should be few (4-6 max), not wallpaper. Leave breathing room.
+
+      Penalize: scattered random props, centered layouts, perimeter fences, invisible
+      low-opacity filler, elements without spatial logic, quantity over quality.
   prompt_fidelity:
-    threshold: 7
+    threshold: 8
     enabled: true
 
 palette:

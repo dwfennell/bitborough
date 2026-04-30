@@ -1,6 +1,6 @@
-# Bitborough Tile Style Guide — v2
+# Bitborough Tile Style Guide — v3
 
-Read this file before authoring any SVG tile. Follow these rules for visual consistency. The goal is tiles that are **pleasant to look at** — charming, detailed, and alive. Every tile should feel like a tiny world worth zooming into.
+Read this file before authoring any SVG tile. Follow these rules for visual consistency.
 
 ## Canvas
 
@@ -12,11 +12,15 @@ Read this file before authoring any SVG tile. Follow these rules for visual cons
 
 ## Design Philosophy
 
-**Warm, impressionist, inviting.** Tiles should evoke the charm of a beloved small town seen from above. Think Miyazaki backgrounds meets SimCity — organic shapes, soft colors, lived-in details. Every building should look like someone lives or works there.
+**Deliberate, not dense.** Every element in the tile should exist for a reason. A wheelbarrow next to a garden bed tells a story. A random scattering of flower circles is noise. Ask "why is this here?" for every element — if there's no answer, remove it.
 
-**Detail density matters.** The difference between a lackluster tile and a charming one is the small touches: a bicycle leaning against a fence, flower boxes under windows, a cat on a rooftop, smoke curling from a chimney. Aim for **150-200 SVG elements per building tile** (current tiles average 60-90 and feel sparse).
+**Quality of detail over quantity.** A well-drawn bicycle with wheels, frame, and handlebars is worth more than ten scattered circles. Fewer elements, each with enough detail to be recognizable at 128px, beats many tiny indistinct blobs.
 
-**Organic over geometric.** Use rounded corners, overlapping shapes, and slight irregularity. Perfectly aligned grid-like layouts feel sterile. Offset elements slightly, vary sizes, let shapes overlap naturally.
+**Composition matters.** Don't center the building. Offset it to create interesting negative space — a garden on one side, a driveway on the other. Let the layout suggest how the space is used. Asymmetry feels natural; symmetry feels like a diagram.
+
+**Warm and lived-in.** Tiles should feel like someone is home. Smoke from the chimney, a car in the driveway, a garden that's been tended. But achieve this through a few well-chosen details, not by filling every empty pixel.
+
+**Minimum visible opacity: 0.3.** If an element renders invisibly at 128px, it's wasted. Every element you draw should be visible. The only exception is building shadows (0.08-0.1) and very subtle ground shadows under trees (0.06-0.08).
 
 ## Color Palette
 
@@ -145,12 +149,8 @@ Use ONLY these colors. Do not invent new hex values.
 | Bicycle            | 1.8x0.6m    | 7x2.5px     | Leaning or parked               |
 | Door               | 1x2m        | 4x8px       | Visible on wall face below roof |
 | Window             | 1.2x1.2m    | 5x5px       | Small square from above         |
-| Window box         | 1.2x0.4m    | 5x1.5px     | Below each window               |
 | Chimney            | 1x1m        | 4x4px       | On rooftop                      |
-| Fence post         | 0.1x0.1m    | 1x1px       | At regular intervals            |
-| Fence rail         | varies      | 1px stroke  | Between posts                   |
 | Flower/plant       | 0.3-0.5m    | 1.5-2px     | Yard accent                     |
-| Streetlight        | 0.3m pole   | 1.5px wide  | 8-10px tall with 2px head       |
 
 ### Scale Integrity Rules
 
@@ -158,132 +158,92 @@ Use ONLY these colors. Do not invent new hex values.
 - **Details must be proportional.** A window is 5px, a door is 4x8px. Don't make them larger.
 - **When in doubt, measure against the scale table.**
 
-## Architectural Detail Standards
+## Architectural Detail
 
-### Windows (5x5px) — REQUIRED DETAIL
-Every window should have:
+### Windows (5x5px)
 1. Glass fill: `window-glass` at 0.8 opacity
 2. Frame: `window-frame` stroke at 0.6px
 3. Mullion cross: vertical + horizontal lines at 0.4px, 0.6 opacity
-4. **Window box** (on at least half the windows): 5x1.5px rect below window, `bush-dark` at 0.5 opacity, with 2-3 tiny flower circles (1px radius) in pink/yellow
 
-### Doors (4x8px) — REQUIRED DETAIL
-Every door should have:
+### Doors (4x8px)
 1. Base fill: `door` color
-2. Panel lines: 2 horizontal lines at 0.3px, 0.2 opacity (suggests 3-panel door)
-3. Knob: 0.6px circle in `door-knob`
-4. **Threshold shadow**: 4x1px rect below door, `shadow` at 0.08 opacity
-5. **Step/welcome mat**: 5x2px rect below threshold, `path` at 0.3 opacity
+2. Knob: 0.6px circle in `door-knob`
+3. Step/threshold: small rect below door, `path` at 0.35 opacity
 
-### Roofs — REQUIRED DETAIL
-Every roof should have:
-1. Main fill with color appropriate to building type
+### Roofs
+1. Main fill appropriate to building type
 2. Ridge line: 2px stroke at 0.5 opacity
-3. Shingle texture: 4-5 horizontal lines at 0.5px, 0.2 opacity
-4. **Gutter line**: thin stroke (0.5px) along the bottom edge of roof, slightly darker than roof
-5. **Roof variation**: at least one detail beyond flat color — a vent (2x2px circle), a skylight (3x4px lighter rect), or a second ridge angle
+3. Shingle texture: 3-4 horizontal lines at 0.5px, 0.25 opacity
+4. At least one distinguishing detail — a vent, skylight, or second ridge angle
 
-### Chimneys — REQUIRED DETAIL
-1. Body: 4x4px rect
-2. Cap: 6x2px rect (1px overhang each side)
-3. **Smoke**: always include 1-2 curving bezier wisps, `smoke` color at 0.25-0.35 opacity
-4. Smoke should curl and drift — use Q (quadratic) curves with gentle S-shape
+### Chimneys
+1. Body: 4x4px rect with cap (6x2px)
+2. Smoke: 1-2 curving bezier wisps, `smoke` at 0.3 opacity
 
-## Charm Elements
+## Telling a Story
 
-These are what make tiles feel alive. **Every building tile MUST include at least 5 charm elements** from this list (in addition to the architectural detail above):
+Instead of scattering random props, think about who lives or works in this building and what evidence they'd leave visible from above. Pick 3-4 story elements that work together:
 
-### Yard & Garden
-- **Flower clusters**: groups of 3-5 tiny circles (1-2px), mix pink/yellow/rose colors, scattered naturally
-- **Bushes**: pairs of overlapping ellipses (dark behind, light in front), at least 2-3 per building
-- **Trees**: 3-4 overlapping circles of varying size and opacity, with shadow underneath. **Vary tree shapes** — not all identical
-- **Garden path**: curved or winding path from door to edge, `path` color at 0.4 opacity
-- **Garden bed**: oval area near building with denser flower clusters
-- **Potted plants**: small circle on porch/entrance area
+**Examples of good storytelling:**
+- A cottage with a *vegetable garden* (neat rows of green rectangles), a *wheelbarrow* beside it, and a *garden hose* coiled near the faucet
+- A family home with a *swing set* in the backyard, a *parked minivan*, and *chalk drawings* (faint colored circles) on the driveway
+- A retired person's house with a *bird feeder* (pole + small platform), *well-tended flower beds* along the foundation, and a *rocking chair* on the porch
+- A fire station with a *truck in the bay*, a *hose tower* with ladder detail, and a *training yard* with obstacles
 
-### Props & Furniture
-- **Bicycle**: two small circles (wheels, 1.5px radius) connected by frame lines, leaning against building or fence
-- **Clothesline**: two thin posts (1px wide) with 2-3 curved lines between them (fabric shapes)
-- **Outdoor chair/bench**: small rect (4x3px) with back line, in yard or patio area
-- **Grill/BBQ**: small dark circle (2px) with smoke wisp, in backyard
-- **Stepping stones**: 3-4 small circles (2-3px) in a path through grass
-- **Bird bath**: small circle (3px) with lighter inner circle, in garden
+**Examples of bad storytelling:**
+- Random flower circles scattered everywhere with no grouping or purpose
+- A bike, bench, bird bath, grill, clothesline, and potted plant all crammed into one yard — no one's yard has all of these
+- Fence posts running the entire perimeter like a picture frame
+- Grass blade triangles filling every empty space
 
-### Building Accessories
-- **Fence sections**: thin posts (1px) at regular intervals along lot edge, connected by horizontal rail strokes
-- **Mailbox**: small rect (1.5x3px) near lot entrance with `mailbox` color
-- **Streetlight**: narrow pole (1.5px wide, 10px tall) with circular head (2px), placed at lot corner
-- **Satellite dish**: tiny circle (2px) on roof edge, gray
-- **AC unit** (commercial): circle with cross stroke on roof
+## Composition
 
-### Life & Movement
-- **Parked cars**: include at least 1 car for residential, 2-3 for commercial. Cars should have windshield detail (lighter rect) and vary in color
-- **Smoke/steam**: from chimneys, industrial stacks, or kitchen vents. Use curving bezier paths
-- **Pets**: optional — a small oval (3x2px) on a porch or yard suggests a resting cat or dog
-- **Puddle**: small blue-tinted ellipse (4x2px) in a driveway or path after rain (water-base-1 at 0.2 opacity)
+- **Offset the building.** Place it upper-left, upper-right, or centered-back — not dead center. Leave room for the yard to breathe on at least one side.
+- **Create zones.** A front yard, a driveway, a backyard garden — each area should feel distinct, not uniform.
+- **Use negative space.** Empty grass is fine. Not every square pixel needs an element. A few well-placed details surrounded by breathing room read better than wall-to-wall stuff.
+- **Fences are optional and subtle.** If used, only along one or two sides. Thin strokes, moderate opacity. Never a full rectangle around the lot.
+- **Ground shadows anchor objects.** Every tree needs a shadow. The building shadow is required. These ground the scene.
 
 ## Layer Order (back to front)
 
 1. Base fill (full tile rect with gradient or flat color)
-2. Texture patches (ellipses for grass variation, depth patches for water)
-3. Surface details (ripples, grain dots, blade clusters)
+2. Texture patches (grass variation — keep these subtle, 4-6 patches max)
+3. Surface details (grass blade clusters — 2-3 max, not filling every corner)
 4. Infrastructure (road surface, curbs)
 5. Markings (lane dashes, stop lines)
 6. Small infrastructure details (manhole)
-7. **Fence/boundary elements**
+7. Fence sections (if any — partial, not perimeter)
 8. Building shadow
 9. Lot ground
-10. Paths/walkways/stepping stones
+10. Paths/walkways
 11. Walls
 12. Roof
-13. Roof details (ridge, shingles, vents, skylights, gutter)
+13. Roof details (ridge, shingles, vent/skylight)
 14. Chimney
-15. Exposed wall elements (windows with boxes, doors with thresholds)
-16. **Props & furniture** (bikes, chairs, grills, bird baths)
-17. Yard details (bushes, flowers, mailbox, streetlight)
-18. **Pets/life details**
-19. Atmospheric (smoke wisps, steam)
-
-## Texture Density
-
-- Grass patches per tile: **10-14** light ellipses + **4-5** dark ellipses
-- Grass blade clusters: **4-6** clusters of **2-3** blades each
-- Flowers per building tile: **8-15** tiny circles in **3-5** clusters
-- Flowers per grass tile: **5-8** tiny circles
-- Roof shingle lines: **4-5** horizontal lines, evenly spaced
-- Road grain dots: **12-16** per tile
-- Water ripple lines: **5** primary + **5** secondary
-- Window boxes: on **at least half** of all windows
-- Charm props per building: **minimum 5** distinct elements
+15. Exposed wall elements (windows, doors)
+16. Story props (the 3-4 deliberate elements that tell who lives here)
+17. Vegetation (bushes, trees with shadows, intentional flower groupings)
+18. Atmospheric (smoke wisps)
 
 ## SVG Conventions
 
 - Always `xmlns="http://www.w3.org/2000/svg"`
-- Gradients go in `<defs>` — use sparingly (terrain base, road asphalt, water only)
-- Gradient IDs must be unique per file (prefix with tile type: `grassBase`, `waterBase`)
-- No external references or `<use>` across files
-- Each SVG is fully self-contained
-- All strokes use `stroke-linecap="round"` unless rectangular (curbs, stop lines)
-- No pure black fills — use `shadow` color at low opacity only for shadows
-- Comment each visual layer group for readability
-- Use `<g>` groups with comments to organize layers: `<!-- Yard details -->`, `<!-- Charm props -->`
+- Gradients in `<defs>`, used sparingly (terrain base, road asphalt, water)
+- Gradient IDs unique per file (prefix with tile type)
+- No external references, no `<use>` across files, fully self-contained
+- All strokes use `stroke-linecap="round"` unless rectangular
+- No pure black fills — shadows use `#000000` at low opacity only
+- Comment each layer group for readability
 
 ## Seamless Tiling Rules
 
-- Terrain tiles: elements touching edges must tile seamlessly with copies of themselves
-- Avoid placing prominent features (flowers, blade clusters) within 4px of edges
-- Building tiles: buildings should not touch tile edges — lot margin ensures this
-- Fence elements at lot boundary should align to consistent positions near edges
+- Terrain tiles: elements touching edges must tile seamlessly
+- Avoid prominent features within 4px of edges
+- Building tiles: buildings don't touch edges — lot margin handles this
 
 ## Connection Tile Naming
 
 Road files: `road-NESW.svg` where each letter is `0` or `1`.
-- N = connection exits north edge
-- E = connection exits east edge
-- S = connection exits south edge
-- W = connection exits west edge
-
-Examples:
 - `road-1010.svg` = straight north-south
 - `road-0110.svg` = east-south curve
 - `road-1111.svg` = 4-way intersection

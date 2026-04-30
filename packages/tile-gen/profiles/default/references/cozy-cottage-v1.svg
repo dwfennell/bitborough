@@ -1,0 +1,243 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <!-- Transparent background - terrain renders underneath -->
+
+  <!-- Layer 2: Texture patches (grass variation) -->
+  <ellipse cx="22" cy="20" rx="14" ry="8" fill="#95d07a" opacity="0.4"/>
+  <ellipse cx="100" cy="16" rx="12" ry="7" fill="#82c466" opacity="0.35"/>
+  <ellipse cx="18" cy="100" rx="16" ry="9" fill="#95d07a" opacity="0.38"/>
+  <ellipse cx="105" cy="105" rx="14" ry="8" fill="#82c466" opacity="0.32"/>
+  <ellipse cx="70" cy="108" rx="10" ry="6" fill="#9ad680" opacity="0.3"/>
+  <ellipse cx="28" cy="60" rx="8" ry="5" fill="#a0da88" opacity="0.28"/>
+  <ellipse cx="108" cy="55" rx="10" ry="7" fill="#95d07a" opacity="0.3"/>
+  <ellipse cx="55" cy="14" rx="9" ry="5" fill="#9ad680" opacity="0.32"/>
+  <ellipse cx="90" cy="80" rx="8" ry="5" fill="#a0da88" opacity="0.25"/>
+  <ellipse cx="15" cy="42" rx="7" ry="5" fill="#82c466" opacity="0.3"/>
+  <!-- Darker patches for depth -->
+  <ellipse cx="30" cy="90" rx="8" ry="5" fill="#6aaa50" opacity="0.25"/>
+  <ellipse cx="95" cy="40" rx="7" ry="4" fill="#6aaa50" opacity="0.2"/>
+  <ellipse cx="50" cy="110" rx="9" ry="5" fill="#6aaa50" opacity="0.22"/>
+  <ellipse cx="112" cy="85" rx="6" ry="4" fill="#6aaa50" opacity="0.25"/>
+
+  <!-- Layer 3: Surface details (grass blade clusters) -->
+  <g fill="#6aaa50" opacity="0.45">
+    <path d="M16 28 L17.5 22 L19 28Z"/>
+    <path d="M18 28.5 L20 21 L21.5 28.5Z"/>
+    <path d="M14 28.5 L16 23 L18 28.5Z"/>
+  </g>
+  <g fill="#78b868" opacity="0.4">
+    <path d="M105 94 L106.5 88 L108 94Z"/>
+    <path d="M107 94.5 L109 87 L110.5 94.5Z"/>
+  </g>
+  <g fill="#6aaa50" opacity="0.42">
+    <path d="M20 112 L21.5 106 L23 112Z"/>
+    <path d="M22 112.5 L24 105 L25.5 112.5Z"/>
+  </g>
+  <g fill="#78b868" opacity="0.38">
+    <path d="M96 18 L97.5 12 L99 18Z"/>
+    <path d="M98 18.5 L100 11 L101.5 18.5Z"/>
+  </g>
+  <g fill="#6aaa50" opacity="0.4">
+    <path d="M68 100 L69.5 94 L71 100Z"/>
+    <path d="M70 100.5 L72 93 L73.5 100.5Z"/>
+    <path d="M66 100.5 L68 95 L70 100.5Z"/>
+  </g>
+
+  <!-- Layer 7: Fence/boundary elements -->
+  <g stroke="#b09878" stroke-width="0.8" stroke-linecap="round">
+    <line x1="10" y1="18" x2="10" y2="118"/>
+    <line x1="10" y1="118" x2="118" y2="118"/>
+    <line x1="118" y1="18" x2="118" y2="118"/>
+    <line x1="10" y1="18" x2="118" y2="18"/>
+  </g>
+  <g fill="#b09878">
+    <rect x="9" y="17" width="2" height="3" rx="0.3"/>
+    <rect x="9" y="40" width="2" height="3" rx="0.3"/>
+    <rect x="9" y="63" width="2" height="3" rx="0.3"/>
+    <rect x="9" y="86" width="2" height="3" rx="0.3"/>
+    <rect x="9" y="110" width="2" height="3" rx="0.3"/>
+    <rect x="117" y="17" width="2" height="3" rx="0.3"/>
+    <rect x="117" y="40" width="2" height="3" rx="0.3"/>
+    <rect x="117" y="63" width="2" height="3" rx="0.3"/>
+    <rect x="117" y="86" width="2" height="3" rx="0.3"/>
+    <rect x="117" y="110" width="2" height="3" rx="0.3"/>
+    <rect x="30" y="117" width="3" height="2" rx="0.3"/>
+    <rect x="55" y="117" width="3" height="2" rx="0.3"/>
+    <rect x="80" y="117" width="3" height="2" rx="0.3"/>
+    <rect x="105" y="117" width="3" height="2" rx="0.3"/>
+    <rect x="30" y="17" width="3" height="2" rx="0.3"/>
+    <rect x="55" y="17" width="3" height="2" rx="0.3"/>
+    <rect x="80" y="17" width="3" height="2" rx="0.3"/>
+    <rect x="105" y="17" width="3" height="2" rx="0.3"/>
+  </g>
+  <g stroke="#c8b898" stroke-width="0.4" stroke-linecap="round" opacity="0.5">
+    <line x1="10" y1="20" x2="10" y2="116"/>
+    <line x1="12" y1="118" x2="116" y2="118"/>
+    <line x1="118" y1="20" x2="118" y2="116"/>
+    <line x1="12" y1="18" x2="116" y2="18"/>
+  </g>
+
+  <!-- Layer 8: Building shadow -->
+  <rect x="41" y="33" width="44" height="36" rx="2" fill="#000000" opacity="0.1"/>
+
+  <!-- Layer 9: Lot ground -->
+  <rect x="12" y="20" width="104" height="96" rx="3" fill="#a0d48a" opacity="0.45"/>
+
+  <!-- Layer 10: Paths/walkways/stepping stones -->
+  <path d="M58 70 Q56 82 54 92 Q52 102 56 116" fill="none" stroke="#c8b898" stroke-width="6" stroke-linecap="round" opacity="0.4"/>
+  <ellipse cx="57" cy="76" rx="2.5" ry="2" fill="#c8b898" opacity="0.5"/>
+  <ellipse cx="55" cy="85" rx="2.5" ry="2" fill="#c8b898" opacity="0.45"/>
+  <ellipse cx="54" cy="95" rx="2.5" ry="2" fill="#c8b898" opacity="0.42"/>
+  <ellipse cx="55" cy="105" rx="2.5" ry="2" fill="#c8b898" opacity="0.4"/>
+  <!-- Garden bed area -->
+  <ellipse cx="26" cy="80" rx="13" ry="9" fill="#6aaa50" opacity="0.18"/>
+  <!-- Stepping stones through garden -->
+  <circle cx="20" cy="72" r="2" fill="#c8b898" opacity="0.35"/>
+  <circle cx="24" cy="75" r="1.8" fill="#c8b898" opacity="0.3"/>
+  <circle cx="22" cy="85" r="2" fill="#c8b898" opacity="0.32"/>
+
+  <!-- Layer 11: Walls -->
+  <rect x="38" y="30" width="44" height="36" rx="2" fill="#e8c8b0"/>
+  <rect x="38" y="30" width="44" height="36" rx="2" fill="#e0b89a" opacity="0.3"/>
+
+  <!-- Layer 12: Roof -->
+  <rect x="35" y="27" width="50" height="30" rx="2" fill="#d08870"/>
+
+  <!-- Layer 13: Roof details -->
+  <line x1="37" y1="42" x2="83" y2="42" stroke="#c07060" stroke-width="2" opacity="0.5"/>
+  <g stroke="#c07860" stroke-width="0.5" opacity="0.2">
+    <line x1="37" y1="32" x2="83" y2="32"/>
+    <line x1="37" y1="36" x2="83" y2="36"/>
+    <line x1="37" y1="47" x2="83" y2="47"/>
+    <line x1="37" y1="51" x2="83" y2="51"/>
+  </g>
+  <line x1="35" y1="57" x2="85" y2="57" stroke="#c07060" stroke-width="0.5" opacity="0.35"/>
+  <!-- Skylight -->
+  <rect x="44" y="34" width="4" height="5" rx="0.5" fill="#a8d0e8" opacity="0.3"/>
+  <rect x="44" y="34" width="4" height="5" rx="0.5" fill="none" stroke="#c07060" stroke-width="0.4" opacity="0.4"/>
+  <!-- Roof vent -->
+  <circle cx="72" cy="38" r="1.5" fill="#a08070" opacity="0.5"/>
+  <circle cx="72" cy="38" r="0.8" fill="#8a7060" opacity="0.4"/>
+
+  <!-- Layer 14: Chimney -->
+  <rect x="76" y="29" width="4" height="4" rx="0.5" fill="#a08070"/>
+  <rect x="75" y="28" width="6" height="2" rx="0.5" fill="#8a7060"/>
+
+  <!-- Layer 15: Exposed wall elements -->
+  <!-- Window 1 (5x5px) -->
+  <g>
+    <rect x="42" y="60" width="5" height="5" rx="0.5" fill="#a8d0e8" opacity="0.8"/>
+    <rect x="42" y="60" width="5" height="5" rx="0.5" fill="none" stroke="#987868" stroke-width="0.6"/>
+    <line x1="44.5" y1="60" x2="44.5" y2="65" stroke="#987868" stroke-width="0.4" opacity="0.6"/>
+    <line x1="42" y1="62.5" x2="47" y2="62.5" stroke="#987868" stroke-width="0.4" opacity="0.6"/>
+    <!-- Window box with flowers -->
+    <rect x="42" y="65.5" width="5" height="1.5" rx="0.3" fill="#78b868" opacity="0.5"/>
+    <circle cx="43.2" cy="65.8" r="0.8" fill="#e8c8d0" opacity="0.7"/>
+    <circle cx="44.5" cy="65.6" r="0.7" fill="#e8d8a0" opacity="0.7"/>
+    <circle cx="45.8" cy="65.8" r="0.8" fill="#e8a8b8" opacity="0.65"/>
+  </g>
+  <!-- Window 2 (5x5px) -->
+  <g>
+    <rect x="69" y="60" width="5" height="5" rx="0.5" fill="#a8d0e8" opacity="0.8"/>
+    <rect x="69" y="60" width="5" height="5" rx="0.5" fill="none" stroke="#987868" stroke-width="0.6"/>
+    <line x1="71.5" y1="60" x2="71.5" y2="65" stroke="#987868" stroke-width="0.4" opacity="0.6"/>
+    <line x1="69" y1="62.5" x2="74" y2="62.5" stroke="#987868" stroke-width="0.4" opacity="0.6"/>
+    <!-- Window box with flowers -->
+    <rect x="69" y="65.5" width="5" height="1.5" rx="0.3" fill="#78b868" opacity="0.5"/>
+    <circle cx="70.2" cy="65.8" r="0.8" fill="#e8a8b8" opacity="0.7"/>
+    <circle cx="71.5" cy="65.6" r="0.7" fill="#e8c8d0" opacity="0.65"/>
+    <circle cx="72.8" cy="65.8" r="0.8" fill="#e8d8a0" opacity="0.7"/>
+  </g>
+  <!-- Door (4x8px) -->
+  <rect x="56" y="58" width="4" height="8" rx="0.5" fill="#8a6848"/>
+  <line x1="56.5" y1="60.5" x2="59.5" y2="60.5" stroke="#8a6848" stroke-width="0.3" opacity="0.4"/>
+  <line x1="56.5" y1="63" x2="59.5" y2="63" stroke="#8a6848" stroke-width="0.3" opacity="0.4"/>
+  <circle cx="59.2" cy="62.5" r="0.6" fill="#c0a080"/>
+  <!-- Threshold shadow -->
+  <rect x="56" y="66" width="4" height="1" fill="#000000" opacity="0.08"/>
+  <!-- Welcome mat -->
+  <rect x="55" y="67" width="6" height="2.5" rx="0.5" fill="#c8b898" opacity="0.35"/>
+
+  <!-- Layer 16: Props & furniture -->
+  <!-- Parked car (18x8px) on right side -->
+  <rect x="92" y="92" width="18" height="8" rx="2" fill="#90b8d8" opacity="0.5"/>
+  <rect x="94" y="93" width="5" height="6" rx="1" fill="#a8d0e8" opacity="0.35"/>
+  <rect x="104" y="93" width="4" height="6" rx="1" fill="#a8d0e8" opacity="0.35"/>
+  <!-- Bicycle leaning against fence -->
+  <g opacity="0.6">
+    <circle cx="112" cy="70" r="1.8" fill="none" stroke="#b8b8a8" stroke-width="0.6"/>
+    <circle cx="117" cy="70" r="1.8" fill="none" stroke="#b8b8a8" stroke-width="0.6"/>
+    <line x1="112" y1="70" x2="114.5" y2="68" stroke="#b8b8a8" stroke-width="0.5"/>
+    <line x1="114.5" y1="68" x2="117" y2="70" stroke="#b8b8a8" stroke-width="0.5"/>
+    <line x1="114.5" y1="68" x2="114.5" y2="70.5" stroke="#b8b8a8" stroke-width="0.5"/>
+  </g>
+  <!-- Outdoor bench in garden -->
+  <rect x="20" y="70" width="5" height="3" rx="0.5" fill="#b09878" opacity="0.5"/>
+  <line x1="20" y1="70" x2="25" y2="70" stroke="#b09878" stroke-width="0.8" opacity="0.6"/>
+  <!-- Bird bath -->
+  <circle cx="25" cy="88" r="3" fill="#b8b8a8" opacity="0.35"/>
+  <circle cx="25" cy="88" r="2" fill="#a8d0e8" opacity="0.25"/>
+  <!-- Clothesline in backyard -->
+  <g opacity="0.5">
+    <line x1="42" y1="22" x2="42" y2="26" stroke="#b8b8a8" stroke-width="0.8"/>
+    <line x1="62" y1="22" x2="62" y2="26" stroke="#b8b8a8" stroke-width="0.8"/>
+    <path d="M42 23 Q48 24.5 52 23.5 Q56 22.5 62 23" fill="none" stroke="#b8b8a8" stroke-width="0.4"/>
+    <rect x="46" y="23" width="2" height="2.5" rx="0.3" fill="#d8a888" opacity="0.6"/>
+    <rect x="51" y="23.2" width="2.5" height="2" rx="0.3" fill="#a8d0e8" opacity="0.5"/>
+    <rect x="56" y="23" width="2" height="2.5" rx="0.3" fill="#e8c8d0" opacity="0.5"/>
+  </g>
+  <!-- Potted plant near door -->
+  <rect x="61" y="66" width="2" height="2" rx="0.3" fill="#c07060" opacity="0.5"/>
+  <circle cx="62" cy="65.5" r="1.5" fill="#78b868" opacity="0.6"/>
+  <circle cx="62.5" cy="65" r="1" fill="#90c880" opacity="0.5"/>
+
+  <!-- Layer 17: Yard details -->
+  <!-- Bushes flanking the house -->
+  <ellipse cx="33" cy="60" rx="4" ry="3" fill="#78b868" opacity="0.7"/>
+  <ellipse cx="31.5" cy="58.5" rx="3" ry="2.2" fill="#90c880" opacity="0.6"/>
+  <ellipse cx="88" cy="58" rx="3.5" ry="2.8" fill="#78b868" opacity="0.7"/>
+  <ellipse cx="86.5" cy="56.5" rx="2.8" ry="2" fill="#88c070" opacity="0.6"/>
+  <!-- Bush near garden path -->
+  <ellipse cx="48" cy="72" rx="3" ry="2.5" fill="#78b868" opacity="0.6"/>
+  <ellipse cx="46.5" cy="71" rx="2.2" ry="1.8" fill="#90c880" opacity="0.55"/>
+  <!-- Additional bush near fence -->
+  <ellipse cx="14" cy="92" rx="3" ry="2.5" fill="#78b868" opacity="0.6"/>
+  <ellipse cx="13" cy="91" rx="2" ry="1.5" fill="#90c880" opacity="0.5"/>
+  <!-- Yard tree (right side) -->
+  <circle cx="104" cy="38" r="11" fill="#78b868" opacity="0.6"/>
+  <circle cx="102" cy="36" r="8" fill="#90c880" opacity="0.5"/>
+  <circle cx="106" cy="40" r="6" fill="#60a850" opacity="0.3"/>
+  <ellipse cx="108" cy="48" rx="8" ry="3" fill="#000000" opacity="0.06"/>
+  <!-- Small tree (left side) -->
+  <circle cx="18" cy="50" r="7" fill="#78b868" opacity="0.55"/>
+  <circle cx="16.5" cy="48" r="5" fill="#90c880" opacity="0.5"/>
+  <circle cx="19" cy="51" r="4" fill="#60a850" opacity="0.25"/>
+  <!-- Garden bed flowers -->
+  <circle cx="18" cy="78" r="1.5" fill="#e8c8d0" opacity="0.7"/>
+  <circle cx="20" cy="76" r="1.2" fill="#d8a8b8" opacity="0.6"/>
+  <circle cx="22" cy="79" r="1.3" fill="#e8a8b8" opacity="0.65"/>
+  <circle cx="26" cy="77" r="1.5" fill="#e8d8a0" opacity="0.7"/>
+  <circle cx="28" cy="80" r="1.2" fill="#e8c8d0" opacity="0.6"/>
+  <circle cx="24" cy="82" r="1.4" fill="#d8b8c0" opacity="0.6"/>
+  <circle cx="19" cy="83" r="1.2" fill="#e8a8b8" opacity="0.55"/>
+  <circle cx="30" cy="78" r="1" fill="#e8d8a0" opacity="0.6"/>
+  <!-- Scattered flowers in right yard -->
+  <circle cx="96" cy="68" r="1.2" fill="#e8c8d0" opacity="0.6"/>
+  <circle cx="98" cy="70" r="1" fill="#e8d8a0" opacity="0.65"/>
+  <circle cx="100" cy="100" r="1.3" fill="#e8a8b8" opacity="0.6"/>
+  <circle cx="102" cy="102" r="1" fill="#e8c8d0" opacity="0.55"/>
+  <circle cx="88" cy="100" r="1.2" fill="#e8d8a0" opacity="0.6"/>
+  <!-- Flowers near door -->
+  <circle cx="52" cy="69" r="1" fill="#e8c8d0" opacity="0.6"/>
+  <circle cx="63" cy="69" r="1" fill="#e8a8b8" opacity="0.6"/>
+  <!-- Mailbox -->
+  <rect x="50" y="108" width="1.5" height="3" rx="0.2" fill="#6088c0"/>
+  <rect x="49.5" y="107" width="2.5" height="1.5" rx="0.3" fill="#5078b0"/>
+
+  <!-- Layer 18: Pets/life details -->
+  <ellipse cx="53" cy="67.5" rx="1.8" ry="1.2" fill="#d8a888" opacity="0.45"/>
+  <ellipse cx="53" cy="67" rx="1" ry="0.8" fill="#d8a888" opacity="0.5"/>
+
+  <!-- Layer 19: Atmospheric -->
+  <path d="M78 27 Q80 22 77 17 Q75 12 78 8" fill="none" stroke="#d0d0d0" stroke-width="1.5" stroke-linecap="round" opacity="0.3"/>
+  <path d="M79 26 Q82 20 80 14" fill="none" stroke="#d0d0d0" stroke-width="1" stroke-linecap="round" opacity="0.2"/>
+</svg>
